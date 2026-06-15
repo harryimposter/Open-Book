@@ -18,6 +18,7 @@
       </div>
       <div class="masthead-meta">
         <a class="back-link" id="backLink" href="index.html">‹ Back to Advisor Book</a>
+        <a class="back-link" id="onepagerLink" href="#" style="margin-left:18px;color:var(--bronze-deep)">Client one-pager ›</a>
       </div>
     </div>
   </header>
@@ -35,6 +36,7 @@
     const id = params.get("client") || (SEED.clients[0] && SEED.clients[0].id);
     const c = SEED.clients.find(x => x.id === id);
     document.getElementById("backLink").href = "index.html?tab=book&client=" + encodeURIComponent(id);
+    document.getElementById("onepagerLink").href = "onepager.html?client=" + encodeURIComponent(id);
 
     if (!c) { document.getElementById("report").innerHTML = "<p>Client not found.</p>"; return; }
 
@@ -121,6 +123,7 @@
           <div class="agenda" style="margin:0">
             <span class="eyebrow">Objective</span>
             <p>${esc(c.goals.objective)}. Horizon: ${esc(c.goals.horizon)}.</p>
+            <div style="background:#fff;color:var(--ink);border-radius:var(--radius);padding:14px 16px;margin-top:14px">${BPCharts.fundingBar(c.goals.funding)}</div>
           </div>
           <div class="panel">
             <div class="panel-head"><h3>Strategic target allocation</h3></div>

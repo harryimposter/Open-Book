@@ -73,16 +73,25 @@
       <p>Your full book as line items. Choose a client to see their portfolio, the desk's agenda for the book, and the ideas that apply to them — with the reasoning behind each.</p>
     </div>
 
-    <div class="book-controls">
-      <div class="select-wrap">
-        <label class="eyebrow">Client</label>
-        <select class="client-select" id="clientSelect"></select>
-      </div>
-      <div class="book-stats" id="bookStats"></div>
+    <div class="book-viewtoggle">
+      <button class="seg active" data-bookview="list">Client list</button>
+      <button class="seg" data-bookview="coverage">Coverage grid</button>
     </div>
 
-    <div class="book-table" id="bookTable"></div>
-    <div class="client-detail" id="clientDetail" hidden></div>
+    <div id="bookListWrap">
+      <div class="book-controls">
+        <div class="select-wrap">
+          <label class="eyebrow">Client</label>
+          <select class="client-select" id="clientSelect"></select>
+        </div>
+        <div class="book-stats" id="bookStats"></div>
+      </div>
+
+      <div class="book-table" id="bookTable"></div>
+      <div class="client-detail" id="clientDetail" hidden></div>
+    </div>
+
+    <div id="coverageWrap" hidden></div>
   </main>
 
   <!-- ================= PRE-TRADE ANALYSIS ================= -->

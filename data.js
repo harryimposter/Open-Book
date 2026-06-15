@@ -266,7 +266,8 @@ const SEED_CLIENTS = [
     goals: {
       objective: "Aggressive capital growth concentrated in the AI complex",
       horizon: "Long-term · 10+ yrs",
-      target: { Growth: 80, Income: 5, Protection: 10, Liquidity: 5 }
+      target: { Growth: 80, Income: 5, Protection: 10, Liquidity: 5 },
+      funding: { headline: "Grow to $75m by 2034", metricLabel: "Projected value", current: 38, target: 75, unit: "$m", status: "On track" }
     },
     profile: "US tech founder, options-fluent. High single-stock concentration in the AI complex, minimal cash. Comfortable with autocalls, overwrites and leveraged certificates.",
     split: { Equity: 88, "Structured": 6, Cash: 4, "Fixed Income": 2 },
@@ -292,7 +293,8 @@ const SEED_CLIENTS = [
     goals: {
       objective: "Grow the book while drawing income — and protect the concentrated MU gain",
       horizon: "Long-term · 7–10 yrs",
-      target: { Growth: 55, Income: 25, Protection: 12, Liquidity: 8 }
+      target: { Growth: 55, Income: 25, Protection: 12, Liquidity: 8 },
+      funding: { headline: "Grow to €70m by 2035 while drawing income", metricLabel: "Projected value", current: 50.2, target: 70, unit: "€m", status: "On track" }
     },
     profile: "EMEA private-bank client, growth-oriented with income needs. Comfortable with structured products and derivatives overlays. Book is 72% USD against an EUR base.",
     split: { Equity: 71, "Fixed Income": 13.9, Commodity: 6, Cash: 10.1 },
@@ -319,7 +321,8 @@ const SEED_CLIENTS = [
     goals: {
       objective: "Fund retirement income and preserve capital",
       horizon: "Drawdown · 0–5 yrs",
-      target: { Growth: 25, Income: 50, Protection: 15, Liquidity: 10 }
+      target: { Growth: 25, Income: 50, Protection: 15, Liquidity: 10 },
+      funding: { headline: "Fund $0.9m/yr retirement income", metricLabel: "Annual income run-rate", current: 0.72, target: 0.9, unit: "$m/yr", status: "Behind" }
     },
     profile: "US retiree drawing income. Capital preservation first. Dividend equity, regulated utilities, treasuries and munis with a healthy cash buffer. Low appetite for single-stock risk.",
     split: { Equity: 46, "Fixed Income": 38, Real_Assets: 8, Cash: 8 },
@@ -345,7 +348,8 @@ const SEED_CLIENTS = [
     goals: {
       objective: "Compound a real-asset core across cycles",
       horizon: "Multi-generational · 10+ yrs",
-      target: { Growth: 40, Income: 20, Protection: 30, Liquidity: 10 }
+      target: { Growth: 40, Income: 20, Protection: 30, Liquidity: 10 },
+      funding: { headline: "Preserve real value, grow to $90m by 2036", metricLabel: "Projected value", current: 61, target: 90, unit: "$m", status: "On track" }
     },
     profile: "APAC family-office mandate, multi-currency (USD/SGD). Strong tilt to commodities, gold, energy and infrastructure. Comfortable with private markets and structured accumulators.",
     split: { Equity: 40, Commodity: 18, Real_Assets: 16, "Fixed Income": 14, Cash: 6, Private: 6 },
@@ -371,7 +375,8 @@ const SEED_CLIENTS = [
     goals: {
       objective: "Balanced growth with controlled drawdown",
       horizon: "Long-term · 8–10 yrs",
-      target: { Growth: 55, Income: 30, Protection: 8, Liquidity: 7 }
+      target: { Growth: 55, Income: 30, Protection: 8, Liquidity: 7 },
+      funding: { headline: "Grow to $45m by 2033", metricLabel: "Projected value", current: 29, target: 45, unit: "$m", status: "On track" }
     },
     profile: "US corporate executive, balanced mandate. Mega-cap quality plus an index core. Wants AI exposure but is drawdown-sensitive — prefers buffered structures to naked single stocks.",
     split: { Equity: 64, "Fixed Income": 22, Structured: 9, Cash: 5 },
@@ -396,7 +401,8 @@ const SEED_CLIENTS = [
     goals: {
       objective: "Own the AI build-out end to end",
       horizon: "Long-term · 7–10 yrs",
-      target: { Growth: 70, Income: 15, Protection: 8, Liquidity: 7 }
+      target: { Growth: 70, Income: 15, Protection: 8, Liquidity: 7 },
+      funding: { headline: "Grow to $80m by 2032", metricLabel: "Projected value", current: 44, target: 80, unit: "$m", status: "Slightly behind" }
     },
     profile: "US tech operator running a thematic growth book around the AI build-out. Owns the whole supply chain — compute, memory, equipment and the power that feeds it. Comfortable with overwrites and certificates.",
     split: { Equity: 78, Structured: 8, "Real_Assets": 8, Cash: 6 },
@@ -422,7 +428,8 @@ const SEED_CLIENTS = [
     goals: {
       objective: "Durable income from diversified real assets",
       horizon: "Long-term · 5–8 yrs",
-      target: { Growth: 45, Income: 35, Protection: 12, Liquidity: 8 }
+      target: { Growth: 45, Income: 35, Protection: 12, Liquidity: 8 },
+      funding: { headline: "Fund $0.8m/yr income", metricLabel: "Annual income run-rate", current: 0.6, target: 0.8, unit: "$m/yr", status: "Behind" }
     },
     profile: "UK/US business owner, GBP/USD split. Value-and-income style with an energy overweight and real-asset income. Wants to keep the energy carry but diversify its cyclicality.",
     split: { Equity: 58, "Fixed Income": 20, Real_Assets: 13, Cash: 9 },

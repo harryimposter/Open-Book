@@ -439,6 +439,65 @@ button { font-family: inherit; cursor: pointer; }
 .target-list .tl-fill { display: block; height: 100%; border-radius: 3px; }
 .target-list .tl-val { font-family: var(--serif); font-size: 14px; min-width: 64px; text-align: right; color: var(--ink-soft); }
 
+/* ===== Funding goal bar ================================================= */
+.fund { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line); }
+.fund-top { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.fund-head { font-family: var(--serif); font-size: 15px; font-weight: 700; }
+.fund-pill { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 600; padding: 2px 9px; border-radius: 10px; }
+.fund-pill.ok { background: #EAF0EB; color: var(--pos); }
+.fund-pill.warn { background: #F4EFE3; color: var(--warn); }
+.fund-pill.behind { background: #F6ECE7; color: var(--neg); }
+.fund-bar { height: 8px; background: var(--cream-2); border: 1px solid var(--line); border-radius: 5px; overflow: hidden; }
+.fund-bar span { display: block; height: 100%; background: linear-gradient(90deg, var(--bronze), var(--gold)); border-radius: 5px; }
+.fund-meta { font-size: 12px; color: var(--ink-soft); margin-top: 7px; }
+.fund-meta b { color: var(--ink); }
+
+/* ===== Next Best Action ================================================= */
+.nba-banner {
+  display: flex; align-items: center; gap: 16px; cursor: pointer;
+  background: var(--espresso); color: #ECE4D6; border-radius: var(--radius);
+  border-left: 3px solid var(--gold); padding: 16px 20px; margin-bottom: 18px;
+  transition: background .12s;
+}
+.nba-banner:hover { background: var(--espresso-2); }
+.nba-banner-l { flex: 1; }
+.nba-tag { font-size: 9.5px; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 700; color: var(--espresso); background: var(--gold); padding: 2px 8px; border-radius: 8px; }
+.nba-title { font-family: var(--serif); font-size: 17px; margin-left: 10px; color: #F6F0E4; }
+.nba-why { font-size: 12.8px; color: #C9BFAE; margin: 8px 0 0; line-height: 1.5; }
+.nba-cta { flex: 0 0 auto; color: var(--gold); font-size: 12.5px; font-weight: 600; letter-spacing: 0.04em; }
+.rec-idea.is-nba { background: #FBF7EF; margin: 0 -18px; padding: 14px 18px; border-bottom: 1px solid var(--line); }
+.rec-idea .nba-tag { margin-right: 2px; }
+.view-port-btn.ghost { background: none; color: var(--bronze-deep); border: 1px solid var(--line-strong); }
+.view-port-btn.ghost:hover { background: var(--cream-2); color: var(--bronze-deep); }
+.lead-line { font-size: 11.5px; color: var(--bronze-deep); margin-bottom: 5px; }
+.lead-line .lead-k { font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; background: #F3ECDD; border: 1px solid var(--line-strong); padding: 1px 6px; border-radius: 7px; margin-right: 6px; color: var(--bronze-deep); }
+.mini-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+
+/* ===== Book view toggle + coverage grid ================================= */
+.book-viewtoggle { display: inline-flex; border: 1px solid var(--line-strong); border-radius: var(--radius); overflow: hidden; margin-bottom: 20px; }
+.book-viewtoggle .seg { background: var(--paper); border: none; padding: 9px 18px; font-size: 12.5px; letter-spacing: 0.04em; color: var(--ink-soft); border-right: 1px solid var(--line); }
+.book-viewtoggle .seg:last-child { border-right: none; }
+.book-viewtoggle .seg.active { background: var(--espresso); color: #F4EEE3; }
+.cov-legend { display: flex; gap: 18px; flex-wrap: wrap; margin-bottom: 12px; font-size: 12px; color: var(--ink-soft); }
+.cov-legend span { display: inline-flex; align-items: center; gap: 7px; }
+.cov-sw { width: 13px; height: 13px; border-radius: 3px; display: inline-block; border: 1px solid var(--line-strong); }
+.cov-grid { background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.cov-row { display: grid; grid-template-columns: 168px repeat(var(--cols), 1fr); border-bottom: 1px solid var(--line); }
+.cov-row:last-child { border-bottom: none; }
+.cov-row[data-client] { cursor: pointer; }
+.cov-row[data-client]:hover { background: var(--cream); }
+.cov-cell { padding: 12px 6px; text-align: center; font-size: 13px; border-right: 1px solid var(--line); display: flex; align-items: center; justify-content: center; }
+.cov-cell:last-child { border-right: none; }
+.cov-client { justify-content: flex-start; gap: 9px; padding-left: 16px; font-weight: 600; font-size: 13.5px; }
+.cov-client .avatar { width: 26px; height: 26px; font-size: 11px; }
+.cov-head { background: var(--cream-2); }
+.cov-head .cov-th { font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-faint); font-weight: 600; line-height: 1.3; }
+.cov-have { background: var(--bronze); color: #fff; font-weight: 700; font-family: var(--serif); }
+.cov-opp { background: #FBEFCF; color: var(--bronze-deep); font-weight: 700; }
+.cov-none { color: var(--line-strong); }
+.cov-sw.cov-have { background: var(--bronze); } .cov-sw.cov-opp { background: #FBEFCF; } .cov-sw.cov-none { background: var(--paper); }
+.cov-note { font-size: 12px; color: var(--ink-soft); margin-top: 12px; line-height: 1.55; }
+
 /* ===== Charts / donuts =================================================== */
 .don-legend { display: flex; flex-wrap: wrap; gap: 8px 14px; margin-top: 10px; justify-content: center; }
 .don-legend span { font-size: 11.5px; color: var(--ink-soft); display: inline-flex; align-items: center; gap: 6px; }

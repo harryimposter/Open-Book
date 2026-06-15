@@ -218,11 +218,15 @@
         .map(tid => themeById(tid)).filter(Boolean).slice(0, 4)
         .map(t => `<span class="mini-tag">${esc(t.name)}</span>`).join("");
       const nIdeas = ideasForClient(c.id).length;
+      const nba = BPCharts.rankIdeas(ideasForClient(c.id), c)[0];
       return `<div class="book-row" data-client="${esc(c.id)}">
         <div class="br-client">${avatar(c.name)}<div><div class="nm">${esc(c.name)}</div><div class="rl">${esc(c.relationship)}</div></div></div>
         <div class="br-aum">${esc(fmtAum(c))}</div>
         <div class="br-risk">${esc(c.risk)}<br><span class="class-pill ${c.classification.toLowerCase()}">${esc(c.classification)}</span></div>
-        <div class="br-themes">${themes}</div>
+        <div class="br-themes">
+          ${nba ? `<div class="lead-line"><span class="lead-k">Lead</span> ${esc(nba.idea.title)}</div>` : ""}
+          <div class="mini-tags">${themes}</div>
+        </div>
         <div class="br-ideas"><span class="n">${nIdeas}</span> <span class="lbl">ideas</span></div>
       </div>`;
     }).join("");
@@ -258,11 +262,15 @@
 
   function renderClientDetail(c) {
     if (!c) return;
-    const recos = ideasForClient(c.id).map(idea => {
+    const ranked = BPCharts.rankIdeas(ideasForClient(c.id), c);
+    const nba = ranked[0];
+    const recos = ranked.map((r, idx) => {
+      const idea = r.idea;
       const why = (idea.clients.find(x => x.id === c.id) || {}).why || "";
       const theme = themeById(idea.themeId);
-      return `<div class="rec-idea" data-idea="${esc(idea.id)}">
+      return `<div class="rec-idea${idx === 0 ? " is-nba" : ""}" data-idea="${esc(idea.id)}">
         <div class="rec-idea-top">
+          ${idx === 0 ? '<span class="nba-tag">Next best</span>' : ""}
           <span class="tag ${convClass(idea.conviction)}">${esc(idea.conviction)}</span>
           <span class="rec-title">${esc(idea.title)}</span>
           <span class="rec-theme">${esc(theme ? theme.name : "")}</span>
@@ -297,10 +305,21 @@
           <div class="goal-item"><div class="gk">Horizon</div><div class="gv">${esc(c.goals.horizon)}</div></div>
           <div class="goal-item"><div class="gk">Classification</div><div class="gv">${esc(c.mifid)}</div></div>
         </div>
+        ${BPCharts.fundingBar(c.goals.funding)}
         <div class="cd-actions">
           <a class="view-port-btn" href="portfolio.html?client=${esc(c.id)}">View current portfolio ›</a>
+          <a class="view-port-btn ghost" href="onepager.html?client=${esc(c.id)}">Client one-pager ›</a>
         </div>
       </div>
+
+      ${nba ? `<div class="nba-banner" data-idea="${esc(nba.idea.id)}">
+        <div class="nba-banner-l">
+          <span class="nba-tag">Next best action</span>
+          <span class="nba-title">${esc(nba.idea.title)}</span>
+          <p class="nba-why">${esc((nba.idea.clients.find(x => x.id === c.id) || {}).why || "")}</p>
+        </div>
+        <span class="nba-cta">Stage in Pre-Trade ›</span>
+      </div>` : ""}
 
       <div class="agenda">
         <span class="eyebrow">The desk's agenda for this book</span>
@@ -320,6 +339,54 @@
 
     $$("#clientDetail .rec-idea").forEach(el =>
       el.addEventListener("click", () => openIdeaDrawer(el.dataset.idea)));
+    const banner = $("#clientDetail .nba-banner");
+    if (banner) banner.addEventListener("click", () => stageInPretrade(c.id, banner.dataset.idea));
+  }
+
+  function stageInPretrade(clientId, ideaId) {
+    switchTab("pretrade");
+    const cl = $("#ptClient"); cl.value = clientId; cl.dispatchEvent(new Event("change"));
+    const id = $("#ptIdea"); id.value = ideaId; id.dispatchEvent(new Event("change"));
+    $("#ptForm").dispatchEvent(new Event("submit"));
+  }
+
+  /* ----------------------- coverage / whitespace grid ----------------- */
+  function setBookView(v) {
+    $$(".book-viewtoggle .seg").forEach(b => b.classList.toggle("active", b.dataset.bookview === v));
+    $("#bookListWrap").hidden = v !== "list";
+    $("#coverageWrap").hidden = v !== "coverage";
+    if (v === "coverage") renderCoverageGrid();
+  }
+
+  function renderCoverageGrid() {
+    const themes = DATA.themes;
+    const head = `<div class="cov-row cov-head">
+      <div class="cov-cell cov-client">Client</div>
+      ${themes.map(t => `<div class="cov-cell cov-th">${esc(t.name)}</div>`).join("")}</div>`;
+    const rows = DATA.clients.map(c => {
+      const curB = BPCharts.bucketAlloc(c.split);
+      const cells = themes.map(t => {
+        const mapped = DATA.ideas.filter(i => i.themeId === t.id && (i.clients || []).some(x => x.id === c.id)).length;
+        const imp = SEED.THEME_IMPACT[t.id] || { bucket: "Growth" };
+        const gap = (c.goals.target[imp.bucket] || 0) - (curB[imp.bucket] || 0);
+        let cls = "cov-none", label = "·", title = `${c.name} · ${t.name}`;
+        if (mapped > 0) { cls = "cov-have"; label = mapped; title = `${mapped} idea${mapped > 1 ? "s" : ""} recommended in ${t.name}`; }
+        else if (gap >= 6) { cls = "cov-opp"; label = "+"; title = `Whitespace — ${c.name} is ${gap.toFixed(0)}pts under target on ${imp.bucket}; no ${t.name} idea mapped`; }
+        return `<div class="cov-cell ${cls}" title="${esc(title)}">${label}</div>`;
+      }).join("");
+      return `<div class="cov-row" data-client="${esc(c.id)}">
+        <div class="cov-cell cov-client">${avatar(c.name)}<span>${esc(c.name)}</span></div>${cells}</div>`;
+    }).join("");
+    $("#coverageWrap").innerHTML = `
+      <div class="cov-legend">
+        <span><i class="cov-sw cov-have"></i> Recommended (covered)</span>
+        <span><i class="cov-sw cov-opp"></i> Whitespace — underweight &amp; unmapped</span>
+        <span><i class="cov-sw cov-none"></i> No gap</span>
+      </div>
+      <div class="cov-grid" style="--cols:${themes.length}">${head}${rows}</div>
+      <p class="cov-note">Each row is a client; each column a theme. <b>Bronze</b> cells are themes where we already have a recommendation; <b>gold +</b> cells are cross-sell whitespace — the client is under their strategic target for that theme's role and has no idea mapped. Click a row to open the client.</p>`;
+    $$("#coverageWrap .cov-row[data-client]").forEach(el =>
+      el.addEventListener("click", () => { setBookView("list"); selectClient(el.dataset.client); }));
   }
 
   /* ====================== PRE-TRADE ANALYSIS ========================= */
@@ -437,7 +504,7 @@
 
     checks.push({ type: closer ? "ok" : neutral ? "info" : "warn",
       title: "Long-term goal alignment",
-      detail: `${c.name}'s objective: "${esc(c.goals.objective)}" (${esc(c.goals.horizon)}). This lifts the <b>${bucket}</b> sleeve and moves the book ${neutral ? "broadly neutrally vs" : (closer ? `~${moveMag}pts closer to` : `~${moveMag}pts further from`)} the strategic target.` });
+      detail: `${c.name}'s objective: "${esc(c.goals.objective)}" (${esc(c.goals.horizon)}). This lifts the <b>${bucket}</b> sleeve and moves the book ${neutral ? "broadly neutrally vs" : (closer ? `~${moveMag}pts closer to` : `~${moveMag}pts further from`)} the strategic target. Funding goal: ${esc(c.goals.funding.headline)} — currently <b>${esc(c.goals.funding.status)}</b>.` });
 
     if (c.ccy !== "USD")
       checks.push({ type: "info", title: "Currency", detail: `Book base is ${c.ccy}; most ideas are USD-denominated. Consider an FX overlay or ${c.ccy}-hedged sleeve.` });
@@ -630,6 +697,7 @@
     renderClientSelect();
     renderBookStats();
     renderBookTable();
+    $$(".book-viewtoggle .seg").forEach(b => b.addEventListener("click", () => setBookView(b.dataset.bookview)));
 
     // pretrade
     renderPretradeForm();

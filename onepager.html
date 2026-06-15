@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Client one-pager — J.P.Morgan Private Bank</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .op-bar { background:#fff; border-bottom:1px solid var(--line); }
+    .op-bar-inner { max-width:840px; margin:0 auto; padding:16px 28px; display:flex; align-items:center; gap:16px; }
+    .op-actions { margin-left:auto; display:flex; gap:10px; }
+    .op-sheet { max-width:840px; margin:26px auto 60px; background:#fff; border:1px solid var(--line); border-radius:var(--radius); padding:44px 52px 50px; box-shadow:var(--shadow-card); }
+    .op-letterhead { display:flex; align-items:flex-start; border-bottom:2px solid var(--espresso); padding-bottom:18px; margin-bottom:26px; }
+    .op-letterhead .conf { margin-left:auto; text-align:right; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:var(--ink-faint); }
+    .op-title { font-family:var(--serif); font-size:26px; margin:0 0 4px; }
+    .op-sub { font-size:13px; color:var(--ink-soft); }
+    .op-sec { margin-bottom:28px; }
+    .op-sec h2 { font-family:var(--serif); font-size:17px; margin:0 0 10px; padding-bottom:7px; border-bottom:1px solid var(--line); }
+    .op-sec p { font-size:14px; line-height:1.62; color:var(--ink); margin:0 0 8px; }
+    .op-rec { padding:14px 0; border-bottom:1px solid var(--line); }
+    .op-rec:last-child { border-bottom:none; }
+    .op-rec h3 { font-family:var(--serif); font-size:15.5px; margin:0 0 3px; }
+    .op-rec .op-rec-meta { font-size:11px; letter-spacing:0.05em; text-transform:uppercase; color:var(--bronze-deep); margin-bottom:6px; }
+    .op-rec p { font-size:13.5px; color:var(--ink-soft); line-height:1.55; margin:0; }
+    .op-rec .op-rec-how { font-size:12.5px; color:var(--ink-soft); margin-top:6px; }
+    .op-rec .op-rec-how b { color:var(--ink); }
+    .op-disc { font-size:11px; color:var(--ink-faint); line-height:1.5; border-top:1px solid var(--line); padding-top:14px; margin-top:8px; }
+    .op-num { display:inline-grid; place-items:center; width:22px; height:22px; border-radius:50%; background:var(--espresso); color:var(--gold); font-size:12px; font-weight:600; margin-right:9px; }
+    @media print {
+      .op-bar, .no-print { display:none !important; }
+      body { background:#fff; }
+      .op-sheet { box-shadow:none; border:none; margin:0; max-width:none; padding:0 6px; }
+      a { color:inherit; text-decoration:none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="op-bar no-print">
+    <div class="op-bar-inner">
+      <div class="brand"><span class="jpm-wordmark">J.P.Morgan</span><span class="jpm-sub">Private Bank</span></div>
+      <div class="op-actions">
+        <a class="view-port-btn ghost" id="backLink" href="index.html?tab=book">‹ Back</a>
+        <button class="view-port-btn" onclick="window.print()">Print / Save PDF</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="op-sheet" id="sheet"></div>
+
+  <script src="data.js"></script>
+  <script src="charts.js"></script>
+  <script>
+  (function () {
+    "use strict";
+    const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, c =>
+      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+    const params = new URLSearchParams(location.search);
+    const id = params.get("client") || (SEED.clients[0] && SEED.clients[0].id);
+    const c = SEED.clients.find(x => x.id === id);
+    document.getElementById("backLink").href = "index.html?tab=book&client=" + encodeURIComponent(id);
+    if (!c) { document.getElementById("sheet").innerHTML = "<p>Client not found.</p>"; return; }
+
+    const sym = c.ccy === "EUR" ? "€" : c.ccy === "GBP" ? "£" : "$";
+    const fmtAum = sym + c.aum.toFixed(1) + "m";
+    const today = new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" });
+
+    // allocation in plain words
+    const top3 = Object.entries(c.split).sort((a, b) => b[1] - a[1]).slice(0, 3)
+      .map(([k, v]) => `${k.replace(/_/g, " ").toLowerCase()} (${v}%)`).join(", ");
+
+    // target alignment
+    const curB = BPCharts.bucketAlloc(c.split);
+    const target = c.goals.target;
+    const gaps = SEED.GOAL_BUCKETS.map(b => ({ key: b.key, d: (curB[b.key] || 0) - (target[b.key] || 0) }))
+      .filter(g => Math.abs(g.d) >= 5).sort((a, b) => Math.abs(b.d) - Math.abs(a.d));
+    const alignText = gaps.length
+      ? "Relative to the long-term plan we set together, the portfolio is currently " +
+        gaps.map(g => `${g.d > 0 ? "a little heavier in" : "lighter in"} ${g.key.toLowerCase()}`).join(" and ") + "."
+      : "The portfolio is well aligned with the long-term plan we set together.";
+
+    // top 3 recommendations, client-facing
+    const ranked = BPCharts.rankIdeas(SEED.ideas.filter(i => (i.clients || []).some(x => x.id === c.id)), c).slice(0, 3);
+    const recs = ranked.map((r, i) => {
+      const idea = r.idea;
+      const why = (idea.clients.find(x => x.id === c.id) || {}).why || "";
+      return `<div class="op-rec">
+        <div class="op-rec-meta">Recommendation ${i + 1}${i === 0 ? " · we suggest leading here" : ""}</div>
+        <h3>${esc(idea.title)}</h3>
+        <p>${esc(why)}</p>
+        <div class="op-rec-how"><b>How we'd implement:</b> ${esc((idea.structures || []).join(", "))}.</div>
+      </div>`;
+    }).join("");
+
+    document.getElementById("sheet").innerHTML = `
+      <div class="op-letterhead">
+        <div>
+          <div class="op-title">Private Wealth Review</div>
+          <div class="op-sub">Prepared for <b>${esc(c.name)}</b> · ${esc(c.mifid)}</div>
+        </div>
+        <div class="conf">Private &amp; confidential<br>${today}</div>
+      </div>
+
+      <div class="op-sec">
+        <h2><span class="op-num">1</span>Your objectives</h2>
+        <p>${esc(c.goals.objective)}. Time horizon: ${esc(c.goals.horizon).replace(/·/g, "—")}.</p>
+        ${BPCharts.fundingBar(c.goals.funding)}
+      </div>
+
+      <div class="op-sec">
+        <h2><span class="op-num">2</span>Where your portfolio stands today</h2>
+        <p>Your ${esc(fmtAum)} portfolio is led by ${esc(top3)}. ${esc(alignText)}</p>
+      </div>
+
+      <div class="op-sec">
+        <h2><span class="op-num">3</span>What we recommend</h2>
+        ${recs || "<p>No specific recommendations at this time.</p>"}
+      </div>
+
+      <p class="op-disc">This document has been prepared by your J.P.&nbsp;Morgan Private Bank team for discussion purposes only. It is illustrative, does not constitute investment advice or an offer, and figures are indicative. Any strategy should be considered in light of your full circumstances. This is a demonstration environment — not a live client communication.</p>`;
+  })();
+  </script>
+</body>
+</html>

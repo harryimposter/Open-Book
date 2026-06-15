@@ -93,8 +93,40 @@
     return Object.keys(target).reduce((d, k) => d + Math.abs((buckets[k] || 0) - target[k]), 0);
   }
 
+  /* funding-goal progress bar (used on detail, portfolio, one-pager) */
+  function fundingBar(f) {
+    if (!f) return "";
+    const pct = Math.min(100, Math.round((f.current / f.target) * 100));
+    const sc = f.status === "On track" ? "ok" : f.status === "Slightly behind" ? "warn" : "behind";
+    // place a leading currency symbol before the number ("$m/yr" + 0.72 -> "$0.72m/yr")
+    const fmt = (v) => /^[$€£]/.test(f.unit) ? f.unit[0] + v + f.unit.slice(1) : v + f.unit;
+    return `<div class="fund">
+      <div class="fund-top">
+        <span class="fund-head">${f.headline}</span>
+        <span class="fund-pill ${sc}">${f.status}</span>
+      </div>
+      <div class="fund-bar"><span style="width:${pct}%"></span></div>
+      <div class="fund-meta">${f.metricLabel}: <b>${fmt(f.current)}</b> of ${fmt(f.target)} target · ${pct}% there</div>
+    </div>`;
+  }
+
+  /* Next Best Action: score a client's mapped ideas by goal-gap × conviction × suitability */
+  const CONV_W = { "High": 3, "Medium-High": 2, "Medium": 1 };
+  function ideaScore(idea, client) {
+    const imp = window.SEED.THEME_IMPACT[idea.themeId] || { bucket: "Growth" };
+    const curB = bucketAlloc(client.split);
+    const gap = Math.max(0, (client.goals.target[imp.bucket] || 0) - (curB[imp.bucket] || 0)); // underweight = need
+    const conv = CONV_W[idea.conviction] || 1;
+    const allOtc = (idea.structures || []).every(s => window.SEED.isOtcOption(s));
+    const suit = (client.classification === "Retail" && allOtc) ? 0.4 : 1; // retail-blocked ideas score low
+    return { score: (gap + 1) * conv * suit, gap, bucket: imp.bucket, retailBlocked: client.classification === "Retail" && allOtc };
+  }
+  function rankIdeas(ideas, client) {
+    return ideas.map(i => ({ idea: i, ...ideaScore(i, client) })).sort((a, b) => b.score - a.score);
+  }
+
   window.BPCharts = {
     PALETTE, donut, legend, splitSegments, bucketAlloc, bucketSegments,
-    bucketForClass, applyTrade, targetDistance
+    bucketForClass, applyTrade, targetDistance, fundingBar, ideaScore, rankIdeas
   };
 })();
