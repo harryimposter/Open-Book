@@ -107,21 +107,14 @@
 
       <div class="report-section">
         <h2>Allocation</h2>
-        <div class="report-two">
-          <div class="pie-card"><div class="pc-t">By asset class</div>${BPCharts.donut(allocSeg, { size: 150 })}${BPCharts.legend(allocSeg)}</div>
-          <div class="panel">
-            <div class="panel-head"><h3>Strategic target vs current</h3></div>
-            <div class="panel-body">
-              <div class="pie-row" style="grid-template-columns:1fr 1fr">
-                <div class="pie-card" style="border:none;padding:6px"><div class="pc-t">Target</div>${BPCharts.donut(tgtSeg, { size: 116, thickness: 18 })}</div>
-                <div class="pie-card" style="border:none;padding:6px"><div class="pc-t">Current</div>${BPCharts.donut(curBSeg, { size: 116, thickness: 18 })}</div>
-              </div>
-              <div class="pt-verdict ${onTarget ? "toward" : "away"}" style="margin-top:6px">
-                <span class="vch">${onTarget ? "✓" : "▲"}</span>
-                <div>${gapText}</div>
-              </div>
-            </div>
-          </div>
+        <div class="pie-row">
+          <div class="pie-card"><div class="pc-t">By asset class</div>${BPCharts.donut(allocSeg)}${BPCharts.legend(allocSeg)}</div>
+          <div class="pie-card"><div class="pc-t">Strategic target · by goal</div>${BPCharts.donut(tgtSeg)}${BPCharts.legend(tgtSeg)}</div>
+          <div class="pie-card"><div class="pc-t">Current · by goal</div>${BPCharts.donut(curBSeg)}${BPCharts.legend(curBSeg)}</div>
+        </div>
+        <div class="pt-verdict ${onTarget ? "toward" : "away"}" style="margin-top:14px">
+          <span class="vch">${onTarget ? "✓" : "▲"}</span>
+          <div>${gapText}</div>
         </div>
       </div>
 
