@@ -119,7 +119,7 @@ The <b>Next Best Action</b> is the highest-severity finding from the portfolio s
       <div id="morganPanel" hidden>
         <div class="morgan-head">
           <div><span class="morgan-spark">✦</span> <b>Morgan AI</b><div class="morgan-sub">Grounded in your book · explains the reasoning</div></div>
-          <button id="morganClose" aria-label="Close">×</button>
+          <button id="morganClose" aria-label="Minimise" title="Minimise">–</button>
         </div>
         <div class="morgan-msgs" id="morganMsgs"></div>
         <div class="morgan-sugs" id="morganSugs"></div>
@@ -149,12 +149,15 @@ The <b>Next Best Action</b> is the highest-severity finding from the portfolio s
     sugWrap.innerHTML = SUGGESTIONS.map(s => `<button class="morgan-sug">${esc(s)}</button>`).join("");
     sugWrap.querySelectorAll(".morgan-sug").forEach(b => b.addEventListener("click", () => ask(b.textContent)));
 
-    document.getElementById("morganFab").addEventListener("click", () => {
-      panel.hidden = !panel.hidden;
-      if (!panel.hidden && !msgs.children.length) push(answer("hello"), "bot");
-      if (!panel.hidden) document.getElementById("morganText").focus();
-    });
-    document.getElementById("morganClose").addEventListener("click", () => { panel.hidden = true; });
+    const fab = document.getElementById("morganFab");
+    function openPanel() {
+      panel.hidden = false; fab.hidden = true;
+      if (!msgs.children.length) push(answer("hello"), "bot");
+      document.getElementById("morganText").focus();
+    }
+    function minimisePanel() { panel.hidden = true; fab.hidden = false; }
+    fab.addEventListener("click", openPanel);
+    document.getElementById("morganClose").addEventListener("click", minimisePanel);
     document.getElementById("morganForm").addEventListener("submit", e => {
       e.preventDefault();
       const t = document.getElementById("morganText");
