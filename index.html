@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Brokerage Playground — Private Bank Investment Desk</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- Masthead -->
+  <header class="masthead">
+    <div class="masthead-inner">
+      <div class="brand">
+        <div class="brand-mark"><span>B</span></div>
+        <div class="brand-text">
+          <div class="brand-name">Brokerage Playground</div>
+          <div class="brand-sub">Private Bank · Investment Desk</div>
+        </div>
+      </div>
+      <div class="masthead-meta">
+        <div><strong>Advisor view</strong> · Coverage book</div>
+        <div id="asOf">As of —</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Tabs -->
+  <nav class="tabs">
+    <div class="tabs-inner">
+      <button class="tab active" data-tab="ideas">Views &amp; Ideas</button>
+      <button class="tab" data-tab="book">Advisor Book</button>
+      <button class="tab" data-tab="pretrade">Pre-Trade Analysis</button>
+    </div>
+  </nav>
+
+  <!-- ================= VIEWS & IDEAS ================= -->
+  <main class="view" id="view-ideas">
+    <div class="view-head">
+      <div class="eyebrow">House Views</div>
+      <h1>Views &amp; Ideas</h1>
+      <p>Investment themes from the desk. Select a theme on the left to filter its ideas — open any idea to see which clients in your book it applies to, and why.</p>
+    </div>
+
+    <div class="ideas-grid">
+      <!-- LHS theme rail -->
+      <aside class="theme-rail">
+        <div class="theme-rail-head"><span class="eyebrow">Themes</span></div>
+        <ul class="theme-list" id="themeList"></ul>
+        <button class="add-btn" id="addThemeBtn"><span class="plus">+</span> Add theme</button>
+      </aside>
+
+      <!-- RHS idea panel -->
+      <section class="idea-panel">
+        <div class="idea-panel-head">
+          <div>
+            <span class="eyebrow" id="ideaThemeEyebrow">Theme</span>
+            <h2 id="ideaThemeTitle">—</h2>
+            <p id="ideaThemeBlurb"></p>
+          </div>
+          <button class="add-idea" id="addIdeaBtn"><span class="plus">+</span> Add idea</button>
+        </div>
+        <div class="tiles" id="tiles"></div>
+      </section>
+    </div>
+  </main>
+
+  <!-- ================= ADVISOR BOOK ================= -->
+  <main class="view" id="view-book" hidden>
+    <div class="view-head">
+      <div class="eyebrow">Coverage</div>
+      <h1>Advisor Book</h1>
+      <p>Your full book as line items. Choose a client to see their portfolio, the desk's agenda for the book, and the ideas that apply to them — with the reasoning behind each.</p>
+    </div>
+
+    <div class="book-controls">
+      <div class="select-wrap">
+        <label class="eyebrow">Client</label>
+        <select class="client-select" id="clientSelect"></select>
+      </div>
+      <div class="book-stats" id="bookStats"></div>
+    </div>
+
+    <div class="book-table" id="bookTable"></div>
+    <div class="client-detail" id="clientDetail" hidden></div>
+  </main>
+
+  <!-- ================= PRE-TRADE ANALYSIS ================= -->
+  <main class="view" id="view-pretrade" hidden>
+    <div class="view-head">
+      <div class="eyebrow">Suitability &amp; Impact</div>
+      <h1>Pre-Trade Analysis</h1>
+      <p>Stage a trade against a client book before you place it. Pick a client, an idea or instrument, and a structure to see a first-pass read on suitability, concentration, currency and the desk view.</p>
+    </div>
+
+    <div class="pretrade-grid">
+      <form class="pt-form panel" id="ptForm">
+        <div class="panel-head"><span class="eyebrow">Stage a trade</span></div>
+        <div class="panel-body">
+          <div class="field">
+            <label class="field-label">Client</label>
+            <select id="ptClient"></select>
+          </div>
+          <div class="field">
+            <label class="field-label">Idea</label>
+            <select id="ptIdea"></select>
+          </div>
+          <div class="field">
+            <label class="field-label">Structure</label>
+            <select id="ptStructure"></select>
+          </div>
+          <div class="field">
+            <label class="field-label">Notional (% of book)</label>
+            <input id="ptNotional" type="number" min="0" max="100" step="0.5" value="5" />
+          </div>
+          <button class="pt-run" type="submit">Run pre-trade check</button>
+        </div>
+      </form>
+
+      <section class="pt-result" id="ptResult">
+        <div class="pt-placeholder">
+          <div class="big">No trade staged</div>
+          <div>Choose a client and an idea, then run the check.</div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Overlay + drawer + modal mounts -->
+  <div class="overlay" id="overlay"></div>
+  <aside class="drawer" id="drawer" aria-hidden="true"></aside>
+  <div class="modal-card" id="modal" role="dialog" aria-modal="true"></div>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

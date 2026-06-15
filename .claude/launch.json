@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "playground",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "5544", "--directory", "C:/Users/harin/OneDrive/Desktop/Claude Code/brokerageplayground"],
+      "port": 5544
+    }
+  ]
+}
