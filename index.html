@@ -28,18 +28,48 @@
   <!-- Tabs -->
   <nav class="tabs">
     <div class="tabs-inner">
-      <button class="tab active" data-tab="ideas">Views &amp; Ideas</button>
+      <button class="tab" data-tab="ideas">Solutions Views</button>
+      <button class="tab active" data-tab="focus">Today's Focus</button>
       <button class="tab" data-tab="book">Advisor Book</button>
       <button class="tab" data-tab="pretrade">Pre-Trade Analysis</button>
     </div>
   </nav>
 
-  <!-- ================= VIEWS & IDEAS ================= -->
-  <main class="view" id="view-ideas">
+  <!-- ================= TODAY'S FOCUS ================= -->
+  <main class="view" id="view-focus">
+    <div class="view-head focus-head">
+      <div>
+        <div class="eyebrow">AI-generated · <span id="focusAsOf">—</span></div>
+        <h1>Today's Focus</h1>
+        <p>The desk's daily idea sweep — earnings catalysts and ex-earnings ideas, each <b>scored</b>, <b>tagged to the clients it fits</b> with a per-client fit score, and expressible in one click. Generated from a market scan; the client mapping is computed live against your book.</p>
+      </div>
+      <button class="rubric-btn" id="rubricBtn" type="button">How scoring works</button>
+    </div>
+
+    <div class="focus-sweepnote" id="focusSweepNote"></div>
+
+    <section class="focus-section">
+      <div class="focus-section-head"><span class="fs-kicker">Earnings</span><h2>Reporting now — catalyst ideas</h2></div>
+      <div class="focus-cards" id="focusEarnings"></div>
+    </section>
+
+    <section class="focus-section">
+      <div class="focus-section-head"><span class="fs-kicker ex">Ex-earnings</span><h2>Macro &amp; thematic ideas</h2></div>
+      <div class="focus-cards" id="focusExEarnings"></div>
+    </section>
+  </main>
+
+  <!-- ================= SOLUTIONS VIEWS ================= -->
+  <main class="view" id="view-ideas" hidden>
     <div class="view-head">
-      <div class="eyebrow">House Views</div>
-      <h1>Views &amp; Ideas</h1>
-      <p>Investment themes from the desk. Select a theme on the left to filter its ideas — open any idea to see which clients in your book it applies to, and why.</p>
+      <div class="eyebrow">House Strategy</div>
+      <h1>Solutions Views</h1>
+      <p>The desk's standing investment themes — the human strategy input the daily focus leans on. Select a theme to filter its ideas; open any idea to see how we'd express it and which client books it fits. <b>Draft a view</b> from a one-line thesis and the app suggests the structure, expressions and candidate clients for you to keep or edit.</p>
+    </div>
+
+    <div class="draftbar">
+      <input id="draftThesis" class="draft-input" placeholder="Type a one-line thesis — e.g. “copper supply deficit into the energy transition” — and let the desk draft it" />
+      <button class="draft-go" id="draftGoBtn">✎ Draft a view</button>
     </div>
 
     <div class="ideas-grid">
@@ -157,6 +187,8 @@
   <script src="charts.js"></script>
   <script src="scanner.js"></script>
   <script src="expressions.js"></script>
+  <script src="mapping.js"></script>
+  <script src="today_focus.js"></script>
   <script src="app.js"></script>
   <script src="morgan.js"></script>
 </body>

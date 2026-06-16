@@ -57,7 +57,7 @@
   /* ============================== TABS ================================== */
   function switchTab(tab) {
     $$(".tab").forEach(b => b.classList.toggle("active", b.dataset.tab === tab));
-    ["ideas", "book", "pretrade"].forEach(t => { $("#view-" + t).hidden = (t !== tab); });
+    ["ideas", "focus", "book", "pretrade"].forEach(t => { $("#view-" + t).hidden = (t !== tab); });
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -641,6 +641,280 @@
     };
   }
 
+  /* ====================== TODAY'S FOCUS =============================== */
+  const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  function fmtFocusDate(iso) { const p = String(iso).split("-").map(Number); return p[2] + " " + MONTHS[p[1] - 1]; }
+  const convTierClass = (t) => "conv-" + String(t).toLowerCase();
+  const fitTierClass = (t) => "fit-" + String(t).toLowerCase();
+  const srcFlag = (tag) => `<span class="src-flag ${esc(tag)}">${esc(tag)}</span>`;
+
+  function pillarHTML(p) {
+    return `<div class="pill-row">
+      <span class="pl-k">${esc(p.label)}</span>
+      <span class="pl-bar"><span style="width:${(p.score / p.max * 100).toFixed(0)}%"></span></span>
+      <span class="pl-sc">${p.score}/${p.max}</span>
+      <div class="pl-note">${esc(p.note)}</div>
+    </div>`;
+  }
+
+  function axisRowHTML(a) {
+    return `<div class="ax-row">
+      <span class="ax-k">${esc(a.label)}</span>
+      <span class="ax-bar"><span style="width:${a.score}%"></span></span>
+      <span class="ax-sc">${a.score}</span>
+      <span class="ax-w">× ${a.weight}</span>
+      <div class="ax-note">${esc(a.note)}</div>
+    </div>`;
+  }
+
+  function focusClientHTML(idea, flag) {
+    const c = flag.client;
+    return `<div class="fc-client" data-fclient="${esc(c.id)}">
+      <div class="fcl-top">
+        ${avatar(c.name)}
+        <span class="fcl-name">${esc(c.name)}</span>
+        <span class="fcl-meta">${esc(c.classification)} · ${esc(fmtAum(c))}</span>
+        <span class="fcl-fit ${fitTierClass(flag.tier)}" title="Client-fit score">${flag.fit}<span class="fcl-fit-lbl">fit</span></span>
+      </div>
+      <p class="fcl-why">${esc(flag.why)}</p>
+      <button type="button" class="fcl-expand">Why ${esc(c.name)}? See the per-axis breakdown ›</button>
+      <div class="fcl-axes" hidden>
+        ${flag.axes.map(axisRowHTML).join("")}
+        <div class="ax-total">Weighted client-fit score <b>${flag.fit}</b> / 100 — <a href="index.html?tab=book&client=${esc(c.id)}" class="ax-open">open ${esc(c.name)} in the Advisor Book ›</a></div>
+      </div>
+    </div>`;
+  }
+
+  function themeTagHTML(idea) {
+    if (idea.themeId) {
+      const t = themeById(idea.themeId);
+      return `<span class="fc-tag theme" data-gotheme="${esc(idea.themeId)}" role="button" tabindex="0">On theme · ${esc(t ? t.name : "House view")} ›</span>`;
+    }
+    return `<span class="fc-tag offtheme">Off-theme</span>`;
+  }
+
+  function earningsIntelHTML(idea) {
+    const e = idea.earnings; if (!e) return "";
+    const vsCls = /rich/.test(e.impliedVsHist) ? "rich" : /cheap/.test(e.impliedVsHist) ? "cheap" : "";
+    return `<div class="fc-intel">
+      <div class="intel-cell"><div class="ic-k">Reports</div><div class="ic-v">${fmtFocusDate(e.reportDate)} · ${esc(e.reportWhen)}</div></div>
+      <div class="intel-cell"><div class="ic-k">Implied move ${srcFlag(e.impliedSource)}</div><div class="ic-v">±${e.impliedMovePct}%</div></div>
+      <div class="intel-cell"><div class="ic-k">Historical avg ${srcFlag(e.historicalSource)}</div><div class="ic-v">±${e.historicalAvgMovePct}%</div></div>
+      <div class="intel-cell"><div class="ic-k">Implied vs history</div><div class="ic-v ${vsCls}">${esc(e.impliedVsHist)}</div></div>
+    </div>
+    <div class="fc-watch"><b>What to watch:</b> ${esc(e.watch)}</div>`;
+  }
+
+  function macroIntelHTML(idea) {
+    const m = idea.macro; if (!m) return "";
+    return `<div class="fc-macro">
+      <div class="fm-top"><span class="fm-metric">${esc(m.metric)}</span> ${srcFlag(m.source)}</div>
+      <div class="fm-detail">${esc(m.detail)}</div>
+      <div class="fc-watch"><b>What to watch:</b> ${esc(m.watch)}</div>
+    </div>`;
+  }
+
+  function factsHTML(idea) {
+    if (!(idea.facts || []).length) return "";
+    return `<details class="fc-facts"><summary>Evidence &amp; sources (${idea.facts.length})</summary>
+      <ul class="fcf-list">${idea.facts.map(f => `<li>${esc(f.text)} ${srcFlag(f.tag)}</li>`).join("")}</ul>
+      <div class="fcf-src">Sources: ${(idea.sources || []).map(s => esc(s.name)).join(" · ")}</div>
+    </details>`;
+  }
+
+  function focusCardHTML(idea) {
+    const flags = window.MAPPING.flagClients(idea);
+    const conv = idea.conviction;
+    const intel = idea.kind === "earnings" ? earningsIntelHTML(idea) : macroIntelHTML(idea);
+    return `<article class="focus-card" data-fcard="${esc(idea.id)}">
+      <div class="fc-top">
+        <div class="fc-id">
+          <h3>${esc(idea.name)}${idea.ticker ? ` <span class="fc-tick">${esc(idea.ticker)}</span>` : ""}</h3>
+          <div class="fc-headline">${esc(idea.headline)}</div>
+        </div>
+        <div class="fc-conv ${convTierClass(conv.tier)}" data-conv role="button" tabindex="0" title="How the conviction score is built">
+          <div class="fc-conv-score">${conv.score}</div>
+          <div class="fc-conv-tier">${esc(conv.tier)} ›</div>
+        </div>
+      </div>
+
+      <div class="fc-tags">
+        ${themeTagHTML(idea)}
+        ${idea.kind === "earnings" ? `<span class="fc-tag earn">Earnings</span>` : `<span class="fc-tag macro">Ex-earnings</span>`}
+        <span class="fc-tag sector">${esc(idea.sector)}</span>
+      </div>
+      ${idea.offThemeWhy ? `<div class="fc-offwhy"><b>Off-theme —</b> ${esc(idea.offThemeWhy)}</div>` : ""}
+
+      <p class="fc-thesis">${esc(idea.thesis)}</p>
+
+      <div class="fc-conv-detail" hidden>
+        <div class="fcd-head">Conviction <b>${conv.score}/100</b> — four pillars (1–5 each):</div>
+        ${conv.pillars.map(pillarHTML).join("")}
+      </div>
+
+      ${intel}
+
+      <div class="fc-block">
+        <span class="fc-eyebrow">How we'd express it — tap any to see exactly how</span>
+        ${window.EXPRESSIONS.accordionHTML(idea.structures || [], { sector: idea.sector, assetClass: idea.assetClass, title: idea.name })}
+      </div>
+
+      <div class="fc-block">
+        <span class="fc-eyebrow">Flagged to ${flags.length} client${flags.length === 1 ? "" : "s"} · client-fit score</span>
+        <div class="fc-clients">
+          ${flags.length ? flags.map(f => focusClientHTML(idea, f)).join("") : `<p class="fcl-why" style="padding:6px 0">No client in the book is a strong fit right now (scored live against the Advisor Book).</p>`}
+        </div>
+      </div>
+
+      ${factsHTML(idea)}
+    </article>`;
+  }
+
+  function renderFocus() {
+    const TF = window.TODAY_FOCUS;
+    if (!TF) return;
+    $("#focusAsOf").textContent = "as of " + fmtFocusDate(TF.asOf) + " " + TF.asOf.slice(0, 4);
+    $("#focusSweepNote").innerHTML =
+      `<span class="fsn-k">Market sweep</span> ${esc(TF.sweep.sources.join(" · "))}. <span class="fsn-rule">${esc(TF.sweep.rule)}</span>`;
+    $("#focusEarnings").innerHTML = (TF.earnings || []).map(focusCardHTML).join("");
+    $("#focusExEarnings").innerHTML = (TF.exEarnings || []).map(focusCardHTML).join("");
+    wireFocus($("#view-focus"));
+  }
+
+  function wireFocus(root) {
+    if (!root) return;
+    window.EXPRESSIONS.wire(root);
+    // conviction breakdown toggle
+    $$(".fc-conv", root).forEach(el => el.addEventListener("click", () => {
+      const card = el.closest(".focus-card"); const d = card && card.querySelector(".fc-conv-detail");
+      if (d) { d.hidden = !d.hidden; el.classList.toggle("open", !d.hidden); }
+    }));
+    // client-fit axis breakdown toggle
+    $$(".fcl-expand", root).forEach(btn => btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const row = btn.closest(".fc-client"); const ax = row && row.querySelector(".fcl-axes");
+      if (ax) { ax.hidden = !ax.hidden; btn.classList.toggle("open", !ax.hidden); }
+    }));
+    // theme tag -> jump to Solutions Views theme
+    $$(".fc-tag.theme[data-gotheme]", root).forEach(el => el.addEventListener("click", () => {
+      activeThemeId = el.dataset.gotheme; switchTab("ideas"); renderThemes(); renderIdeaPanel();
+    }));
+  }
+
+  /* ----------------------- rubric / methodology modal ----------------- */
+  const AXIS_DESC = {
+    holdings: "Does the book own the underlying name, or at least the sector? Owning the name scores highest.",
+    gap: "Is the book under its strategic target for the goal this idea fills (e.g. under its Income or Structured-notes target)?",
+    mandate: "Can the client trade the expressions (MiFID tier vs OTC), and does the idea suit a growth / income / preservation mandate?",
+    concentration: "Is the book heavily concentrated in this name — making the idea urgent (protect / monetise) rather than optional?",
+    houseview: "Does the client already sit on the Solutions Views theme behind the idea? Off-theme ideas score lower here."
+  };
+  function openRubric() {
+    const R = (window.TODAY_FOCUS || {}).convictionRubric || { max_per_pillar: 5, pillars: [], tiers: [] };
+    openModal(`
+      <div class="modal-head"><span class="eyebrow">Methodology</span><h2>How an idea is scored</h2></div>
+      <div class="modal-body">
+        <h3 class="rub-h">1 · Conviction score — “how good is the idea”</h3>
+        <p class="rub-p">Four pillars, each scored 1–${R.max_per_pillar}; the total is shown out of 100. ${R.tiers.map(t => `<b>${esc(t.key)}</b> ≥ ${t.min}`).join(" · ")}.</p>
+        <div class="rub-list">${R.pillars.map(p => `<div class="rub-item"><div class="ri-k">${esc(p.label)}</div><div class="ri-d">${esc(p.desc)}</div></div>`).join("")}</div>
+        <h3 class="rub-h">2 · Client-fit score — “how right for THIS client”</h3>
+        <p class="rub-p">Separate from conviction. Each idea is scored against every client across five weighted axes; the weighted sum is the fit score (0–100), and you can open the per-axis breakdown on any flagged client.</p>
+        <div class="rub-list">${window.MAPPING.AXES.map(a => `<div class="rub-item"><div class="ri-k">${esc(a.label)} <span class="ri-w">weight ${a.weight}</span></div><div class="ri-d">${esc(AXIS_DESC[a.key] || "")}</div></div>`).join("")}</div>
+      </div>
+      <div class="modal-foot"><button class="btn btn-primary" id="rubClose">Got it</button></div>`);
+    $("#rubClose").onclick = closeModal;
+  }
+
+  /* ----------------------- draft a view (lighter add) ----------------- */
+  const DRAFT_RULES = [
+    { kw: ["ai", "semiconductor", "semis", "chip", "gpu", "compute", "memory", "hbm", "nvidia", "datacenter", "data center", "software"], themeId: "ai", sector: "Technology", assetClass: "Equity", bucket: "Growth", structs: ["Direct equity", "Structured note", "Index core"] },
+    { kw: ["power", "grid", "electric", "utility", "utilities", "nuclear", "smr"], themeId: "power", sector: "Utilities", assetClass: "Equity", bucket: "Income", structs: ["Utility basket", "Thematic basket"] },
+    { kw: ["bond", "duration", "yield", "treasur", "rates", "fixed income"], themeId: "duration", sector: "Rates", assetClass: "Fixed Income", bucket: "Income", structs: ["Extend duration", "Bond ladder", "Govt / IG bonds"] },
+    { kw: ["gold", "bullion", "debasement"], themeId: "gold", sector: "Gold", assetClass: "Commodity", bucket: "Protection", structs: ["Physical / ETC", "Gold accumulator"] },
+    { kw: ["infrastructure", "infra", "toll", "midstream", "real asset"], themeId: "realassets", sector: "Infrastructure", assetClass: "Real Assets", bucket: "Income", structs: ["Infrastructure fund", "Listed infrastructure"] },
+    { kw: ["health", "glp", "pharma", "medtech", "biotech", "device"], themeId: "health", sector: "Healthcare", assetClass: "Equity", bucket: "Growth", structs: ["Healthcare basket", "Direct equity"] },
+    { kw: ["protect", "hedge", "downside", "collar", "buffer"], themeId: "resilience", sector: "Broad", assetClass: "Multi-Asset", bucket: "Protection", structs: ["Buffered note", "Zero-cost collar"] },
+    { kw: ["value", "international", "cyclical", "quality", "broaden", "small cap"], themeId: "broaden", sector: "Broad", assetClass: "Equity", bucket: "Growth", structs: ["Quality basket", "Equal-weight index"] },
+    { kw: ["coupon", "autocall", "structured note", "income note"], themeId: "structured", sector: "Broad", assetClass: "Structured", bucket: "Structured", structs: ["Phoenix autocall", "Reverse convertible", "Buffered note"] },
+    { kw: ["copper", "materials", "mining", "rare earth", "lithium"], themeId: null, sector: "Materials", assetClass: "Equity", bucket: "Growth", structs: ["Thematic basket", "Direct equity"] },
+    { kw: ["energy", "oil", "gas", "crude", "brent"], themeId: null, sector: "Energy", assetClass: "Equity", bucket: "Income", structs: ["Direct equity", "Call overwrite", "Thematic basket"] },
+    { kw: ["real estate", "reit", "property", "housing"], themeId: "realassets", sector: "Real Estate", assetClass: "Real Assets", bucket: "Income", structs: ["REIT basket", "Private real estate"] },
+    { kw: ["crypto", "bitcoin", "digital asset"], themeId: null, sector: "Crypto", assetClass: "Alternatives", bucket: "Protection", structs: ["Direct equity", "Structured note"] }
+  ];
+  function draftFromThesis(thesis) {
+    const s = String(thesis || "").toLowerCase();
+    for (const r of DRAFT_RULES) { if (r.kw.some(k => s.includes(k))) return r; }
+    return { themeId: null, sector: "Broad", assetClass: "Equity", bucket: "Growth", structs: ["Direct equity", "Structured note", "Index core"] };
+  }
+  function titleFromThesis(thesis) {
+    let t = String(thesis || "").trim().replace(/\s+/g, " ");
+    if (t.length > 64) t = t.slice(0, 61) + "…";
+    return t.charAt(0).toUpperCase() + t.slice(1);
+  }
+
+  function openDraftView(prefill) {
+    const themeOpts = (extraId) => DATA.themes.map(t => `<option value="${esc(t.id)}">${esc(t.name)}</option>`).join("");
+    openModal(`
+      <div class="modal-head"><span class="eyebrow">Draft a view</span><h2>From a one-line thesis</h2></div>
+      <div class="modal-body">
+        <div class="field"><label class="field-label">Your thesis (one line)</label>
+          <textarea id="dvThesis" placeholder="e.g. copper supply deficit into the energy transition">${esc(prefill || "")}</textarea></div>
+        <button class="btn btn-ghost" id="dvDraft" style="margin-bottom:6px">✎ Draft it for me</button>
+        <div id="dvResult" class="dv-result"><p class="hint">The desk will suggest a theme, asset class, expressions and the client books it would fit — all editable before you save.</p></div>
+      </div>
+      <div class="modal-foot"><button class="btn btn-ghost" id="dvCancel">Cancel</button><button class="btn btn-primary" id="dvSave" disabled>Add to Solutions Views</button></div>`);
+    $("#dvCancel").onclick = closeModal;
+    const doDraft = () => {
+      const thesis = $("#dvThesis").value.trim();
+      if (!thesis) { $("#dvThesis").focus(); return; }
+      const d = draftFromThesis(thesis);
+      const synth = { ticker: "", name: titleFromThesis(thesis), sector: d.sector, assetClass: d.assetClass, bucket: d.bucket, structures: d.structs, themeId: d.themeId };
+      const flags = window.MAPPING.flagClients(synth, { min: 45, max: 5 });
+      const acOpts = ["Equity", "Fixed Income", "Commodity", "Real Assets", "Alternatives", "Multi-Asset", "Structured"]
+        .map(a => `<option ${a === d.assetClass ? "selected" : ""}>${a}</option>`).join("");
+      const secOpts = ["Technology", "Healthcare", "Financials", "Energy", "Utilities", "Industrials", "Materials", "Consumer", "Real Estate", "Infrastructure", "Rates", "Credit", "Gold", "Crypto", "FX", "Broad"]
+        .map(x => `<option ${x === d.sector ? "selected" : ""}>${x}</option>`).join("");
+      const themeSel = DATA.themes.map(t => `<option value="${esc(t.id)}" ${t.id === d.themeId ? "selected" : ""}>${esc(t.name)}</option>`).join("");
+      $("#dvResult").innerHTML = `
+        <div class="dv-draft">
+          <div class="dv-eyebrow">Suggested — edit anything</div>
+          <div class="field"><label class="field-label">Idea title</label><input id="dvTitle" value="${esc(titleFromThesis(thesis))}" /></div>
+          <div class="field" style="display:flex;gap:10px">
+            <div style="flex:1"><label class="field-label">Theme</label><select id="dvTheme">${themeSel}</select></div>
+            <div style="flex:1"><label class="field-label">Conviction</label><select id="dvConv"><option>High</option><option selected>Medium-High</option><option>Medium</option></select></div>
+          </div>
+          <div class="field" style="display:flex;gap:10px">
+            <div style="flex:1"><label class="field-label">Asset class</label><select id="dvAC">${acOpts}</select></div>
+            <div style="flex:1"><label class="field-label">Sector</label><select id="dvSector">${secOpts}</select></div>
+          </div>
+          <div class="field"><label class="field-label">Expressions (comma-separated)</label><input id="dvStructs" value="${esc(d.structs.join(", "))}" /></div>
+          <div class="dv-eyebrow">Candidate client books — scored live</div>
+          <div class="dv-clients">${flags.length ? flags.map(f => `<div class="dv-client"><span class="dv-c-name">${avatar(f.client.name)} ${esc(f.client.name)}</span><span class="fcl-fit ${fitTierClass(f.tier)}">${f.fit}</span><span class="dv-c-why">${esc(f.why)}</span></div>`).join("") : `<p class="hint">No strong client fit yet — adjust the sector / bucket above.</p>`}</div>
+        </div>`;
+      $("#dvSave").disabled = false;
+    };
+    $("#dvDraft").onclick = doDraft;
+    $("#dvSave").onclick = () => {
+      const title = ($("#dvTitle") || {}).value;
+      if (!title || !title.trim()) return;
+      const assetClass = $("#dvAC").value, sector = $("#dvSector").value;
+      const bucket = SEED.SECTOR_BUCKET[sector] || SEED.ASSET_BUCKET[assetClass] || "Growth";
+      const structs = $("#dvStructs").value.split(",").map(s => s.trim()).filter(Boolean);
+      const themeId = $("#dvTheme").value;
+      userData.ideas.push({
+        id: "u-idea-" + Date.now().toString(36), themeId, title: title.trim(),
+        type: "Thematic", assetClass, sector, bucket,
+        conviction: $("#dvConv").value, horizon: "Strategic",
+        thesis: $("#dvThesis").value.trim() || "Drafted from a one-line thesis.",
+        structures: structs.length ? structs : ["Direct equity"]
+      });
+      saveUser(userData); rebuildData(); activeThemeId = themeId;
+      switchTab("ideas"); renderThemes(); renderIdeaPanel(); renderBookTable(); renderBookStats();
+      closeModal();
+    };
+    if (prefill && prefill.trim()) doDraft();
+  }
+
   /* ============================== INIT ============================== */
   function init() {
     rebuildData();
@@ -652,6 +926,11 @@
     renderThemes(); renderIdeaPanel();
     $("#addThemeBtn").addEventListener("click", openAddTheme);
     $("#addIdeaBtn").addEventListener("click", openAddIdea);
+
+    renderFocus();
+    $("#rubricBtn").addEventListener("click", openRubric);
+    $("#draftGoBtn").addEventListener("click", () => openDraftView($("#draftThesis").value));
+    $("#draftThesis").addEventListener("keydown", e => { if (e.key === "Enter") openDraftView($("#draftThesis").value); });
 
     renderClientSelect(); renderBookStats(); renderBookTable();
     $$(".book-viewtoggle .seg").forEach(b => b.addEventListener("click", () => setBookView(b.dataset.bookview)));
@@ -670,6 +949,8 @@
     } else if (qTab === "book") {
       switchTab("book"); if (qClient && clientById(qClient)) selectClient(qClient);
     } else if (qTab === "pretrade") { switchTab("pretrade"); }
+    else if (qTab === "ideas") { switchTab("ideas"); }
+    else { switchTab("focus"); }
   }
 
   document.addEventListener("DOMContentLoaded", init);
