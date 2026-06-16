@@ -130,7 +130,8 @@
       </div>`;
     }).join("") || `<p class="why">No books are a strong fit right now (derived from exposure + goals).</p>`;
 
-    const structs = (idea.structures || []).map(s => `<span class="struct-chip">${esc(s)}</span>`).join("");
+    const structs = window.EXPRESSIONS.accordionHTML(idea.structures || [],
+      { sector: idea.sector, assetClass: idea.assetClass, title: idea.title });
     $("#drawer").innerHTML = `
       <div class="drawer-head">
         <button class="drawer-close" id="drawerClose" aria-label="Close">×</button>
@@ -148,13 +149,14 @@
           <p class="thesis-full">${esc(idea.thesis)}</p>
           <p class="thesis-full" style="font-size:12.5px;color:var(--ink-faint);margin-top:8px">${esc(idea.assetClass)} · ${esc(idea.sector)} · ${esc(idea.bucket)} role</p>
         </div>
-        ${structs ? `<div class="drawer-section"><span class="eyebrow">How we'd express it</span><div class="struct-row">${structs}</div></div>` : ""}
+        ${(idea.structures || []).length ? `<div class="drawer-section"><span class="eyebrow">How we'd express it</span><p class="struct-hint">Tap any expression to see exactly how to do it — mechanics, terms, pros &amp; cons.</p>${structs}</div>` : ""}
         <div class="drawer-section">
           <span class="eyebrow">Which books this fits · ${clients.length}</span>
           ${clientCards}
         </div>
       </div>`;
     $("#drawerClose").addEventListener("click", closeDrawer);
+    window.EXPRESSIONS.wire($("#drawer"));
     $$("#drawer .client-apply").forEach(el =>
       el.addEventListener("click", () => { closeDrawer(); switchTab("book"); selectClient(el.dataset.goclient); }));
     $("#overlay").classList.add("open");
@@ -227,8 +229,9 @@
 
   /* one recommendation tile (scanner finding OR matched view idea) */
   function recoItemHTML(it, isNba) {
-    const chips = (it.structures || []).slice(0, 3).map(s =>
-      `<span class="struct-chip sm ${SEED.isOtcOption(s) && it.retailBlocked ? "blocked" : ""}">${esc(s)}</span>`).join("");
+    const chips = window.EXPRESSIONS.accordionHTML((it.structures || []).slice(0, 3),
+      { sector: it.sector, assetClass: it.assetClass, title: it.title },
+      { sm: true, blockedFn: (s) => SEED.isOtcOption(s) && it.retailBlocked });
     const handle = it.source === "View" ? `data-idea="${esc(it.ideaId)}"` : `data-stage="1"`;
     return `<article class="reco-card${isNba ? " is-nba" : ""}" ${handle}>
       <div class="rc-top">
@@ -320,6 +323,7 @@
       ${liabilities}`;
 
     // wire interactions
+    window.EXPRESSIONS.wire($("#clientDetail"));
     $$("#clientDetail .reco-card[data-idea]").forEach(el =>
       el.addEventListener("click", () => openIdeaDrawer(el.dataset.idea)));
     $$("#clientDetail .reco-card[data-stage]").forEach(el =>

@@ -1,0 +1,853 @@
+/* ============================================================================
+   Brokerage Playground — EXPRESSIONS knowledge base
+   ----------------------------------------------------------------------------
+   "How we'd express it" detail. Every distinct expression string used anywhere
+   in the app (SEED_IDEAS.structures, scanner.js findings, custom ideas) resolves
+   to ONE canonical entry below, via an alias table + keyword fallback. Each entry
+   carries the concrete "exactly how": what it is, the precise mechanics/payoff,
+   typical underlying + tenor, CONCRETE example terms, pros/cons and when to use.
+
+   Additive + data-driven: no change to the theme/idea model or the scanner.
+   Exposes window.EXPRESSIONS with:
+     resolve(raw)            -> canonical id (or null)
+     get(raw)                -> entry (or graceful fallback)
+     detail(raw, ctx)        -> entry + a context line tailored to the idea
+     itemHTML(raw, ctx, o)   -> one accordion item (button + hidden panel)
+     accordionHTML(arr,c,o)  -> wrapped list of accordion items
+     wire(rootEl)            -> attach click/keyboard toggles within a root
+   ========================================================================== */
+(function () {
+  "use strict";
+
+  const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, c =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+  /* sector -> representative underlying, so an example can read against the
+     specific idea (e.g. "Structured note" under AI reads against the semis). */
+  const SECTOR_U = {
+    "Technology":  { name: "the AI & semis complex",   ticker: "NVDA",       index: "the SOX semiconductor index", etf: "SMH/SOXX" },
+    "Utilities":   { name: "load-growth utilities",    ticker: "NEE/CEG",    index: "a utilities index",          etf: "XLU" },
+    "Energy":      { name: "energy majors",            ticker: "XOM/SHEL",   index: "an energy index",            etf: "XLE" },
+    "Healthcare":  { name: "healthcare innovation",    ticker: "LLY",        index: "a healthcare index",         etf: "XLV/IHI" },
+    "Broad":       { name: "the broad market",         ticker: "SPY",        index: "the S&P 500",                etf: "SPY/VOO" },
+    "Rates":       { name: "the high-quality rates sleeve", ticker: "UST",   index: "the Treasury curve",         etf: "IEF/GOVT" },
+    "Credit":      { name: "investment-grade credit",  ticker: "LQD",        index: "the IG credit index",        etf: "LQD" },
+    "Gold":        { name: "the gold sleeve",          ticker: "gold (XAU)", index: "the gold price",             etf: "GLD/4GLD" },
+    "Infrastructure": { name: "listed infrastructure", ticker: "IGF",        index: "a global infrastructure index", etf: "IGF" },
+    "Real Estate": { name: "the real-estate sleeve",   ticker: "O",          index: "a REIT index",               etf: "VNQ" },
+    "FX":          { name: "the currency mismatch",    ticker: "EUR/USD",    index: "the currency pair",          etf: "—" },
+    "Materials":   { name: "miners & materials",       ticker: "GDX",        index: "a materials index",          etf: "XME" },
+    "Financials":  { name: "financials",               ticker: "JPM",        index: "a financials index",         etf: "XLF" },
+    "Industrials": { name: "industrials",              ticker: "CAT",        index: "an industrials index",       etf: "XLI" },
+    "Consumer":    { name: "consumer staples",         ticker: "PG",         index: "a staples index",            etf: "XLP" },
+    "Crypto":      { name: "the digital-asset sleeve", ticker: "BTC",        index: "bitcoin",                    etf: "IBIT" },
+    "Cash":        { name: "the cash sleeve",          ticker: "T-bills",    index: "the front end",              etf: "BIL/SGOV" },
+    "default":     { name: "the underlying",           ticker: "the name",   index: "the relevant index",         etf: "the ETF" }
+  };
+  function uFor(ctx) {
+    if (!ctx || !ctx.sector) return SECTOR_U.default;
+    return SECTOR_U[ctx.sector] || SECTOR_U.default;
+  }
+
+  /* ---------------------------- canonical entries ------------------------- */
+  const E = {
+
+    "direct-equity": {
+      label: "Direct equity", complex: false,
+      what: "Own the shares outright — the cleanest, most liquid way to take the view.",
+      mechanics: "Buy the common stock (or ADR/local line) in the cash account. Full upside and downside, you collect dividends and keep voting rights — no leverage, no embedded option, no counterparty.",
+      underlying: "Single stocks, or a small hand-picked set of names in the theme.",
+      tenor: "Open-ended — hold as long as the thesis runs.",
+      example: "Buy a 3–5% position in the 2–4 highest-conviction names; e.g. a 4% line funded from cash, with a rule to trim if any single name passes ~8% of the book.",
+      pros: ["Maximum liquidity and transparency", "No fees beyond commission; no counterparty/credit risk", "Full dividend and uncapped upside", "Simple tax lots (harvest, gift, step-up)"],
+      cons: ["Full downside — no protection", "Single-name idiosyncratic risk", "Needs position-sizing discipline to avoid concentration"],
+      whenToUse: "Highest-conviction names where you want uncapped upside and will manage risk by sizing rather than by structure.",
+      context: (u) => `Expressed as a direct line in ${u.name} — e.g. a 3–5% position in ${u.ticker}-type names, sized so no single stock dominates the book.`
+    },
+
+    "index-core": {
+      label: "Index core / ETF", complex: false,
+      what: "Own the whole theme through a low-cost ETF or fund rather than picking winners.",
+      mechanics: "Buy a passive ETF or active fund tracking the sector/index. One ticker gives diversified exposure; the fund holds and rebalances the basket for you.",
+      underlying: "A sector/thematic index or broad benchmark.",
+      tenor: "Open-ended core holding.",
+      example: "A 5–10% allocation to a sector ETF at ~0.10–0.35% expense ratio, held as the strategic core with single names layered on top.",
+      pros: ["Instant diversification — removes single-stock risk", "Cheap and tax-efficient (ETFs)", "Daily liquidity"],
+      cons: ["No alpha vs the index; you own the laggards too", "Tracking error / fees on active funds", "Caps upside vs a winning single name"],
+      whenToUse: "The strategic core of a theme, or when you want the exposure without a view on individual names.",
+      context: (u) => `Held via a ${u.etf}-type ETF tracking ${u.index} — the diversified core of the ${u.name} exposure.`
+    },
+
+    "structured-note": {
+      label: "Structured note", complex: true,
+      what: "A bank-issued note that packages a custom payoff on an underlying into a single security.",
+      mechanics: "An unsecured senior bond from a bank issuer with an embedded option strategy. At maturity it pays a formula-defined return (participation, cap, buffer or coupon) instead of a fixed coupon — and you take the issuer's credit risk.",
+      underlying: "A single stock, sector index or basket tied to the theme.",
+      tenor: "Typically 1–5 years; most commonly 12–36 months.",
+      example: "A 2-year growth note: 150% upside participation to a 25% cap, 1:1 downside below par, A-rated issuer — leveraged participation with no income.",
+      pros: ["Payoff fully customisable to the view", "Can add leverage, protection or income not available in cash", "Single, simple-to-book line"],
+      cons: ["Issuer credit risk (it's an unsecured bond)", "Illiquid — secondary market only at the issuer's mark", "No dividends; caps and fees embedded"],
+      whenToUse: "When you want a tailored risk/reward on a theme — leverage, a cap-for-protection trade, or income — and can hold to maturity.",
+      context: (u) => `Issued on ${u.index}: e.g. a 2-year note giving leveraged, capped participation in ${u.name} in place of holding ${u.ticker} outright.`
+    },
+
+    "buffered-note": {
+      label: "Buffered note", complex: true,
+      what: "A structured note that gives equity upside while absorbing the first slice of any loss.",
+      mechanics: "Links to an index/stock; at maturity you get upside participation (often to a cap), and on the downside the issuer absorbs the first X% (the buffer) — you only lose beyond it. A geared buffer accelerates losses past the buffer.",
+      underlying: "Usually a broad equity index (SPX, SX5E) or a sector index.",
+      tenor: "12–36 months; 14-month and 2-year are common.",
+      example: "Buffered note: 100% upside to a ~15% cap, first 10% of losses absorbed (10% buffer), 14-month, on SPX, A-rated issuer. Index −8% → you're flat; −25% → you lose 15%.",
+      pros: ["Defined downside cushion while staying invested", "Strong re-entry vehicle after harvesting a loss", "No premium outlay — protection funded by the cap"],
+      cons: ["Upside capped", "Issuer credit risk; illiquid to maturity", "No dividends; a buffer is not full protection"],
+      whenToUse: "Re-enter or stay invested when you want a cushion against a pullback but still want participation — classic after a loss harvest or late in a rally.",
+      context: (u) => `On ${u.index}: e.g. 100% up to a ~15% cap with a 10% downside buffer over 14 months — a protected way back into ${u.name} after harvesting a loss in ${u.ticker}.`
+    },
+
+    "call-overwrite": {
+      label: "Call overwrite / covered calls", complex: true,
+      what: "Sell call options against stock you own to turn it into income.",
+      mechanics: "Hold the shares and sell (write) out-of-the-money calls against them. You collect premium up front; if the stock stays below the strike the calls expire worthless and you keep premium + shares. Above the strike, upside is capped and shares may be called away.",
+      underlying: "Single stocks you own, or an index/ETF overlay.",
+      tenor: "Roll monthly to quarterly (30–90 day options).",
+      example: "Own a winner, sell 1-month calls ~5% OTM for ~1.0–1.5% premium; ~10–15% annualised income if repeated, capping gains above the strike.",
+      pros: ["Monetises a flat/range-bound winner into yield", "Premium cushions small drawdowns", "Keeps the position (no immediate tax vs selling)"],
+      cons: ["Caps upside — shares called away in a rally", "Still fully exposed below the premium", "Requires active rolling/management"],
+      whenToUse: "On a high-conviction-but-richly-valued winner you expect to grind sideways and want to be paid to hold.",
+      context: (u) => `Write ~1-month calls ~5% out-of-the-money on your ${u.ticker} line in ${u.name}, harvesting ~1% premium a month while it trades range-bound.`
+    },
+
+    "utility-basket": {
+      label: "Utility basket", complex: false,
+      what: "A basket of regulated utilities positioned for AI/electrification load growth.",
+      mechanics: "Hold a diversified set of regulated and integrated utilities (plus select IPPs) with rate-base growth from datacenters, reshoring and electrification. Income from regulated dividends plus rate-base compounding.",
+      underlying: "Regulated/integrated utilities and grid suppliers (e.g. NextEra, Constellation, Vistra) plus grid names.",
+      tenor: "Strategic, multi-year.",
+      example: "An 8-name, roughly equal-weighted basket (~5–8% of book) tilted to load-growth utilities yielding ~3% with mid-single-digit rate-base growth; or an XLU-type ETF as the core.",
+      pros: ["Regulated, contracted income with a growth kicker", "Lower-beta defensive sleeve", "Direct play on AI power demand"],
+      cons: ["Rate-sensitive (long-duration equity)", "Regulatory/political risk on allowed returns", "IPPs add volatility"],
+      whenToUse: "Income-oriented books wanting the power/AI theme in a defensive, yield-bearing form.",
+      context: (u) => `A basket of load-growth utilities (${u.ticker}-type names) for ${u.name} — regulated income plus datacenter-driven rate-base growth.`
+    },
+
+    "thematic-basket": {
+      label: "Thematic basket", complex: false,
+      what: "A custom, roughly equal-weighted basket of stocks expressing one specific theme.",
+      mechanics: "Build (or buy as a tradable basket) 8–20 names that capture the theme end-to-end. Equal- or conviction-weighted, rebalanced periodically — concentrated enough to express the view, diversified enough to avoid single-name blow-ups.",
+      underlying: "Stocks across the theme's value chain (e.g. gas + nuclear + grid for AI power).",
+      tenor: "Strategic to 12-month, rebalanced quarterly.",
+      example: "A 10-name AI-power basket (gas infra, nuclear operators, turbines, grid) equal-weighted at ~0.6% each for a ~6% sleeve, rebalanced quarterly.",
+      pros: ["Captures a theme no single ETF covers cleanly", "Tunable weights and names", "Diversifies single-name risk"],
+      cons: ["More maintenance than one ETF", "Needs periodic rebalancing", "Commission/implementation drag across many lines"],
+      whenToUse: "When the theme spans several sub-sectors and you want curated exposure rather than an off-the-shelf fund.",
+      context: (u) => `A curated 8–15 name basket across the ${u.name} value chain, equal-weighted into a single ~5–7% sleeve.`
+    },
+
+    "govt-ig-bonds": {
+      label: "Govt / IG bonds", complex: false,
+      what: "Own high-quality government and investment-grade corporate bonds directly for yield and ballast.",
+      mechanics: "Buy individual Treasuries/gilts/bunds and IG corporates, holding to maturity for a known yield-to-maturity (or via a fund). Adds duration that tends to rally when equities fall.",
+      underlying: "Sovereigns (UST/gilt/bund) and IG corporates.",
+      tenor: "Intermediate, ~3–10 year maturities.",
+      example: "A blend of 5–10y Treasuries at ~4.3% YTM and A/BBB corporates at ~5.3% YTM, ~10–15% of book, locking the yield to maturity.",
+      pros: ["Locks in today's yields before cuts", "True equity diversifier (duration)", "High quality, predictable cashflows"],
+      cons: ["Mark-to-market loss if yields rise", "Credit/spread risk on the corporate sleeve", "Lower long-run return than equities"],
+      whenToUse: "Extending out of cash to lock yields and add ballast as the cutting cycle approaches.",
+      context: (u) => `High-quality govvies and IG paper at ~4.3–5.3% YTM — locking yield and adding duration ballast around ${u.name}.`
+    },
+
+    "bond-ladder": {
+      label: "Bond ladder", complex: false,
+      what: "A staggered set of bonds maturing in consecutive years.",
+      mechanics: "Buy roughly equal amounts maturing in each of, say, years 1 through 7. Each year a rung matures and is reinvested at the long end — smoothing reinvestment risk and giving predictable annual liquidity without timing rates.",
+      underlying: "Treasuries and/or IG corporates (or munis for taxable accounts).",
+      tenor: "Ladder spans ~1–7 (or 2–10) years; rolling.",
+      example: "A 1–7 year Treasury ladder, ~$1m per rung at ~4.2–4.6% YTM; each maturing rung rolls into a fresh 7-year, locking ~4.4% blended yield.",
+      pros: ["Removes rate-timing decisions", "Predictable cashflow and annual liquidity", "Self-managing reinvestment"],
+      cons: ["Average yield can lag a barbell in some curves", "Needs enough capital to diversify each rung", "Manual rolls (unless a laddered ETF/UIT)"],
+      whenToUse: "Income books that want dependable cashflow and to neutralise reinvestment risk.",
+      context: (u) => `A 1–7y ladder of high-quality bonds, ~equal per rung at ~4.4% blended YTM, rolling maturities out each year.`
+    },
+
+    "ig-corporates": {
+      label: "IG corporates", complex: false,
+      what: "Investment-grade corporate bonds for extra carry over govvies at modest credit risk.",
+      mechanics: "Hold A/BBB-rated corporate bonds (single names or a fund/ETF) to capture the credit spread above Treasuries. Income is coupon plus spread; default risk is low but non-zero.",
+      underlying: "Senior IG corporate bonds across sectors.",
+      tenor: "Intermediate, ~3–7 years.",
+      example: "An A/BBB corporate sleeve at ~5.2% YTM (~90–110bp over Treasuries), ~8–12% of book, via individual bonds or an LQD-type ETF.",
+      pros: ["Higher yield than govvies for limited extra risk", "Diversified income sleeve", "Liquid via ETFs"],
+      cons: ["Spread widening in risk-off", "Quality drift if not monitored", "Still rate-sensitive"],
+      whenToUse: "Building durable income with a small step out of governments into high-quality credit.",
+      context: (u) => `IG corporate paper at ~5.2% YTM (~100bp of spread) — the carry engine of the income sleeve.`
+    },
+
+    "securitised-sleeve": {
+      label: "Securitised sleeve", complex: false,
+      what: "Select securitised credit — agency MBS, ABS, senior CLOs — for spread and diversification.",
+      mechanics: "Allocate to pools of collateralised cashflows (mortgages, consumer loans, senior CLO tranches), typically via a specialist fund. Adds spread and a different risk factor (prepayment, consumer credit) than corporate bonds.",
+      underlying: "Agency MBS, asset-backed securities, AAA/AA CLO tranches.",
+      tenor: "Intermediate; varies by structure.",
+      example: "A 4–6% allocation to a securitised-credit fund yielding ~6%, weighted to agency MBS and senior (AAA) CLOs for spread with limited credit risk.",
+      pros: ["Attractive all-in yields", "Diversifies away from corporate-spread risk", "Senior tranches are high quality"],
+      cons: ["Complexity and prepayment risk", "Liquidity varies; usually fund-only", "Lower tranches carry real credit risk"],
+      whenToUse: "Income books that already hold govvies/corporates and want spread diversification.",
+      context: (u) => `A specialist securitised-credit fund (agency MBS / senior CLOs) at ~6% yield, diversifying the income sleeve away from corporate spreads.`
+    },
+
+    "equal-weight-index": {
+      label: "Equal-weight index", complex: false,
+      what: "Own the index equal-weighted so the rally can broaden beyond the mega-caps.",
+      mechanics: "Buy an equal-weight version of the benchmark (each constituent ~the same weight) instead of cap-weighted — tilting away from the largest names toward the median stock. A bet that breadth improves.",
+      underlying: "A broad index, equal-weighted (e.g. RSP for the S&P 500).",
+      tenor: "Strategic; the fund rebalances quarterly.",
+      example: "Swap part of an S&P 500 cap-weight core into an equal-weight ETF (RSP); an ~8–10% sleeve cuts top-name weight from ~7% to ~0.2% each.",
+      pros: ["Reduces mega-cap concentration", "Benefits if leadership broadens", "Simple one-ticker implementation"],
+      cons: ["Lags badly if mega-caps keep leading", "Higher turnover/fees than cap-weight", "Small/mid tilt adds cyclicality"],
+      whenToUse: "Diversifying a book dominated by a handful of mega-caps as earnings broaden.",
+      context: (u) => `An equal-weight ETF (RSP-type) sized to dilute mega-cap concentration in the ${u.name} exposure.`
+    },
+
+    "quality-basket": {
+      label: "Quality basket", complex: false,
+      what: "A basket of high-return-on-capital, low-leverage compounders.",
+      mechanics: "Screen for high ROIC, stable margins, low debt and consistent cash generation; hold the resulting names (or a quality-factor ETF). A defensive-growth sleeve that holds up better in drawdowns.",
+      underlying: "Quality-factor stocks across sectors; or a quality ETF (QUAL).",
+      tenor: "Strategic.",
+      example: "A 12–15 name quality basket (or the QUAL ETF) at ~6–8% of book, tilted to industrials/healthcare/staples compounders at reasonable multiples.",
+      pros: ["Lower drawdowns, durable compounding", "Diversifies away from a single hot sector", "Works across cycles"],
+      cons: ["Can lag in junk/cyclical rallies", "'Quality' can get expensive", "Factor crowding"],
+      whenToUse: "Broadening a concentrated growth book into resilient compounders.",
+      context: (u) => `A quality-factor basket (or QUAL ETF) broadening ${u.name} into high-ROIC compounders with lower drawdown.`
+    },
+
+    "international-etf": {
+      label: "International ETF", complex: false,
+      what: "Diversify out of US home-bias into developed / EM international equities.",
+      mechanics: "Buy a developed-international (or EM) ETF to add non-US exposure and FX diversification, capturing the valuation discount to US growth. Currency-hedged share classes are available if you want equity-only exposure.",
+      underlying: "Developed ex-US (EAFE) and/or EM indices.",
+      tenor: "Strategic.",
+      example: "A 6–10% allocation split across an EAFE ETF (IEFA) and a small EM sleeve (IEMG); optionally a currency-hedged class to strip out FX.",
+      pros: ["Wide valuation discount to US", "Weaker-dollar tailwind", "Genuine geographic diversification"],
+      cons: ["Persistent US outperformance has burned this trade before", "FX adds volatility unless hedged", "Governance/quality dispersion"],
+      whenToUse: "Trimming home bias when the dollar and the US-growth premium look stretched.",
+      context: (u) => `A developed-international ETF (IEFA-type) sleeve to trim US home bias and add the valuation-discount / FX angle to ${u.name}.`
+    },
+
+    "value-basket": {
+      label: "Value basket", complex: false,
+      what: "A basket tilted to cheap, cash-generative value stocks.",
+      mechanics: "Hold low-multiple, high-free-cash-flow names (financials, energy, industrials, staples) or a value-factor ETF — a bet that the value/growth gap narrows as the cycle broadens.",
+      underlying: "Value-factor stocks; or a value ETF (e.g. VTV).",
+      tenor: "Strategic to cyclical.",
+      example: "A 6–8% value sleeve via a VTV-type ETF plus a few high-conviction names, tilted to financials and energy at ~10–12x earnings.",
+      pros: ["Cheap entry multiples, dividend support", "Catches up when breadth/rates rotate", "Diversifies a growth-heavy book"],
+      cons: ["Value traps; can stay cheap for years", "Cyclically sensitive", "Lags in a momentum/growth regime"],
+      whenToUse: "Rotating part of a growth-concentrated book toward cyclicals and value as earnings broaden.",
+      context: (u) => `A value-factor basket (VTV-type) tilted to financials/energy, broadening ${u.name} toward cheaper cyclicals.`
+    },
+
+    "infrastructure-fund": {
+      label: "Infrastructure fund", complex: false,
+      what: "A fund holding contracted, inflation-linked infrastructure assets.",
+      mechanics: "Allocate to a listed or open-ended infrastructure fund holding toll roads, midstream, contracted power, airports and utilities. Income is often inflation-linked via concession/contract escalators, with lower drawdown than broad equity.",
+      underlying: "Global listed/core infrastructure assets.",
+      tenor: "Strategic, multi-year.",
+      example: "A 5–8% allocation to a core-infrastructure fund yielding ~4–5% with CPI-linked escalators, as an income-and-ballast diversifier.",
+      pros: ["Inflation-linked, contracted income", "Equity-like return with lower drawdown", "Real-asset diversification"],
+      cons: ["Rate-sensitive", "Some funds use leverage", "Liquidity varies (open-ended vs listed)"],
+      whenToUse: "Income-oriented books wanting real-asset diversification with inflation protection.",
+      context: (u) => `A core-infrastructure fund at ~4–5% yield with CPI-linked income — the real-asset ballast around ${u.name}.`
+    },
+
+    "private-markets": {
+      label: "Private markets", complex: true,
+      what: "Access the theme through private equity, credit or infrastructure funds / co-invests.",
+      mechanics: "Commit capital to a closed-end private fund (PE, private credit, private infra) or a co-investment. Capital is drawn over time and locked for years; return comes from the illiquidity premium, operational value-add and leverage. Often accessed via feeder/evergreen vehicles for private banks.",
+      underlying: "Private companies, assets or loans in the theme.",
+      tenor: "Long — 5–10+ year lock-ups (evergreen vehicles offer limited liquidity).",
+      example: "A $2–5m commitment to a private-infrastructure fund (e.g. datacenter power), drawn over 3 years, ~12–15% target net IRR, 8–10 year life.",
+      pros: ["Illiquidity premium and access to unique assets", "Lower mark-to-market volatility", "Deals not available in public markets"],
+      cons: ["Capital locked for years; J-curve", "High fees; wide manager dispersion", "Qualified-investor gating and capital calls"],
+      whenToUse: "Long-horizon, professional/qualified books that can fund commitments and tolerate illiquidity for higher returns.",
+      context: (u) => `A closed-end or evergreen private fund in ${u.name} (e.g. infra/PE), ~$2–5m committed over a multi-year drawdown for an illiquidity premium.`
+    },
+
+    "reit-basket": {
+      label: "REIT basket", complex: false,
+      what: "A basket of listed real-estate investment trusts for property income.",
+      mechanics: "Hold a diversified set of REITs (logistics, datacenter, residential, healthcare) or a REIT ETF. Income from rents distributed as dividends; also a re-rating play as rates peak.",
+      underlying: "Listed REITs / REIT ETF (e.g. VNQ), tilted to logistics, datacenter and residential.",
+      tenor: "Strategic.",
+      example: "A 4–6% REIT sleeve tilted to logistics and datacenter names yielding ~4%, via a VNQ-type ETF plus 2–3 high-quality single REITs.",
+      pros: ["Liquid real-estate income", "Re-rating upside as rates peak", "Inflation pass-through via rents"],
+      cons: ["Rate-sensitive; hit hard in 2022", "Sector dispersion (office weak)", "Equity-market correlation"],
+      whenToUse: "Adding liquid, income-generating real assets — selectively by property type.",
+      context: (u) => `A REIT basket (VNQ-type plus logistics/datacenter names) at ~4% yield for liquid real-estate income alongside ${u.name}.`
+    },
+
+    "private-real-estate": {
+      label: "Private real estate", complex: true,
+      what: "Direct/fund ownership of physical real estate for contracted income and lower volatility.",
+      mechanics: "Invest via a private real-estate fund (open-ended core or closed-end value-add) holding physical buildings. Income from leases; returns from rent growth, cap-rate moves and (value-add) refurbishment. Valued periodically, so smoother than listed REITs.",
+      underlying: "Physical logistics, residential, datacenter or core commercial assets.",
+      tenor: "Long; multi-year, with periodic liquidity windows.",
+      example: "A 4–6% commitment to a core open-ended real-estate fund yielding ~4–5% with (gated) quarterly redemption windows, tilted to logistics/residential.",
+      pros: ["Stable, contracted income; low reported volatility", "Direct inflation hedge via rents", "Diversifies away from listed-market beta"],
+      cons: ["Illiquid; redemption gates", "Appraisal lag hides true volatility", "Leverage and sector risk (office)"],
+      whenToUse: "Long-horizon income books wanting physical real estate with smoother marks than listed REITs.",
+      context: (u) => `A core private real-estate fund at ~4–5% yield (logistics/residential) with periodic liquidity — smoother than listed REITs for the income sleeve.`
+    },
+
+    "zero-cost-collar": {
+      label: "Zero-cost collar", complex: true,
+      what: "Protect a holding by buying a downside put funded by selling an upside call — at ~no premium.",
+      mechanics: "On a stock you own, buy a protective put (sets the floor) and simultaneously sell a call (sets the ceiling), choosing strikes so the call premium pays for the put. You're protected below the put strike, give up gains above the call strike, and keep the stock (and usually dividends) in between.",
+      underlying: "A concentrated single-stock winner you don't want to sell.",
+      tenor: "3–12 months; commonly 6–12m, rolled.",
+      example: "Hold a stock at $200: buy a 12-month 90% put ($180 floor), sell a 12-month 115% call ($230 ceiling) for ~zero net premium — protected below $180, capped above $230.",
+      pros: ["Locks in a gain without selling (defers tax)", "No upfront premium", "Keeps the position and dividends"],
+      cons: ["Upside capped at the call strike", "Possible early assignment / dividend risk", "Complex / OTC — appropriateness gating"],
+      whenToUse: "A large, deep-in-the-money single name you want to ride a bit longer but must protect — without triggering a taxable sale.",
+      context: (u) => `On your ${u.ticker} winner: buy a ~12-month 90% put and sell a 115% call for ~zero cost — a protected band around the position without selling it.`
+    },
+
+    "liquid-alternatives": {
+      label: "Liquid alternatives", complex: false,
+      what: "Daily-liquid alternative strategies that add an uncorrelated return stream.",
+      mechanics: "Allocate to '40 Act / UCITS funds running market-neutral, long-short, managed-futures or multi-strategy approaches. The aim is equity-like return with low correlation to a 60/40, providing ballast in drawdowns.",
+      underlying: "Diversified alternative strategies in a liquid fund wrapper.",
+      tenor: "Strategic core diversifier; daily liquidity.",
+      example: "A 5–10% allocation across a managed-futures fund and a market-neutral fund, targeting ~5–8% return at <0.3 correlation to equities.",
+      pros: ["Genuine diversification vs 60/40", "Daily liquidity (unlike hedge funds)", "Ballast in equity drawdowns"],
+      cons: ["High strategy/manager dispersion", "Can lag in straight-up equity markets", "Fees above passive"],
+      whenToUse: "Adding an uncorrelated sleeve for resilience without locking up capital.",
+      context: (u) => `Daily-liquid alt funds (managed futures, market-neutral) as an uncorrelated ballast sleeve alongside ${u.name}.`
+    },
+
+    "macro-sleeve": {
+      label: "Macro sleeve", complex: false,
+      what: "A global-macro / trend allocation that can profit in either direction.",
+      mechanics: "Allocate to discretionary global-macro and systematic-trend managers who trade rates, FX, equities and commodities long and short. Designed to be long-volatility / crisis-responsive — often rising when equities fall.",
+      underlying: "Cross-asset macro positions (rates, FX, commodities, equity indices).",
+      tenor: "Strategic; fund liquidity monthly/daily depending on wrapper.",
+      example: "A 5–7% macro/trend sleeve targeting ~7–10% return with positive skew in risk-off (trend has historically gained in sustained equity drawdowns).",
+      pros: ["Crisis-alpha / positive drawdown convexity", "Truly uncorrelated return driver", "Can be long or short any market"],
+      cons: ["Whipsaw in choppy, range-bound markets", "Manager dispersion; opaque", "Long flat stretches"],
+      whenToUse: "Books wanting an explicit hedge/diversifier that tends to perform when equities don't.",
+      context: (u) => `A global-macro/trend sleeve (~5–7%) as crisis-responsive ballast that can profit when ${u.name} sells off.`
+    },
+
+    "physical-gold": {
+      label: "Physical gold / ETC", complex: false,
+      what: "Own gold itself via allocated bullion or a physically-backed ETC.",
+      mechanics: "Buy allocated/vaulted physical gold or a physically-backed exchange-traded commodity (ETC) that holds bars one-for-one. No income; value tracks the gold price. A debasement / tail hedge.",
+      underlying: "Spot gold (XAU).",
+      tenor: "Strategic, open-ended hold.",
+      example: "A 3–7% allocation via a physically-backed ETC (e.g. 4GLD, GLD) sized to the book's protection gap; held as strategic ballast, not traded.",
+      pros: ["Clean tail / debasement hedge", "No credit/counterparty risk (allocated)", "Low correlation to equities and bonds"],
+      cons: ["No yield; storage cost", "Long flat/negative stretches possible", "Sized too big, it drags returns"],
+      whenToUse: "Strategic protection — sizing gold to a book's protection target as ballast against debasement and geopolitical risk.",
+      context: (u) => `A physically-backed gold ETC (GLD/4GLD), 3–7% of book, as strategic ballast — sized to the protection gap, not traded.`
+    },
+
+    "gold-accumulator": {
+      label: "Gold accumulator", complex: true,
+      what: "A structured product to build a gold position at a discount — with conditional obligations.",
+      mechanics: "An accumulator lets you buy gold at a fixed strike below spot on a schedule. If gold trades above a knock-out you stop early (capped benefit); if it falls below the strike you're obliged to buy at the strike (often at double size). Effectively, you finance a discounted entry by selling downside.",
+      underlying: "Spot gold.",
+      tenor: "Typically 3–12 months, with periodic (e.g. weekly) fixings.",
+      example: "12-month gold accumulator: buy at 95% of spot weekly, knock-out at 105%; obliged to take 2x if gold is below the 95% strike at a fixing — accumulates ~5% under market while gold is range-bound.",
+      pros: ["Builds the position below spot", "Good for systematic accumulation in a range", "No upfront premium"],
+      cons: ["Doubled buying into a falling market", "Upside capped by the knock-out", "Complex / OTC — appropriateness and margin"],
+      whenToUse: "Professional books wanting to accumulate gold at a discount with a range-bound-to-firm view.",
+      context: (u) => `A 12-month gold accumulator buying at ~95% of spot on weekly fixings (knock-out ~105%) to build the gold hedge below market.`
+    },
+
+    "fx-forward-collar": {
+      label: "FX forward / collar", complex: true,
+      what: "Hedge a currency mismatch with an outright forward or a zero-cost FX collar.",
+      mechanics: "A forward locks a future exchange rate to fully hedge the mismatch. A collar instead buys a protective option and sells one on the other side (zero premium) to bound the rate within a band — keeping some favourable move while capping adverse moves. Sized to the non-base-currency exposure.",
+      underlying: "The currency pair of the mismatch (e.g. EUR/USD for a USD-asset, EUR-base book).",
+      tenor: "1–12 months, rolled.",
+      example: "Hedge 72% USD exposure in an EUR-base book: sell USD 6-month forward at ~1.08, or a EUR/USD collar protecting beyond 1.12 while giving up gains below 1.04, at zero premium.",
+      pros: ["Removes / bounds an unmanaged FX risk", "Collar keeps some upside at no premium", "Deep, liquid market"],
+      cons: ["A forward gives up any favourable FX move", "Roll cost / carry (rate differential)", "Complex / OTC for Retail"],
+      whenToUse: "Books whose asset currency has drifted far from the base currency, and the rate-differential narrative is turning.",
+      context: (u) => `On ${u.name}: a 6-month forward or zero-cost collar to bound the currency mismatch (e.g. EUR/USD), sized to the non-base exposure.`
+    },
+
+    "currency-hedged-sleeve": {
+      label: "Currency-hedged sleeve", complex: false,
+      what: "Hold the same assets in currency-hedged share classes to strip out FX.",
+      mechanics: "Swap foreign-currency funds/ETFs into their currency-hedged share class, which rolls FX forwards internally to neutralise currency moves. You keep the asset return and remove the FX return — the non-complex way to hedge a mismatch.",
+      underlying: "Existing international equity/bond funds, hedged share class.",
+      tenor: "Strategic, ongoing.",
+      example: "Move a 10% international-equity sleeve into EUR-hedged share classes so an EUR-base client gets the equity return without USD/EUR noise; ~0.1–0.2% hedging cost.",
+      pros: ["Non-complex — Retail-eligible", "Removes FX volatility cleanly", "No derivatives account needed"],
+      cons: ["Small ongoing hedging cost/carry", "Gives up favourable FX moves", "Hedges the fund's currency, not full look-through"],
+      whenToUse: "The simple, appropriateness-friendly FX hedge — especially for Retail books with a currency mismatch.",
+      context: (u) => `Shift the foreign sleeve in ${u.name} into currency-hedged share classes — a Retail-friendly way to strip out the FX mismatch.`
+    },
+
+    "healthcare-basket": {
+      label: "Healthcare basket", complex: false,
+      what: "A basket spanning GLP-1, devices and medical innovation.",
+      mechanics: "Hold a curated set of pharma (GLP-1 leaders), medtech/devices and tools/diagnostics names, or a healthcare ETF tilted to innovation. A durable, less-cyclical growth engine that's under-owned in tech-heavy books.",
+      underlying: "Healthcare innovators; or a healthcare ETF (XLV / IHI for devices).",
+      tenor: "Strategic.",
+      example: "A 5–7% sleeve: ~40% GLP-1/pharma leaders, ~35% devices, ~25% tools/diagnostics — via single names plus an IHI-type device ETF.",
+      pros: ["Durable secular growth, defensive", "Diversifies away from tech concentration", "Under-owned in most growth books"],
+      cons: ["Binary clinical/regulatory risk on single names", "Drug-pricing politics", "GLP-1 valuations elevated"],
+      whenToUse: "Diversifying a tech-concentrated growth book into a second, less-correlated growth engine.",
+      context: (u) => `A healthcare-innovation basket (GLP-1 + devices + tools, ~XLV/IHI core) as a second growth engine diversifying ${u.name}.`
+    },
+
+    "prepaid-variable-forward": {
+      label: "Prepaid variable forward", complex: true,
+      what: "Monetise a concentrated stock now while deferring the sale and capping the price band.",
+      mechanics: "Contract with a bank to deliver a variable number of shares at a future date in exchange for cash up front (typically ~75–90% of value today). It embeds a collar (floor + cap), so you keep gains up to the cap and are protected below the floor — and you get liquidity now without a current taxable sale.",
+      underlying: "A large, low-basis concentrated single stock.",
+      tenor: "1–3 years.",
+      example: "On a $20m stake: a PVF advancing ~85% ($17m) now, floor at 90% / cap at 130%, 2-year; settle in shares or cash at maturity, deferring the capital-gains event.",
+      pros: ["Immediate liquidity from a low-basis position", "Downside protection via the floor", "Defers capital-gains tax"],
+      cons: ["Upside capped above the cap", "Counterparty risk and complex tax (constructive-sale rules)", "Complex / OTC — sophisticated investors only"],
+      whenToUse: "A concentrated, low-basis holder who needs liquidity and protection now but wants to defer the tax hit.",
+      context: (u) => `On a low-basis ${u.ticker} stake: a 2-year PVF advancing ~85% cash now with a 90%/130% collar — liquidity and protection without a taxable sale.`
+    },
+
+    "protective-put": {
+      label: "Protective put", complex: true,
+      what: "Buy a put to insure a holding's downside while keeping all the upside.",
+      mechanics: "Own the stock and buy a put at a chosen strike. Below the strike the put's gains offset the stock's loss (a hard floor); above it you keep full upside. You pay a premium for the insurance.",
+      underlying: "A single stock or index position you want to protect.",
+      tenor: "1–6 months, rolled (LEAPS for longer).",
+      example: "Hold a stock at $200, buy a 3-month 90% put ($180 strike) for ~2.5% premium — loss capped at ~12.5% over the period, full upside retained.",
+      pros: ["Hard floor, uncapped upside", "Simple, exchange-traded", "Keeps the position and dividends"],
+      cons: ["Premium is a recurring drag", "Time decay if the stock holds", "Complex for Retail (options approval)"],
+      whenToUse: "Protecting a winner through a known risk event (earnings, macro) when you don't want to cap upside.",
+      context: (u) => `Buy a 3-month ~90% put on your ${u.ticker} line for ~2–3% — a hard floor through the next event with upside intact.`
+    },
+
+    "tax-loss-harvest": {
+      label: "Tax-loss harvest", complex: false,
+      what: "Realise a paper loss to bank a tax asset, then re-establish the exposure.",
+      mechanics: "Sell the underwater position to crystallise the capital loss (offsets gains elsewhere), then re-enter the exposure without breaching wash-sale rules — buy a similar-but-not-identical ETF/peer immediately, or repurchase the same name after 31 days.",
+      underlying: "Any underwater position with an unrealised loss.",
+      tenor: "Immediate; 30-day wash-sale window.",
+      example: "Sell a −28% line to bank the loss, immediately buy a sector ETF or peer for the 31-day window, then optionally rotate back — the loss offsets realised gains, exposure barely interrupted.",
+      pros: ["Creates a usable tax asset with no view change", "Keeps market exposure via a proxy", "Cheap and simple"],
+      cons: ["Wash-sale rules constrain repurchase", "Proxy tracking error for ~30 days", "Resets the cost basis lower"],
+      whenToUse: "Any time you hold a meaningful loss against realised gains and want the tax benefit without abandoning the exposure.",
+      context: (u) => `Crystallise the loss in the underwater ${u.name} name, hold a ${u.etf}-type proxy through the 31-day wash-sale window, then rotate back.`
+    },
+
+    "peer-rotation": {
+      label: "Peer rotation", complex: false,
+      what: "Rotate from an underwater name into a comparable peer to keep exposure during a wash-sale window.",
+      mechanics: "Sell the loss-making stock and immediately buy a close peer (same sector/factor) so the portfolio keeps its market exposure while the tax loss is banked and the 30-day wash-sale clock runs. Optionally rotate back, or keep the peer if conviction has shifted.",
+      underlying: "An underwater single stock and its sector peer.",
+      tenor: "Immediate; ~30-day window.",
+      example: "Harvest a loss in one pharma name, buy a close pharma peer for 31 days — sector exposure continues, the loss is realised, then decide whether to switch back.",
+      pros: ["Maintains exposure precisely", "Banks the tax loss cleanly", "May upgrade to a better name"],
+      cons: ["Peer isn't identical (basis/idiosyncratic risk)", "Two sets of transaction costs", "Needs a genuine comparable"],
+      whenToUse: "Loss-harvesting a single stock where a close peer keeps the exposure intact through the wash-sale window.",
+      context: (u) => `Sell the underwater ${u.name} name into a close sector peer for the 31-day window — exposure intact, loss banked.`
+    },
+
+    "bond-swap": {
+      label: "Bond swap", complex: false,
+      what: "Swap an underwater bond into similar-quality, current-coupon paper.",
+      mechanics: "Sell a bond that's down on rates (not credit), bank the loss for tax, and buy a comparable-maturity, comparable-quality bond at today's higher coupon. Duration and credit profile stay similar; you pick up carry plus a tax loss with no real change in risk.",
+      underlying: "An underwater high-quality bond (Treasury / IG).",
+      tenor: "Matched to the bond sold.",
+      example: "Sell a UST 1.25% '31 down 14% (a rate, not credit, loss), buy a current-coupon ~4.4% Treasury of similar maturity — bank the loss, lift coupon income by ~3pts.",
+      pros: ["Tax loss with no real risk change", "Materially higher carry", "Stays in high quality"],
+      cons: ["Only works on rate-driven losses", "Small bid/offer cost", "No benefit if you can't use the loss"],
+      whenToUse: "Underwater high-quality bonds where the loss is rate-driven — harvest it and pick up today's coupon.",
+      context: (u) => `Sell the underwater bond and roll into current-coupon paper of the same maturity/quality — bank the loss, lift carry by ~3pts.`
+    },
+
+    "current-coupon-ladder": {
+      label: "Current-coupon ladder", complex: false,
+      what: "Reinvest into a ladder of bonds issued at today's higher coupons.",
+      mechanics: "Build a maturity ladder using newly-issued, current-coupon bonds so each rung carries today's yield. Often the destination of a bond swap — replaces low-coupon legacy holdings with market-rate income across the curve.",
+      underlying: "Current-coupon Treasuries / IG across maturities.",
+      tenor: "Ladder ~1–7 (or 2–10) years.",
+      example: "Redeploy proceeds into a 2–10y ladder of current-coupon bonds averaging ~4.5% YTM, one rung per maturity, replacing ~1–2% legacy coupons.",
+      pros: ["Locks today's higher coupons", "Smooths reinvestment risk", "Predictable cashflow"],
+      cons: ["Mark-to-market risk if yields rise further", "Needs scale to diversify", "Manual rolls"],
+      whenToUse: "The reinvestment leg after harvesting or swapping legacy low-coupon bonds.",
+      context: (u) => `Reinvest proceeds into a 2–10y current-coupon ladder at ~4.5% YTM, replacing legacy low-coupon paper.`
+    },
+
+    "staged-trim": {
+      label: "Staged trim", complex: false,
+      what: "Reduce a winner gradually on a pre-set schedule rather than all at once.",
+      mechanics: "Sell the position down in tranches against a rule (calendar, price levels, or % steps) to de-risk a concentrated winner while spreading the tax hit across periods and avoiding market-timing. Proceeds rotate into diversifiers.",
+      underlying: "A concentrated, appreciated single-stock winner.",
+      tenor: "Spread over months / quarters / tax years.",
+      example: "Trim a 22% position by 3% of book per quarter over a year into an equal-weight core — cutting single-name risk and splitting the gain across two tax years.",
+      pros: ["Non-complex — no options/approval needed", "Spreads tax across periods", "Removes timing risk vs one big sale"],
+      cons: ["Stays exposed while trimming", "Realises gains (taxable)", "Requires discipline to follow the schedule"],
+      whenToUse: "Right-sizing a concentrated winner when a collar/derivative is unavailable or unwanted (e.g. Retail).",
+      context: (u) => `Trim the concentrated ${u.ticker} winner ~3% of book per quarter into a diversified core — spreading the gain across tax years.`
+    },
+
+    "tbill-ladder": {
+      label: "T-bill / muni ladder", complex: false,
+      what: "A short ladder of Treasury bills (or munis) to earn yield on idle cash.",
+      mechanics: "Buy T-bills maturing in staggered weeks/months (e.g. 1/3/6/12-month) so cash rolls continuously at the front-end yield while staying liquid. For taxable books a muni version delivers tax-exempt income. Removes cash drag without taking duration or credit risk.",
+      underlying: "Treasury bills (or short munis).",
+      tenor: "Front-end, ~1–12 months, rolling.",
+      example: "Ladder idle cash across 1/3/6/12-month T-bills at ~4.8–5.1%; for a high-tax book use short munis at ~3.6% tax-exempt (≈5.9% taxable-equivalent).",
+      pros: ["Earns ~5% on otherwise idle cash", "Stays liquid (rungs mature constantly)", "No duration/credit risk; muni option for tax"],
+      cons: ["Reinvestment risk as bills mature into cuts", "Yields fall with the front end", "Slightly more admin than a money fund"],
+      whenToUse: "Putting idle cash to work while preserving liquidity, or as the liquidity leg of a liability plan.",
+      context: (u) => `Ladder idle cash across 1/3/6/12-month T-bills (~5%), or short munis for taxable books — yield without giving up liquidity.`
+    },
+
+    "short-duration-bonds": {
+      label: "Short-duration bonds", complex: false,
+      what: "Step from cash into short high-quality bonds for a bit more yield with little rate risk.",
+      mechanics: "Hold 1–3 year Treasuries / IG corporates (single bonds or a short-duration ETF). Captures most of the yield with low price sensitivity to rates — a low-risk extension of cash that locks yield a little longer than bills.",
+      underlying: "1–3y Treasuries / IG corporates; or a short-duration bond ETF.",
+      tenor: "1–3 years.",
+      example: "Move idle cash into a 1–3y IG bond ETF at ~4.9% YTM, ~1.8y duration — ~+20–40bp over bills, locked a bit longer with minimal rate risk.",
+      pros: ["More yield than cash/bills, low volatility", "Locks yield beyond the very front end", "Liquid via ETFs"],
+      cons: ["Small mark-to-market risk", "Modest credit risk on corporates", "Less liquid than pure bills"],
+      whenToUse: "Reducing cash drag while keeping rate risk minimal and locking yield slightly longer than T-bills.",
+      context: (u) => `Shift idle cash into a 1–3y high-quality bond sleeve (~4.9% YTM, ~1.8y duration) — a low-risk step out of cash.`
+    },
+
+    "cash-secured-puts": {
+      label: "Cash-secured puts", complex: true,
+      what: "Get paid premium to set a limit-buy on a name you'd happily own lower.",
+      mechanics: "Sell (write) a put on a stock you want to buy, setting aside the cash to purchase it at the strike. You collect premium; if the stock stays above the strike you keep it as income, if it falls below you buy the shares at the strike (your target entry) — effectively a paid limit order.",
+      underlying: "A name you'd add to on a dip; or an index.",
+      tenor: "30–60 day options, rolled.",
+      example: "Sell a 1-month put ~5% below spot on a name you want, collect ~1% premium; assigned → you own it ~5% cheaper, not assigned → ~12% annualised income on the reserved cash.",
+      pros: ["Earns income on cash earmarked to invest", "Disciplined, below-market entry", "Monetises the cash sleeve"],
+      cons: ["Obliged to buy in a fast decline (could keep falling)", "Upside above premium foregone if not assigned", "Complex / OTC — options approval"],
+      whenToUse: "Deploying idle cash into names you want to own anyway, getting paid to wait for a better entry.",
+      context: (u) => `Sell 1-month puts ~5% below spot on ${u.name} names you'd add lower — ~1% premium a month, or assignment at your target entry.`
+    },
+
+    "securities-backed-line": {
+      label: "Securities-backed line (SBL)", complex: false,
+      what: "Borrow against the portfolio instead of selling appreciated assets.",
+      mechanics: "A revolving credit line collateralised by marketable securities; advance rate typically ~50–70% of eligible holdings. Funds a liability (tax, mortgage, purchase) without triggering a taxable sale or disturbing the strategy. Variable rate; subject to maintenance/margin call if collateral falls.",
+      underlying: "The diversified portfolio as collateral.",
+      tenor: "Revolving / on-demand.",
+      example: "Draw a $2.4m SBL at ~SOFR+1.5% to fund a Q3 tax bill against a $96m book (well within a ~50% advance rate) — avoiding a sale of appreciated stock into the event.",
+      pros: ["No taxable sale; strategy stays intact", "Fast, flexible liquidity", "Cheaper than disturbing low-basis positions"],
+      cons: ["Floating rate; cost rises with rates", "Margin-call risk if collateral drops", "Adds leverage to the book"],
+      whenToUse: "Meeting a near-term liability when selling appreciated assets would be tax-inefficient and the book can support the collateral.",
+      context: (u) => `Draw an SBL at ~SOFR+1.5% against the book to fund the liability — no taxable sale, strategy untouched.`
+    },
+
+    "diversifiers": {
+      label: "Cross-asset diversifiers", complex: false,
+      what: "A blend of uncorrelated assets/strategies added as portfolio ballast.",
+      mechanics: "Combine return streams with low correlation to equities — gold, trend/macro, market-neutral and high-quality duration — sized to lower whole-portfolio drawdown rather than to maximise return. The point is the correlation, not any single sleeve.",
+      underlying: "Gold + managed futures/macro + quality bonds (a blend).",
+      tenor: "Strategic core.",
+      example: "A 10–15% diversifier block: ~5% gold, ~5% managed-futures, ~5% high-quality duration — aiming to cut 60/40 drawdown by a few points at similar return.",
+      pros: ["Lowers drawdown and volatility", "Multiple uncorrelated drivers", "Improves risk-adjusted return"],
+      cons: ["Drags in straight-up bull markets", "Needs rebalancing discipline", "Instrument/manager selection matters"],
+      whenToUse: "Building genuine resilience into a book that's effectively all equity beta.",
+      context: (u) => `A cross-asset diversifier block (gold + trend + quality duration, ~10–15%) to cut whole-book drawdown around ${u.name}.`
+    },
+
+    "extend-duration": {
+      label: "Extend duration", complex: false,
+      what: "Move out of cash/bills into intermediate bonds to lock yields and add ballast.",
+      mechanics: "Lengthen the average maturity of the fixed-income sleeve from the front end (bills) into ~5–10y high-quality bonds. Locks today's yield for longer and adds duration that appreciates if the cutting cycle drives yields down — a genuine equity diversifier.",
+      underlying: "Intermediate Treasuries / IG corporates (or a core bond ETF).",
+      tenor: "~5–10 year duration target.",
+      example: "Rotate part of a 10% cash/bill holding into a 5–10y bond sleeve at ~4.4% YTM (~6y duration); a 1% fall in yields would add ~6% price upside on top of carry.",
+      pros: ["Locks yields before cuts", "Convexity / upside if yields fall", "Strong equity diversifier"],
+      cons: ["Mark-to-market loss if yields rise", "Gives up some front-end yield today", "Duration cuts both ways"],
+      whenToUse: "Reducing reinvestment risk in cash/bills as the cutting cycle approaches; adding ballast to an equity-heavy book.",
+      context: (u) => `Extend from cash/bills into a 5–10y high-quality bond sleeve (~4.4% YTM, ~6y duration) — lock yield and add ballast to ${u.name}.`
+    },
+
+    "listed-infrastructure": {
+      label: "Listed infrastructure", complex: false,
+      what: "Listed equities of infrastructure operators for liquid, inflation-linked income.",
+      mechanics: "Own listed owners/operators of toll roads, midstream, contracted power, airports and towers — via single names or an infrastructure-equity ETF. Concession/contract structures pass inflation through to revenue; lower drawdown than broad equity, with daily liquidity (unlike private infra).",
+      underlying: "Listed infrastructure equities / ETF (e.g. IGF).",
+      tenor: "Strategic.",
+      example: "A 5–8% allocation to listed infrastructure (an IGF-type ETF plus 2–3 midstream/toll-road names) yielding ~3.5–4.5% with CPI-linked revenue escalators.",
+      pros: ["Inflation-linked, contracted income", "Daily liquidity vs private markets", "Lower-drawdown diversifier"],
+      cons: ["Rate-sensitive", "Equity-market correlation in stress", "Regulatory/concession risk"],
+      whenToUse: "Adding real-asset income with liquidity — the listed alternative to a private-infrastructure commitment.",
+      context: (u) => `A listed-infrastructure sleeve (IGF-type + midstream/toll roads, ~5–8%) at ~4% yield with CPI-linked income — liquid real-asset ballast.`
+    },
+
+    "phoenix-autocall": {
+      label: "Phoenix autocall", complex: true,
+      what: "A yield-generating note that pays conditional coupons and can redeem early.",
+      mechanics: "Note on an underlying (or worst-of a basket). On each observation, if the underlying is above a coupon barrier (e.g. 70%) it pays a fixed coupon; if above the autocall level (e.g. 100%) it redeems early, returning par + coupon. At maturity capital is protected unless the underlying is below a downside barrier (e.g. 60–70%), in which case you take the loss. 'Phoenix' = missed coupons can be recovered later (memory).",
+      underlying: "A single stock, index or worst-of basket — often range-bound names.",
+      tenor: "1–3 years, with quarterly/semi-annual observations.",
+      example: "1-year Phoenix autocall on a semis index: quarterly ~3% coupon (12% p.a.) if index ≥70%, autocall at ≥100%, 65% capital barrier at maturity (memory coupons) — yield on a range-bound view.",
+      pros: ["High conditional income on a flat/range-bound view", "Early redemption frees capital", "Memory feature recovers missed coupons"],
+      cons: ["Capital at risk below the barrier (worst-of is worse)", "Caps upside to the coupons", "Issuer credit risk; complex / OTC"],
+      whenToUse: "Generating yield on names/indices you expect to trade sideways within a band — not for a strong directional view.",
+      context: (u) => `On ${u.index} (or a worst-of basket): e.g. quarterly ~3% coupons (12% p.a.), autocall at 100%, 65% capital barrier — income on a range-bound ${u.name} view.`
+    },
+
+    "call-spread": {
+      label: "Call spread", complex: true,
+      what: "A cheaper, capped way to take bullish upside using two call options.",
+      mechanics: "Buy a call at a lower strike and sell a call at a higher strike (same expiry). The sold call cheapens the position; you profit between the strikes and your gain is capped at the upper strike. Defined cost (net premium) and defined max payoff — leveraged participation in a band.",
+      underlying: "A single stock or index you're moderately bullish on.",
+      tenor: "1–12 months.",
+      example: "On an index at 100: buy the 100-strike call, sell the 115-strike call, net premium ~4% — max ~11% payoff if it's ≥115 at expiry, for a defined ~4% outlay.",
+      pros: ["Cheap leveraged upside; defined risk", "Lower cost than an outright call", "Good for a moderate, bounded view"],
+      cons: ["Upside capped at the short strike", "Premium lost if it doesn't rise (time decay)", "Complex / OTC — options approval"],
+      whenToUse: "A defined-risk bullish tactical view where you expect a move to a level, not a melt-up — or to add cheap upside without full capital.",
+      context: (u) => `On ${u.index}: buy the 100 / sell the 115 call (net ~4%) for capped, defined-risk upside to a ${u.name} move — without committing full capital.`
+    },
+
+    "leveraged-certificate": {
+      label: "Leveraged certificate", complex: true,
+      what: "An exchange-traded certificate giving geared exposure to an underlying.",
+      mechanics: "A bank-issued tracker/factor certificate delivering a multiple (e.g. 2–3x) of the underlying's move, or geared participation above a strike (with a knock-out level). Daily-leveraged factor certs reset each day (path-dependent); participation certs gear a single move. You take issuer credit risk.",
+      underlying: "Single stock, index or commodity.",
+      tenor: "Open-ended (factor) or fixed (participation); a knock-out can end it early.",
+      example: "A 2x long factor certificate on a semis index: a +5% day → ~+10%, a −5% day → ~−10%; knock-out if the index falls ~50% intraday — tactical geared exposure, not a hold.",
+      pros: ["Capital-efficient leverage in one liquid line", "No margin account / maintenance calls", "Exchange-traded, transparent pricing"],
+      cons: ["Daily reset decays in choppy markets (factor certs)", "Knock-out can wipe the position", "Issuer credit risk; complex / OTC"],
+      whenToUse: "Short-term, tactical geared expression of a strong directional view — actively monitored, not buy-and-hold.",
+      context: (u) => `A 2x factor certificate on ${u.index} for tactical geared exposure to ${u.name} — monitored daily, minding reset decay and the knock-out.`
+    }
+  };
+
+  /* --------------------------- alias table -------------------------------- */
+  /* every raw string used anywhere in the app, normalised -> canonical id */
+  const ALIAS = {
+    "direct equity": "direct-equity",
+    "index core": "index-core",
+    "etf / fund": "index-core",
+    "structured note": "structured-note",
+    "structured re-entry note": "structured-note",
+    "call overwrite": "call-overwrite",
+    "covered calls": "call-overwrite",
+    "load-growth utilities": "utility-basket",
+    "utility basket": "utility-basket",
+    "thematic basket": "thematic-basket",
+    "govt / ig bonds": "govt-ig-bonds",
+    "bond ladder": "bond-ladder",
+    "ig corporates": "ig-corporates",
+    "securitised sleeve": "securitised-sleeve",
+    "equal-weight index": "equal-weight-index",
+    "quality basket": "quality-basket",
+    "quality / equal-weight basket": "quality-basket",
+    "international etf": "international-etf",
+    "value basket": "value-basket",
+    "infrastructure fund": "infrastructure-fund",
+    "private markets": "private-markets",
+    "reit basket": "reit-basket",
+    "private real estate": "private-real-estate",
+    "buffered note": "buffered-note",
+    "buffered notes": "buffered-note",
+    "buffered re-entry note": "buffered-note",
+    "zero-cost collar": "zero-cost-collar",
+    "collar": "zero-cost-collar",
+    "liquid alternatives": "liquid-alternatives",
+    "macro sleeve": "macro-sleeve",
+    "physical / etc": "physical-gold",
+    "gold (physical/etc)": "physical-gold",
+    "gold accumulator": "gold-accumulator",
+    "fx forward / collar": "fx-forward-collar",
+    "currency-hedged sleeve": "currency-hedged-sleeve",
+    "healthcare basket": "healthcare-basket",
+    "prepaid variable forward": "prepaid-variable-forward",
+    "protective put": "protective-put",
+    "tax-loss harvest": "tax-loss-harvest",
+    "loss harvest": "tax-loss-harvest",
+    "peer rotation": "peer-rotation",
+    "bond swap": "bond-swap",
+    "current-coupon ladder": "current-coupon-ladder",
+    "staged trim": "staged-trim",
+    "t-bill ladder": "tbill-ladder",
+    "t-bill / muni ladder": "tbill-ladder",
+    "short-duration bonds": "short-duration-bonds",
+    "cash-secured puts": "cash-secured-puts",
+    "securities-backed line (sbl)": "securities-backed-line",
+    "diversifiers": "diversifiers",
+    "cross-asset diversifiers": "diversifiers",
+    "extend duration": "extend-duration",
+    "listed infrastructure": "listed-infrastructure",
+    "phoenix autocall": "phoenix-autocall",
+    "call spread": "call-spread",
+    "leveraged certificate": "leveraged-certificate"
+  };
+
+  function norm(s) { return String(s == null ? "" : s).toLowerCase().replace(/\s+/g, " ").trim(); }
+
+  /* keyword fallback so user-added ideas (arbitrary structure strings) still
+     resolve to a real, sensible entry rather than the generic placeholder. */
+  function keywordResolve(n) {
+    const has = (k) => n.indexOf(k) !== -1;
+    if (has("collar")) return "zero-cost-collar";
+    if (has("buffer")) return "buffered-note";
+    if (has("autocall") || has("phoenix")) return "phoenix-autocall";
+    if (has("covered call") || has("overwrite")) return "call-overwrite";
+    if (has("call spread") || (has("spread") && has("call"))) return "call-spread";
+    if (has("certificate")) return "leveraged-certificate";
+    if (has("variable forward") || has("prepaid")) return "prepaid-variable-forward";
+    if (has("cash-secured") || has("secured put")) return "cash-secured-puts";
+    if (has("protective put") || (has("put") && has("protect"))) return "protective-put";
+    if (has("accumulator")) return "gold-accumulator";
+    if (has("securities-backed") || has("sbl")) return "securities-backed-line";
+    if (has("bond swap") || has("swap")) return "bond-swap";
+    if (has("current-coupon")) return "current-coupon-ladder";
+    if (has("t-bill") || has("tbill") || (has("bill") && has("ladder"))) return "tbill-ladder";
+    if (has("ladder")) return "bond-ladder";
+    if (has("short-duration") || has("short duration")) return "short-duration-bonds";
+    if (has("extend") && has("duration")) return "extend-duration";
+    if (has("duration")) return "extend-duration";
+    if (has("securitised") || has("securitized") || has("clo") || has("mbs")) return "securitised-sleeve";
+    if (has("ig ") || has("corporate")) return "ig-corporates";
+    if (has("govt") || has("government") || has("treasur") || has("gilt")) return "govt-ig-bonds";
+    if (has("loss harvest") || has("tax-loss") || has("harvest")) return "tax-loss-harvest";
+    if (has("peer")) return "peer-rotation";
+    if (has("trim")) return "staged-trim";
+    if (has("structured") || has("note")) return "structured-note";
+    if (has("gold") || has("physical") || has("etc")) return "physical-gold";
+    if (has("fx") || has("forward") || has("currency overlay")) return "fx-forward-collar";
+    if (has("hedged")) return "currency-hedged-sleeve";
+    if (has("reit")) return "reit-basket";
+    if (has("private real")) return "private-real-estate";
+    if (has("private")) return "private-markets";
+    if (has("listed infra")) return "listed-infrastructure";
+    if (has("infrastructure") || has("infra")) return "infrastructure-fund";
+    if (has("equal-weight") || has("equal weight")) return "equal-weight-index";
+    if (has("quality")) return "quality-basket";
+    if (has("value")) return "value-basket";
+    if (has("international") || has("ex-us") || has("ex us")) return "international-etf";
+    if (has("healthcare") || has("health")) return "healthcare-basket";
+    if (has("utility") || has("utilities")) return "utility-basket";
+    if (has("macro") || has("trend")) return "macro-sleeve";
+    if (has("alternativ") || has("hedge fund") || has("market-neutral")) return "liquid-alternatives";
+    if (has("diversif")) return "diversifiers";
+    if (has("basket")) return "thematic-basket";
+    if (has("etf") || has("fund") || has("index")) return "index-core";
+    if (has("direct") || has("equity") || has("shares")) return "direct-equity";
+    return null;
+  }
+
+  function resolve(raw) {
+    const n = norm(raw);
+    if (ALIAS[n]) return ALIAS[n];
+    return keywordResolve(n);
+  }
+
+  function fallback(raw) {
+    return {
+      label: String(raw || "Expression"), complex: false,
+      what: "A way to express this view in the portfolio.",
+      mechanics: "The precise structure for this expression isn't catalogued yet — agree the mechanics, sizing and instrument with the desk before trading.",
+      underlying: "Per the idea's asset class and sector.",
+      tenor: "Per the client's mandate and horizon.",
+      example: "Sized to the book's policy weights and risk targets.",
+      pros: ["Tailored to the specific idea"],
+      cons: ["Needs desk specification before execution"],
+      whenToUse: "When this expression best fits the client's mandate, goals and appropriateness.",
+      context: null
+    };
+  }
+
+  function get(raw) {
+    const id = resolve(raw);
+    return (id && E[id]) ? E[id] : fallback(raw);
+  }
+
+  /* entry + a context line tailored to the idea/finding (ctx has .sector) */
+  function detail(raw, ctx) {
+    const base = get(raw);
+    let contextLine = null;
+    if (typeof base.context === "function") {
+      try { contextLine = base.context(uFor(ctx), ctx || {}); } catch (e) { contextLine = null; }
+    }
+    return {
+      label: base.label, complex: !!base.complex, what: base.what, mechanics: base.mechanics,
+      underlying: base.underlying, tenor: base.tenor, example: base.example,
+      pros: base.pros || [], cons: base.cons || [], whenToUse: base.whenToUse,
+      contextLine, raw: raw
+    };
+  }
+
+  /* --------------------------- rendering ---------------------------------- */
+  function detailHTML(d) {
+    const li = (arr) => (arr || []).map(x => `<li>${esc(x)}</li>`).join("");
+    return `<div class="xd">
+      ${d.contextLine ? `<div class="xd-context"><span class="xd-ctx-k">For this idea</span><span class="xd-ctx-v">${esc(d.contextLine)}</span></div>` : ""}
+      <p class="xd-what">${esc(d.what)}</p>
+      <div class="xd-grid">
+        <div class="xd-row"><span class="xd-k">How it's built</span><span class="xd-v">${esc(d.mechanics)}</span></div>
+        <div class="xd-row"><span class="xd-k">Underlying</span><span class="xd-v">${esc(d.underlying)}</span></div>
+        <div class="xd-row"><span class="xd-k">Tenor</span><span class="xd-v">${esc(d.tenor)}</span></div>
+        <div class="xd-row"><span class="xd-k">Example terms</span><span class="xd-v">${esc(d.example)}</span></div>
+      </div>
+      <div class="xd-pc">
+        <div class="xd-col xd-pros"><span class="xd-k">Pros</span><ul>${li(d.pros)}</ul></div>
+        <div class="xd-col xd-cons"><span class="xd-k">Cons</span><ul>${li(d.cons)}</ul></div>
+      </div>
+      <div class="xd-when"><span class="xd-k">When to use</span><span class="xd-when-v">${esc(d.whenToUse)}</span></div>
+      ${d.complex ? `<div class="xd-note">⚠️ Complex / OTC product — a MiFID Retail account needs re-classification or a non-complex alternative.</div>` : ""}
+    </div>`;
+  }
+
+  function itemHTML(raw, ctx, opts) {
+    opts = opts || {};
+    const d = detail(raw, ctx);
+    const sm = opts.sm ? " sm" : "";
+    const blocked = opts.blocked ? " blocked" : "";
+    return `<div class="struct-acc-item">
+      <button type="button" class="struct-chip struct-toggle${sm}${blocked}" aria-expanded="false">
+        <span class="st-label">${esc(d.label)}</span><span class="st-caret" aria-hidden="true">›</span>
+      </button>
+      <div class="struct-detail" hidden>${detailHTML(d)}</div>
+    </div>`;
+  }
+
+  function accordionHTML(structures, ctx, opts) {
+    opts = opts || {};
+    const items = (structures || []).map(s => itemHTML(s, ctx, {
+      sm: opts.sm,
+      blocked: typeof opts.blockedFn === "function" ? opts.blockedFn(s) : false
+    })).join("");
+    return `<div class="struct-accordion">${items}</div>`;
+  }
+
+  /* attach click/keyboard toggles within a root; idempotent + stops the click
+     bubbling to any clickable parent card */
+  function wire(root) {
+    if (!root) return;
+    root.querySelectorAll(".struct-toggle").forEach(btn => {
+      if (btn.dataset.xwired) return;
+      btn.dataset.xwired = "1";
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const item = btn.closest(".struct-acc-item");
+        if (!item) return;
+        const panel = item.querySelector(".struct-detail");
+        const open = btn.getAttribute("aria-expanded") === "true";
+        btn.setAttribute("aria-expanded", open ? "false" : "true");
+        item.classList.toggle("open", !open);
+        if (panel) panel.hidden = open;
+      });
+    });
+    root.querySelectorAll(".struct-detail").forEach(p => {
+      if (p.dataset.xwired) return;
+      p.dataset.xwired = "1";
+      p.addEventListener("click", (e) => e.stopPropagation());
+    });
+  }
+
+  window.EXPRESSIONS = { resolve, get, detail, itemHTML, accordionHTML, wire, E, SECTOR_U };
+})();

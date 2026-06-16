@@ -28,6 +28,7 @@
   <script src="data.js"></script>
   <script src="charts.js"></script>
   <script src="scanner.js"></script>
+  <script src="expressions.js"></script>
   <script src="morgan.js"></script>
   <script>
   (function () {
@@ -89,7 +90,7 @@
         </div>
         <h4>${esc(it.title)}</h4>
         <p class="rc-why">${esc(it.rationale)}</p>
-        <div class="rc-structs">${(it.structures || []).slice(0, 3).map(s => `<span class="struct-chip sm">${esc(s)}</span>`).join("")}</div>
+        <div class="rc-structs">${window.EXPRESSIONS.accordionHTML((it.structures || []).slice(0, 3), { sector: it.sector, assetClass: it.assetClass, title: it.title }, { sm: true })}</div>
         <div class="rc-foot"><span class="rc-bucket">${esc(it.assetClass)}</span><span class="rc-cta">${it.source === "View" ? "View idea ›" : "Open client ›"}</span></div>
       </article>`).join("") + `</div>` : `<p class="rec-why">No recommendations — book is on plan.</p>`;
 
@@ -166,6 +167,7 @@
 
     document.querySelectorAll(".reco-card[data-href]").forEach(el =>
       el.addEventListener("click", () => { location.href = el.dataset.href; }));
+    window.EXPRESSIONS.wire(document.getElementById("report"));
   })();
   </script>
 </body>
