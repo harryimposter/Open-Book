@@ -21,23 +21,69 @@
   let activeThemeId = null;
   let selectedClientId = null;
   let ptFindings = [];
+  let viewsQuery = "";   // Solutions Views search
+  let focusQuery = "";   // Today's Focus search
 
-  /* ---------- persistence ---------- */
+  /* ---------- persistence ----------
+     localStorage holds: user-added themes/ideas, the set of seed ideas the user
+     has hidden (deleted), and the set of Today's-Focus ideas they've dismissed. */
   function loadUser() {
-    try { return JSON.parse(localStorage.getItem(LS_KEY)) || { themes: [], ideas: [] }; }
-    catch { return { themes: [], ideas: [] }; }
+    let u;
+    try { u = JSON.parse(localStorage.getItem(LS_KEY)) || {}; }
+    catch { u = {}; }
+    u.themes = u.themes || [];
+    u.ideas = u.ideas || [];
+    u.hiddenIdeas = u.hiddenIdeas || [];        // seed-idea ids removed by the user
+    u.dismissedFocus = u.dismissedFocus || [];  // Today's-Focus idea ids dismissed
+    return u;
   }
   function saveUser(u) { localStorage.setItem(LS_KEY, JSON.stringify(u)); }
   let userData = loadUser();
 
   function rebuildData() {
     const themes = BASE_THEMES.concat((userData.themes || []).map(t => ({ ...t, _user: true })));
-    const ideas  = BASE_IDEAS.concat((userData.ideas  || []).map(i => ({ ...i, _user: true })));
+    const hidden = userData.hiddenIdeas || [];
+    const ideas  = BASE_IDEAS.concat((userData.ideas || []).map(i => ({ ...i, _user: true })))
+      .filter(i => !hidden.includes(i.id));
     // keep window.SEED in sync so Scanner matches user-added ideas too
     window.SEED.themes = themes;
     window.SEED.ideas = ideas;
     DATA = { themes, ideas, clients: window.SEED.clients };
   }
+
+  /* ---------- delete / dismiss ---------- */
+  function confirmAction(title, detail, onYes) {
+    openModal(`
+      <div class="modal-head"><span class="eyebrow">Confirm</span><h2>${esc(title)}</h2></div>
+      <div class="modal-body"><p class="rub-p">${detail}</p></div>
+      <div class="modal-foot"><button class="btn btn-ghost" id="cfNo">Cancel</button><button class="btn btn-danger" id="cfYes">Delete</button></div>`);
+    $("#cfNo").onclick = closeModal;
+    $("#cfYes").onclick = () => { closeModal(); onYes(); };
+  }
+
+  /* remove a Solutions Views idea: user-added → drop it; seed → hide it. Persists. */
+  function deleteViewIdea(id) {
+    const idx = (userData.ideas || []).findIndex(i => i.id === id);
+    if (idx >= 0) userData.ideas.splice(idx, 1);
+    else if (!userData.hiddenIdeas.includes(id)) userData.hiddenIdeas.push(id);
+    saveUser(userData);
+    rebuildData();
+    if (!themeById(activeThemeId)) activeThemeId = DATA.themes[0] && DATA.themes[0].id;
+    closeDrawer();
+    renderThemes(); renderIdeaPanel(); renderBookTable(); renderBookStats();
+    if (selectedClientId) renderClientDetail(clientById(selectedClientId));
+  }
+
+  /* dismiss a Today's-Focus idea (persists in localStorage; harmless once the
+     daily file regenerates with new ids). */
+  function dismissFocusIdea(id) {
+    if (!userData.dismissedFocus.includes(id)) userData.dismissedFocus.push(id);
+    saveUser(userData);
+    closeDrawer();
+    renderFocus();
+    if (selectedClientId) renderClientDetail(clientById(selectedClientId));
+  }
+  const isDismissed = (id) => (userData.dismissedFocus || []).includes(id);
 
   /* ---------- helpers ---------- */
   const clientById = (id) => DATA.clients.find(c => c.id === id);
@@ -69,29 +115,67 @@
         <span class="count">${ideasForTheme(t.id).length}</span>
       </li>`).join("");
     $$("#themeList .theme-item").forEach(el =>
-      el.addEventListener("click", () => { activeThemeId = el.dataset.theme; renderThemes(); renderIdeaPanel(); }));
+      el.addEventListener("click", () => { clearViewsSearch(true); activeThemeId = el.dataset.theme; renderThemes(); renderIdeaPanel(); }));
+  }
+
+  function clearViewsSearch(skipRender) {
+    viewsQuery = "";
+    const inp = $("#viewsSearch"); if (inp) inp.value = "";
+    const c = $("#viewsSearchClear"); if (c) c.hidden = true;
+    if (!skipRender) renderIdeaPanel();
+  }
+
+  function viewsIdeaMatches(idea, q) {
+    if (!q) return true;
+    const theme = themeById(idea.themeId);
+    const hay = [idea.title, idea.assetClass, idea.sector, idea.conviction, idea.type,
+      theme ? theme.name : "", ...(idea.structures || []),
+      ...window.Scanner.clientsForIdea(idea).map(x => x.client.name)
+    ].join(" ").toLowerCase();
+    return hay.includes(q);
   }
 
   function renderIdeaPanel() {
-    const theme = themeById(activeThemeId) || DATA.themes[0];
-    if (!theme) return;
-    activeThemeId = theme.id;
-    $("#ideaThemeEyebrow").textContent = theme._user ? "Custom theme" : "Theme";
-    $("#ideaThemeTitle").textContent = theme.name;
-    $("#ideaThemeBlurb").textContent = theme.blurb || "";
-    const ideas = ideasForTheme(theme.id);
+    const searching = !!viewsQuery;
+    let ideas, eyebrow, title, blurb;
+    if (searching) {
+      ideas = DATA.ideas.filter(i => viewsIdeaMatches(i, viewsQuery));
+      eyebrow = "Search"; title = `Results for “${viewsQuery}”`;
+      blurb = `${ideas.length} idea${ideas.length === 1 ? "" : "s"} across all themes match — by name, theme, asset class, expression or flagged client.`;
+    } else {
+      const theme = themeById(activeThemeId) || DATA.themes[0];
+      if (!theme) return;
+      activeThemeId = theme.id;
+      ideas = ideasForTheme(theme.id);
+      eyebrow = theme._user ? "Custom theme" : "Theme"; title = theme.name; blurb = theme.blurb || "";
+    }
+    $("#ideaThemeEyebrow").textContent = eyebrow;
+    $("#ideaThemeTitle").textContent = title;
+    $("#ideaThemeBlurb").textContent = blurb;
     const tiles = $("#tiles");
     tiles.innerHTML = ideas.length
-      ? ideas.map(renderTile).join("")
-      : `<div class="empty-note">No ideas under this theme yet. Use <strong>+ Add idea</strong> to create one.</div>`;
+      ? ideas.map(i => renderTile(i, searching)).join("")
+      : (searching
+        ? `<div class="empty-note">No ideas match “${esc(viewsQuery)}”. <button class="link-btn" id="viewsClearInline">Clear search</button></div>`
+        : `<div class="empty-note">No ideas under this theme yet. Use <strong>+ Add idea</strong> to create one.</div>`);
     $$("#tiles .tile").forEach(el => el.addEventListener("click", () => openIdeaDrawer(el.dataset.idea)));
+    $$("#tiles .tile-del").forEach(el => el.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const id = el.closest(".tile").dataset.idea, idea = ideaById(id);
+      confirmAction("Delete this view?",
+        `“${esc(idea ? idea.title : "")}” will be removed from Solutions Views.${idea && idea._user ? "" : " (Restore the default views by clearing this site's saved data.)"}`,
+        () => deleteViewIdea(id));
+    }));
+    const clr = $("#viewsClearInline"); if (clr) clr.addEventListener("click", () => clearViewsSearch());
   }
 
-  function renderTile(idea) {
+  function renderTile(idea, searching) {
     const clients = clientsForIdea(idea);
     const avatars = clients.slice(0, 4).map(x => avatar(x.client.name)).join("");
     const extra = clients.length > 4 ? `<span class="avatar">+${clients.length - 4}</span>` : "";
+    const theme = themeById(idea.themeId);
     return `<article class="tile" data-idea="${esc(idea.id)}">
+      <button class="tile-del" type="button" title="Delete this view" aria-label="Delete ${esc(idea.title)}">✕</button>
       <div class="tile-top">
         <span class="tag ${convClass(idea.conviction)}">${esc(idea.conviction)}</span>
         <span class="tag type">${esc(idea.type || "Thematic")}</span>
@@ -99,7 +183,7 @@
       </div>
       <h3>${esc(idea.title)}</h3>
       <p class="thesis">${esc(idea.thesis)}</p>
-      <div class="tile-tags">${esc(idea.assetClass)} · ${esc(idea.sector)}</div>
+      <div class="tile-tags">${searching && theme ? `<span class="tile-theme">${esc(theme.name)}</span> · ` : ""}${esc(idea.assetClass)} · ${esc(idea.sector)}</div>
       <div class="tile-foot">
         <span class="avatars">${avatars}${extra}</span>
         <span class="clients-pill">${clients.length} book${clients.length === 1 ? "" : "s"}</span>
@@ -154,9 +238,16 @@
           <span class="eyebrow">Which books this fits · ${clients.length}</span>
           ${clientCards}
         </div>
+        <div class="drawer-section drawer-danger">
+          <button class="del-btn" id="drawerDelIdea" type="button">✕ Delete this view</button>
+        </div>
       </div>`;
     $("#drawerClose").addEventListener("click", closeDrawer);
     window.EXPRESSIONS.wire($("#drawer"));
+    $("#drawerDelIdea").addEventListener("click", () =>
+      confirmAction("Delete this view?",
+        `“${esc(idea.title)}” will be removed from Solutions Views.${idea._user ? "" : " (Restore the default views by clearing this site's saved data.)"}`,
+        () => deleteViewIdea(idea.id)));
     $$("#drawer .client-apply").forEach(el =>
       el.addEventListener("click", () => { closeDrawer(); switchTab("book"); selectClient(el.dataset.goclient); }));
     $("#overlay").classList.add("open");
@@ -746,7 +837,8 @@
   let FOCUS_BY_ID = {};
   const fitTier = (fit) => fit >= 68 ? "Strong" : fit >= 50 ? "Good" : "Marginal";
 
-  /* compact tile — just the essentials; clicking opens the full side drawer */
+  /* compact tile — just the essentials; clicking opens the full side drawer.
+     A role="button" div (not a <button>) so we can nest the dismiss ✕ button. */
   function focusTileHTML(idea, opts) {
     opts = opts || {};
     const conv = idea.conviction;
@@ -754,7 +846,9 @@
     const rightChip = opts.client
       ? `<span class="fcl-fit ${fitTierClass(fitTier(opts.fit))}" title="Client-fit score for ${esc(opts.client.name)}">${opts.fit}<span class="fcl-fit-lbl">fit</span></span>`
       : (() => { const n = window.MAPPING.flagClients(idea).length; return `<span class="ft-count">${n} book${n === 1 ? "" : "s"}</span>`; })();
-    return `<button type="button" class="focus-tile" data-ftile="${esc(idea.id)}"${opts.client ? ` data-fclient="${esc(opts.client.id)}"` : ""}>
+    const del = opts.deletable ? `<button class="tile-del" type="button" title="Dismiss this idea" aria-label="Dismiss ${esc(idea.name)}">✕</button>` : "";
+    return `<div class="focus-tile" role="button" tabindex="0" data-ftile="${esc(idea.id)}"${opts.client ? ` data-fclient="${esc(opts.client.id)}"` : ""}>
+      ${del}
       <div class="ft-top">
         <span class="ft-conv ${convTierClass(conv.tier)}" title="Conviction ${conv.score}/100 (${esc(conv.tier)})">${conv.score}</span>
         <div class="ft-id">
@@ -767,7 +861,7 @@
         ${idea.themeId ? `<span class="fc-tag theme nolink">${esc(theme ? theme.name : "House view")}</span>` : `<span class="fc-tag offtheme">Off-theme</span>`}
         ${rightChip}
       </div>
-    </button>`;
+    </div>`;
   }
 
   /* the full detail (everything from the old long card) — rendered into the drawer */
@@ -808,7 +902,11 @@
         <div class="fc-clients">${flags.length ? flags.map(f => focusClientHTML(idea, f)).join("") : `<p class="fcl-why">No client in the book is a strong fit right now (scored live against the Advisor Book).</p>`}</div>
       </div>
 
-      <div class="drawer-section">${factsHTML(idea)}</div>`;
+      <div class="drawer-section">${factsHTML(idea)}</div>
+
+      <div class="drawer-section drawer-danger">
+        <button class="del-btn" id="drawerDismiss" type="button">✕ Dismiss this idea</button>
+      </div>`;
   }
 
   /* open the full focus detail in the shared side drawer (same component as Views) */
@@ -834,6 +932,8 @@
     $$(".fc-tag.theme[data-gotheme]", root).forEach(el => el.addEventListener("click", () => {
       const id = el.dataset.gotheme; closeDrawer(); activeThemeId = id; switchTab("ideas"); renderThemes(); renderIdeaPanel();
     }));
+    $("#drawerDismiss").addEventListener("click", () =>
+      confirmAction("Dismiss this idea?", `“${esc(idea.name)}” will be hidden from Today's Focus.`, () => dismissFocusIdea(idea.id)));
     $("#overlay").classList.add("open");
     root.classList.add("open");
     root.setAttribute("aria-hidden", "false");
@@ -843,11 +943,32 @@
   function topFocusIdeasForClient(client, n) {
     const TF = window.TODAY_FOCUS;
     if (!TF) return [];
-    return (TF.earnings || []).concat(TF.exEarnings || []).map(idea => {
+    return (TF.earnings || []).concat(TF.exEarnings || []).filter(i => !isDismissed(i.id)).map(idea => {
       const fit = window.MAPPING.scoreIdeaForClient(idea, client).fit;
       const conv = (idea.conviction && idea.conviction.score) || 0;
       return { idea, fit, conv, blend: Math.round(0.45 * conv + 0.55 * fit) };
     }).sort((a, b) => b.blend - a.blend).slice(0, n);
+  }
+
+  function focusIdeaMatches(idea, q) {
+    if (!q) return true;
+    const theme = idea.themeId ? themeById(idea.themeId) : null;
+    const hay = [idea.name, idea.ticker, idea.headline, idea.sector, idea.assetClass, idea.kind,
+      theme ? theme.name : "off-theme", ...(idea.structures || []),
+      ...window.MAPPING.flagClients(idea).map(f => f.client.name)
+    ].join(" ").toLowerCase();
+    return hay.includes(q);
+  }
+  function clearFocusSearch() {
+    focusQuery = "";
+    const inp = $("#focusSearch"); if (inp) inp.value = "";
+    const c = $("#focusSearchClear"); if (c) c.hidden = true;
+    renderFocus();
+  }
+  function focusEmptyHTML() {
+    return focusQuery
+      ? `<div class="empty-note">No ideas match “${esc(focusQuery)}”. <button class="link-btn focusClearInline" type="button">Clear search</button></div>`
+      : `<div class="empty-note">Nothing here right now.</div>`;
   }
 
   function renderFocus() {
@@ -858,16 +979,28 @@
     $("#focusAsOf").textContent = "as of " + fmtFocusDate(TF.asOf) + " " + TF.asOf.slice(0, 4);
     $("#focusSweepNote").innerHTML =
       `<span class="fsn-k">Market sweep</span> ${esc(TF.sweep.sources.join(" · "))}. <span class="fsn-rule">${esc(TF.sweep.rule)}</span>`;
-    $("#focusEarnings").innerHTML = (TF.earnings || []).map(i => focusTileHTML(i)).join("");
-    $("#focusExEarnings").innerHTML = (TF.exEarnings || []).map(i => focusTileHTML(i)).join("");
+    const keep = (i) => !isDismissed(i.id) && focusIdeaMatches(i, focusQuery);
+    const earn = (TF.earnings || []).filter(keep), ex = (TF.exEarnings || []).filter(keep);
+    $("#focusEarnings").innerHTML = earn.length ? earn.map(i => focusTileHTML(i, { deletable: true })).join("") : focusEmptyHTML();
+    $("#focusExEarnings").innerHTML = ex.length ? ex.map(i => focusTileHTML(i, { deletable: true })).join("") : focusEmptyHTML();
     wireFocusTiles($("#view-focus"));
+    $$("#view-focus .focusClearInline").forEach(b => b.addEventListener("click", () => clearFocusSearch()));
   }
 
   /* wire compact tiles (Today's Focus + Advisor-Book top-3) -> open the side drawer */
   function wireFocusTiles(root) {
     if (!root) return;
-    $$(".focus-tile[data-ftile]", root).forEach(btn =>
-      btn.addEventListener("click", () => openFocusDrawer(btn.dataset.ftile)));
+    $$(".focus-tile[data-ftile]", root).forEach(el => {
+      el.addEventListener("click", () => openFocusDrawer(el.dataset.ftile));
+      el.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openFocusDrawer(el.dataset.ftile); }
+      });
+    });
+    $$(".focus-tile .tile-del", root).forEach(el => el.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const id = el.closest(".focus-tile").dataset.ftile, idea = FOCUS_BY_ID[id];
+      confirmAction("Dismiss this idea?", `“${esc(idea ? idea.name : "")}” will be hidden from Today's Focus.`, () => dismissFocusIdea(id));
+    }));
   }
 
   /* ----------------------- rubric / methodology modal ----------------- */
@@ -1000,6 +1133,13 @@
     $("#rubricBtn").addEventListener("click", openRubric);
     $("#draftGoBtn").addEventListener("click", () => openDraftView($("#draftThesis").value));
     $("#draftThesis").addEventListener("keydown", e => { if (e.key === "Enter") openDraftView($("#draftThesis").value); });
+
+    const fs = $("#focusSearch"), fsc = $("#focusSearchClear");
+    fs.addEventListener("input", () => { focusQuery = fs.value.trim().toLowerCase(); fsc.hidden = !fs.value; renderFocus(); });
+    fsc.addEventListener("click", () => clearFocusSearch());
+    const vs = $("#viewsSearch"), vsc = $("#viewsSearchClear");
+    vs.addEventListener("input", () => { viewsQuery = vs.value.trim().toLowerCase(); vsc.hidden = !vs.value; renderIdeaPanel(); });
+    vsc.addEventListener("click", () => clearViewsSearch());
 
     renderClientSelect(); renderBookStats(); renderBookTable();
     $$(".book-viewtoggle .seg").forEach(b => b.addEventListener("click", () => setBookView(b.dataset.bookview)));

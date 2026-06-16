@@ -993,3 +993,42 @@ button.struct-chip.struct-toggle:focus-visible { outline: 2px solid var(--gold);
   .fc-intel { grid-template-columns: repeat(2, 1fr); }
   .draftbar { flex-direction: column; }
 }
+
+/* ===== search bars (Today's Focus + Solutions Views) ===================== */
+.search-bar { position: relative; display: flex; align-items: center; margin-bottom: 18px; }
+.search-ico { position: absolute; left: 14px; font-size: 17px; color: var(--ink-faint); pointer-events: none; }
+.search-input {
+  width: 100%; font-family: var(--sans); font-size: 13.5px; color: var(--ink);
+  background: var(--paper); border: 1px solid var(--line-strong); border-radius: var(--radius);
+  padding: 11px 38px;
+}
+.search-input:focus { outline: none; border-color: var(--bronze); }
+.search-input::-webkit-search-cancel-button { display: none; }
+.search-clear {
+  position: absolute; right: 8px; width: 26px; height: 26px; border: none; background: none;
+  color: var(--ink-faint); font-size: 13px; cursor: pointer; border-radius: 50%;
+}
+.search-clear:hover { background: var(--cream-2); color: var(--ink); }
+
+/* ===== delete affordances =============================================== */
+.tile, .focus-tile { position: relative; }
+.tile-del {
+  position: absolute; top: 8px; right: 8px; width: 24px; height: 24px; z-index: 4;
+  border: 1px solid transparent; background: var(--paper); color: var(--ink-faint);
+  font-size: 11px; line-height: 1; cursor: pointer; border-radius: 50%; opacity: 0;
+  transition: opacity .12s, background .12s, color .12s, border-color .12s;
+}
+.tile:hover .tile-del, .focus-tile:hover .tile-del, .tile-del:focus-visible { opacity: 1; }
+.tile-del:hover { background: #F9EEEA; color: var(--neg); border-color: #E6C4BC; }
+.focus-tile .ft-id { padding-right: 18px; }
+.tile-theme { color: var(--bronze-deep); font-weight: 600; }
+
+.drawer-danger { border-top: 1px solid var(--line); padding-top: 14px; }
+.del-btn {
+  background: none; border: 1px solid #E0C3BB; color: var(--neg); border-radius: var(--radius);
+  padding: 9px 14px; font-size: 12.5px; letter-spacing: .03em; cursor: pointer;
+}
+.del-btn:hover { background: #F9EEEA; border-color: var(--neg); }
+.btn-danger { background: var(--neg); color: #fff; border: none; }
+.btn-danger:hover { background: #863F35; }
+.link-btn { background: none; border: none; color: var(--bronze-deep); font-weight: 600; cursor: pointer; padding: 0; font-size: inherit; text-decoration: underline; }
