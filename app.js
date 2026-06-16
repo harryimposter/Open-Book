@@ -251,6 +251,7 @@
     if (!c) return;
     const rec = window.Scanner.recommendations(c);
     const nba = rec.nba;
+    const curBuckets = window.Scanner.bucketAlloc(c.split);
     const nbaKey = nba ? (nba.source === "View" ? nba.ideaId : nba.title) : null;
 
     const groupsHTML = rec.groups.map(g => `
@@ -310,6 +311,16 @@
       </div>` : ""}
 
       <div class="agenda"><span class="eyebrow">The desk's agenda for this book</span><p>${esc(c.summary)}</p></div>
+
+      <div class="panel" style="margin-top:18px">
+        <div class="panel-head"><h3>Strategic allocation — now vs target</h3></div>
+        <div class="panel-body">${BPCharts.goalTargetBar(c.goals.target, curBuckets)}</div>
+      </div>
+
+      <details class="goals-explainer" style="margin-top:14px">
+        <summary>What do these goals mean? <span class="ge-hint">Growth · Income · Protection · Structured notes · Liquidity</span></summary>
+        <div class="ge-body">${BPCharts.goalGlossary()}</div>
+      </details>
 
       <div class="panel" style="margin-top:18px">
         <div class="panel-head"><h3>Recommendations by asset class</h3><span class="rec-theme" style="margin-left:auto">${rec.findings.length} from the book · ${rec.viewItems.length} from Views</span></div>
@@ -378,13 +389,13 @@
     const rows = DATA.clients.map(c => {
       const ns = normSplit(c.split);
       const buckets = window.Scanner.bucketAlloc(c.split);
-      const gap = SEED.GOAL_BUCKETS.map(b => ({ key: b.key, d: (c.goals.target[b.key] || 0) - (buckets[b.key] || 0) }))
+      const gap = SEED.GOAL_BUCKETS.map(b => ({ key: b.key, name: b.name || b.key, d: (c.goals.target[b.key] || 0) - (buckets[b.key] || 0) }))
         .sort((a, b) => b.d - a.d)[0];
-      const gapTxt = gap && gap.d >= 4 ? `${gap.key} <b>−${gap.d.toFixed(0)}</b>` : `<span class="cov-ontrack">on plan</span>`;
+      const gapTxt = gap && gap.d >= 4 ? `${esc(gap.name)} <b>${gap.d.toFixed(0)}pts under</b>` : `<span class="cov-ontrack">on plan</span>`;
       const cells = cols.map(ac => {
         const v = Math.round(ns[ac] || 0);
         const shade = v === 0 ? 0 : Math.min(1, v / 45);
-        return `<div class="cov-cell cov-num" style="background:rgba(154,123,79,${(shade * 0.85).toFixed(2)});color:${shade > 0.55 ? "#fff" : "var(--ink)"}" title="${esc(ac)} ${v}%">${v ? v + "%" : "·"}</div>`;
+        return `<div class="cov-cell cov-num" style="background:rgba(154,123,79,${(shade * 0.85).toFixed(2)});color:${shade > 0.55 ? "#fff" : "var(--ink)"}" title="${esc(c.name)} holds ${v}% of the book in ${esc(ac)}">${v ? v + "%" : "·"}</div>`;
       }).join("");
       return `<div class="cov-row" data-client="${esc(c.id)}">
         <div class="cov-cell cov-client">${avatar(c.name)}<span>${esc(c.name)}</span></div>
@@ -392,14 +403,15 @@
     }).join("");
     $("#coverageWrap").innerHTML = `
       <div class="cov-grid" style="--cols:${cols.length + 1}">${head}${rows}</div>
-      <p class="cov-note">Each row is a client; each column an <b>asset class</b>, shaded by weight (darker = bigger holding). The <b>Biggest gap</b> column shows where the book is furthest under its strategic target — the sleeve to build. Click a row to open the client.</p>`;
+      <p class="cov-note"><b>Each number is the % of that client's book held in that asset class</b> (cells shaded darker = a bigger holding; “·” = none). It is a holding weight, <b>not</b> a gap. The <b>Biggest gap</b> column is the one place the book is furthest <b>under its strategic goal target</b>, in percentage points — e.g. “Structured 8pts under” means the book holds 8pts less in structured notes than its plan, so that's the sleeve to build. Click a row to open the client.</p>`;
     $$("#coverageWrap .cov-row[data-client]").forEach(el =>
       el.addEventListener("click", () => { setBookView("list"); selectClient(el.dataset.client); }));
   }
 
   /* ====================== PRE-TRADE ANALYSIS ========================= */
   const CUSTOM_STRUCTURES = ["Direct equity", "ETF / fund", "Covered calls", "Zero-cost collar",
-    "Buffered note", "Phoenix autocall", "Call spread", "Leveraged certificate", "Cash-secured puts"];
+    "Buffered note", "Phoenix autocall", "Reverse convertible", "Capital-protected note",
+    "HALO basket (ACM+)", "Call spread", "Leveraged certificate", "Cash-secured puts"];
 
   function renderPretradeForm() {
     $("#ptClient").innerHTML = DATA.clients.map(c =>
@@ -499,10 +511,13 @@
 
     /* checks */
     const checks = [];
-    const otc = c.classification === "Retail" && SEED.isOtcOption(structure);
-    checks.push(otc
-      ? { type: "warn", title: "Appropriateness — MiFID Retail blocks this", detail: `${c.name} is <b>${c.mifid}</b>. A <b>${esc(structure)}</b> is a complex / OTC product — Retail can't trade it without re-classification or a non-complex alternative (direct equity, ETF, fund, bond ladder).` }
-      : { type: "ok", title: "Appropriateness — cleared", detail: `${c.name} (${c.mifid}) can trade <b>${esc(structure)}</b>.` });
+    const cls = SEED.complexityOf(structure);
+    const retailOtc = c.classification === "Retail" && cls === "otc";
+    checks.push(retailOtc
+      ? { type: "warn", title: "Appropriateness — MiFID Retail blocks this", detail: `${c.name} is <b>${c.mifid}</b>. A <b>${esc(structure)}</b> is an <b>OTC derivative</b> — a Retail client can't trade it without Professional re-classification. Use a structured-product or non-complex alternative (autocall / buffered note, direct equity, ETF, bond ladder).` }
+      : cls === "structured"
+        ? { type: "ok", title: "Appropriateness — structured product, Retail-eligible", detail: `<b>${esc(structure)}</b> is a <b>packaged security (a note)</b>, so ${c.name} (${c.mifid}) can hold it — unlike an OTC derivative. It's still a complex product, so the appropriateness test applies.` }
+        : { type: "ok", title: "Appropriateness — cleared", detail: `${c.name} (${c.mifid}) can trade <b>${esc(structure)}</b>.` });
 
     checks.push(fitText
       ? { type: "ok", title: "Suitability — fits the book", detail: fitText }

@@ -79,29 +79,29 @@
     },
 
     "structured-note": {
-      label: "Structured note", complex: true,
-      what: "A bank-issued note that packages a custom payoff on an underlying into a single security.",
-      mechanics: "An unsecured senior bond from a bank issuer with an embedded option strategy. At maturity it pays a formula-defined return (participation, cap, buffer or coupon) instead of a fixed coupon — and you take the issuer's credit risk.",
-      underlying: "A single stock, sector index or basket tied to the theme.",
-      tenor: "Typically 1–5 years; most commonly 12–36 months.",
-      example: "A 2-year growth note: 150% upside participation to a 25% cap, 1:1 downside below par, A-rated issuer — leveraged participation with no income.",
-      pros: ["Payoff fully customisable to the view", "Can add leverage, protection or income not available in cash", "Single, simple-to-book line"],
-      cons: ["Issuer credit risk (it's an unsecured bond)", "Illiquid — secondary market only at the issuer's mark", "No dividends; caps and fees embedded"],
-      whenToUse: "When you want a tailored risk/reward on a theme — leverage, a cap-for-protection trade, or income — and can hold to maturity.",
-      context: (u) => `Issued on ${u.index}: e.g. a 2-year note giving leveraged, capped participation in ${u.name} in place of holding ${u.ticker} outright.`
+      label: "Structured note",
+      what: "A packaged senior bank note with a defined, formula-based payoff — the wrapper for autocalls, buffered and capital-protected notes.",
+      mechanics: "An unsecured senior note from a bank issuer with an embedded option strategy: instead of a fixed coupon it pays a rule (coupon, participation, buffer, autocall). Because it's a packaged SECURITY (an ISIN you book like a bond), a MiFID Retail client can hold it — unlike an OTC option. Which structure to use follows the view: flat-to-up single name → Autocall Market Plus (ACM+); re-enter after a loss → buffered note; stay invested with a floor → capital-protected note.",
+      underlying: "A single stock, worst-of basket, or equity index tied to the theme.",
+      tenor: "12–24 months for income/autocalls. The coupon and barrier are the levers, not a long hold — short enough to re-strike as the view moves, long enough to earn the coupon through an earnings cycle.",
+      example: "Recommended for a constructive single-name view: a 12-month ACM+ — 80% capital barrier, ~12–24% p.a. coupon paid while above the barrier, quarterly autocall at the start level. Why 12m: it banks a full coupon year and lets you reassess at the next annual earnings cycle.",
+      pros: ["Payoff tailored to the exact view (income, protection or leverage)", "Packaged security — MiFID Retail eligible (it is not OTC)", "Defined, rules-based outcome you can show the client"],
+      cons: ["Issuer credit risk (it's an unsecured bank note)", "Illiquid — secondary market only at the issuer's mark", "Capped upside / no dividends; complex, so the appropriateness test still applies"],
+      whenToUse: "When you want a defined outcome on a theme — high income, protected participation or leverage — as a security the client can hold to maturity.",
+      context: (u) => `On ${u.index}: e.g. a 12-month ACM+ on ${u.ticker} — 80% barrier, rich quarterly coupon, autocall at the start level — a packaged way to monetise the ${u.name} view without holding the stock outright.`
     },
 
     "buffered-note": {
-      label: "Buffered note", complex: true,
-      what: "A structured note that gives equity upside while absorbing the first slice of any loss.",
-      mechanics: "Links to an index/stock; at maturity you get upside participation (often to a cap), and on the downside the issuer absorbs the first X% (the buffer) — you only lose beyond it. A geared buffer accelerates losses past the buffer.",
-      underlying: "Usually a broad equity index (SPX, SX5E) or a sector index.",
-      tenor: "12–36 months; 14-month and 2-year are common.",
-      example: "Buffered note: 100% upside to a ~15% cap, first 10% of losses absorbed (10% buffer), 14-month, on SPX, A-rated issuer. Index −8% → you're flat; −25% → you lose 15%.",
-      pros: ["Defined downside cushion while staying invested", "Strong re-entry vehicle after harvesting a loss", "No premium outlay — protection funded by the cap"],
-      cons: ["Upside capped", "Issuer credit risk; illiquid to maturity", "No dividends; a buffer is not full protection"],
-      whenToUse: "Re-enter or stay invested when you want a cushion against a pullback but still want participation — classic after a loss harvest or late in a rally.",
-      context: (u) => `On ${u.index}: e.g. 100% up to a ~15% cap with a 10% downside buffer over 14 months — a protected way back into ${u.name} after harvesting a loss in ${u.ticker}.`
+      label: "Buffered note",
+      what: "A structured note that participates in the upside with a soft floor — the desk's go-to loss-repair / protected re-entry structure.",
+      mechanics: "A senior bank note that gives you the underlying's upside (often uncapped) while protecting the first part of any fall: down to the barrier (e.g. 70% — a 30% cushion) your capital is returned in full; only below it do you take the loss from par. Pairs perfectly with a tax-loss harvest — sell the underwater stock, book the loss, put the proceeds into a buffered note to stay invested with a cushion through the 30-day wash window.",
+      underlying: "A single stock you're repairing (e.g. a post-miss name) or a broad equity index.",
+      tenor: "12–18 months. Why: long enough to clear the 30-day wash-sale window and ride out the drawdown that created the loss, short enough to re-underwrite the name at the next cycle.",
+      example: "Recommended re-entry note: 70% barrier (protected until the stock is down 30%), 100% uncapped upside participation, 15-month, USD, A-rated issuer — turns a −21% post-earnings loss into a protected stay-invested.",
+      pros: ["30% downside cushion while keeping full upside", "Ideal stock-repair / re-entry after a loss harvest", "Packaged security — Retail eligible (it is not OTC)"],
+      cons: ["Below the barrier you take the loss from par (it's a barrier, not a hard buffer)", "Issuer credit risk; illiquid to maturity", "No dividends while you hold the note"],
+      whenToUse: "Re-entering a name you've just harvested a loss in, or staying invested late in a rally — when you want participation but a cushion against the next leg down.",
+      context: (u) => `On ${u.ticker}: e.g. a 15-month note, 70% barrier with full uncapped upside — the protected way back into ${u.name} after harvesting the loss.`
     },
 
     "call-overwrite": {
@@ -586,16 +586,16 @@
     },
 
     "phoenix-autocall": {
-      label: "Phoenix autocall", complex: true,
-      what: "A yield-generating note that pays conditional coupons and can redeem early.",
-      mechanics: "Note on an underlying (or worst-of a basket). On each observation, if the underlying is above a coupon barrier (e.g. 70%) it pays a fixed coupon; if above the autocall level (e.g. 100%) it redeems early, returning par + coupon. At maturity capital is protected unless the underlying is below a downside barrier (e.g. 60–70%), in which case you take the loss. 'Phoenix' = missed coupons can be recovered later (memory).",
-      underlying: "A single stock, index or worst-of basket — often range-bound names.",
-      tenor: "1–3 years, with quarterly/semi-annual observations.",
-      example: "1-year Phoenix autocall on a semis index: quarterly ~3% coupon (12% p.a.) if index ≥70%, autocall at ≥100%, 65% capital barrier at maturity (memory coupons) — yield on a range-bound view.",
-      pros: ["High conditional income on a flat/range-bound view", "Early redemption frees capital", "Memory feature recovers missed coupons"],
-      cons: ["Capital at risk below the barrier (worst-of is worse)", "Caps upside to the coupons", "Issuer credit risk; complex / OTC"],
-      whenToUse: "Generating yield on names/indices you expect to trade sideways within a band — not for a strong directional view.",
-      context: (u) => `On ${u.index} (or a worst-of basket): e.g. quarterly ~3% coupons (12% p.a.), autocall at 100%, 65% capital barrier — income on a range-bound ${u.name} view.`
+      label: "Autocall (ACM+ / Phoenix)",
+      what: "A high-coupon income note that pays conditional coupons and can redeem early — the desk's core income structure on a flat-to-up view.",
+      mechanics: "An Autocall Market Plus (ACM+) / Phoenix note on a single name or worst-of basket. On each observation it pays a fixed coupon if the underlying is above the coupon barrier (e.g. 70–80%); if it's at/above the autocall level (usually the start level) the note redeems early at par + coupon. At maturity capital is returned in full unless the underlying is below the capital barrier (e.g. 65–80%), where you take the loss. 'Phoenix / memory' means missed coupons are recovered once the barrier is regained.",
+      underlying: "A single stock or worst-of basket of names you'd be happy to own — ideally range-bound to firm.",
+      tenor: "12 months with quarterly observations. Why: a year banks a meaningful coupon and the quarterly autocall gives four early-exit chances; you re-underwrite the names annually rather than locking in for years.",
+      example: "Recommended on a constructive single name: 1-year ACM+, 80% capital barrier, ~12–16% p.a. coupon (memory) paid quarterly while above 80%, autocall at ≥100% on any quarterly observation. Worst-of baskets pay far more (see the HALO basket).",
+      pros: ["High contractual income on a flat/range-bound view", "Soft barrier (e.g. 80%) gives a cushion before capital is at risk", "Early autocall frees capital; packaged security — Retail eligible"],
+      cons: ["Capital at risk below the barrier (worst-of is more so)", "Upside capped at the coupons — no equity participation", "Issuer credit risk; hold to call/maturity"],
+      whenToUse: "Generating yield on names or baskets you expect to trade sideways-to-up within a band — not for a strongly directional view.",
+      context: (u) => `On ${u.ticker} (or a worst-of basket): a 1-year ACM+, 80% barrier, rich quarterly memory coupon, autocall at the start level — income on a range-bound ${u.name} view.`
     },
 
     "call-spread": {
@@ -612,16 +612,55 @@
     },
 
     "leveraged-certificate": {
-      label: "Leveraged certificate", complex: true,
+      label: "Leveraged certificate",
       what: "An exchange-traded certificate giving geared exposure to an underlying.",
       mechanics: "A bank-issued tracker/factor certificate delivering a multiple (e.g. 2–3x) of the underlying's move, or geared participation above a strike (with a knock-out level). Daily-leveraged factor certs reset each day (path-dependent); participation certs gear a single move. You take issuer credit risk.",
       underlying: "Single stock, index or commodity.",
       tenor: "Open-ended (factor) or fixed (participation); a knock-out can end it early.",
       example: "A 2x long factor certificate on a semis index: a +5% day → ~+10%, a −5% day → ~−10%; knock-out if the index falls ~50% intraday — tactical geared exposure, not a hold.",
-      pros: ["Capital-efficient leverage in one liquid line", "No margin account / maintenance calls", "Exchange-traded, transparent pricing"],
-      cons: ["Daily reset decays in choppy markets (factor certs)", "Knock-out can wipe the position", "Issuer credit risk; complex / OTC"],
+      pros: ["Capital-efficient leverage in one liquid line", "No margin account / maintenance calls", "Exchange-traded packaged security — Retail eligible"],
+      cons: ["Daily reset decays in choppy markets (factor certs)", "Knock-out can wipe the position", "Issuer credit risk; a complex, geared product"],
       whenToUse: "Short-term, tactical geared expression of a strong directional view — actively monitored, not buy-and-hold.",
       context: (u) => `A 2x factor certificate on ${u.index} for tactical geared exposure to ${u.name} — monitored daily, minding reset decay and the knock-out.`
+    },
+
+    "halo-basket": {
+      label: "HALO basket (ACM+)",
+      what: "The desk's flagship structured note: a high-coupon worst-of autocall on Constellation Energy, MP Materials and Caterpillar.",
+      mechanics: "An Autocall Market Plus (ACM+) referencing the WORST performer of three equally-weighted names — CEG (power), MP Materials (rare-earth materials) and CAT (industrials). It pays a fixed 24% p.a. coupon in USD on each observation while all three sit above 80% of their start level, and autocalls (redeems early at par + coupon) if the worst-of is back at/above its start level on an observation date. At maturity capital is returned in full unless the worst-of closes below the 80% barrier, in which case you're delivered that stock (or its cash loss). The cross-name dispersion of three different drivers is what funds the rich coupon.",
+      underlying: "Worst-of CEG · MP Materials · CAT, equally weighted, USD.",
+      tenor: "12 months, quarterly autocall observations. Why: long enough to bank a serious coupon, short enough to re-underwrite three fast-moving names each year.",
+      example: "Equal-weight worst-of ACM+: 24% p.a. coupon (≈6%/quarter) paid while all three ≥80% of strike; autocall at ≥100% of the worst-of on any quarterly observation; 80% capital barrier at maturity with memory coupon. A ~$2–3m clip as the core of the structured-notes sleeve.",
+      pros: ["Very high 24% USD coupon vs a single-name autocall", "20% cushion before any capital is at risk; memory coupon", "Packaged note — MiFID Retail eligible (it is not OTC)", "Early autocall frees capital to redeploy"],
+      cons: ["Worst-of: your payoff tracks the WEAKEST of the three names", "Capital at risk if any one name falls more than 20%", "Coupon-capped — no equity upside beyond the 24%", "Issuer credit risk; hold to call/maturity"],
+      whenToUse: "Books under their structured-notes target wanting high contractual USD income, who'd be comfortable owning CEG, MP Materials or CAT at a 20% discount if put to them.",
+      context: (u) => `Sits in the structured-notes sleeve: 24% p.a. USD coupon on the worst-of CEG / MP Materials / CAT, 80% barrier, 1-year — a high-income complement to the ${u.name} exposure.`
+    },
+
+    "reverse-convertible": {
+      label: "Reverse convertible (RevCon / FCN)",
+      what: "A high fixed-coupon income note on a single name, where you risk being delivered the stock if it falls through a barrier.",
+      mechanics: "A short-dated note (RevCon, or a Fixed-Coupon Note / FCN) that pays a high guaranteed coupon. If the underlying never breaches the knock-in barrier (e.g. 70–80%) you get coupon + full capital back. If it breaches and ends below the strike, the note converts — you're delivered the shares (or the cash loss) at the strike. Effectively you're paid a rich coupon for selling a downside put.",
+      underlying: "A single stock you'd be willing to own lower (often an underwater name you'd average into).",
+      tenor: "3–6 months. Why: short tenors keep the conversion risk tightly defined and let you re-coupon frequently; it's an income trade, not a long hold.",
+      example: "Recommended on a name you'd add to: 6-month RevCon, 75% knock-in barrier, ~10–12% p.a. coupon, USD — keep coupon + capital unless it ends down >25%, in which case you own the stock at the strike (your intended add level).",
+      pros: ["High fixed coupon, paid regardless of direction (above the barrier)", "Defined: worst case is owning a stock you wanted anyway", "Packaged security — Retail eligible (it is not OTC)"],
+      cons: ["Capped upside (you only ever earn the coupon)", "Converts to shares / takes the loss below the barrier", "Issuer credit risk; short tenor means frequent re-underwriting"],
+      whenToUse: "Income on a name you'd be happy to own at a lower level — turning a 'what should I average down to?' decision into a paid one.",
+      context: (u) => `On ${u.ticker}: e.g. a 6-month RevCon, 75% barrier, ~10–12% coupon — income now, or you own ${u.name} at your add level if it falls through.`
+    },
+
+    "capital-protected-note": {
+      label: "Capital-protected note",
+      what: "A note that returns 100% of capital at maturity plus a share of the upside — participation with a hard floor.",
+      mechanics: "The issuer combines a zero-coupon bond (which accretes back to par at maturity, providing the 100% protection) with a call option funded by the remaining premium (which provides the upside). You get a participation rate in the underlying's gain (often <100%, sometimes capped); if the underlying falls you still get your capital back at maturity. The longer tenor is what makes the zero-coupon + option affordable.",
+      underlying: "A broad equity index (or basket) — protection is cheapest on liquid indices.",
+      tenor: "2–3 years. Why: the protection is funded by the discount on a zero-coupon bond, which needs time to accrete back to par — too short and there's no premium left to buy meaningful upside.",
+      example: "Recommended for protected growth: 3-year note, 100% capital protection at maturity, ~60–70% participation in the index upside (uncapped or a generous cap), USD/EUR — full downside protection, a defined share of the rally.",
+      pros: ["100% capital back at maturity, whatever the market does", "Keeps equity upside (at a participation rate)", "Packaged security — Retail eligible; the most conservative structured note"],
+      cons: ["Participation is below 100% (and may be capped)", "Protection only holds AT maturity; no dividends", "Issuer credit risk; ties up capital for 2–3 years"],
+      whenToUse: "Putting cautious or drawdown-sensitive capital to work in equities with a guaranteed floor — or for clients who can't stomach a loss but need growth.",
+      context: (u) => `On ${u.index}: a 3-year note, 100% capital protected with ~65% participation — protected access to ${u.name} for capital that can't take a drawdown.`
     }
   };
 
@@ -682,8 +721,16 @@
     "extend duration": "extend-duration",
     "listed infrastructure": "listed-infrastructure",
     "phoenix autocall": "phoenix-autocall",
+    "autocall market plus": "phoenix-autocall",
+    "acm+": "phoenix-autocall",
     "call spread": "call-spread",
-    "leveraged certificate": "leveraged-certificate"
+    "leveraged certificate": "leveraged-certificate",
+    "halo basket (acm+)": "halo-basket",
+    "halo basket": "halo-basket",
+    "reverse convertible": "reverse-convertible",
+    "reverse convertible (revcon / fcn)": "reverse-convertible",
+    "capital-protected note": "capital-protected-note",
+    "capital protected note": "capital-protected-note"
   };
 
   function norm(s) { return String(s == null ? "" : s).toLowerCase().replace(/\s+/g, " ").trim(); }
@@ -693,8 +740,11 @@
   function keywordResolve(n) {
     const has = (k) => n.indexOf(k) !== -1;
     if (has("collar")) return "zero-cost-collar";
+    if (has("halo")) return "halo-basket";
     if (has("buffer")) return "buffered-note";
-    if (has("autocall") || has("phoenix")) return "phoenix-autocall";
+    if (has("reverse convertible") || has("revcon") || has("fcn")) return "reverse-convertible";
+    if (has("capital-protected") || has("capital protected") || has("cpn")) return "capital-protected-note";
+    if (has("autocall") || has("autocallable") || has("acm+") || has("phoenix")) return "phoenix-autocall";
     if (has("covered call") || has("overwrite")) return "call-overwrite";
     if (has("call spread") || (has("spread") && has("call"))) return "call-spread";
     if (has("certificate")) return "leveraged-certificate";
@@ -746,9 +796,23 @@
     return keywordResolve(n);
   }
 
+  /* MiFID class by canonical id — structured products are Retail-eligible
+     packaged securities; OTC derivatives are not; private = qualified-investor. */
+  const STRUCTURED_IDS = ["structured-note", "buffered-note", "phoenix-autocall", "leveraged-certificate",
+    "halo-basket", "reverse-convertible", "capital-protected-note"];
+  const OTC_IDS = ["call-overwrite", "zero-cost-collar", "gold-accumulator", "fx-forward-collar",
+    "prepaid-variable-forward", "protective-put", "cash-secured-puts", "call-spread"];
+  const PRIVATE_IDS = ["private-markets", "private-real-estate"];
+  function clsOf(id) {
+    if (STRUCTURED_IDS.indexOf(id) !== -1) return "structured";
+    if (OTC_IDS.indexOf(id) !== -1) return "otc";
+    if (PRIVATE_IDS.indexOf(id) !== -1) return "private";
+    return "non-complex";
+  }
+
   function fallback(raw) {
     return {
-      label: String(raw || "Expression"), complex: false,
+      label: String(raw || "Expression"),
       what: "A way to express this view in the portfolio.",
       mechanics: "The precise structure for this expression isn't catalogued yet — agree the mechanics, sizing and instrument with the desk before trading.",
       underlying: "Per the idea's asset class and sector.",
@@ -768,13 +832,14 @@
 
   /* entry + a context line tailored to the idea/finding (ctx has .sector) */
   function detail(raw, ctx) {
-    const base = get(raw);
+    const id = resolve(raw);
+    const base = (id && E[id]) ? E[id] : fallback(raw);
     let contextLine = null;
     if (typeof base.context === "function") {
       try { contextLine = base.context(uFor(ctx), ctx || {}); } catch (e) { contextLine = null; }
     }
     return {
-      label: base.label, complex: !!base.complex, what: base.what, mechanics: base.mechanics,
+      label: base.label, cls: clsOf(id), what: base.what, mechanics: base.mechanics,
       underlying: base.underlying, tenor: base.tenor, example: base.example,
       pros: base.pros || [], cons: base.cons || [], whenToUse: base.whenToUse,
       contextLine, raw: raw
@@ -798,8 +863,20 @@
         <div class="xd-col xd-cons"><span class="xd-k">Cons</span><ul>${li(d.cons)}</ul></div>
       </div>
       <div class="xd-when"><span class="xd-k">When to use</span><span class="xd-when-v">${esc(d.whenToUse)}</span></div>
-      ${d.complex ? `<div class="xd-note">⚠️ Complex / OTC product — a MiFID Retail account needs re-classification or a non-complex alternative.</div>` : ""}
+      ${noteHTML(d.cls)}
     </div>`;
+  }
+
+  /* MiFID appropriateness note — the key correction: structured products (notes)
+     ARE tradable by Retail; OTC derivatives are not. */
+  function noteHTML(cls) {
+    if (cls === "otc")
+      return `<div class="xd-note otc">⚠️ <b>OTC derivative</b> — <b>not</b> available to a MiFID Retail client. Needs Professional re-classification, or use a structured-product / non-complex alternative.</div>`;
+    if (cls === "structured")
+      return `<div class="xd-note structured">ℹ️ <b>Structured product</b> — a packaged security (a note), so <b>MiFID Retail can trade it</b> (unlike an OTC derivative). It's complex, so the appropriateness test still applies.</div>`;
+    if (cls === "private")
+      return `<div class="xd-note otc">⚠️ <b>Private / illiquid</b> — restricted to qualified or professional investors; capital is locked for the term.</div>`;
+    return "";
   }
 
   function itemHTML(raw, ctx, opts) {

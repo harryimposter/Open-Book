@@ -22,7 +22,8 @@ const SEED_THEMES = [
   { id: "realassets", name: "Real Assets",              blurb: "Infrastructure and real estate for inflation-protected, contracted income." },
   { id: "resilience", name: "Resilience & Protection",  blurb: "Structured downside protection and diversifiers to carry risk through the cycle." },
   { id: "gold",       name: "Gold & Currency",          blurb: "Gold as a debasement hedge and currency diversification for concentrated-USD books." },
-  { id: "health",     name: "Healthcare Innovation",    blurb: "GLP-1, devices and medical innovation as a durable, less-correlated growth engine." }
+  { id: "health",     name: "Healthcare Innovation",    blurb: "GLP-1, devices and medical innovation as a durable, less-correlated growth engine." },
+  { id: "structured", name: "Structured Outcomes",      blurb: "Defined-outcome notes — autocalls, buffered and capital-protected structures that reshape risk and return as packaged securities. Retail-eligible; OTC derivatives are not." }
 ];
 
 /* ----------------------------------- IDEAS --------------------------------- */
@@ -147,6 +148,29 @@ const SEED_IDEAS = [
     conviction: "Medium-High", horizon: "Strategic",
     thesis: "Metabolic-disease therapeutics, devices and tools offer a durable, less cyclical growth engine that is under-owned in most growth books — a quality diversifier away from tech.",
     structures: ["Direct equity", "Healthcare basket"]
+  },
+
+  /* ---- Structured Outcomes ---- */
+  {
+    id: "halo-acm", themeId: "structured", title: "HALO worst-of autocall — CEG · MP Materials · CAT",
+    type: "Opportunistic", assetClass: "Structured", sector: "Broad", bucket: "Structured",
+    conviction: "High", horizon: "12m",
+    thesis: "The desk's flagship note: an Autocall Market Plus (ACM+) on the worst-of Constellation Energy, MP Materials and Caterpillar, equally weighted. It pays a fixed 24% p.a. coupon in USD while all three hold above 80% of their start level, and autocalls early if they rally. Three different drivers — power, rare-earth materials and industrials — fund the rich coupon, with a 20% cushion before any capital is at risk. A packaged note Retail can hold.",
+    structures: ["HALO basket (ACM+)", "Phoenix autocall", "Reverse convertible", "Capital-protected note"]
+  },
+  {
+    id: "struct-income", themeId: "structured", title: "Defined-income autocalls on names you'd own",
+    type: "Strategic", assetClass: "Structured", sector: "Broad", bucket: "Structured",
+    conviction: "Medium-High", horizon: "Strategic",
+    thesis: "Single-stock and worst-of autocalls (ACM+ / Phoenix) and reverse convertibles on quality names you'd be happy to own anyway — turning a flat-to-up view into a high contractual coupon with a soft capital barrier. The core building block of the structured-notes sleeve.",
+    structures: ["Phoenix autocall", "Reverse convertible", "Buffered note", "Capital-protected note"]
+  },
+  {
+    id: "struct-protect", themeId: "structured", title: "Protected & buffered participation",
+    type: "Strategic", assetClass: "Structured", sector: "Broad", bucket: "Structured",
+    conviction: "High", horizon: "Strategic",
+    thesis: "Stay invested with a floor — buffered and capital-protected notes that give equity-index upside (often to a cap) while protecting some or all of the downside. The way to keep a concentrated winner's upside, or re-enter after a loss, without taking full drawdown risk.",
+    structures: ["Buffered note", "Capital-protected note", "Structured note"]
   }
 ];
 
@@ -167,7 +191,7 @@ const SEED_CLIENTS = [
     goals: {
       objective: "Aggressive capital growth concentrated in the AI complex",
       horizon: "Long-term · 10+ yrs",
-      target: { Growth: 80, Income: 5, Protection: 10, Liquidity: 5 },
+      target: { Growth: 70, Income: 5, Protection: 10, Structured: 10, Liquidity: 5 },
       funding: { headline: "Grow to $75m by 2034", metricLabel: "Projected value", current: 38, target: 75, unit: "$m", status: "On track" }
     },
     positions: [
@@ -193,7 +217,7 @@ const SEED_CLIENTS = [
     goals: {
       objective: "Grow the book while drawing income — and protect the concentrated MU gain",
       horizon: "Long-term · 7–10 yrs",
-      target: { Growth: 55, Income: 25, Protection: 12, Liquidity: 8 },
+      target: { Growth: 47, Income: 25, Protection: 12, Structured: 8, Liquidity: 8 },
       funding: { headline: "Grow to €70m by 2035 while drawing income", metricLabel: "Projected value", current: 50.2, target: 70, unit: "€m", status: "On track" }
     },
     positions: [
@@ -220,7 +244,7 @@ const SEED_CLIENTS = [
     goals: {
       objective: "Fund retirement income and preserve capital across the whole estate",
       horizon: "Drawdown · 0–5 yrs",
-      target: { Growth: 30, Income: 48, Protection: 14, Liquidity: 8 },
+      target: { Growth: 24, Income: 48, Protection: 14, Structured: 6, Liquidity: 8 },
       funding: { headline: "Fund $3.6m/yr retirement income", metricLabel: "Annual income run-rate", current: 3.0, target: 3.6, unit: "$m/yr", status: "Slightly behind" }
     },
     positions: [
@@ -251,7 +275,7 @@ const SEED_CLIENTS = [
     goals: {
       objective: "Compound a real-asset core across cycles; rehabilitate the digital-asset sleeve",
       horizon: "Multi-generational · 10+ yrs",
-      target: { Growth: 35, Income: 20, Protection: 35, Liquidity: 10 },
+      target: { Growth: 25, Income: 20, Protection: 35, Structured: 10, Liquidity: 10 },
       funding: { headline: "Preserve real value, grow to $90m by 2036", metricLabel: "Projected value", current: 71, target: 90, unit: "$m", status: "Slightly behind" }
     },
     positions: [
@@ -284,7 +308,7 @@ const SEED_CLIENTS = [
     goals: {
       objective: "Grow wealth while comfortably servicing mortgage and tax liabilities",
       horizon: "Long-term · 8–10 yrs",
-      target: { Growth: 50, Income: 30, Protection: 10, Liquidity: 10 },
+      target: { Growth: 40, Income: 30, Protection: 10, Structured: 10, Liquidity: 10 },
       funding: { headline: "Net worth to $120m by 2033 (after liabilities)", metricLabel: "Net projected value", current: 75, target: 120, unit: "$m", status: "On track" }
     },
     positions: [
@@ -313,7 +337,7 @@ const SEED_CLIENTS = [
     goals: {
       objective: "Steady goals-based growth toward a house purchase and long-term wealth",
       horizon: "Long-term · 7–10 yrs",
-      target: { Growth: 68, Income: 17, Protection: 8, Liquidity: 7 },
+      target: { Growth: 60, Income: 17, Protection: 8, Structured: 8, Liquidity: 7 },
       funding: { headline: "Grow to $70m by 2034; $4m house deposit by 2028", metricLabel: "Projected value", current: 44, target: 70, unit: "$m", status: "On track" }
     },
     positions: [
@@ -339,7 +363,7 @@ const SEED_CLIENTS = [
     goals: {
       objective: "Grow the equity book while building durable income and ballast",
       horizon: "Long-term · 5–8 yrs",
-      target: { Growth: 55, Income: 30, Protection: 8, Liquidity: 7 },
+      target: { Growth: 49, Income: 30, Protection: 8, Structured: 6, Liquidity: 7 },
       funding: { headline: "Fund $0.8m/yr income; grow to $45m by 2033", metricLabel: "Annual income run-rate", current: 0.5, target: 0.8, unit: "$m/yr", status: "Behind" }
     },
     positions: [
@@ -361,16 +385,25 @@ const SEED_CLIENTS = [
 /* ---------------------------------------------------------------------------
    Domain maps + helpers (shared by scanner.js, app.js, portfolio.html, morgan.js)
 --------------------------------------------------------------------------- */
+/* The five goal buckets — the "roles" every holding plays in the plan. Each has
+   a plain-English definition (shown in the app's objectives glossary). */
 const GOAL_BUCKETS = [
-  { key: "Growth",     color: "#29211A" },
-  { key: "Income",     color: "#9A7B4F" },
-  { key: "Protection", color: "#3F6B4E" },
-  { key: "Liquidity",  color: "#C2A661" }
+  { key: "Growth",     name: "Growth",            color: "#29211A",
+    desc: "Capital appreciation — equities and growth assets that drive the book's long-term value. Highest expected return, highest volatility." },
+  { key: "Income",     name: "Income",            color: "#9A7B4F",
+    desc: "Recurring yield — bonds, dividend equity, infrastructure and real estate that pay a contracted cash stream the client can spend or reinvest." },
+  { key: "Protection", name: "Protection",        color: "#3F6B4E",
+    desc: "Downside defence — gold, hedges and diversifiers that hold their value (or gain) when risk assets fall. This is ballast, not return-seeking." },
+  { key: "Structured", name: "Structured notes",  color: "#6E7E8C",
+    desc: "Defined-outcome payoffs — autocalls, buffered and capital-protected notes that reshape risk/return (high income, protected participation or leverage) as packaged securities. MiFID-Retail eligible; OTC derivatives are not." },
+  { key: "Liquidity",  name: "Liquidity",         color: "#C2A661",
+    desc: "Cash & equivalents — cash, T-bills and money-market funds for spending, liabilities and dry powder. (Same role as a holding's “Cash” line — we use “Liquidity” for the goal.)" }
 ];
 
-/* asset class -> goal bucket (role in the plan) */
+/* asset class -> goal bucket (role in the plan). Structured products are their
+   own goal bucket; Cash plays the Liquidity role. */
 const BUCKET_OF = {
-  "Equity": "Growth", "Structured": "Growth", "Alternatives": "Protection",
+  "Equity": "Growth", "Structured": "Structured", "Alternatives": "Protection",
   "Commodity": "Protection", "Real Assets": "Income", "Real_Assets": "Income",
   "Fixed Income": "Income", "Credit": "Income", "Cash": "Liquidity"
 };
@@ -381,26 +414,41 @@ const SECTOR_BUCKET = { Energy: "Income", Utilities: "Income", "Real Estate": "I
 /* custom/ad-hoc instrument asset class -> bucket (pre-trade) */
 const ASSET_BUCKET = {
   "Equity": "Growth", "Fixed Income": "Income", "Commodity": "Protection",
-  "Real Assets": "Income", "Alternatives": "Protection", "Structured": "Growth", "Cash": "Liquidity"
+  "Real Assets": "Income", "Alternatives": "Protection", "Structured": "Structured", "Cash": "Liquidity"
 };
 
 /* asset classes shown in the coverage matrix, in order */
 const ASSET_CLASSES = ["Equity", "Fixed Income", "Real Assets", "Commodity", "Alternatives", "Structured", "Cash"];
 
-/* MiFID appropriateness */
-const OTC_KEYWORDS = ["collar","risk reversal","autocall","phoenix","buffered","range note",
-  "accumulator","reverse convertible","certificate","covered call","overwrite","call spread",
-  "cash-secured","seagull","prepaid","dcd","structured note","note","variable forward"];
-const NONCOMPLEX_KEYWORDS = ["direct equity","equity etf","index core","index","basket","physical",
-  "etc","fund","gilt","govt","bonds","bond ladder","ladder","dividend","international etf","reit basket","direct"];
+/* MiFID appropriateness — THE key distinction:
+   - Structured products (autocalls, buffered/RevCon/capital-protected NOTES,
+     certificates) are PACKAGED SECURITIES — a MiFID Retail client CAN trade them
+     (they're complex, so appropriateness still applies, but they're not OTC).
+   - OTC derivatives (collars, forwards, OTC options, accumulators, PVFs) are
+     bilateral contracts a Retail client CANNOT trade without Professional
+     re-classification.
+   Order matters: check structured BEFORE otc (a "HALO basket (ACM+)" contains
+   "basket" but is a structured note, not a non-complex basket). */
+const STRUCTURED_KEYWORDS = ["structured note","structured re-entry","buffered","autocall","autocallable",
+  "acm+","phoenix","reverse convertible","revcon","fcn","range note","bren","certificate",
+  "capital-protected","capital protected","participation note","memory coupon","barrier note",
+  "credit-linked","twin-win","shark-fin","booster","halo"];
+const OTC_KEYWORDS = ["collar","risk reversal","seagull","accumulator","decumulator","prepaid","variable forward",
+  "fx forward","forward / collar","dcd","dcs","dual currency","covered call","overwrite","cash-secured",
+  "call spread","protective put"];
 
-function isOtcOption(structure) {
+function complexityOf(structure) {
   const s = String(structure || "").toLowerCase();
-  if (NONCOMPLEX_KEYWORDS.some(k => s.includes(k))) return false;
-  return OTC_KEYWORDS.some(k => s.includes(k));
+  if (STRUCTURED_KEYWORDS.some(k => s.includes(k))) return "structured";
+  if (OTC_KEYWORDS.some(k => s.includes(k))) return "otc";
+  return "non-complex";
 }
+/* true only for genuinely OTC instruments (drives Retail "can't trade" flags) */
+function isOtcOption(structure) { return complexityOf(structure) === "otc"; }
+function isStructuredProduct(structure) { return complexityOf(structure) === "structured"; }
 
 window.SEED = {
   themes: SEED_THEMES, ideas: SEED_IDEAS, clients: SEED_CLIENTS,
-  GOAL_BUCKETS, BUCKET_OF, SECTOR_BUCKET, ASSET_BUCKET, ASSET_CLASSES, isOtcOption
+  GOAL_BUCKETS, BUCKET_OF, SECTOR_BUCKET, ASSET_BUCKET, ASSET_CLASSES,
+  isOtcOption, isStructuredProduct, complexityOf
 };

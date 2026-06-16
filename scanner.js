@@ -27,7 +27,7 @@
     return { byClass, bySector, byCcy };
   }
   function bucketAlloc(split) {
-    const out = { Growth: 0, Income: 0, Protection: 0, Liquidity: 0 };
+    const out = { Growth: 0, Income: 0, Protection: 0, Structured: 0, Liquidity: 0 };
     Object.entries(split).forEach(([k, v]) => {
       const b = S().BUCKET_OF[k] || S().BUCKET_OF[k.replace(/_/g, " ")] || "Growth";
       out[b] += v;
@@ -198,6 +198,17 @@
         complex: false, retailBlocked: false,
         ref: { ticker: "SECT", name: `${sec} sleeve` }
       });
+    });
+
+    /* Normalise appropriateness from the actual structures: a finding is only
+       Retail-blocked when EVERY way to express it is OTC (if a structured-product
+       or non-complex route exists, Retail can take that instead). */
+    f.forEach(x => {
+      const structs = x.structures || [];
+      const anyOtc = structs.some(s => S().isOtcOption(s));
+      const allOtc = structs.length > 0 && structs.every(s => S().isOtcOption(s));
+      x.complex = anyOtc || structs.some(s => S().isStructuredProduct(s));
+      x.retailBlocked = retail && allOtc;
     });
 
     return f.sort((a, b) => b.severity - a.severity);

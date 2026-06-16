@@ -131,17 +131,15 @@
             <div style="background:#fff;color:var(--ink);border-radius:var(--radius);padding:14px 16px;margin-top:14px">${BPCharts.fundingBar(c.goals.funding)}</div>
           </div>
           <div class="panel">
-            <div class="panel-head"><h3>Strategic target allocation</h3></div>
+            <div class="panel-head"><h3>Strategic allocation — now vs target</h3></div>
             <div class="panel-body">
-              <ul class="target-list">
-                ${SEED.GOAL_BUCKETS.map(b => `<li>
-                  <span class="don-dot" style="background:${b.color}"></span>${b.key}
-                  <span class="tl-bar"><span class="tl-fill" style="width:${target[b.key] || 0}%;background:${b.color}"></span></span>
-                  <span class="tl-val">${target[b.key] || 0}% <span style="color:var(--ink-faint)">/ now ${Math.round(curB[b.key] || 0)}%</span></span>
-                </li>`).join("")}
-              </ul>
+              ${BPCharts.goalTargetBar(target, curB)}
             </div>
           </div>
+        </div>
+        <div class="panel" style="margin-top:16px">
+          <div class="panel-head"><h3>What the goals mean</h3></div>
+          <div class="panel-body">${BPCharts.goalGlossary()}</div>
         </div>
       </div>
 
