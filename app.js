@@ -368,6 +368,60 @@
     </article>`;
   }
 
+  /* ----------------------- holdings table (grouped by asset class) ----- */
+  const CCY_SYM = { USD: "$", EUR: "€", GBP: "£", JPY: "¥", CHF: "CHF " };
+  function ccySym(ccy) { return CCY_SYM[ccy] || ""; }
+  const HMONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  function fmtTradeDate(iso) {
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || "");
+    if (!m) return "—";
+    return `${+m[3]} ${HMONTHS[(+m[2]) - 1]} ${m[1]}`;
+  }
+  function fmtSpot(p) {
+    if (p.entrySpot == null) return "—";
+    const v = p.entrySpot, dp = v >= 1000 ? 0 : 2;
+    return `${ccySym(p.ccy)}${v.toLocaleString("en-US", { minimumFractionDigits: dp, maximumFractionDigits: dp })}`;
+  }
+  // unrealised P&L in book-ccy millions: current value − cost basis implied by pnlPct
+  function pnlDollarM(p, aum) {
+    if (!p.pnlPct) return 0;
+    const now = (p.weightPct / 100) * aum;
+    return now - now / (1 + p.pnlPct / 100);
+  }
+  function fmtPnlM(v, ccy) {
+    const a = Math.abs(v), str = a >= 10 ? a.toFixed(1) : a.toFixed(2);
+    return `${v >= 0 ? "+" : "−"}${ccySym(ccy)}${str}m`;
+  }
+  function buildHoldings(c) {
+    const present = SEED.ASSET_CLASSES.filter(ac => (c.positions || []).some(p => p.assetClass === ac));
+    if (!present.length) return '<p class="pos-note" style="padding:12px 0">No positions on file.</p>';
+    const header = `<div class="hold-row hold-head">
+      <span>Holding</span><span>Sector</span><span>Trade date</span><span>Entry spot</span><span>Matures</span><span class="hr-num">Weight</span><span class="hr-num">P&amp;L</span>
+    </div>`;
+    const groups = present.map(ac => {
+      const rows = c.positions.filter(p => p.assetClass === ac);
+      const wt = rows.reduce((s, p) => s + p.weightPct, 0);
+      const pnl = rows.reduce((s, p) => s + pnlDollarM(p, c.aum), 0);
+      const body = rows.map(p => {
+        const up = p.pnlPct > 0, dn = p.pnlPct < 0, cls = up ? "up" : dn ? "dn" : "";
+        return `<div class="hold-row">
+          <div class="hold-name"><div class="pos-name">${esc(p.name)}<span class="pos-tick">${esc(p.ticker)}</span></div><div class="pos-note">${esc(p.note || "")}</div></div>
+          <span class="hold-cell">${esc(p.sector || "—")}</span>
+          <span class="hold-cell">${fmtTradeDate(p.entryDate)}</span>
+          <span class="hold-cell">${fmtSpot(p)}</span>
+          <span class="hold-cell">${fmtTradeDate(p.mat)}</span>
+          <span class="hr-num pos-wt">${p.weightPct}%</span>
+          <div class="hr-num"><div class="pos-pnl ${cls}">${up ? "+" : ""}${p.pnlPct}%</div>${p.pnlPct ? `<div class="pos-pnld ${cls}">${fmtPnlM(pnlDollarM(p, c.aum), c.ccy)}</div>` : ""}</div>
+        </div>`;
+      }).join("");
+      return `<div class="hold-group">
+        <div class="hold-group-head"><span class="hg-name">${esc(ac)}</span><span class="hg-meta">${rows.length} ${rows.length === 1 ? "line" : "lines"} · ${wt.toFixed(1)}%${pnl ? ` · <span class="${pnl >= 0 ? "up" : "dn"}">${fmtPnlM(pnl, c.ccy)}</span>` : ""}</span></div>
+        ${body}
+      </div>`;
+    }).join("");
+    return `<div class="hold-table">${header}${groups}</div>`;
+  }
+
   function renderClientDetail(c) {
     if (!c) return;
     const rec = window.Scanner.recommendations(c);
@@ -383,10 +437,10 @@
     // standing house-view ideas that matched this book — demoted below the actions
     const top3 = topFocusIdeasForClient(c, 3);
     const houseViewsHTML = top3.length ? `
-      <div class="panel" style="margin-top:18px">
-        <div class="panel-head"><h3>House views &amp; today's focus that fit ${esc(c.name)}</h3><span class="rec-theme" style="margin-left:auto">standing ideas, ranked for this book (conviction × fit)</span></div>
-        <div class="panel-body"><div class="focus-tiles">${top3.map(t => focusTileHTML(t.idea, { client: c, fit: t.fit })).join("")}</div></div>
-      </div>` : "";
+      <section class="bb-sec bb-views">
+        <div class="bb-views-head"><h3>House views &amp; today's focus that fit ${esc(c.name)}</h3><span class="rec-theme">standing ideas, ranked for this book (conviction × fit)</span></div>
+        <div class="focus-tiles">${top3.map(t => focusTileHTML(t.idea, { client: c, fit: t.fit })).join("")}</div>
+      </section>` : "";
 
     // the rest of the matched catalog, grouped by asset class (behind "see more")
     const viewByAC = {};
@@ -399,17 +453,7 @@
         </div>`).join("")
       : `<p class="reco-why" style="padding:12px 0">No house-view ideas matched this book.</p>`;
 
-    const positions = (c.positions || []).map(p =>
-      `<div class="pos-row">
-        <div>
-          <div class="pos-name">${esc(p.name)}<span class="pos-tick">${esc(p.ticker)}</span></div>
-          <div class="pos-note">${esc(p.note || "")}</div>
-        </div>
-        <div>
-          <div class="pos-wt">${p.weightPct}%</div>
-          <div class="pos-pnl ${p.pnlPct > 0 ? "up" : p.pnlPct < 0 ? "dn" : ""}">${p.pnlPct > 0 ? "+" : ""}${p.pnlPct}%</div>
-        </div>
-      </div>`).join("");
+    const holdingsHTML = buildHoldings(c);
 
     const liabilities = (c.liabilities || []).length
       ? `<div class="panel" style="margin-top:18px"><div class="panel-head"><h3>Liabilities</h3></div><div class="panel-body">
@@ -417,45 +461,52 @@
         </div></div>` : "";
 
     $("#clientDetail").innerHTML = `
-      <div class="cd-head">
-        <div class="cd-head-top">
-          ${avatar(c.name)}
-          <div>
-            <h2>${esc(c.name)} <span class="class-pill ${c.classification.toLowerCase()}">${esc(c.classification)}</span></h2>
-            <div class="cd-rel">${esc(c.relationship)}</div>
+      <div class="cd-cols">
+        <div class="cd-head">
+          <div class="cd-head-top">
+            ${avatar(c.name)}
+            <div>
+              <h2>${esc(c.name)} <span class="class-pill ${c.classification.toLowerCase()}">${esc(c.classification)}</span></h2>
+              <div class="cd-rel">${esc(c.relationship)}</div>
+            </div>
+            <div class="cd-aum"><div class="k">Book AUM</div><div class="v">${esc(fmtAum(c))}</div></div>
           </div>
-          <div class="cd-aum"><div class="k">Book AUM</div><div class="v">${esc(fmtAum(c))}</div></div>
+          ${renderAllocBar(c.split)}
+          <div class="goal-strip">
+            <div class="goal-item"><div class="gk">Objective</div><div class="gv">${esc(c.goals.objective)}</div></div>
+            <div class="goal-item"><div class="gk">Horizon</div><div class="gv">${esc(c.goals.horizon)}</div></div>
+            <div class="goal-item"><div class="gk">Risk profile</div><div class="gv">${esc(c.risk)}</div></div>
+          </div>
+          ${BPCharts.fundingBar(c.goals.funding)}
+          <div class="cd-actions">
+            <a class="view-port-btn" href="portfolio.html?client=${esc(c.id)}">View current portfolio ›</a>
+            <a class="view-port-btn ghost" href="onepager.html?client=${esc(c.id)}">Client one-pager ›</a>
+          </div>
         </div>
-        ${renderAllocBar(c.split)}
-        <div class="goal-strip">
-          <div class="goal-item"><div class="gk">Objective</div><div class="gv">${esc(c.goals.objective)}</div></div>
-          <div class="goal-item"><div class="gk">Horizon</div><div class="gv">${esc(c.goals.horizon)}</div></div>
-          <div class="goal-item"><div class="gk">Risk profile</div><div class="gv">${esc(c.risk)}</div></div>
-        </div>
-        ${BPCharts.fundingBar(c.goals.funding)}
-        <div class="cd-actions">
-          <a class="view-port-btn" href="portfolio.html?client=${esc(c.id)}">View current portfolio ›</a>
-          <a class="view-port-btn ghost" href="onepager.html?client=${esc(c.id)}">Client one-pager ›</a>
+
+        <div class="panel cd-alloc">
+          <div class="panel-head"><h3>Strategic allocation — now vs target</h3></div>
+          <div class="panel-body">${BPCharts.goalTargetBar(c.goals.target, curBuckets)}</div>
         </div>
       </div>
 
-      ${nba ? `<div class="nba-banner" data-stage="1">
-        <div class="nba-banner-l">
-          <span class="nba-tag">Next best action</span>
-          <span class="nba-title">${esc(nba.title)}</span>
-          <p class="nba-why">${esc(nba.rationale)}</p>
-        </div>
-        <span class="nba-cta">Stage in Pre-Trade ›</span>
-      </div>` : ""}
+      <div class="book-brief">
+        <section class="bb-sec bb-agenda">
+          <span class="eyebrow">The desk's agenda for this book</span>
+          <p>${esc(c.summary)}</p>
+        </section>
 
-      <div class="agenda"><span class="eyebrow">The desk's agenda for this book</span><p>${esc(c.summary)}</p></div>
+        ${nba ? `<section class="bb-sec bb-nba" data-stage="1">
+          <div class="bb-nba-l">
+            <span class="nba-tag">Next best action</span>
+            <span class="nba-title">${esc(nba.title)}</span>
+            <p class="nba-why">${esc(nba.rationale)}</p>
+          </div>
+          <span class="nba-cta">Stage in Pre-Trade ›</span>
+        </section>` : ""}
 
-      <div class="panel" style="margin-top:18px">
-        <div class="panel-head"><h3>Actions for this book</h3><span class="rec-theme" style="margin-left:auto">${rec.findings.length} derived from this portfolio · most urgent first</span></div>
-        <div class="panel-body reco-body">${actionsHTML}</div>
+        ${houseViewsHTML}
       </div>
-
-      ${houseViewsHTML}
 
       <button class="see-more-btn" id="seeMoreIdeas" type="button" aria-expanded="false">See all house-view ideas that fit — ${rec.viewItems.length} by asset class ›</button>
       <div class="panel" id="moreIdeasPanel" hidden style="margin-top:14px">
@@ -463,19 +514,14 @@
         <div class="panel-body reco-body">${viewGroupsHTML}</div>
       </div>
 
-      <div class="panel" style="margin-top:18px">
-        <div class="panel-head"><h3>Strategic allocation — now vs target</h3></div>
-        <div class="panel-body">${BPCharts.goalTargetBar(c.goals.target, curBuckets)}</div>
+      <div class="panel framed-panel" style="margin-top:18px">
+        <div class="panel-head"><h3>Actions for this book</h3><span class="rec-theme" style="margin-left:auto">${rec.findings.length} derived from this portfolio · most urgent first</span></div>
+        <div class="panel-body reco-body framed-body">${actionsHTML}</div>
       </div>
 
-      <details class="goals-explainer" style="margin-top:14px">
-        <summary>What do these goals mean? <span class="ge-hint">Growth · Income · Protection · Structured notes · Liquidity</span></summary>
-        <div class="ge-body">${BPCharts.goalGlossary()}</div>
-      </details>
-
-      <div class="panel" style="margin-top:18px">
-        <div class="panel-head"><h3>Holdings</h3></div>
-        <div class="panel-body">${positions || '<p class="pos-note" style="padding:12px 0">No positions on file.</p>'}</div>
+      <div class="panel framed-panel" style="margin-top:18px">
+        <div class="panel-head"><h3>Holdings</h3><span class="rec-theme" style="margin-left:auto">${(c.positions || []).length} positions · grouped by asset class</span></div>
+        <div class="panel-body framed-body">${holdingsHTML}</div>
       </div>
       ${liabilities}`;
 
@@ -496,7 +542,7 @@
       el.addEventListener("click", () => openIdeaDrawer(el.dataset.idea)));
     $$("#clientDetail .reco-card[data-stage]").forEach(el =>
       el.addEventListener("click", () => stageFinding(c.id, el.querySelector("h4").textContent)));
-    const banner = $("#clientDetail .nba-banner");
+    const banner = $("#clientDetail .bb-nba");
     if (banner) banner.addEventListener("click", () => stageNba(c.id, nba));
   }
 
@@ -1165,6 +1211,18 @@
     }));
   }
 
+  /* ----------------------- goal-bucket glossary modal ----------------- */
+  function openGoals() {
+    openModal(`
+      <div class="modal-head"><span class="eyebrow">Strategic allocation</span><h2>What do these goals mean?</h2></div>
+      <div class="modal-body">
+        <p class="rub-p">Every book is mapped to five goal buckets — the strategic plan reads in these terms, and the “now vs target” bars show how the current book sits against each.</p>
+        ${BPCharts.goalGlossary()}
+      </div>
+      <div class="modal-foot"><button class="btn btn-primary" id="goalsClose">Got it</button></div>`);
+    $("#goalsClose").onclick = closeModal;
+  }
+
   /* ----------------------- draft a view (lighter add) ----------------- */
   const DRAFT_RULES = [
     { kw: ["ai", "semiconductor", "semis", "chip", "gpu", "compute", "memory", "hbm", "nvidia", "datacenter", "data center", "software"], themeId: "ai", sector: "Technology", assetClass: "Equity", bucket: "Growth", structs: ["Direct equity", "Structured note", "Index core"] },
@@ -1269,6 +1327,7 @@
 
     renderFocus();
     $("#rubricBtn").addEventListener("click", openRubric);
+    $("#goalsBtn").addEventListener("click", openGoals);
     $("#draftGoBtn").addEventListener("click", () => openDraftView($("#draftThesis").value));
     $("#draftThesis").addEventListener("keydown", e => { if (e.key === "Enter") openDraftView($("#draftThesis").value); });
 

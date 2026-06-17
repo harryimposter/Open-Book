@@ -195,14 +195,14 @@ const SEED_CLIENTS = [
       funding: { headline: "Grow to $75m by 2034", metricLabel: "Projected value", current: 38, target: 75, unit: "$m", status: "On track" }
     },
     positions: [
-      { name: "NVIDIA",   ticker: "NVDA US", assetClass: "Equity", sector: "Technology", ccy: "USD", weightPct: 24.0, pnlPct: 12,  note: "Largest position; range-bound 195–235." },
-      { name: "Broadcom", ticker: "AVGO US", assetClass: "Equity", sector: "Technology", ccy: "USD", weightPct: 14.0, pnlPct: -21, note: "Bought into the print, gapped ~20%." },
-      { name: "Micron",   ticker: "MU US",   assetClass: "Equity", sector: "Technology", ccy: "USD", weightPct: 13.0, pnlPct: 180, note: "HBM supercycle; large unrealised gain." },
-      { name: "ASML",     ticker: "ASML NA", assetClass: "Equity", sector: "Technology", ccy: "EUR", weightPct: 19.0, pnlPct: 30,  note: "Semi-cap leader." },
-      { name: "Microsoft",ticker: "MSFT US", assetClass: "Equity", sector: "Technology", ccy: "USD", weightPct: 18.0, pnlPct: 40,  note: "AI monetization core." },
-      { name: "Phoenix autocall (semis)", ticker: "—", assetClass: "Structured", sector: "Technology", ccy: "USD", weightPct: 6.0, pnlPct: 4, note: "Yield on range-bound semis." },
-      { name: "Short IG bonds", ticker: "—", assetClass: "Fixed Income", sector: "Credit", ccy: "USD", weightPct: 2.0, pnlPct: 0, note: "Thin core sleeve." },
-      { name: "USD cash", ticker: "—", assetClass: "Cash", sector: "Cash", ccy: "USD", weightPct: 4.0, pnlPct: 0, note: "Idle." }
+      { name: "NVIDIA",   ticker: "NVDA US", assetClass: "Equity", sector: "Technology", ccy: "USD", weightPct: 24.0, pnlPct: 12,  entryDate: "2025-11-04", entrySpot: 178.00, mat: null, note: "Largest position; range-bound 195–235." },
+      { name: "Broadcom", ticker: "AVGO US", assetClass: "Equity", sector: "Technology", ccy: "USD", weightPct: 14.0, pnlPct: -21, entryDate: "2026-02-10", entrySpot: 295.00, mat: null, note: "Bought into the print, gapped ~20%." },
+      { name: "Micron",   ticker: "MU US",   assetClass: "Equity", sector: "Technology", ccy: "USD", weightPct: 13.0, pnlPct: 180, entryDate: "2023-05-15", entrySpot: 62.00, mat: null, note: "HBM supercycle; large unrealised gain." },
+      { name: "ASML",     ticker: "ASML NA", assetClass: "Equity", sector: "Technology", ccy: "EUR", weightPct: 19.0, pnlPct: 30,  entryDate: "2024-09-20", entrySpot: 720.00, mat: null, note: "Semi-cap leader." },
+      { name: "Microsoft",ticker: "MSFT US", assetClass: "Equity", sector: "Technology", ccy: "USD", weightPct: 18.0, pnlPct: 40,  entryDate: "2024-03-12", entrySpot: 410.00, mat: null, note: "AI monetization core." },
+      { name: "Phoenix autocall (semis)", ticker: "—", assetClass: "Structured", sector: "Technology", ccy: "USD", weightPct: 6.0, pnlPct: 4, entryDate: "2025-12-01", entrySpot: null, mat: "2027-12-01", note: "Yield on range-bound semis." },
+      { name: "Short IG bonds", ticker: "—", assetClass: "Fixed Income", sector: "Credit", ccy: "USD", weightPct: 2.0, pnlPct: 0, entryDate: "2025-10-01", entrySpot: null, mat: "2027-10-01", note: "Thin core sleeve." },
+      { name: "USD cash", ticker: "—", assetClass: "Cash", sector: "Cash", ccy: "USD", weightPct: 4.0, pnlPct: 0, entryDate: null, entrySpot: null, mat: null, note: "Idle." }
     ],
     summary: "Concentrated, options-fluent AI-growth book — NVDA, AVGO and the semis supply chain at high single-stock weights, almost no cash. The agenda is to keep the upside but get paid for the volatility: protect the Micron gain, overwrite rich premium, recover the AVGO loss, and diversify the single-sector risk into the broader AI build-out."
   },
@@ -222,15 +222,15 @@ const SEED_CLIENTS = [
       funding: { headline: "Grow to €70m by 2035 while drawing income", metricLabel: "Projected value", current: 50.2, target: 70, unit: "€m", status: "On track" }
     },
     positions: [
-      { name: "Micron",        ticker: "MU US",  assetClass: "Equity", sector: "Technology", ccy: "USD", weightPct: 25.8, pnlPct: 1080, note: "~10x gain; earnings 24-Jun; IVol rich." },
-      { name: "SPDR S&P 500",  ticker: "SPY US", assetClass: "Equity", sector: "Broad",     ccy: "USD", weightPct: 25.2, pnlPct: 74,  note: "Core beta anchor." },
-      { name: "NVIDIA",        ticker: "NVDA US",assetClass: "Equity", sector: "Technology", ccy: "USD", weightPct: 7.2,  pnlPct: -10, note: "Range-bound; house still likes it." },
-      { name: "US Treasury 1.25% '31", ticker: "T 1.25 08/31", assetClass: "Fixed Income", sector: "Rates", ccy: "USD", weightPct: 6.0, pnlPct: -14, note: "Underwater on rates — bond-swap candidate." },
-      { name: "Xetra-Gold ETC",ticker: "4GLD GY",assetClass: "Commodity", sector: "Gold",  ccy: "EUR", weightPct: 5.2,  pnlPct: 109, note: "Tail hedge — protective." },
-      { name: "TotalEnergies", ticker: "TTE FP", assetClass: "Equity", sector: "Energy",    ccy: "EUR", weightPct: 4.3,  pnlPct: 55,  note: "Energy hedge." },
-      { name: "SAP",           ticker: "SAP GY", assetClass: "Equity", sector: "Technology", ccy: "EUR", weightPct: 8.4,  pnlPct: 132, note: "Winner — overwrite candidate." },
-      { name: "US IG corporates", ticker: "—", assetClass: "Fixed Income", sector: "Credit", ccy: "USD", weightPct: 7.8, pnlPct: 0, note: "Core USD income sleeve." },
-      { name: "EUR cash",      ticker: "—", assetClass: "Cash", sector: "Cash", ccy: "EUR", weightPct: 10.1, pnlPct: 0, note: "Idle; ~€5m equivalent." }
+      { name: "Micron",        ticker: "MU US",  assetClass: "Equity", sector: "Technology", ccy: "USD", weightPct: 25.8, pnlPct: 1080, entryDate: "2019-06-10", entrySpot: 38.00, mat: null, note: "~10x gain; earnings 24-Jun; IVol rich." },
+      { name: "SPDR S&P 500",  ticker: "SPY US", assetClass: "Equity", sector: "Broad",     ccy: "USD", weightPct: 25.2, pnlPct: 74,  entryDate: "2021-02-01", entrySpot: 360.00, mat: null, note: "Core beta anchor." },
+      { name: "NVIDIA",        ticker: "NVDA US",assetClass: "Equity", sector: "Technology", ccy: "USD", weightPct: 7.2,  pnlPct: -10, entryDate: "2026-01-20", entrySpot: 205.00, mat: null, note: "Range-bound; house still likes it." },
+      { name: "US Treasury 1.25% '31", ticker: "T 1.25 08/31", assetClass: "Fixed Income", sector: "Rates", ccy: "USD", weightPct: 6.0, pnlPct: -14, entryDate: "2021-08-15", entrySpot: 98.50, mat: "2031-08-31", note: "Underwater on rates — bond-swap candidate." },
+      { name: "Xetra-Gold ETC",ticker: "4GLD GY",assetClass: "Commodity", sector: "Gold",  ccy: "EUR", weightPct: 5.2,  pnlPct: 109, entryDate: "2020-03-01", entrySpot: 42.00, mat: null, note: "Tail hedge — protective." },
+      { name: "TotalEnergies", ticker: "TTE FP", assetClass: "Equity", sector: "Energy",    ccy: "EUR", weightPct: 4.3,  pnlPct: 55,  entryDate: "2022-05-10", entrySpot: 48.00, mat: null, note: "Energy hedge." },
+      { name: "SAP",           ticker: "SAP GY", assetClass: "Equity", sector: "Technology", ccy: "EUR", weightPct: 8.4,  pnlPct: 132, entryDate: "2021-09-01", entrySpot: 95.00, mat: null, note: "Winner — overwrite candidate." },
+      { name: "US IG corporates", ticker: "—", assetClass: "Fixed Income", sector: "Credit", ccy: "USD", weightPct: 7.8, pnlPct: 0, entryDate: "2025-09-01", entrySpot: null, mat: "2030-09-01", note: "Core USD income sleeve." },
+      { name: "EUR cash",      ticker: "—", assetClass: "Cash", sector: "Cash", ccy: "EUR", weightPct: 10.1, pnlPct: 0, entryDate: null, entrySpot: null, mat: null, note: "Idle; ~€5m equivalent." }
     ],
     summary: "EMEA book dominated by a 25.8% Micron position on a ~10x gain into a 24-Jun print, 72% USD against an EUR base, with a bond underwater on rates and gold and TotalEnergies as deliberate hedges. The agenda: protect the MU concentration, hedge the USD/EUR mismatch, harvest the bond and NVDA losses, monetize SAP's gain, and put idle cash to work — while protecting the gold and energy hedges, not trimming them."
   },
@@ -250,18 +250,18 @@ const SEED_CLIENTS = [
       funding: { headline: "Fund $3.6m/yr retirement income", metricLabel: "Annual income run-rate", current: 3.0, target: 3.6, unit: "$m/yr", status: "Slightly behind" }
     },
     positions: [
-      { name: "US Treasury ladder",   ticker: "—",      assetClass: "Fixed Income", sector: "Rates",      ccy: "USD", weightPct: 17.0, pnlPct: 1,   note: "2–7yr ladder, current coupons." },
-      { name: "US Treasury 2.0% '40", ticker: "T 2.0 40",assetClass: "Fixed Income", sector: "Rates",     ccy: "USD", weightPct: 8.0,  pnlPct: -22, note: "Long-duration — bought at the lows; deep loss." },
-      { name: "Muni bond sleeve",     ticker: "—",      assetClass: "Fixed Income", sector: "Credit",     ccy: "USD", weightPct: 13.0, pnlPct: 2,   note: "Tax-exempt income." },
-      { name: "NextEra Energy",       ticker: "NEE US", assetClass: "Equity",       sector: "Utilities",  ccy: "USD", weightPct: 7.0,  pnlPct: 35,  note: "Regulated yield + load growth." },
-      { name: "Johnson & Johnson",    ticker: "JNJ US", assetClass: "Equity",       sector: "Healthcare", ccy: "USD", weightPct: 9.0,  pnlPct: 18,  note: "Defensive dividend." },
-      { name: "Pfizer",               ticker: "PFE US", assetClass: "Equity",       sector: "Healthcare", ccy: "USD", weightPct: 5.0,  pnlPct: -28, note: "Underwater — post-COVID de-rating." },
-      { name: "Realty Income (REIT)", ticker: "O US",   assetClass: "Real Assets",  sector: "Real Estate",ccy: "USD", weightPct: 5.0,  pnlPct: -18, note: "Underwater on rates; high yield." },
-      { name: "Listed infra fund",    ticker: "—",      assetClass: "Real Assets",  sector: "Infrastructure", ccy: "USD", weightPct: 4.0, pnlPct: 9, note: "Inflation-linked income." },
-      { name: "Procter & Gamble",     ticker: "PG US",  assetClass: "Equity",       sector: "Consumer",   ccy: "USD", weightPct: 9.0,  pnlPct: 22,  note: "Defensive dividend." },
-      { name: "Gold ETF",             ticker: "GLD US", assetClass: "Commodity",    sector: "Gold",       ccy: "USD", weightPct: 3.0,  pnlPct: 40,  note: "Small hedge sleeve." },
-      { name: "IG corporate bonds",   ticker: "—",      assetClass: "Fixed Income", sector: "Credit",     ccy: "USD", weightPct: 10.0, pnlPct: 0,   note: "Core fixed income." },
-      { name: "USD cash",             ticker: "—",      assetClass: "Cash",         sector: "Cash",       ccy: "USD", weightPct: 10.0, pnlPct: 0,   note: "Drawdown buffer; some redeployable." }
+      { name: "US Treasury ladder",   ticker: "—",      assetClass: "Fixed Income", sector: "Rates",      ccy: "USD", weightPct: 17.0, pnlPct: 1,   entryDate: "2024-01-15", entrySpot: null, mat: "2031-01-15", note: "2–7yr ladder, current coupons." },
+      { name: "US Treasury 2.0% '40", ticker: "T 2.0 40",assetClass: "Fixed Income", sector: "Rates",     ccy: "USD", weightPct: 8.0,  pnlPct: -22, entryDate: "2020-07-01", entrySpot: 72.00, mat: "2040-05-15", note: "Long-duration — bought at the lows; deep loss." },
+      { name: "Muni bond sleeve",     ticker: "—",      assetClass: "Fixed Income", sector: "Credit",     ccy: "USD", weightPct: 13.0, pnlPct: 2,   entryDate: "2023-06-01", entrySpot: null, mat: "2033-06-01", note: "Tax-exempt income." },
+      { name: "NextEra Energy",       ticker: "NEE US", assetClass: "Equity",       sector: "Utilities",  ccy: "USD", weightPct: 7.0,  pnlPct: 35,  entryDate: "2022-11-01", entrySpot: 58.00, mat: null, note: "Regulated yield + load growth." },
+      { name: "Johnson & Johnson",    ticker: "JNJ US", assetClass: "Equity",       sector: "Healthcare", ccy: "USD", weightPct: 9.0,  pnlPct: 18,  entryDate: "2022-04-01", entrySpot: 152.00, mat: null, note: "Defensive dividend." },
+      { name: "Pfizer",               ticker: "PFE US", assetClass: "Equity",       sector: "Healthcare", ccy: "USD", weightPct: 5.0,  pnlPct: -28, entryDate: "2021-12-01", entrySpot: 42.00, mat: null, note: "Underwater — post-COVID de-rating." },
+      { name: "Realty Income (REIT)", ticker: "O US",   assetClass: "Real Assets",  sector: "Real Estate",ccy: "USD", weightPct: 5.0,  pnlPct: -18, entryDate: "2021-09-01", entrySpot: 68.00, mat: null, note: "Underwater on rates; high yield." },
+      { name: "Listed infra fund",    ticker: "—",      assetClass: "Real Assets",  sector: "Infrastructure", ccy: "USD", weightPct: 4.0, pnlPct: 9, entryDate: "2023-03-01", entrySpot: null, mat: null, note: "Inflation-linked income." },
+      { name: "Procter & Gamble",     ticker: "PG US",  assetClass: "Equity",       sector: "Consumer",   ccy: "USD", weightPct: 9.0,  pnlPct: 22,  entryDate: "2022-02-01", entrySpot: 138.00, mat: null, note: "Defensive dividend." },
+      { name: "Gold ETF",             ticker: "GLD US", assetClass: "Commodity",    sector: "Gold",       ccy: "USD", weightPct: 3.0,  pnlPct: 40,  entryDate: "2021-06-01", entrySpot: 168.00, mat: null, note: "Small hedge sleeve." },
+      { name: "IG corporate bonds",   ticker: "—",      assetClass: "Fixed Income", sector: "Credit",     ccy: "USD", weightPct: 10.0, pnlPct: 0,   entryDate: "2025-08-01", entrySpot: null, mat: "2030-08-01", note: "Core fixed income." },
+      { name: "USD cash",             ticker: "—",      assetClass: "Cash",         sector: "Cash",       ccy: "USD", weightPct: 10.0, pnlPct: 0,   entryDate: null, entrySpot: null, mat: null, note: "Drawdown buffer; some redeployable." }
     ],
     summary: "The desk's biggest and most diversified book — a $124m preservation estate built for retirement income. It is in good shape, but three things need work: a long-duration Treasury down 22% and two single names (Pfizer, Realty Income) underwater are textbook tax-loss-harvest and bond-swap candidates, the cash sleeve can be laddered for more income, and the book is light on protection relative to its size."
   },
@@ -281,16 +281,16 @@ const SEED_CLIENTS = [
       funding: { headline: "Preserve real value, grow to $90m by 2036", metricLabel: "Projected value", current: 71, target: 90, unit: "$m", status: "Slightly behind" }
     },
     positions: [
-      { name: "Bitcoin",            ticker: "BTC",     assetClass: "Alternatives", sector: "Crypto",         ccy: "USD", weightPct: 16.0, pnlPct: -38, note: "Bought near the highs; deep drawdown — the book's problem child." },
-      { name: "Gold (allocated)",   ticker: "XAU",     assetClass: "Commodity",    sector: "Gold",           ccy: "USD", weightPct: 12.0, pnlPct: 40,  note: "Strategic hard-asset core." },
-      { name: "Global infra fund",  ticker: "—",       assetClass: "Real Assets",  sector: "Infrastructure", ccy: "USD", weightPct: 13.0, pnlPct: 12,  note: "Listed infrastructure." },
-      { name: "Shell",              ticker: "SHEL LN", assetClass: "Equity",       sector: "Energy",         ccy: "GBP", weightPct: 8.0,  pnlPct: 22,  note: "Majors / energy premium." },
-      { name: "EM equity sleeve",   ticker: "—",       assetClass: "Equity",       sector: "Broad",          ccy: "USD", weightPct: 12.0, pnlPct: 5,   note: "APAC / EM growth." },
-      { name: "GDX gold miners",    ticker: "GDX US",  assetClass: "Equity",       sector: "Materials",      ccy: "USD", weightPct: 6.0,  pnlPct: -5,  note: "Lags spot — catch-up candidate." },
-      { name: "Private infra co-invest", ticker: "—",  assetClass: "Real Assets",  sector: "Infrastructure", ccy: "USD", weightPct: 6.0,  pnlPct: 0,   note: "Datacenter power." },
-      { name: "EUR IG bonds",       ticker: "—",       assetClass: "Fixed Income", sector: "Credit",         ccy: "EUR", weightPct: 12.0, pnlPct: -4,  note: "Diversifier; mild duration loss." },
-      { name: "Macro hedge fund",   ticker: "—",       assetClass: "Alternatives", sector: "Broad",          ccy: "USD", weightPct: 7.0,  pnlPct: 8,   note: "Uncorrelated sleeve." },
-      { name: "USD cash",           ticker: "—",       assetClass: "Cash",         sector: "Cash",           ccy: "USD", weightPct: 8.0,  pnlPct: 0,   note: "Dry powder." }
+      { name: "Bitcoin",            ticker: "BTC",     assetClass: "Alternatives", sector: "Crypto",         ccy: "USD", weightPct: 16.0, pnlPct: -38, entryDate: "2024-11-01", entrySpot: 92000.00, mat: null, note: "Bought near the highs; deep drawdown — the book's problem child." },
+      { name: "Gold (allocated)",   ticker: "XAU",     assetClass: "Commodity",    sector: "Gold",           ccy: "USD", weightPct: 12.0, pnlPct: 40,  entryDate: "2022-01-01", entrySpot: 1850.00, mat: null, note: "Strategic hard-asset core." },
+      { name: "Global infra fund",  ticker: "—",       assetClass: "Real Assets",  sector: "Infrastructure", ccy: "USD", weightPct: 13.0, pnlPct: 12,  entryDate: "2023-05-01", entrySpot: null, mat: null, note: "Listed infrastructure." },
+      { name: "Shell",              ticker: "SHEL LN", assetClass: "Equity",       sector: "Energy",         ccy: "GBP", weightPct: 8.0,  pnlPct: 22,  entryDate: "2022-06-01", entrySpot: 22.50, mat: null, note: "Majors / energy premium." },
+      { name: "EM equity sleeve",   ticker: "—",       assetClass: "Equity",       sector: "Broad",          ccy: "USD", weightPct: 12.0, pnlPct: 5,   entryDate: "2024-02-01", entrySpot: null, mat: null, note: "APAC / EM growth." },
+      { name: "GDX gold miners",    ticker: "GDX US",  assetClass: "Equity",       sector: "Materials",      ccy: "USD", weightPct: 6.0,  pnlPct: -5,  entryDate: "2025-09-01", entrySpot: 38.00, mat: null, note: "Lags spot — catch-up candidate." },
+      { name: "Private infra co-invest", ticker: "—",  assetClass: "Real Assets",  sector: "Infrastructure", ccy: "USD", weightPct: 6.0,  pnlPct: 0,   entryDate: "2024-06-01", entrySpot: null, mat: "2034-06-01", note: "Datacenter power." },
+      { name: "EUR IG bonds",       ticker: "—",       assetClass: "Fixed Income", sector: "Credit",         ccy: "EUR", weightPct: 12.0, pnlPct: -4,  entryDate: "2023-10-01", entrySpot: null, mat: "2029-10-01", note: "Diversifier; mild duration loss." },
+      { name: "Macro hedge fund",   ticker: "—",       assetClass: "Alternatives", sector: "Broad",          ccy: "USD", weightPct: 7.0,  pnlPct: 8,   entryDate: "2023-01-01", entrySpot: null, mat: null, note: "Uncorrelated sleeve." },
+      { name: "USD cash",           ticker: "—",       assetClass: "Cash",         sector: "Cash",           ccy: "USD", weightPct: 8.0,  pnlPct: 0,   entryDate: null, entrySpot: null, mat: null, note: "Dry powder." }
     ],
     summary: "Multi-currency real-assets family office with a hard-asset core (gold, energy, infrastructure) and an uncorrelated alternatives sleeve — but the standout issue is a 16% Bitcoin position down 38%. As a Professional client we can be creative: harvest the crypto loss and re-enter with a downside-defined structure, collar or partially monetize it, and keep building the gold and infrastructure core. The miners lag spot and are a tactical catch-up."
   },
@@ -314,16 +314,16 @@ const SEED_CLIENTS = [
       funding: { headline: "Net worth to $120m by 2033 (after liabilities)", metricLabel: "Net projected value", current: 75, target: 120, unit: "$m", status: "On track" }
     },
     positions: [
-      { name: "S&P 500 index core", ticker: "VOO US",  assetClass: "Equity",       sector: "Broad",      ccy: "USD", weightPct: 29.0, pnlPct: 55, note: "Passive core." },
-      { name: "Microsoft",          ticker: "MSFT US", assetClass: "Equity",       sector: "Technology", ccy: "USD", weightPct: 10.0, pnlPct: 48, note: "Quality compounder." },
-      { name: "Apple",              ticker: "AAPL US", assetClass: "Equity",       sector: "Technology", ccy: "USD", weightPct: 8.0,  pnlPct: 30, note: "Mega-cap quality." },
-      { name: "UnitedHealth",       ticker: "UNH US",  assetClass: "Equity",       sector: "Healthcare", ccy: "USD", weightPct: 6.0,  pnlPct: -12,note: "Underwater; defensive compounder." },
-      { name: "IG corporate bonds", ticker: "—",       assetClass: "Fixed Income", sector: "Credit",     ccy: "USD", weightPct: 14.0, pnlPct: 0,  note: "Core fixed income." },
-      { name: "Muni bond sleeve",   ticker: "—",       assetClass: "Fixed Income", sector: "Credit",     ccy: "USD", weightPct: 8.0,  pnlPct: 1,  note: "Tax-aware income." },
-      { name: "Buffered S&P note",  ticker: "—",       assetClass: "Structured",   sector: "Broad",      ccy: "USD", weightPct: 8.0,  pnlPct: 6,  note: "Downside-protected equity." },
-      { name: "Listed infra fund",  ticker: "—",       assetClass: "Real Assets",  sector: "Infrastructure", ccy: "USD", weightPct: 7.0, pnlPct: 8, note: "Contracted income." },
-      { name: "Apple covered-call income", ticker: "—",assetClass: "Equity",       sector: "Technology", ccy: "USD", weightPct: 5.0,  pnlPct: 12, note: "Overwrite income sleeve." },
-      { name: "USD cash",           ticker: "—",       assetClass: "Cash",         sector: "Cash",       ccy: "USD", weightPct: 5.0,  pnlPct: 0,  note: "Tight vs upcoming liabilities." }
+      { name: "S&P 500 index core", ticker: "VOO US",  assetClass: "Equity",       sector: "Broad",      ccy: "USD", weightPct: 29.0, pnlPct: 55, entryDate: "2021-03-01", entrySpot: 360.00, mat: null, note: "Passive core." },
+      { name: "Microsoft",          ticker: "MSFT US", assetClass: "Equity",       sector: "Technology", ccy: "USD", weightPct: 10.0, pnlPct: 48, entryDate: "2022-08-01", entrySpot: 280.00, mat: null, note: "Quality compounder." },
+      { name: "Apple",              ticker: "AAPL US", assetClass: "Equity",       sector: "Technology", ccy: "USD", weightPct: 8.0,  pnlPct: 30, entryDate: "2022-10-01", entrySpot: 150.00, mat: null, note: "Mega-cap quality." },
+      { name: "UnitedHealth",       ticker: "UNH US",  assetClass: "Equity",       sector: "Healthcare", ccy: "USD", weightPct: 6.0,  pnlPct: -12,entryDate: "2024-09-01", entrySpot: 540.00, mat: null, note: "Underwater; defensive compounder." },
+      { name: "IG corporate bonds", ticker: "—",       assetClass: "Fixed Income", sector: "Credit",     ccy: "USD", weightPct: 14.0, pnlPct: 0,  entryDate: "2025-07-01", entrySpot: null, mat: "2030-07-01", note: "Core fixed income." },
+      { name: "Muni bond sleeve",   ticker: "—",       assetClass: "Fixed Income", sector: "Credit",     ccy: "USD", weightPct: 8.0,  pnlPct: 1,  entryDate: "2024-05-01", entrySpot: null, mat: "2032-05-01", note: "Tax-aware income." },
+      { name: "Buffered S&P note",  ticker: "—",       assetClass: "Structured",   sector: "Broad",      ccy: "USD", weightPct: 8.0,  pnlPct: 6,  entryDate: "2025-06-01", entrySpot: null, mat: "2027-06-01", note: "Downside-protected equity." },
+      { name: "Listed infra fund",  ticker: "—",       assetClass: "Real Assets",  sector: "Infrastructure", ccy: "USD", weightPct: 7.0, pnlPct: 8, entryDate: "2023-04-01", entrySpot: null, mat: null, note: "Contracted income." },
+      { name: "Apple covered-call income", ticker: "—",assetClass: "Equity",       sector: "Technology", ccy: "USD", weightPct: 5.0,  pnlPct: 12, entryDate: "2025-03-01", entrySpot: null, mat: null, note: "Overwrite income sleeve." },
+      { name: "USD cash",           ticker: "—",       assetClass: "Cash",         sector: "Cash",       ccy: "USD", weightPct: 5.0,  pnlPct: 0,  entryDate: null, entrySpot: null, mat: null, note: "Tight vs upcoming liabilities." }
     ],
     summary: "A large balanced book with a complication most clients don't have: a $19m floating-rate mortgage and a $2.4m tax bill due in Q3, against only 5% cash. The agenda is liability-aware: build a liquidity and cashflow-matching sleeve (T-bills, munis), consider a securities-backed line rather than selling appreciated stock into the tax event, and keep compounding the quality core — while recovering the UnitedHealth loss."
   },
@@ -343,13 +343,13 @@ const SEED_CLIENTS = [
       funding: { headline: "Grow to $70m by 2034; $4m house deposit by 2028", metricLabel: "Projected value", current: 44, target: 70, unit: "$m", status: "On track" }
     },
     positions: [
-      { name: "NVIDIA",          ticker: "NVDA US", assetClass: "Equity",       sector: "Technology", ccy: "USD", weightPct: 22.0, pnlPct: 240, note: "Concentrated; huge unrealised gain — needs protecting." },
-      { name: "Constellation Energy", ticker: "CEG US", assetClass: "Equity",   sector: "Utilities",  ccy: "USD", weightPct: 15.0, pnlPct: 95,  note: "Concentrated; datacenter-power winner." },
-      { name: "S&P 500 index core", ticker: "VOO US",assetClass: "Equity",      sector: "Broad",      ccy: "USD", weightPct: 26.0, pnlPct: 28,  note: "Diversified core." },
-      { name: "ASML",            ticker: "ASML NA", assetClass: "Equity",       sector: "Technology", ccy: "EUR", weightPct: 7.0,  pnlPct: 20,  note: "Semi-cap." },
-      { name: "IG corporate bonds", ticker: "—",    assetClass: "Fixed Income", sector: "Credit",     ccy: "USD", weightPct: 15.0, pnlPct: 1,   note: "Income sleeve, on plan." },
-      { name: "Listed infra fund", ticker: "—",      assetClass: "Real Assets",  sector: "Infrastructure", ccy: "USD", weightPct: 8.0, pnlPct: 7, note: "Diversifier." },
-      { name: "USD cash",        ticker: "—",        assetClass: "Cash",         sector: "Cash",       ccy: "USD", weightPct: 7.0,  pnlPct: 0,   note: "House-deposit reserve building." }
+      { name: "NVIDIA",          ticker: "NVDA US", assetClass: "Equity",       sector: "Technology", ccy: "USD", weightPct: 22.0, pnlPct: 240, entryDate: "2023-08-01", entrySpot: 52.00, mat: null, note: "Concentrated; huge unrealised gain — needs protecting." },
+      { name: "Constellation Energy", ticker: "CEG US", assetClass: "Equity",   sector: "Utilities",  ccy: "USD", weightPct: 15.0, pnlPct: 95,  entryDate: "2023-04-01", entrySpot: 95.00, mat: null, note: "Concentrated; datacenter-power winner." },
+      { name: "S&P 500 index core", ticker: "VOO US",assetClass: "Equity",      sector: "Broad",      ccy: "USD", weightPct: 26.0, pnlPct: 28,  entryDate: "2023-01-01", entrySpot: 400.00, mat: null, note: "Diversified core." },
+      { name: "ASML",            ticker: "ASML NA", assetClass: "Equity",       sector: "Technology", ccy: "EUR", weightPct: 7.0,  pnlPct: 20,  entryDate: "2024-10-01", entrySpot: 740.00, mat: null, note: "Semi-cap." },
+      { name: "IG corporate bonds", ticker: "—",    assetClass: "Fixed Income", sector: "Credit",     ccy: "USD", weightPct: 15.0, pnlPct: 1,   entryDate: "2025-08-01", entrySpot: null, mat: "2030-08-01", note: "Income sleeve, on plan." },
+      { name: "Listed infra fund", ticker: "—",      assetClass: "Real Assets",  sector: "Infrastructure", ccy: "USD", weightPct: 8.0, pnlPct: 7, entryDate: "2024-01-01", entrySpot: null, mat: null, note: "Diversifier." },
+      { name: "USD cash",        ticker: "—",        assetClass: "Cash",         sector: "Cash",       ccy: "USD", weightPct: 7.0,  pnlPct: 0,   entryDate: null, entrySpot: null, mat: null, note: "House-deposit reserve building." }
     ],
     summary: "The most goals-aligned book at the top line — bucket allocation sits almost exactly on its strategic target. The whole job here is bottom-up risk management: NVDA (22%, +240%) and Constellation (15%, +95%) are two concentrated, deep-in-the-money winners that should be protected with collars to lock in gains ahead of the house-deposit goal. Because Prahnav is Retail, the collar needs reclassification or a non-complex protective alternative — that's the key conversation."
   },
@@ -369,16 +369,16 @@ const SEED_CLIENTS = [
       funding: { headline: "Fund $0.8m/yr income; grow to $45m by 2033", metricLabel: "Annual income run-rate", current: 0.5, target: 0.8, unit: "$m/yr", status: "Behind" }
     },
     positions: [
-      { name: "ExxonMobil",     ticker: "XOM US",  assetClass: "Equity", sector: "Energy",     ccy: "USD", weightPct: 13.0, pnlPct: 32, note: "Energy overweight; buyback + dividend." },
-      { name: "Shell",          ticker: "SHEL LN", assetClass: "Equity", sector: "Energy",     ccy: "GBP", weightPct: 10.0, pnlPct: 18, note: "Energy overweight." },
-      { name: "Berkshire Hathaway", ticker: "BRK/B US", assetClass: "Equity", sector: "Financials", ccy: "USD", weightPct: 18.0, pnlPct: 40, note: "Quality compounder." },
-      { name: "Apple",          ticker: "AAPL US", assetClass: "Equity", sector: "Technology", ccy: "USD", weightPct: 14.0, pnlPct: 25, note: "Mega-cap quality." },
-      { name: "JPMorgan",       ticker: "JPM US",  assetClass: "Equity", sector: "Financials", ccy: "USD", weightPct: 12.0, pnlPct: 30, note: "Financials." },
-      { name: "Caterpillar",    ticker: "CAT US",  assetClass: "Equity", sector: "Industrials",ccy: "USD", weightPct: 8.0,  pnlPct: 15, note: "Cyclical quality." },
-      { name: "Diageo",         ticker: "DGE LN",  assetClass: "Equity", sector: "Consumer",   ccy: "GBP", weightPct: 7.0,  pnlPct: -16,note: "Underwater — staples de-rating." },
-      { name: "Short IG bonds", ticker: "—",       assetClass: "Fixed Income", sector: "Credit",ccy: "USD", weightPct: 6.0,  pnlPct: 1,  note: "Thin fixed-income sleeve." },
-      { name: "REIT sleeve",    ticker: "—",       assetClass: "Real Assets", sector: "Real Estate", ccy: "USD", weightPct: 4.0, pnlPct: 3, note: "Small real-asset allocation." },
-      { name: "USD cash",       ticker: "—",       assetClass: "Cash", sector: "Cash",         ccy: "USD", weightPct: 8.0,  pnlPct: 0,  note: "Idle." }
+      { name: "ExxonMobil",     ticker: "XOM US",  assetClass: "Equity", sector: "Energy",     ccy: "USD", weightPct: 13.0, pnlPct: 32, entryDate: "2022-09-01", entrySpot: 88.00, mat: null, note: "Energy overweight; buyback + dividend." },
+      { name: "Shell",          ticker: "SHEL LN", assetClass: "Equity", sector: "Energy",     ccy: "GBP", weightPct: 10.0, pnlPct: 18, entryDate: "2022-06-01", entrySpot: 23.00, mat: null, note: "Energy overweight." },
+      { name: "Berkshire Hathaway", ticker: "BRK/B US", assetClass: "Equity", sector: "Financials", ccy: "USD", weightPct: 18.0, pnlPct: 40, entryDate: "2022-01-01", entrySpot: 320.00, mat: null, note: "Quality compounder." },
+      { name: "Apple",          ticker: "AAPL US", assetClass: "Equity", sector: "Technology", ccy: "USD", weightPct: 14.0, pnlPct: 25, entryDate: "2022-11-01", entrySpot: 152.00, mat: null, note: "Mega-cap quality." },
+      { name: "JPMorgan",       ticker: "JPM US",  assetClass: "Equity", sector: "Financials", ccy: "USD", weightPct: 12.0, pnlPct: 30, entryDate: "2023-02-01", entrySpot: 165.00, mat: null, note: "Financials." },
+      { name: "Caterpillar",    ticker: "CAT US",  assetClass: "Equity", sector: "Industrials",ccy: "USD", weightPct: 8.0,  pnlPct: 15, entryDate: "2023-05-01", entrySpot: 290.00, mat: null, note: "Cyclical quality." },
+      { name: "Diageo",         ticker: "DGE LN",  assetClass: "Equity", sector: "Consumer",   ccy: "GBP", weightPct: 7.0,  pnlPct: -16,entryDate: "2023-03-01", entrySpot: 32.00, mat: null, note: "Underwater — staples de-rating." },
+      { name: "Short IG bonds", ticker: "—",       assetClass: "Fixed Income", sector: "Credit",ccy: "USD", weightPct: 6.0,  pnlPct: 1,  entryDate: "2025-09-01", entrySpot: null, mat: "2027-09-01", note: "Thin fixed-income sleeve." },
+      { name: "REIT sleeve",    ticker: "—",       assetClass: "Real Assets", sector: "Real Estate", ccy: "USD", weightPct: 4.0, pnlPct: 3, entryDate: "2024-02-01", entrySpot: null, mat: null, note: "Small real-asset allocation." },
+      { name: "USD cash",       ticker: "—",       assetClass: "Cash", sector: "Cash",         ccy: "USD", weightPct: 8.0,  pnlPct: 0,  entryDate: null, entrySpot: null, mat: null, note: "Idle." }
     ],
     summary: "An equity-heavy value book — energy, financials and quality compounders at 82% equity with barely any fixed income or protection. It has done well, but it is one drawdown away from a problem and it under-delivers income versus the goal. The agenda is to diversify: extend into core fixed income and infrastructure for income and ballast, trim the energy-sector concentration, and recover the Diageo loss — all with non-complex instruments, since Ben is Retail."
   }
