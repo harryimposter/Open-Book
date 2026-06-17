@@ -432,7 +432,8 @@
   // <iframe srcdoc>. Relative href resolves against the parent doc URL.
   const FRAME_FONTS = "https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500;600&display=swap";
   function frameDoc(bodyHTML, extraCSS) {
-    const css = (document.querySelector('link[rel="stylesheet"]') || {}).getAttribute("href") || "styles.css";
+    const cssLink = document.querySelector('link[rel="stylesheet"][href*="styles.css"]');
+    const css = (cssLink && cssLink.getAttribute("href")) || "styles.css";
     return `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
       <link href="${FRAME_FONTS}" rel="stylesheet">
       <link rel="stylesheet" href="${css}">
