@@ -4,26 +4,25 @@
    ONE intent-aware scorer. Replaces the old pair of engines (this file's 5-axis
    engine + scanner.js `ideaFit`), which used different math and disagreed.
 
-   Five transparent axes, each 0–100 with a plain-English note. The weighted sum
-   is the client-FIT score (how RIGHT the idea is for THIS client — separate from
-   the idea's own conviction). What's new vs the old engine:
+   Five transparent axes, each 0–100 with a plain-English note, combined with FLAT
+   (fixed) weights. The weighted sum is the client-FIT score (how RIGHT the idea is
+   for THIS client — separate from the idea's own conviction). The axes:
 
-     • INTENT-AWARE — every idea declares an intent (add / protect / trim /
-       income); the axis WEIGHTS are conditional on it (the axis that matters
-       flips with what the idea is trying to do), and the Intent axis reads
-       concentration + P&L THROUGH that lens (concentration helps protect/trim
-       but hurts add).
-     • READS THE REAL DATA — the explicit `client.risk` string and position
-       `pnlPct` (the old engine ignored both), over ONE reconciled book
-       (positions; `split ≡ Σ positions`).
-     • ROBUST MATCHING — `relevantHolding` matches by ticker root, an alias list
-       (XAU/GLD/4GLD all = gold), or, for empty-ticker macro ideas, the largest
-       single position in the idea's sector (so a power idea sees a 15% CEG).
-     • CONTINUOUS — smooth ramps, not discrete cliffs; no double-counting
-       (house-view no longer re-uses the gap / sector numbers other axes score).
+     • GAP FIT — headroom from the book's current sector allocation up to the
+       strategic peg: (target − current)/target. Shares ONE peg with Affinity.
+     • AFFINITY FIT — recency-weighted (λ=0.94, 24-mo) sector affinity minus an
+       over-the-peg concentration penalty.
+     • MANDATE & RISK — Tradability × (0.6·RiskSuitability + 0.4·IntentFit): can the
+       client trade the idea's natural expression (MiFID), and does its vol/beta/
+       structure and goal type suit the mandate?
+     • CONCENTRATION WITHIN SECTOR — (1 − Herfindahl)×100 over the book's in-sector
+       holdings; inverted for fit by default (a concentrated sector wants a new name).
+     • HOUSE-VIEW FIT — does the book already participate in the idea's theme?
 
-   Pure functions over window.SEED + window.Scanner. Exposed as window.MAPPING;
-   scanner.js delegates its fit functions here.
+   Reads the real data — `client.risk`, `client.sectorHistory`, positions — over ONE
+   reconciled book (`split ≡ Σ positions`). Strategic pegs are a single source of
+   truth (PARAMS.affinity.comfort via sectorPeg). Pure functions over window.SEED +
+   window.Scanner. Exposed as window.MAPPING; scanner.js delegates its fit here.
    ========================================================================== */
 (function () {
   "use strict";
@@ -35,43 +34,35 @@
 
   /* the five axes, in display order */
   const AXES = [
-    { key: "gap",       label: "Gap fit" },         // headroom from current sector alloc up to the strategic peg
-    { key: "holdings",  label: "Affinity fit" },   // recency-weighted sector affinity − over-limit penalty
-    { key: "mandate",   label: "Mandate & risk" },
-    { key: "intent",    label: "Intent fit" },
-    { key: "houseview", label: "House-view fit" }
+    { key: "gap",        label: "Gap fit" },                    // headroom from current sector alloc up to the strategic peg
+    { key: "holdings",   label: "Affinity fit" },               // recency-weighted sector affinity − over-limit penalty
+    { key: "mandate",    label: "Mandate & risk" },             // Tradability × (0.6·RiskSuitability + 0.4·IntentFit)
+    { key: "concSector", label: "Concentration within sector" },// (1 − Herfindahl) × 100, inverted for fit by default
+    { key: "houseview",  label: "House-view fit" }
   ];
 
   /* ------------------------------------------------------------------ tunables
      Every magic number lives here so the model is visible and calibratable. */
   const PARAMS = {
-    /* intent-conditional axis weights — each row sums to 1.00.
-       add/income are goal-gap-led (fit the plan; concentration is a penalty);
-       protect/trim are holdings + intent-led (act on an existing position). */
-    weights: {
-      add:     { gap: 0.32, holdings: 0.18, mandate: 0.20, intent: 0.20, houseview: 0.10 },
-      income:  { gap: 0.34, holdings: 0.16, mandate: 0.22, intent: 0.18, houseview: 0.10 },
-      protect: { gap: 0.16, holdings: 0.26, mandate: 0.18, intent: 0.30, houseview: 0.10 },
-      trim:    { gap: 0.16, holdings: 0.26, mandate: 0.16, intent: 0.32, houseview: 0.10 }
-    },
-    /* Affinity-fit axis (replaces the old holdings axis):
-       max(0, thematicAffinity − concentrationPenalty). λ = recency decay. */
+    /* FLAT axis weights — fixed per axis (no longer intent-conditional). Sum = 1.00.
+       Tune here; the per-client breakdown shows the weight actually used. */
+    weights: { holdings: 0.25, gap: 0.20, mandate: 0.25, concSector: 0.15, houseview: 0.15 },
+    /* Affinity-fit axis: max(0, thematicAffinity − concentrationPenalty). The
+       `comfort` pegs are the SINGLE source of truth, shared with Gap fit (sectorPeg). */
     affinity: {
       lambda: 0.94,                                          // month t weight = 0.94^t
       comfort: { growth: 25, income: 15, preservation: 10 }, // per-mandate sector comfort limit (% of book)
       sectorComfort: {},                                     // optional per-sector overrides, e.g. { Gold: 12 } — tunable
       penaltyPerPp: 10, penaltyCap: 100                      // overshoot (pp over comfort) × 10, capped at 100
     },
-    conc: { lo: 8, hi: 25 },          // single-name % mapped 0..1 (protect/trim)
-    addConc: { lo: 15, hi: 45 },      // SECTOR % mapped 0..1 (add penalty)
-    winner: { lo: 20, hi: 200 },      // unrealised pnl% mapped 0..1
-    income: { gapHi: 12, cashLo: 5, cashHi: 15 },
+    /* Concentration-within-sector axis: (1 − HHI) × 100 over in-sector holdings.
+       invertForFit=true ⇒ a more CONCENTRATED sector position scores HIGHER fit
+       (a new name diversifies it). Flip to false to reward diversified books. */
+    concWithinSector: { invertForFit: true, noHoldingScore: 50 },
     applyMin: 45,                     // fit floor for "applies" (Views / draft preview)
     flagMin: 50, flagMax: 6,          // Today's Focus flagging
     tierStrong: 66, tierGood: 48
   };
-
-  const BUCKET_TILT = { Growth: "growth", Structured: "growth", Income: "income", Protection: "preservation", Liquidity: "preservation" };
 
   /* ---- small lookups ---- */
   function tickerRoot(p) { return String(p.ticker || "").split(" ")[0]; }
@@ -148,6 +139,76 @@
   function sectorPeg(client, sector) {
     const A = PARAMS.affinity;
     return (A.sectorComfort[sector] != null) ? A.sectorComfort[sector] : A.comfort[mandateClass(client)];
+  }
+
+  /* ---- idea risk descriptors (explicit field on the idea, else derived) ----
+     Used by the Mandate & Risk axis. Backfill = sensible derivation when the
+     idea doesn't carry an explicit field. */
+  function naturalExpression(idea) {                 // the idea's primary structure
+    return idea.naturalExpression || (idea.structures && idea.structures[0]) || "Direct equity";
+  }
+  function goalTypeOf(idea) {                         // appreciation | yield | protection
+    if (idea.goalType) return idea.goalType;
+    const b = idea.bucket;
+    const txt = ((idea.structures || []).join(" ") + " " + (idea.title || idea.name || "") + " " + (idea.headline || "")).toLowerCase();
+    if (b === "Protection") return "protection";
+    if (b === "Income" || b === "Liquidity") return "yield";
+    if (b === "Structured") {
+      if (/buffer|protect|collar|capital.protected|principal/.test(txt)) return "protection";
+      if (/autocall|coupon|reverse convertible|range accrual|dividend|phoenix|income/.test(txt)) return "yield";
+      return "appreciation";
+    }
+    return "appreciation"; // Growth / default
+  }
+  const HIGH_BETA_SECTORS = ["Technology", "Crypto", "Materials", "Energy", "Industrials", "Consumer"];
+  const LOW_BETA_SECTORS  = ["Utilities", "Gold", "Rates", "Credit", "Infrastructure", "Real Estate", "FX"];
+  function riskProfileOf(idea) {                      // {vol, beta, structured}
+    if (idea.riskProfile) return idea.riskProfile;
+    const structured = idea.assetClass === "Structured" || (idea.structures || []).some(s => S().isStructuredProduct && S().isStructuredProduct(s));
+    const goal = goalTypeOf(idea);
+    let beta = HIGH_BETA_SECTORS.includes(idea.sector) ? "high" : LOW_BETA_SECTORS.includes(idea.sector) ? "low" : "moderate";
+    let vol;
+    if (structured && goal === "protection") { vol = "low"; beta = "low"; }
+    else if (idea.bucket === "Protection") vol = "moderate";          // gold etc: low beta but can be volatile
+    else if (idea.bucket === "Income") vol = beta === "high" ? "moderate" : "low";
+    else vol = beta === "high" ? "high" : beta === "low" ? "low" : "moderate";
+    return { vol, beta, structured };
+  }
+
+  /* Risk Suitability (0–100 + reason): the idea's vol/beta/structure vs the mandate. */
+  function riskSuitability(mandate, rp) {
+    const hi = rp.beta === "high" || rp.vol === "high";
+    const lo = rp.vol === "low";
+    const protectedNote = rp.structured && rp.vol === "low";
+    if (mandate === "growth") {
+      if (hi) return { score: 92, reason: "high-beta / high-vol matches a growth appetite" };
+      if (rp.beta === "moderate" || rp.vol === "moderate") return { score: 72, reason: "moderate risk for a growth book" };
+      return { score: 55, reason: "low-vol — safe but light on the upside a growth book wants" };
+    }
+    if (mandate === "income") {
+      if (lo) return { score: 90, reason: "low-vol / low-drawdown suits an income book" };
+      if (rp.vol === "moderate" && rp.beta !== "high") return { score: 82, reason: "moderate-vol yield fits an income mandate" };
+      if (hi) return { score: 45, reason: "high-beta — too racy for an income book" };
+      return { score: 70, reason: "acceptable for an income mandate" };
+    }
+    // preservation
+    if (protectedNote || (lo && rp.beta === "low")) return { score: 92, reason: "low-vol / capital-protected suits preservation" };
+    if (lo) return { score: 80, reason: "low-vol fits a preservation mandate" };
+    if (hi) return { score: 22, reason: "high-beta — unsuitable for a preservation book" };
+    return { score: 50, reason: "moderate risk for a preservation mandate" };
+  }
+
+  /* Intent Fit (0–100 + reason): the idea's GOAL TYPE vs the mandate's goal. */
+  const INTENT_FIT = {
+    growth:       { appreciation: 90, yield: 55, protection: 45 },
+    income:       { appreciation: 60, yield: 90, protection: 65 },
+    preservation: { appreciation: 30, yield: 68, protection: 92 }
+  };
+  function intentFitScore(mandate, goalType) {
+    const row = INTENT_FIT[mandate] || INTENT_FIT.growth;
+    const score = row[goalType] != null ? row[goalType] : 60;
+    const g = goalType === "appreciation" ? "capital-appreciation" : goalType === "yield" ? "yield-generating" : "capital-protection";
+    return { score, reason: `${g} goal vs a ${mandate} mandate` };
   }
 
   /* ---- relevant holding: the position that best represents the idea ----
@@ -259,82 +320,42 @@
     return { score, note };
   }
 
+  /* MANDATE & RISK = Tradability × (0.6·RiskSuitability + 0.4·IntentFit), 0–100.
+     Tradability is binary: a Retail client can't trade an OTC natural expression → 0
+     (axis = 0, stop). RiskSuitability and IntentFit grade the idea against the
+     client's mandate (from mandateClass / riskProfile). */
   function axisMandate(idea, client, ctx) {
-    let score = 100;
-    const notes = [];
-    const retail = client.classification === "Retail";
-    const structs = idea.structures || [];
-    const otc = structs.filter(s => S().isOtcOption(s));
-    const tradable = structs.filter(s => !S().isOtcOption(s));
-    if (retail && structs.length && tradable.length === 0) {
-      score -= 55;
-      notes.push(`${client.name} is ${client.mifid} — every listed expression is OTC, so it needs Professional status or a non-complex alternative.`);
-    } else if (retail && otc.length) {
-      score -= 8;
-      notes.push(`${client.name} is Retail — use the structured-product / non-complex expression, not the OTC one.`);
-    } else {
-      notes.push(`${client.name} (${client.mifid}) can trade the expressions on offer.`);
+    const mandate = mandateClass(client);
+    const natural = naturalExpression(idea);
+    const tradable = !(client.classification === "Retail" && S().isOtcOption(natural));
+    if (!tradable) {
+      return { score: 0, note: `Tradability no — ${client.name} (${client.mifid}) can't trade the natural expression (${natural} is OTC). Mandate & Risk 0.` };
     }
-    // risk alignment — idea's risk tilt vs the client's parsed risk profile
-    const ideaTilt = BUCKET_TILT[idea.bucket] || "balanced";
-    const cTilt = ctx.risk.tilt, label = ctx.risk.raw || cTilt;
-    if (cTilt === ideaTilt) notes.push(`Fits a ${label} risk profile.`);
-    else if (cTilt === "balanced" || ideaTilt === "balanced") { score -= 6; notes.push(`Broadly compatible with a ${label} profile.`); }
-    else { score -= 18; notes.push(`A ${ideaTilt}-oriented idea against a ${label} profile — size with care.`); }
-    // a growth-seeking 'add' idea is demanding for a conservative book
-    if (ctx.intent === "add" && idea.bucket === "Growth" && ctx.risk.level === "conservative") {
-      score -= 12; notes.push(`Growth-seeking for a conservative book — modest sizing only.`);
-    }
-    return { score: clamp(score, 8, 100), note: notes.join(" ") };
+    const rs = riskSuitability(mandate, riskProfileOf(idea));
+    const intf = intentFitScore(mandate, goalTypeOf(idea));
+    const blend = 0.6 * rs.score + 0.4 * intf.score;
+    const note = `Tradability yes; Risk Suitability ${rs.score} (${rs.reason}); Intent Fit ${intf.score} (${intf.reason}); Mandate & Risk ${Math.round(blend)}.`;
+    return { score: blend, note };
   }
 
-  /* the new axis: concentration + P&L read THROUGH the idea's intent */
-  function axisIntent(idea, client, ctx) {
-    // INCOME — best where the book is under its income target / sitting on cash
-    if (ctx.intent === "income") {
-      const incGap = Math.max(0, round((client.goals.target.Income || 0) - (ctx.buckets.Income || 0)));
-      const cash = round((client.split && client.split.Cash) || 0);
-      const score = 45 + ramp(incGap, 0, PARAMS.income.gapHi) * 35 + ramp(cash, PARAMS.income.cashLo, PARAMS.income.cashHi) * 20;
-      const note = incGap >= 4
-        ? `${incGap}pts under its income target${cash >= 8 ? ` with ${cash}% idle cash` : ""} — room to add contractual yield.`
-        : cash >= 8 ? `${cash}% idle cash to put to work for income.` : `Income role broadly on plan.`;
-      return { score: clamp(score, 5, 100), note };
+  /* CONCENTRATION WITHIN SECTOR — Herfindahl diversification of the book's holdings
+     INSIDE the idea's sector. raw = (1 − HHI) × 100 (concentrated→0, diversified→100,
+     where HHI = Σ(in-sector weightᵢ)² over weights normalised to sum to 1).
+     For the FIT blend it is INVERTED by default — a concentrated sector position
+     means a new name diversifies it, so it should fit MORE. */
+  function axisConcSector(idea, client, ctx) {
+    const P = PARAMS.concWithinSector, sector = idea.sector;
+    const inSector = (client.positions || []).filter(p => p.sector === sector && p.weightPct > 0);
+    const total = inSector.reduce((s, p) => s + p.weightPct, 0);
+    if (!inSector.length || total <= 0) {
+      return { score: P.noHoldingScore, note: `No ${sector} holdings to measure within-sector concentration — neutral ${P.noHoldingScore}.` };
     }
-    // ADD — concentration in the idea's SECTOR reduces fit (don't pile into what you're already heavy in)
-    if (ctx.intent === "add") {
-      const sx = ctx.sectorExp;
-      const score = 85 - ramp(sx, PARAMS.addConc.lo, PARAMS.addConc.hi) * 55;
-      const note = sx >= PARAMS.addConc.hi
-        ? `Book is already ~${Math.round(sx)}% in ${idea.sector} — adding here would deepen that concentration.`
-        : sx >= PARAMS.addConc.lo
-          ? `~${Math.round(sx)}% in ${idea.sector} already — room to add, but mind the concentration.`
-          : `Room to build ${idea.sector} exposure without overloading the book.`;
-      return { score: clamp(score, 5, 100), note };
-    }
-    // PROTECT / TRIM — act on a concentrated position. Use the idea's own holding
-    // (name match, or same-sector top) when there is one; only a GENERIC hedge
-    // (Broad / Multi-Asset / Alternatives — no specific underlying) falls back to
-    // the book's largest single name. A sector-specific idea (e.g. gold) must NOT
-    // "protect" an unrelated position the client happens to hold.
-    const generic = !idea.sector || idea.sector === "Broad" || idea.assetClass === "Multi-Asset" || idea.assetClass === "Alternatives";
-    const t = ctx.rh ? { name: ctx.ownName, pct: ctx.ownPct, pnl: ctx.ownPnl }
-      : (generic && ctx.topName ? { name: ctx.topName.name, pct: ctx.topName.weightPct, pnl: ctx.topName.pnlPct } : null);
-    const pct = t ? t.pct : 0, pnl = t ? t.pnl : 0;
-    const conc = ramp(pct, PARAMS.conc.lo, PARAMS.conc.hi);
-    const winner = ramp(pnl, PARAMS.winner.lo, PARAMS.winner.hi);
-    if (ctx.intent === "trim") {
-      const score = 25 + conc * 40 + winner * 35;
-      const note = (t && pct >= PARAMS.conc.lo && pnl >= PARAMS.winner.lo)
-        ? `${pct}% in ${t.name} at +${pnl}% — a concentrated winner to monetise or overwrite.`
-        : `No concentrated winner to trim on this book right now.`;
-      return { score: clamp(score, 5, 100), note };
-    }
-    // protect
-    const score = 30 + conc * 55 + winner * 15;
-    const note = (t && pct >= PARAMS.conc.lo)
-      ? `${pct}% in ${t.name}${pnl >= PARAMS.winner.lo ? ` on a +${pnl}% gain` : ""} — a position worth protecting${pnl >= PARAMS.winner.lo ? ` (define the downside, keep the upside)` : ""}.`
-      : `Defensive overlay — limited single-name concentration to protect on this book.`;
-    return { score: clamp(score, 5, 100), note };
+    let hhi = 0;
+    inSector.forEach(p => { const w = p.weightPct / total; hhi += w * w; });
+    const raw = Math.max(0, Math.min(100, (1 - hhi) * 100));      // diversification score (0 conc … 100 diversified)
+    const fitContribution = P.invertForFit ? (100 - raw) : raw;   // ← SINGLE flippable line: PARAMS.concWithinSector.invertForFit
+    const note = `${inSector.length} ${sector} name${inSector.length === 1 ? "" : "s"} (HHI ${hhi.toFixed(2)}) → diversification ${Math.round(raw)}/100; fit contribution ${Math.round(fitContribution)} (${P.invertForFit ? "more concentrated ⇒ a new name fits more" : "more diversified ⇒ fits more"}).`;
+    return { score: fitContribution, note };
   }
 
   function axisHouseview(idea, client, ctx) {
@@ -347,12 +368,12 @@
       : { score: 50, note: `On the ${tn} house view — a new thematic overlay for this book.` };
   }
 
-  const AXIS_FN = { gap: axisGap, holdings: axisAffinity, mandate: axisMandate, intent: axisIntent, houseview: axisHouseview };
+  const AXIS_FN = { gap: axisGap, holdings: axisAffinity, mandate: axisMandate, concSector: axisConcSector, houseview: axisHouseview };
 
   /* ---- score one idea for one client → superset consumed by every call site ---- */
   function scoreIdeaForClient(idea, client) {
     const ctx = buildCtx(idea, client);
-    const W = PARAMS.weights[ctx.intent] || PARAMS.weights.add;
+    const W = PARAMS.weights;   // flat weights (fixed per axis)
     const axes = AXES.map(a => {
       const r = AXIS_FN[a.key](idea, client, ctx);
       const weight = W[a.key];
@@ -382,5 +403,5 @@
       .slice(0, max);
   }
 
-  window.MAPPING = { AXES, PARAMS, scoreIdeaForClient, flagClients, tiltOf, mandateClass, sectorPeg, ideaIntent, relevantHolding };
+  window.MAPPING = { AXES, PARAMS, scoreIdeaForClient, flagClients, tiltOf, mandateClass, sectorPeg, naturalExpression, goalTypeOf, riskProfileOf, ideaIntent, relevantHolding };
 })();
