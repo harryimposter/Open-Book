@@ -215,7 +215,7 @@
     }).join("") || `<p class="why">No books are a strong fit right now (derived from exposure + goals).</p>`;
 
     const structs = window.EXPRESSIONS.accordionHTML(idea.structures || [],
-      { sector: idea.sector, assetClass: idea.assetClass, title: idea.title });
+      { sector: idea.sector, assetClass: idea.assetClass, title: idea.title, ticker: idea.ticker, name: idea.title });
     $("#drawer").innerHTML = `
       <div class="drawer-head">
         <button class="drawer-close" id="drawerClose" aria-label="Close">×</button>
@@ -319,9 +319,20 @@
   }
 
   /* one recommendation tile (scanner finding OR matched view idea) */
-  function recoItemHTML(it, isNba) {
+  const PSEUDO_TICKERS = new Set(["FX", "CASH", "LIAB", "PROT", "INC", "SECT", "—", ""]);
+  function recoItemHTML(it, isNba, client) {
+    // client-aware expression example: a portfolio finding points at its own
+    // position; a matched house-view points at the client's held underlying (if any).
+    let exTicker, exName;
+    if (it.source !== "View" && it.ref && it.ref.ticker && !PSEUDO_TICKERS.has(it.ref.ticker)) {
+      exTicker = it.ref.ticker; exName = it.ref.name;
+    } else if (it.source === "View" && client && it.ideaId) {
+      const idea = ideaById(it.ideaId);
+      const rh = idea && window.MAPPING.relevantHolding(idea, client);
+      if (rh && rh.kind === "name" && rh.ticker) { exTicker = rh.ticker; exName = rh.name; }
+    }
     const chips = window.EXPRESSIONS.accordionHTML((it.structures || []).slice(0, 3),
-      { sector: it.sector, assetClass: it.assetClass, title: it.title },
+      { sector: it.sector, assetClass: it.assetClass, title: it.title, ticker: exTicker, name: exName },
       { sm: true, blockedFn: (s) => SEED.isOtcOption(s) && it.retailBlocked });
     const handle = it.source === "View" ? `data-idea="${esc(it.ideaId)}"` : `data-stage="1"`;
     return `<article class="reco-card${isNba ? " is-nba" : ""}" ${handle}>
@@ -345,18 +356,29 @@
     const curBuckets = window.Scanner.bucketAlloc(c.split);
     const nbaKey = nba ? (nba.source === "View" ? nba.ideaId : nba.title) : null;
 
+    // client-specific actions derived from THIS book — the sharp, bespoke ideas
+    const actionsHTML = rec.findings.length
+      ? `<div class="reco-tiles">${rec.findings.map(f => recoItemHTML(f, nbaKey && f.title === nbaKey, c)).join("")}</div>`
+      : `<p class="reco-why" style="padding:12px 0">No portfolio actions flagged — the book is on plan.</p>`;
+
+    // standing house-view ideas that matched this book — demoted below the actions
     const top3 = topFocusIdeasForClient(c, 3);
-    const topIdeasHTML = top3.length ? `
+    const houseViewsHTML = top3.length ? `
       <div class="panel" style="margin-top:18px">
-        <div class="panel-head"><h3>Top ideas for ${esc(c.name)}</h3><span class="rec-theme" style="margin-left:auto">today's focus · ranked for this book (conviction × fit)</span></div>
+        <div class="panel-head"><h3>House views &amp; today's focus that fit ${esc(c.name)}</h3><span class="rec-theme" style="margin-left:auto">standing ideas, ranked for this book (conviction × fit)</span></div>
         <div class="panel-body"><div class="focus-tiles">${top3.map(t => focusTileHTML(t.idea, { client: c, fit: t.fit })).join("")}</div></div>
       </div>` : "";
 
-    const groupsHTML = rec.groups.map(g => `
-      <div class="reco-group">
-        <div class="reco-group-head">${esc(g.assetClass)} <span class="reco-count">${g.items.length}</span></div>
-        <div class="reco-tiles">${g.items.map(it => recoItemHTML(it, nbaKey && (it.source === "View" ? it.ideaId : it.title) === nbaKey)).join("")}</div>
-      </div>`).join("") || `<p class="reco-why" style="padding:12px 0">No recommendations — book is on plan.</p>`;
+    // the rest of the matched catalog, grouped by asset class (behind "see more")
+    const viewByAC = {};
+    rec.viewItems.forEach(it => { (viewByAC[it.assetClass] = viewByAC[it.assetClass] || []).push(it); });
+    const viewGroupsHTML = Object.keys(viewByAC).length
+      ? Object.entries(viewByAC).map(([ac, items]) => `
+        <div class="reco-group">
+          <div class="reco-group-head">${esc(ac)} <span class="reco-count">${items.length}</span></div>
+          <div class="reco-tiles">${items.map(it => recoItemHTML(it, nbaKey && it.ideaId === nbaKey, c)).join("")}</div>
+        </div>`).join("")
+      : `<p class="reco-why" style="padding:12px 0">No house-view ideas matched this book.</p>`;
 
     const positions = (c.positions || []).map(p =>
       `<div class="pos-row">
@@ -385,12 +407,11 @@
           </div>
           <div class="cd-aum"><div class="k">Book AUM</div><div class="v">${esc(fmtAum(c))}</div></div>
         </div>
-        <p class="cd-profile">${esc(c.profile)}</p>
         ${renderAllocBar(c.split)}
         <div class="goal-strip">
           <div class="goal-item"><div class="gk">Objective</div><div class="gv">${esc(c.goals.objective)}</div></div>
           <div class="goal-item"><div class="gk">Horizon</div><div class="gv">${esc(c.goals.horizon)}</div></div>
-          <div class="goal-item"><div class="gk">Classification</div><div class="gv">${esc(c.mifid)}</div></div>
+          <div class="goal-item"><div class="gk">Risk profile</div><div class="gv">${esc(c.risk)}</div></div>
         </div>
         ${BPCharts.fundingBar(c.goals.funding)}
         <div class="cd-actions">
@@ -410,12 +431,17 @@
 
       <div class="agenda"><span class="eyebrow">The desk's agenda for this book</span><p>${esc(c.summary)}</p></div>
 
-      ${topIdeasHTML}
+      <div class="panel" style="margin-top:18px">
+        <div class="panel-head"><h3>Actions for this book</h3><span class="rec-theme" style="margin-left:auto">${rec.findings.length} derived from this portfolio · most urgent first</span></div>
+        <div class="panel-body reco-body">${actionsHTML}</div>
+      </div>
 
-      <button class="see-more-btn" id="seeMoreIdeas" type="button" aria-expanded="false">See more ideas — all ${rec.all.length} recommendations by asset class ›</button>
+      ${houseViewsHTML}
+
+      <button class="see-more-btn" id="seeMoreIdeas" type="button" aria-expanded="false">See all house-view ideas that fit — ${rec.viewItems.length} by asset class ›</button>
       <div class="panel" id="moreIdeasPanel" hidden style="margin-top:14px">
-        <div class="panel-head"><h3>Recommendations by asset class</h3><span class="rec-theme" style="margin-left:auto">${rec.findings.length} from the book · ${rec.viewItems.length} from Views</span></div>
-        <div class="panel-body reco-body">${groupsHTML}</div>
+        <div class="panel-head"><h3>House views that fit, by asset class</h3><span class="rec-theme" style="margin-left:auto">${rec.viewItems.length} standing ideas matched to this book</span></div>
+        <div class="panel-body reco-body">${viewGroupsHTML}</div>
       </div>
 
       <div class="panel" style="margin-top:18px">
@@ -835,7 +861,7 @@
   }
 
   let FOCUS_BY_ID = {};
-  const fitTier = (fit) => fit >= 68 ? "Strong" : fit >= 50 ? "Good" : "Marginal";
+  const fitTier = (fit) => { const P = window.MAPPING.PARAMS; return fit >= P.tierStrong ? "Strong" : fit >= P.tierGood ? "Good" : "Marginal"; };
 
   /* compact tile — just the essentials; clicking opens the full side drawer.
      A role="button" div (not a <button>) so we can nest the dismiss ✕ button. */
@@ -894,7 +920,7 @@
 
       <div class="drawer-section">
         <span class="eyebrow">How we'd express it — tap any to see exactly how</span>
-        ${window.EXPRESSIONS.accordionHTML(idea.structures || [], { sector: idea.sector, assetClass: idea.assetClass, title: idea.name })}
+        ${window.EXPRESSIONS.accordionHTML(idea.structures || [], { sector: idea.sector, assetClass: idea.assetClass, title: idea.name, ticker: idea.ticker, name: idea.name })}
       </div>
 
       <div class="drawer-section">
@@ -1005,11 +1031,11 @@
 
   /* ----------------------- rubric / methodology modal ----------------- */
   const AXIS_DESC = {
-    holdings: "Does the book own the underlying name, or at least the sector? Owning the name scores highest.",
-    gap: "Is the book under its strategic target for the goal this idea fills (e.g. under its Income or Structured-notes target)?",
-    mandate: "Can the client trade the expressions (MiFID tier vs OTC), and does the idea suit a growth / income / preservation mandate?",
-    concentration: "Is the book heavily concentrated in this name — making the idea urgent (protect / monetise) rather than optional?",
-    houseview: "Does the client already sit on the Solutions Views theme behind the idea? Off-theme ideas score lower here."
+    gap: "Is the book under its strategic target for the goal this idea fills (e.g. under its Income or Protection target)? The further under, the stronger the fit.",
+    holdings: "Affinity fit: recency-weighted sector affinity (λ=0.94 over a 24-month allocation history — has the book been building / sitting at the top of its range in the idea's sector) minus a penalty for being over the mandate's sector comfort limit (growth 25% / income 15% / preservation 10%).",
+    mandate: "Can the client trade the expressions (MiFID tier vs OTC), and does the idea suit the client's stated risk profile?",
+    intent: "Does the idea's intent match the book? Concentration and unrealised P&L help a protect / trim idea, but count against piling into an add idea.",
+    houseview: "Does the client already participate in the Solutions Views theme behind the idea? Off-theme ideas score lower here."
   };
   function openRubric() {
     const R = (window.TODAY_FOCUS || {}).convictionRubric || { max_per_pillar: 5, pillars: [], tiers: [] };
@@ -1020,8 +1046,8 @@
         <p class="rub-p">Four pillars, each scored 1–${R.max_per_pillar}; the total is shown out of 100. ${R.tiers.map(t => `<b>${esc(t.key)}</b> ≥ ${t.min}`).join(" · ")}.</p>
         <div class="rub-list">${R.pillars.map(p => `<div class="rub-item"><div class="ri-k">${esc(p.label)}</div><div class="ri-d">${esc(p.desc)}</div></div>`).join("")}</div>
         <h3 class="rub-h">2 · Client-fit score — “how right for THIS client”</h3>
-        <p class="rub-p">Separate from conviction. Each idea is scored against every client across five weighted axes; the weighted sum is the fit score (0–100), and you can open the per-axis breakdown on any flagged client.</p>
-        <div class="rub-list">${window.MAPPING.AXES.map(a => `<div class="rub-item"><div class="ri-k">${esc(a.label)} <span class="ri-w">weight ${a.weight}</span></div><div class="ri-d">${esc(AXIS_DESC[a.key] || "")}</div></div>`).join("")}</div>
+        <p class="rub-p">Separate from conviction. Each idea is scored against every client across five axes; the weighted sum is the fit score (0–100). Weights are <b>intent-aware</b> — they shift with what the idea is trying to do (add / income lean on goal-gap fit; protect / trim lean on holdings and the intent axis). Open the per-axis breakdown on any flagged client to see the exact weight used on each axis.</p>
+        <div class="rub-list">${window.MAPPING.AXES.map(a => `<div class="rub-item"><div class="ri-k">${esc(a.label)}</div><div class="ri-d">${esc(AXIS_DESC[a.key] || "")}</div></div>`).join("")}</div>
       </div>
       <div class="modal-foot"><button class="btn btn-primary" id="rubClose">Got it</button></div>`);
     $("#rubClose").onclick = closeModal;

@@ -31,14 +31,14 @@ const SEED_THEMES = [
 const SEED_IDEAS = [
   /* ---- AI & Productivity ---- */
   {
-    id: "ai-compute", themeId: "ai", title: "AI infrastructure & compute leaders",
+    id: "ai-compute", themeId: "ai", intent: "add", title: "AI infrastructure & compute leaders",
     type: "Thematic", assetClass: "Equity", sector: "Technology", bucket: "Growth",
     conviction: "High", horizon: "Strategic",
     thesis: "The build-out of AI compute remains supply-constrained into 2027. We stay long the leaders but increasingly express it with downside-defined structures given valuations and concentration.",
     structures: ["Direct equity", "Index core", "Structured note"]
   },
   {
-    id: "ai-software", themeId: "ai", title: "Software & the AI adopters",
+    id: "ai-software", themeId: "ai", intent: "add", title: "Software & the AI adopters",
     type: "Thematic", assetClass: "Equity", sector: "Technology", bucket: "Growth",
     conviction: "Medium-High", horizon: "Strategic",
     thesis: "The next leg of the AI trade broadens from infrastructure to the software and services layer attaching AI to existing revenue. Quality compounders with pricing power.",
@@ -47,14 +47,14 @@ const SEED_IDEAS = [
 
   /* ---- Power & Infrastructure ---- */
   {
-    id: "power-grid", themeId: "power", title: "Electricity & the grid build-out",
+    id: "power-grid", themeId: "power", intent: "income", title: "Electricity & the grid build-out",
     type: "Thematic", assetClass: "Equity", sector: "Utilities", bucket: "Income",
     conviction: "High", horizon: "Strategic",
     thesis: "After two flat decades, US power demand is inflecting on datacenters, reshoring and electrification. Utilities and grid suppliers with the right footprint get unprecedented rate-base growth.",
     structures: ["Load-growth utilities", "Utility basket"]
   },
   {
-    id: "power-gas-nuclear", themeId: "power", title: "Natural gas & nuclear as AI power",
+    id: "power-gas-nuclear", themeId: "power", intent: "add", title: "Natural gas & nuclear as AI power",
     type: "Opportunistic", assetClass: "Equity", sector: "Energy", bucket: "Growth",
     conviction: "Medium-High", horizon: "12m",
     thesis: "Firm, dispatchable power is the binding constraint on AI capacity. Gas infrastructure and nuclear operators are the cleanest way to own the supply side of datacenter load.",
@@ -63,14 +63,14 @@ const SEED_IDEAS = [
 
   /* ---- Core Fixed Income ---- */
   {
-    id: "extend-duration", themeId: "duration", title: "Lock in yields — extend duration",
+    id: "extend-duration", themeId: "duration", intent: "income", title: "Lock in yields — extend duration",
     type: "Strategic", assetClass: "Fixed Income", sector: "Rates", bucket: "Income",
     conviction: "High", horizon: "Strategic",
     thesis: "With the cutting cycle approaching, reinvestment risk in cash and bills is rising. Extending into intermediate high-quality bonds locks in yields and adds a true equity diversifier.",
     structures: ["Govt / IG bonds", "Bond ladder"]
   },
   {
-    id: "quality-credit", themeId: "duration", title: "Quality credit carry",
+    id: "quality-credit", themeId: "duration", intent: "income", title: "Quality credit carry",
     type: "Strategic", assetClass: "Fixed Income", sector: "Credit", bucket: "Income",
     conviction: "Medium-High", horizon: "Strategic",
     thesis: "Investment-grade and select securitised credit offer attractive all-in yields with limited spread risk — durable income for books that have been sitting in cash.",
@@ -79,14 +79,14 @@ const SEED_IDEAS = [
 
   /* ---- Broadening Equity ---- */
   {
-    id: "broaden-quality", themeId: "broaden", title: "Diversify the rally — quality & cyclicals",
+    id: "broaden-quality", themeId: "broaden", intent: "add", title: "Diversify the rally — quality & cyclicals",
     type: "Strategic", assetClass: "Equity", sector: "Broad", bucket: "Growth",
     conviction: "Medium-High", horizon: "Strategic",
     thesis: "Leadership is narrow. As earnings broaden, quality cyclicals, industrials and equal-weight exposure should catch up — a diversifier for books concentrated in a handful of names.",
     structures: ["Equal-weight index", "Quality basket"]
   },
   {
-    id: "international-value", themeId: "broaden", title: "International & value catch-up",
+    id: "international-value", themeId: "broaden", intent: "add", title: "International & value catch-up",
     type: "Opportunistic", assetClass: "Equity", sector: "Broad", bucket: "Growth",
     conviction: "Medium", horizon: "12m",
     thesis: "International developed and value trade at a wide discount to US growth. A weaker-dollar regime and a broadening cycle argue for trimming home bias.",
@@ -95,14 +95,14 @@ const SEED_IDEAS = [
 
   /* ---- Real Assets ---- */
   {
-    id: "listed-infra", themeId: "realassets", title: "Listed & private infrastructure",
+    id: "listed-infra", themeId: "realassets", intent: "income", title: "Listed & private infrastructure",
     type: "Strategic", assetClass: "Real Assets", sector: "Infrastructure", bucket: "Income",
     conviction: "Medium-High", horizon: "Strategic",
     thesis: "Toll roads, midstream and contracted power deliver inflation-linked, equity-like income with lower drawdown — a core diversifier for income-oriented books.",
     structures: ["Infrastructure fund", "Private markets"]
   },
   {
-    id: "real-estate", themeId: "realassets", title: "Real estate, selectively",
+    id: "real-estate", themeId: "realassets", intent: "income", title: "Real estate, selectively",
     type: "Opportunistic", assetClass: "Real Assets", sector: "Real Estate", bucket: "Income",
     conviction: "Medium", horizon: "12m",
     thesis: "With rates peaking, high-quality logistics, data-center and residential real estate offer a re-rating opportunity and a contracted income stream.",
@@ -111,14 +111,14 @@ const SEED_IDEAS = [
 
   /* ---- Resilience & Protection ---- */
   {
-    id: "structured-protection", themeId: "resilience", title: "Structured downside protection",
+    id: "structured-protection", themeId: "resilience", intent: "protect", title: "Structured downside protection",
     type: "Strategic", assetClass: "Multi-Asset", sector: "Broad", bucket: "Protection",
     conviction: "High", horizon: "Strategic",
     thesis: "After a strong run in risk assets, buffered notes and collars let concentrated holders keep upside participation while defining the downside — protect the gains without realising the tax.",
     structures: ["Buffered note", "Zero-cost collar"]
   },
   {
-    id: "diversifiers", themeId: "resilience", title: "Diversifiers & hedges",
+    id: "diversifiers", themeId: "resilience", intent: "protect", title: "Diversifiers & hedges",
     type: "Strategic", assetClass: "Alternatives", sector: "Broad", bucket: "Protection",
     conviction: "Medium-High", horizon: "Strategic",
     thesis: "Macro, trend and relative-value strategies add a return stream that is genuinely uncorrelated to a 60/40 — ballast for the next drawdown.",
@@ -127,14 +127,14 @@ const SEED_IDEAS = [
 
   /* ---- Gold & Currency ---- */
   {
-    id: "gold-hedge", themeId: "gold", title: "Gold as a debasement hedge",
+    id: "gold-hedge", themeId: "gold", intent: "protect", tickers: ["XAU", "GLD", "4GLD", "GDX", "IAU", "GLDM"], title: "Gold as a debasement hedge",
     type: "Strategic", assetClass: "Commodity", sector: "Gold", bucket: "Protection",
     conviction: "High", horizon: "Strategic",
     thesis: "Persistent deficits, central-bank buying and geopolitical risk underpin gold as the cleanest tail hedge. We treat it as strategic ballast, sized to the book's protection gap.",
     structures: ["Physical / ETC", "Gold accumulator"]
   },
   {
-    id: "fx-diversify", themeId: "gold", title: "Currency diversification & FX overlays",
+    id: "fx-diversify", themeId: "gold", intent: "protect", title: "Currency diversification & FX overlays",
     type: "Opportunistic", assetClass: "Multi-Asset", sector: "FX", bucket: "Protection",
     conviction: "Medium", horizon: "12m",
     thesis: "Books that have drifted heavily into one currency carry an unmanaged risk. A weaker-dollar regime argues for FX overlays and hedging the mismatch between base currency and asset currency.",
@@ -143,7 +143,7 @@ const SEED_IDEAS = [
 
   /* ---- Healthcare Innovation ---- */
   {
-    id: "glp1", themeId: "health", title: "GLP-1 & medical innovation",
+    id: "glp1", themeId: "health", intent: "add", title: "GLP-1 & medical innovation",
     type: "Thematic", assetClass: "Equity", sector: "Healthcare", bucket: "Growth",
     conviction: "Medium-High", horizon: "Strategic",
     thesis: "Metabolic-disease therapeutics, devices and tools offer a durable, less cyclical growth engine that is under-owned in most growth books — a quality diversifier away from tech.",
@@ -152,21 +152,21 @@ const SEED_IDEAS = [
 
   /* ---- Structured Outcomes ---- */
   {
-    id: "halo-acm", themeId: "structured", title: "HALO worst-of autocall — CEG · MP Materials · CAT",
+    id: "halo-acm", themeId: "structured", intent: "income", title: "HALO worst-of autocall — CEG · MP Materials · CAT",
     type: "Opportunistic", assetClass: "Structured", sector: "Broad", bucket: "Structured",
     conviction: "High", horizon: "12m",
     thesis: "The desk's flagship note: an Autocall Market Plus (ACM+) on the worst-of Constellation Energy, MP Materials and Caterpillar, equally weighted. It pays a fixed 24% p.a. coupon in USD while all three hold above 80% of their start level, and autocalls early if they rally. Three different drivers — power, rare-earth materials and industrials — fund the rich coupon, with a 20% cushion before any capital is at risk. A packaged note Retail can hold.",
     structures: ["HALO basket (ACM+)", "Phoenix autocall", "Reverse convertible", "Capital-protected note"]
   },
   {
-    id: "struct-income", themeId: "structured", title: "Defined-income autocalls on names you'd own",
+    id: "struct-income", themeId: "structured", intent: "income", title: "Defined-income autocalls on names you'd own",
     type: "Strategic", assetClass: "Structured", sector: "Broad", bucket: "Structured",
     conviction: "Medium-High", horizon: "Strategic",
     thesis: "Single-stock and worst-of autocalls (ACM+ / Phoenix) and reverse convertibles on quality names you'd be happy to own anyway — turning a flat-to-up view into a high contractual coupon with a soft capital barrier. The core building block of the structured-notes sleeve.",
     structures: ["Phoenix autocall", "Reverse convertible", "Buffered note", "Capital-protected note"]
   },
   {
-    id: "struct-protect", themeId: "structured", title: "Protected & buffered participation",
+    id: "struct-protect", themeId: "structured", intent: "protect", title: "Protected & buffered participation",
     type: "Strategic", assetClass: "Structured", sector: "Broad", bucket: "Structured",
     conviction: "High", horizon: "Strategic",
     thesis: "Stay invested with a floor — buffered and capital-protected notes that give equity-index upside (often to a cap) while protecting some or all of the downside. The way to keep a concentrated winner's upside, or re-enter after a loss, without taking full drawdown risk.",
@@ -198,9 +198,10 @@ const SEED_CLIENTS = [
       { name: "NVIDIA",   ticker: "NVDA US", assetClass: "Equity", sector: "Technology", ccy: "USD", weightPct: 24.0, pnlPct: 12,  note: "Largest position; range-bound 195–235." },
       { name: "Broadcom", ticker: "AVGO US", assetClass: "Equity", sector: "Technology", ccy: "USD", weightPct: 14.0, pnlPct: -21, note: "Bought into the print, gapped ~20%." },
       { name: "Micron",   ticker: "MU US",   assetClass: "Equity", sector: "Technology", ccy: "USD", weightPct: 13.0, pnlPct: 180, note: "HBM supercycle; large unrealised gain." },
-      { name: "ASML",     ticker: "ASML NA", assetClass: "Equity", sector: "Technology", ccy: "EUR", weightPct: 9.0,  pnlPct: 30,  note: "Semi-cap leader." },
-      { name: "Microsoft",ticker: "MSFT US", assetClass: "Equity", sector: "Technology", ccy: "USD", weightPct: 8.0,  pnlPct: 40,  note: "AI monetization core." },
+      { name: "ASML",     ticker: "ASML NA", assetClass: "Equity", sector: "Technology", ccy: "EUR", weightPct: 19.0, pnlPct: 30,  note: "Semi-cap leader." },
+      { name: "Microsoft",ticker: "MSFT US", assetClass: "Equity", sector: "Technology", ccy: "USD", weightPct: 18.0, pnlPct: 40,  note: "AI monetization core." },
       { name: "Phoenix autocall (semis)", ticker: "—", assetClass: "Structured", sector: "Technology", ccy: "USD", weightPct: 6.0, pnlPct: 4, note: "Yield on range-bound semis." },
+      { name: "Short IG bonds", ticker: "—", assetClass: "Fixed Income", sector: "Credit", ccy: "USD", weightPct: 2.0, pnlPct: 0, note: "Thin core sleeve." },
       { name: "USD cash", ticker: "—", assetClass: "Cash", sector: "Cash", ccy: "USD", weightPct: 4.0, pnlPct: 0, note: "Idle." }
     ],
     summary: "Concentrated, options-fluent AI-growth book — NVDA, AVGO and the semis supply chain at high single-stock weights, almost no cash. The agenda is to keep the upside but get paid for the volatility: protect the Micron gain, overwrite rich premium, recover the AVGO loss, and diversify the single-sector risk into the broader AI build-out."
@@ -213,7 +214,7 @@ const SEED_CLIENTS = [
     relationship: "5-yr relationship · MiFID Retail · Growth + income",
     risk: "Growth, with income needs",
     profile: "EMEA private-bank client, growth with income needs. The book is 72% USD against an EUR base, with a dominant Micron position into earnings and two bonds underwater on rates.",
-    split: { Equity: 71, "Fixed Income": 13.9, Commodity: 6, Cash: 10.1 },
+    split: { Equity: 70.9, "Fixed Income": 13.8, Commodity: 5.2, Cash: 10.1 },
     goals: {
       objective: "Grow the book while drawing income — and protect the concentrated MU gain",
       horizon: "Long-term · 7–10 yrs",
@@ -222,12 +223,13 @@ const SEED_CLIENTS = [
     },
     positions: [
       { name: "Micron",        ticker: "MU US",  assetClass: "Equity", sector: "Technology", ccy: "USD", weightPct: 25.8, pnlPct: 1080, note: "~10x gain; earnings 24-Jun; IVol rich." },
-      { name: "SPDR S&P 500",  ticker: "SPY US", assetClass: "Equity", sector: "Broad",     ccy: "USD", weightPct: 20.4, pnlPct: 74,  note: "Core beta anchor." },
+      { name: "SPDR S&P 500",  ticker: "SPY US", assetClass: "Equity", sector: "Broad",     ccy: "USD", weightPct: 25.2, pnlPct: 74,  note: "Core beta anchor." },
       { name: "NVIDIA",        ticker: "NVDA US",assetClass: "Equity", sector: "Technology", ccy: "USD", weightPct: 7.2,  pnlPct: -10, note: "Range-bound; house still likes it." },
       { name: "US Treasury 1.25% '31", ticker: "T 1.25 08/31", assetClass: "Fixed Income", sector: "Rates", ccy: "USD", weightPct: 6.0, pnlPct: -14, note: "Underwater on rates — bond-swap candidate." },
       { name: "Xetra-Gold ETC",ticker: "4GLD GY",assetClass: "Commodity", sector: "Gold",  ccy: "EUR", weightPct: 5.2,  pnlPct: 109, note: "Tail hedge — protective." },
       { name: "TotalEnergies", ticker: "TTE FP", assetClass: "Equity", sector: "Energy",    ccy: "EUR", weightPct: 4.3,  pnlPct: 55,  note: "Energy hedge." },
-      { name: "SAP",           ticker: "SAP GY", assetClass: "Equity", sector: "Technology", ccy: "EUR", weightPct: 4.1,  pnlPct: 132, note: "Winner — overwrite candidate." },
+      { name: "SAP",           ticker: "SAP GY", assetClass: "Equity", sector: "Technology", ccy: "EUR", weightPct: 8.4,  pnlPct: 132, note: "Winner — overwrite candidate." },
+      { name: "US IG corporates", ticker: "—", assetClass: "Fixed Income", sector: "Credit", ccy: "USD", weightPct: 7.8, pnlPct: 0, note: "Core USD income sleeve." },
       { name: "EUR cash",      ticker: "—", assetClass: "Cash", sector: "Cash", ccy: "EUR", weightPct: 10.1, pnlPct: 0, note: "Idle; ~€5m equivalent." }
     ],
     summary: "EMEA book dominated by a 25.8% Micron position on a ~10x gain into a 24-Jun print, 72% USD against an EUR base, with a bond underwater on rates and gold and TotalEnergies as deliberate hedges. The agenda: protect the MU concentration, hedge the USD/EUR mismatch, harvest the bond and NVDA losses, monetize SAP's gain, and put idle cash to work — while protecting the gold and energy hedges, not trimming them."
@@ -240,7 +242,7 @@ const SEED_CLIENTS = [
     relationship: "11-yr relationship · Retiree · Income & preservation",
     risk: "Conservative income",
     profile: "The desk's largest relationship. A broad, well-diversified preservation book — treasuries, munis, dividend equity, regulated utilities and infrastructure — but carrying a handful of underwater single names and a long-duration bond that need attention.",
-    split: { Equity: 40, "Fixed Income": 38, "Real Assets": 9, Commodity: 3, Cash: 10 },
+    split: { Equity: 30, "Fixed Income": 48, "Real Assets": 9, Commodity: 3, Cash: 10 },
     goals: {
       objective: "Fund retirement income and preserve capital across the whole estate",
       horizon: "Drawdown · 0–5 yrs",
@@ -252,11 +254,11 @@ const SEED_CLIENTS = [
       { name: "US Treasury 2.0% '40", ticker: "T 2.0 40",assetClass: "Fixed Income", sector: "Rates",     ccy: "USD", weightPct: 8.0,  pnlPct: -22, note: "Long-duration — bought at the lows; deep loss." },
       { name: "Muni bond sleeve",     ticker: "—",      assetClass: "Fixed Income", sector: "Credit",     ccy: "USD", weightPct: 13.0, pnlPct: 2,   note: "Tax-exempt income." },
       { name: "NextEra Energy",       ticker: "NEE US", assetClass: "Equity",       sector: "Utilities",  ccy: "USD", weightPct: 7.0,  pnlPct: 35,  note: "Regulated yield + load growth." },
-      { name: "Johnson & Johnson",    ticker: "JNJ US", assetClass: "Equity",       sector: "Healthcare", ccy: "USD", weightPct: 6.0,  pnlPct: 18,  note: "Defensive dividend." },
+      { name: "Johnson & Johnson",    ticker: "JNJ US", assetClass: "Equity",       sector: "Healthcare", ccy: "USD", weightPct: 9.0,  pnlPct: 18,  note: "Defensive dividend." },
       { name: "Pfizer",               ticker: "PFE US", assetClass: "Equity",       sector: "Healthcare", ccy: "USD", weightPct: 5.0,  pnlPct: -28, note: "Underwater — post-COVID de-rating." },
       { name: "Realty Income (REIT)", ticker: "O US",   assetClass: "Real Assets",  sector: "Real Estate",ccy: "USD", weightPct: 5.0,  pnlPct: -18, note: "Underwater on rates; high yield." },
       { name: "Listed infra fund",    ticker: "—",      assetClass: "Real Assets",  sector: "Infrastructure", ccy: "USD", weightPct: 4.0, pnlPct: 9, note: "Inflation-linked income." },
-      { name: "Procter & Gamble",     ticker: "PG US",  assetClass: "Equity",       sector: "Consumer",   ccy: "USD", weightPct: 6.0,  pnlPct: 22,  note: "Defensive dividend." },
+      { name: "Procter & Gamble",     ticker: "PG US",  assetClass: "Equity",       sector: "Consumer",   ccy: "USD", weightPct: 9.0,  pnlPct: 22,  note: "Defensive dividend." },
       { name: "Gold ETF",             ticker: "GLD US", assetClass: "Commodity",    sector: "Gold",       ccy: "USD", weightPct: 3.0,  pnlPct: 40,  note: "Small hedge sleeve." },
       { name: "IG corporate bonds",   ticker: "—",      assetClass: "Fixed Income", sector: "Credit",     ccy: "USD", weightPct: 10.0, pnlPct: 0,   note: "Core fixed income." },
       { name: "USD cash",             ticker: "—",      assetClass: "Cash",         sector: "Cash",       ccy: "USD", weightPct: 10.0, pnlPct: 0,   note: "Drawdown buffer; some redeployable." }
@@ -271,7 +273,7 @@ const SEED_CLIENTS = [
     relationship: "7-yr relationship · Family office · Real assets + digital",
     risk: "Growth, real-asset tilt",
     profile: "APAC family-office mandate, multi-currency. Strong tilt to commodities, gold, energy and infrastructure — plus a large Bitcoin position that is now well underwater. Comfortable with options, structured products and private markets.",
-    split: { Equity: 30, Commodity: 18, "Real Assets": 16, Alternatives: 16, "Fixed Income": 12, Cash: 8 },
+    split: { Equity: 26, Commodity: 12, "Real Assets": 19, Alternatives: 23, "Fixed Income": 12, Cash: 8 },
     goals: {
       objective: "Compound a real-asset core across cycles; rehabilitate the digital-asset sleeve",
       horizon: "Multi-generational · 10+ yrs",
@@ -281,9 +283,9 @@ const SEED_CLIENTS = [
     positions: [
       { name: "Bitcoin",            ticker: "BTC",     assetClass: "Alternatives", sector: "Crypto",         ccy: "USD", weightPct: 16.0, pnlPct: -38, note: "Bought near the highs; deep drawdown — the book's problem child." },
       { name: "Gold (allocated)",   ticker: "XAU",     assetClass: "Commodity",    sector: "Gold",           ccy: "USD", weightPct: 12.0, pnlPct: 40,  note: "Strategic hard-asset core." },
-      { name: "Global infra fund",  ticker: "—",       assetClass: "Real Assets",  sector: "Infrastructure", ccy: "USD", weightPct: 10.0, pnlPct: 12,  note: "Listed infrastructure." },
+      { name: "Global infra fund",  ticker: "—",       assetClass: "Real Assets",  sector: "Infrastructure", ccy: "USD", weightPct: 13.0, pnlPct: 12,  note: "Listed infrastructure." },
       { name: "Shell",              ticker: "SHEL LN", assetClass: "Equity",       sector: "Energy",         ccy: "GBP", weightPct: 8.0,  pnlPct: 22,  note: "Majors / energy premium." },
-      { name: "EM equity sleeve",   ticker: "—",       assetClass: "Equity",       sector: "Broad",          ccy: "USD", weightPct: 9.0,  pnlPct: 5,   note: "APAC / EM growth." },
+      { name: "EM equity sleeve",   ticker: "—",       assetClass: "Equity",       sector: "Broad",          ccy: "USD", weightPct: 12.0, pnlPct: 5,   note: "APAC / EM growth." },
       { name: "GDX gold miners",    ticker: "GDX US",  assetClass: "Equity",       sector: "Materials",      ccy: "USD", weightPct: 6.0,  pnlPct: -5,  note: "Lags spot — catch-up candidate." },
       { name: "Private infra co-invest", ticker: "—",  assetClass: "Real Assets",  sector: "Infrastructure", ccy: "USD", weightPct: 6.0,  pnlPct: 0,   note: "Datacenter power." },
       { name: "EUR IG bonds",       ticker: "—",       assetClass: "Fixed Income", sector: "Credit",         ccy: "EUR", weightPct: 12.0, pnlPct: -4,  note: "Diversifier; mild duration loss." },
@@ -312,7 +314,7 @@ const SEED_CLIENTS = [
       funding: { headline: "Net worth to $120m by 2033 (after liabilities)", metricLabel: "Net projected value", current: 75, target: 120, unit: "$m", status: "On track" }
     },
     positions: [
-      { name: "S&P 500 index core", ticker: "VOO US",  assetClass: "Equity",       sector: "Broad",      ccy: "USD", weightPct: 24.0, pnlPct: 55, note: "Passive core." },
+      { name: "S&P 500 index core", ticker: "VOO US",  assetClass: "Equity",       sector: "Broad",      ccy: "USD", weightPct: 29.0, pnlPct: 55, note: "Passive core." },
       { name: "Microsoft",          ticker: "MSFT US", assetClass: "Equity",       sector: "Technology", ccy: "USD", weightPct: 10.0, pnlPct: 48, note: "Quality compounder." },
       { name: "Apple",              ticker: "AAPL US", assetClass: "Equity",       sector: "Technology", ccy: "USD", weightPct: 8.0,  pnlPct: 30, note: "Mega-cap quality." },
       { name: "UnitedHealth",       ticker: "UNH US",  assetClass: "Equity",       sector: "Healthcare", ccy: "USD", weightPct: 6.0,  pnlPct: -12,note: "Underwater; defensive compounder." },
@@ -343,7 +345,7 @@ const SEED_CLIENTS = [
     positions: [
       { name: "NVIDIA",          ticker: "NVDA US", assetClass: "Equity",       sector: "Technology", ccy: "USD", weightPct: 22.0, pnlPct: 240, note: "Concentrated; huge unrealised gain — needs protecting." },
       { name: "Constellation Energy", ticker: "CEG US", assetClass: "Equity",   sector: "Utilities",  ccy: "USD", weightPct: 15.0, pnlPct: 95,  note: "Concentrated; datacenter-power winner." },
-      { name: "S&P 500 index core", ticker: "VOO US",assetClass: "Equity",      sector: "Broad",      ccy: "USD", weightPct: 16.0, pnlPct: 28,  note: "Diversified core." },
+      { name: "S&P 500 index core", ticker: "VOO US",assetClass: "Equity",      sector: "Broad",      ccy: "USD", weightPct: 26.0, pnlPct: 28,  note: "Diversified core." },
       { name: "ASML",            ticker: "ASML NA", assetClass: "Equity",       sector: "Technology", ccy: "EUR", weightPct: 7.0,  pnlPct: 20,  note: "Semi-cap." },
       { name: "IG corporate bonds", ticker: "—",    assetClass: "Fixed Income", sector: "Credit",     ccy: "USD", weightPct: 15.0, pnlPct: 1,   note: "Income sleeve, on plan." },
       { name: "Listed infra fund", ticker: "—",      assetClass: "Real Assets",  sector: "Infrastructure", ccy: "USD", weightPct: 8.0, pnlPct: 7, note: "Diversifier." },
@@ -369,9 +371,9 @@ const SEED_CLIENTS = [
     positions: [
       { name: "ExxonMobil",     ticker: "XOM US",  assetClass: "Equity", sector: "Energy",     ccy: "USD", weightPct: 13.0, pnlPct: 32, note: "Energy overweight; buyback + dividend." },
       { name: "Shell",          ticker: "SHEL LN", assetClass: "Equity", sector: "Energy",     ccy: "GBP", weightPct: 10.0, pnlPct: 18, note: "Energy overweight." },
-      { name: "Berkshire Hathaway", ticker: "BRK/B US", assetClass: "Equity", sector: "Financials", ccy: "USD", weightPct: 14.0, pnlPct: 40, note: "Quality compounder." },
-      { name: "Apple",          ticker: "AAPL US", assetClass: "Equity", sector: "Technology", ccy: "USD", weightPct: 11.0, pnlPct: 25, note: "Mega-cap quality." },
-      { name: "JPMorgan",       ticker: "JPM US",  assetClass: "Equity", sector: "Financials", ccy: "USD", weightPct: 9.0,  pnlPct: 30, note: "Financials." },
+      { name: "Berkshire Hathaway", ticker: "BRK/B US", assetClass: "Equity", sector: "Financials", ccy: "USD", weightPct: 18.0, pnlPct: 40, note: "Quality compounder." },
+      { name: "Apple",          ticker: "AAPL US", assetClass: "Equity", sector: "Technology", ccy: "USD", weightPct: 14.0, pnlPct: 25, note: "Mega-cap quality." },
+      { name: "JPMorgan",       ticker: "JPM US",  assetClass: "Equity", sector: "Financials", ccy: "USD", weightPct: 12.0, pnlPct: 30, note: "Financials." },
       { name: "Caterpillar",    ticker: "CAT US",  assetClass: "Equity", sector: "Industrials",ccy: "USD", weightPct: 8.0,  pnlPct: 15, note: "Cyclical quality." },
       { name: "Diageo",         ticker: "DGE LN",  assetClass: "Equity", sector: "Consumer",   ccy: "GBP", weightPct: 7.0,  pnlPct: -16,note: "Underwater — staples de-rating." },
       { name: "Short IG bonds", ticker: "—",       assetClass: "Fixed Income", sector: "Credit",ccy: "USD", weightPct: 6.0,  pnlPct: 1,  note: "Thin fixed-income sleeve." },
@@ -381,6 +383,77 @@ const SEED_CLIENTS = [
     summary: "An equity-heavy value book — energy, financials and quality compounders at 82% equity with barely any fixed income or protection. It has done well, but it is one drawdown away from a problem and it under-delivers income versus the goal. The agenda is to diversify: extend into core fixed income and infrastructure for income and ballast, trim the energy-sector concentration, and recover the Diageo loss — all with non-complex instruments, since Ben is Retail."
   }
 ];
+
+/* ===========================================================================
+   SYNTHETIC 24-month sector-allocation history  ⚠️ SEED DATA — REPLACE LATER
+   ---------------------------------------------------------------------------
+   The books only carry CURRENT holdings, so we synthesise a plausible monthly
+   history to feed the Affinity-fit axis (mapping.js). Attached as:
+
+     client.sectorHistory[sector] = [24 numbers]   // index 0 = most recent month,
+                                                    // index 23 = oldest
+
+   Invariants / design:
+   • index 0 EXACTLY equals the client's current allocation to that sector
+     (Σ weightPct of its positions in that sector), so history is consistent
+     with the live book.
+   • The trajectory toward "now" is shaped from the sector's dominant position
+     P&L (a proxy for how the weight got there — pure price drift aside):
+         winner (pnl ≥ 50)  → 'ramp'  (built up into the book — like Micron)
+         loser  (pnl ≤ -10) → 'fade'  (was a larger slice, drifted down)
+         else               → 'core'  (held roughly steady around current)
+   • Deterministic (no RNG) so the seed is reproducible.
+   • Cash is excluded (not a thematic sector).
+
+   To swap in REAL data: replace `client.sectorHistory[sector]` with the true
+   24-month monthly series (index 0 = most recent). Nothing else changes.
+=========================================================================== */
+function _curSectorAlloc(client) {
+  const m = {};
+  (client.positions || []).forEach(p => { m[p.sector] = (m[p.sector] || 0) + p.weightPct; });
+  return m;
+}
+function _sectorShape(client, sector) {
+  const ps = (client.positions || []).filter(p => p.sector === sector);
+  if (!ps.length) return "core";
+  const top = ps.reduce((a, b) => (b.weightPct > a.weightPct ? b : a));
+  if (top.pnlPct >= 50) return "ramp";
+  if (top.pnlPct <= -10) return "fade";
+  return "core";
+}
+function _genSectorHistory(cur, shape, seed) {
+  const n = 24, arr = new Array(n);
+  // oldest-month level as a fraction of current: ramps start low, fades start high
+  const startFrac = shape === "ramp" ? 0.12 : shape === "fade" ? 1.30 : 0.92;
+  for (let t = 0; t < n; t++) {
+    let v;
+    if (shape === "ramp") {
+      // index 0 = current; index 1 sits at a small recent peak just ABOVE current
+      // (so "now" is not the strict 24-mo max → affinity lands in the mid-90s, not
+      // a saturated 100); index 2+ is a clean rise from the oldest up to ~current.
+      if (t === 0) v = cur;
+      else if (t === 1) v = cur * 1.05;
+      else { const frac = (t - 2) / (n - 1 - 2); v = cur * 0.98 - (cur * 0.98 - cur * startFrac) * frac; }
+    } else {
+      const age = t / (n - 1);                        // 0 = newest … 1 = oldest
+      v = cur * (1 - age * (1 - startFrac));           // linear: cur (now) → cur*startFrac (oldest)
+    }
+    if (t >= 4) v += Math.sin(t * 1.1 + seed) * cur * 0.04; // small deterministic wobble (older months only)
+    arr[t] = Math.max(0, +v.toFixed(2));
+  }
+  arr[0] = +(+cur).toFixed(2);                         // most recent month == current allocation, exactly
+  return arr;
+}
+SEED_CLIENTS.forEach(c => {
+  const cur = _curSectorAlloc(c);
+  c.sectorHistory = {};
+  let seed = 0;
+  Object.keys(cur).forEach(sec => {
+    if (sec === "Cash") return;
+    seed += 1.7;
+    c.sectorHistory[sec] = _genSectorHistory(cur[sec], _sectorShape(c, sec), seed);
+  });
+});
 
 /* ---------------------------------------------------------------------------
    Domain maps + helpers (shared by scanner.js, app.js, portfolio.html, morgan.js)
