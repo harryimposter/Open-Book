@@ -1031,7 +1031,7 @@
 
   /* ----------------------- rubric / methodology modal ----------------- */
   const AXIS_DESC = {
-    gap: "Is the book under its strategic target for the goal this idea fills (e.g. under its Income or Protection target)? The further under, the stronger the fit.",
+    gap: "Gap fit: headroom from the book's current allocation in the idea's sector up to the strategic target peg — (target − current) ÷ target. Rewards books with room to add; zero once they're at or over the peg. Reads the same peg as the Affinity penalty.",
     holdings: "Affinity fit: recency-weighted sector affinity (λ=0.94 over a 24-month allocation history — has the book been building / sitting at the top of its range in the idea's sector) minus a penalty for being over the mandate's sector comfort limit (growth 25% / income 15% / preservation 10%).",
     mandate: "Can the client trade the expressions (MiFID tier vs OTC), and does the idea suit the client's stated risk profile?",
     intent: "Does the idea's intent match the book? Concentration and unrealised P&L help a protect / trim idea, but count against piling into an add idea.",
@@ -1046,8 +1046,18 @@
         <p class="rub-p">Four pillars, each scored 1–${R.max_per_pillar}; the total is shown out of 100. ${R.tiers.map(t => `<b>${esc(t.key)}</b> ≥ ${t.min}`).join(" · ")}.</p>
         <div class="rub-list">${R.pillars.map(p => `<div class="rub-item"><div class="ri-k">${esc(p.label)}</div><div class="ri-d">${esc(p.desc)}</div></div>`).join("")}</div>
         <h3 class="rub-h">2 · Client-fit score — “how right for THIS client”</h3>
-        <p class="rub-p">Separate from conviction. Each idea is scored against every client across five axes; the weighted sum is the fit score (0–100). Weights are <b>intent-aware</b> — they shift with what the idea is trying to do (add / income lean on goal-gap fit; protect / trim lean on holdings and the intent axis). Open the per-axis breakdown on any flagged client to see the exact weight used on each axis.</p>
+        <p class="rub-p">Separate from conviction. Each idea is scored against every client across five axes; the weighted sum is the fit score (0–100). Weights are <b>intent-aware</b> — they shift with what the idea is trying to do (add / income lean on gap fit; protect / trim lean on the affinity and intent axes). Open the per-axis breakdown on any flagged client to see the exact weight used on each axis.</p>
         <div class="rub-list">${window.MAPPING.AXES.map(a => `<div class="rub-item"><div class="ri-k">${esc(a.label)}</div><div class="ri-d">${esc(AXIS_DESC[a.key] || "")}</div></div>`).join("")}</div>
+        ${(() => { const P = window.MAPPING.PARAMS.affinity.comfort; return `
+        <div class="rub-pegs">
+          <h3 class="rub-h">Strategic target pegs — one shared constant</h3>
+          <p class="rub-p"><b>Gap fit</b> rewards headroom <i>toward</i> the strategic sector target; the <b>Affinity fit</b> penalty punishes overshoot <i>beyond</i> it. Both axes read this one peg (by mandate) — there is no second copy.</p>
+          <div class="peg-row">
+            <span class="peg"><b>Growth</b> ${P.growth}%</span>
+            <span class="peg"><b>Income</b> ${P.income}%</span>
+            <span class="peg"><b>Preservation</b> ${P.preservation}%</span>
+          </div>
+        </div>`; })()}
       </div>
       <div class="modal-foot"><button class="btn btn-primary" id="rubClose">Got it</button></div>`);
     $("#rubClose").onclick = closeModal;

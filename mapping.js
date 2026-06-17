@@ -35,7 +35,7 @@
 
   /* the five axes, in display order */
   const AXES = [
-    { key: "gap",       label: "Goal-gap fit" },
+    { key: "gap",       label: "Gap fit" },         // headroom from current sector alloc up to the strategic peg
     { key: "holdings",  label: "Affinity fit" },   // recency-weighted sector affinity − over-limit penalty
     { key: "mandate",   label: "Mandate & risk" },
     { key: "intent",    label: "Intent fit" },
@@ -62,7 +62,6 @@
       sectorComfort: {},                                     // optional per-sector overrides, e.g. { Gold: 12 } — tunable
       penaltyPerPp: 10, penaltyCap: 100                      // overshoot (pp over comfort) × 10, capped at 100
     },
-    gap: { lo: 0, hi: 10, base: 18, span: 82, atTarget: 16 },
     conc: { lo: 8, hi: 25 },          // single-name % mapped 0..1 (protect/trim)
     addConc: { lo: 15, hi: 45 },      // SECTOR % mapped 0..1 (add penalty)
     winner: { lo: 20, hi: 200 },      // unrealised pnl% mapped 0..1
@@ -141,6 +140,16 @@
     return "income"; // moderate / balanced → middle peg
   }
 
+  /* THE STRATEGIC SECTOR PEG — SINGLE SOURCE OF TRUTH.
+     One constant (PARAMS.affinity.comfort by mandate, + optional per-sector
+     overrides in PARAMS.affinity.sectorComfort) read by BOTH the Gap-fit axis
+     (rewards headroom toward it) and the Affinity penalty (punishes overshoot
+     beyond it). There is no second copy. */
+  function sectorPeg(client, sector) {
+    const A = PARAMS.affinity;
+    return (A.sectorComfort[sector] != null) ? A.sectorComfort[sector] : A.comfort[mandateClass(client)];
+  }
+
   /* ---- relevant holding: the position that best represents the idea ----
      ticker root / alias list, else the largest single position in the sector. */
   function relevantHolding(idea, client) {
@@ -188,12 +197,20 @@
 
   /* ============================== the five axes ============================ */
 
+  /* GAP FIT — headroom from the current sector allocation up to the strategic peg.
+       Gap Fit = max(0, (target − current) / target × 100), 0–100.
+     Uses the SAME current sector exposure and the SAME peg constant as the
+     Affinity axis (via sectorPeg) — Gap rewards headroom toward the peg, the
+     Affinity penalty punishes overshoot beyond it. */
   function axisGap(idea, client, ctx) {
-    const g = ctx.gap, name = bucketName(idea.bucket);
-    if (g <= 0) return { score: PARAMS.gap.atTarget, note: `Already at or above its ${name} target — not a gap-filler here.` };
-    const score = clamp(PARAMS.gap.base + ramp(g, PARAMS.gap.lo, PARAMS.gap.hi) * PARAMS.gap.span, PARAMS.gap.base, 100);
-    const lead = g >= 8 ? `a clear sleeve this idea fills` : g >= 4 ? `a sensible top-up` : `a marginal top-up`;
-    return { score, note: `${g}pts under its ${name} target — ${lead}.` };
+    const cur = ctx.sectorExp;                  // current % of book in the idea's sector
+    const peg = sectorPeg(client, idea.sector); // shared strategic target
+    const mc = mandateClass(client);
+    const score = peg > 0 ? Math.max(0, (peg - cur) / peg * 100) : 0;
+    const note = cur >= peg
+      ? `${cur}% in ${idea.sector} vs the ${mc} target ${peg}% — at/over target, no headroom.`
+      : `${cur}% in ${idea.sector} vs the ${mc} target ${peg}% → ${Math.round(score)}% headroom to the strategic peg.`;
+    return { score, note };
   }
 
   /* AFFINITY FIT — replaces the old holdings axis.
@@ -230,7 +247,7 @@
 
     // ---- Part B: Concentration Penalty (0–100, subtracted) ----
     const mc = mandateClass(client);
-    const peg = (A.sectorComfort[sector] != null) ? A.sectorComfort[sector] : A.comfort[mc];
+    const peg = sectorPeg(client, sector);   // SAME shared peg constant as Gap fit
     const overshoot = cur - peg;
     const penalty = overshoot <= 0 ? 0 : Math.min(A.penaltyCap, overshoot * A.penaltyPerPp);
 
@@ -365,5 +382,5 @@
       .slice(0, max);
   }
 
-  window.MAPPING = { AXES, PARAMS, scoreIdeaForClient, flagClients, tiltOf, mandateClass, ideaIntent, relevantHolding };
+  window.MAPPING = { AXES, PARAMS, scoreIdeaForClient, flagClients, tiltOf, mandateClass, sectorPeg, ideaIntent, relevantHolding };
 })();
