@@ -167,8 +167,10 @@ field). Its `dq` is `sourced` only when the drivers trace to cited facts, so an 
 the Medium cap. Each idea also carries a `changeMyMind` field — the condition that would invalidate
 the view — surfaced on the conviction tile but **not scored** (a discrete kill-switch would bias the
 score toward dated catalyst trades over strategic holds, the same flaw the Stop pillar had). The old
-standalone **RSI flag** pillar is folded into Technical (price-crowding) and Positioning, removing the
-double-count where RSI hit the score twice. **Consensus** now credits *either* sell-side alignment *or*
+standalone **RSI flag** pillar now lives in **Positioning** only, as the crowding/sentiment read
+(alongside short interest, CoT and flows); **Technical** is purely trend + entry — moving-average
+alignment, Bollinger, Fibonacci — so RSI scores in exactly one pillar and the moving averages in the
+other, with no overlap. **Consensus** now credits *either* sell-side alignment *or*
 a defensible variant, so it no longer fights the thesis pillar.
 
 **Data-quality cap (global modifier).** If any pillar's core input is `estimated`/`unverified`

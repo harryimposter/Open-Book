@@ -194,7 +194,7 @@
           { "key": "thesis", "score": 1, "dq": "estimated", "note": "Driver specificity yes (sourced central-bank tonnage and named bank targets), but no variant edge — this is the consensus call, not a differentiated one. A well-supported follow, not a thesis with an edge." },
           { "key": "houseview", "score": 2, "dq": "sourced", "note": "Core to the Gold & Currency house view as strategic ballast." },
           { "key": "positioning", "score": 1, "dq": "estimated", "note": "~25% off the highs with positioning reset — neither washed-out nor crowded; mild fuel." },
-          { "key": "technical", "score": 1, "dq": "estimated", "note": "Below the January high near-term, but the long-term uptrend is intact and not overbought — confirms on balance." }
+          { "key": "technical", "score": 1, "dq": "estimated", "note": "Below the January high near-term, but the long-term uptrend (above the rising 200-day) is intact — confirms on balance." }
         ]
       },
       "macro": {
@@ -237,7 +237,7 @@
           { "key": "thesis", "score": 2, "dq": "estimated", "note": "Quantified driver (IEA: datacenter load ~1,050 TWh, roughly doubling) and a real variant — own the power bottleneck rather than the crowded chips. Driver yes, variant yes." },
           { "key": "houseview", "score": 2, "dq": "sourced", "note": "Core Power & Infrastructure house view." },
           { "key": "positioning", "score": 2, "dq": "estimated", "note": "Still under-owned versus the chip names — the crowd is clearly not yet with us, which is fuel." },
-          { "key": "technical", "score": 1, "dq": "estimated", "note": "Multi-year rate-base and load growth; constructive and not at a crowded extreme — confirms, though not a clean breakout." }
+          { "key": "technical", "score": 1, "dq": "estimated", "note": "Multi-year rate-base and load growth; the trend is constructive but there's no clean breakout off the moving averages yet — mixed." }
         ]
       },
       "macro": {
@@ -278,7 +278,7 @@
           { "key": "thesis", "score": 1, "dq": "sourced", "note": "Quantified, sourced drivers (FOMC 16-17 Jun hold at 3.50-3.75%, cuts pushed later), but it's the consensus path — no variant edge." },
           { "key": "houseview", "score": 2, "dq": "sourced", "note": "Core Fixed Income house view — extend duration before the cutting cycle." },
           { "key": "positioning", "score": 1, "dq": "sourced", "note": "The crowd is still parked in cash and bills; extending is the contrarian-leaning move." },
-          { "key": "technical", "score": 1, "dq": "estimated", "note": "A duration trade; the curve picture is constructive and not at a crowding extreme — neutral-to-confirming." }
+          { "key": "technical", "score": 1, "dq": "estimated", "note": "A duration trade; the curve picture is constructive but the price trend is mixed — neutral-to-confirming." }
         ]
       },
       "macro": {
@@ -319,7 +319,7 @@
           { "key": "thesis", "score": 2, "dq": "estimated", "note": "Sourced price drivers (Brent ~$87 off the ~$118 April peak) and a genuine variant — bet against the de-escalation consensus the market has priced as durable. Driver and variant yes." },
           { "key": "houseview", "score": 0, "dq": "sourced", "note": "Off-theme — explicitly a tactical hedge, not a strategic house view." },
           { "key": "positioning", "score": 1, "dq": "sourced", "note": "The geopolitical premium is half-deflated — positioning two-sided, no clear edge." },
-          { "key": "technical", "score": 1, "dq": "estimated", "note": "Brent has rolled off the April spike and is not at a crowded extreme — chart neutral." }
+          { "key": "technical", "score": 1, "dq": "estimated", "note": "Brent has rolled off the April spike and is sitting mid-range between its moving averages — chart neutral." }
         ]
       },
       "macro": {

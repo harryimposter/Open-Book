@@ -476,7 +476,7 @@ window.TODAY_FOCUS = {
             "key": "technical",
             "score": 1,
             "dq": "estimated",
-            "note": "Below the January high near-term, but the long-term uptrend is intact and not overbought — confirms on balance.",
+            "note": "Below the January high near-term, but the long-term uptrend (above the rising 200-day) is intact — confirms on balance.",
             "label": "Technical",
             "max": 2
           }
@@ -602,7 +602,7 @@ window.TODAY_FOCUS = {
             "key": "technical",
             "score": 1,
             "dq": "estimated",
-            "note": "Multi-year rate-base and load growth; constructive and not at a crowded extreme — confirms, though not a clean breakout.",
+            "note": "Multi-year rate-base and load growth; the trend is constructive but there's no clean breakout off the moving averages yet — mixed.",
             "label": "Technical",
             "max": 2
           }
@@ -720,7 +720,7 @@ window.TODAY_FOCUS = {
             "key": "technical",
             "score": 1,
             "dq": "estimated",
-            "note": "A duration trade; the curve picture is constructive and not at a crowding extreme — neutral-to-confirming.",
+            "note": "A duration trade; the curve picture is constructive but the price trend is mixed — neutral-to-confirming.",
             "label": "Technical",
             "max": 2
           }
@@ -838,7 +838,7 @@ window.TODAY_FOCUS = {
             "key": "technical",
             "score": 1,
             "dq": "estimated",
-            "note": "Brent has rolled off the April spike and is not at a crowded extreme — chart neutral.",
+            "note": "Brent has rolled off the April spike and is sitting mid-range between its moving averages — chart neutral.",
             "label": "Technical",
             "max": 2
           }
@@ -954,13 +954,13 @@ window.TODAY_FOCUS = {
           "key": "positioning",
           "label": "Positioning",
           "max": 2,
-          "desc": "Confirmation / veto, not a driver. Crowd offside our trade is fuel; crowd already with us is unwind risk — a hard read (SI >10% float / extreme CoT) plus a price-crowding read (RSI + stretch from the 50/200-day). Clearly offside → 2 · neutral / mixed → 1 · clearly with us (unwind risk) → 0."
+          "desc": "Confirmation / veto, not a driver. Crowd offside our trade is fuel; crowd already with us is unwind risk — a hard read (SI >10% float / extreme CoT, fund flows) plus a sentiment read (RSI at a crowded extreme). Clearly offside → 2 · neutral / mixed → 1 · clearly with us (unwind risk) → 0."
         },
         {
           "key": "technical",
           "label": "Technical",
           "max": 2,
-          "desc": "Confirmation / veto, not a driver. Trend and entry agree with the thesis — 50/100/200-day MA alignment, Bollinger entry quality, Fibonacci off the trailing 6-month swing, RSI not at a crowded extreme against us → 2 · mixed → 1 · contradicts → 0."
+          "desc": "Confirmation / veto, not a driver. Trend and entry agree with the thesis — 50/100/200-day moving-average alignment, Bollinger entry quality, Fibonacci off the trailing 6-month swing → 2 · mixed → 1 · contradicts → 0."
         }
       ],
       "tiers": [
