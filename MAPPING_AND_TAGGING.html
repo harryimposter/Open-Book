@@ -243,9 +243,12 @@
 
   <p><b>Contrast &mdash; a Today's Focus idea that <em>does</em> flag Aurora.</b> The
   <b>&ldquo;Gold &mdash; accumulate the pullback&rdquo;</b> idea (<span class="mono">gold-pullback</span>; sector Gold, bucket
-  Protection, natural expression <em>Physical / ETC</em>) scores her <b>82</b> on the same engine &mdash; far above the 50
-  flag &mdash; because she is well <em>under</em> peg in Gold with headroom and a clean record there. The arithmetic is
-  identical to the Views worked example in &sect;2.4 (same sector/bucket/structure profile).</p>
+  Protection, natural expression <em>Physical / ETC</em>) scores her <b>84</b> on the same engine &mdash; far above the 50
+  flag &mdash; because she is well <em>under</em> peg in Gold (5.2% vs 15%, Gap 65) with a clean record there (Affinity 93,
+  no penalty). It is <em>nearly</em> identical to the Views &ldquo;Gold as a debasement hedge&rdquo; example in &sect;2.2
+  (<b>82</b>): same Gap, Affinity and Conc-within-sector, but gold-pullback's structures include a
+  <em>capital-protected note</em>, which reads as lower-vol and lifts <b>Risk Suitability to 90</b> (vs 82),
+  so Mandate&nbsp;&amp;&nbsp;risk is 80 vs 75 and the final fit is 84 vs 82.</p>
 
   <!-- ============================ SECTION 2 ============================ -->
   <h2 class="pagebreak">2 &nbsp;&middot;&nbsp; Current process &mdash; how the Views tab tags ideas to a client <span class="tag tag-current">Live</span></h2>
@@ -402,19 +405,21 @@
   <p>A <b>growth</b> client holds BABA, <em>down hard</em>, with <em>no bullish house view</em>. BABA's goal type is
   <em>appreciation</em> (dial 1.0), so the drop is driven purely by a weak <b>Preference</b> &mdash; not the loss.</p>
   <table class="data">
-    <tr><th>Component</th><th>Value</th><th>Reasoning</th></tr>
-    <tr><td>Trajectory</td><td class="num">37.5</td><td>Position faded as it fell &rarr; &Delta; &asymp; &minus;3 &rarr; 20 + (&minus;3+5)/4&times;35.</td></tr>
-    <tr class="alt"><td>View</td><td class="num">40</td><td>No bullish house view &rarr; &ldquo;none&rdquo; = 40.</td></tr>
-    <tr><td><b>Preference</b></td><td class="num">38.5</td><td>0.6&times;37.5 + 0.4&times;40 = 22.5 + 16. <b>Weak &mdash; this is what sinks the score.</b></td></tr>
-    <tr class="alt"><td>Gap</td><td class="num">20</td><td>Already heavy in the sector &rarr; little headroom.</td></tr>
-    <tr><td>Conc. contribution</td><td class="num">40</td><td>Several names in the sector &rarr; fairly diversified.</td></tr>
-    <tr class="alt"><td>Risk suitability</td><td class="num">90</td><td>High-beta name; growth&times;high = 90.</td></tr>
-    <tr><td><b>Base</b></td><td class="num">45.7</td><td>0.40&times;38.5 + 0.20&times;20 + 0.15&times;40 + 0.25&times;90 = 15.4 + 4 + 6 + 22.5.</td></tr>
-    <tr class="alt"><td>Goal dial</td><td class="num">1.00</td><td>growth&times;appreciation = full dial.</td></tr>
-    <tr class="total"><td><b>FinalFit</b></td><td class="num">&asymp; 46</td><td>round(1 &times; 45.7). <b>Below the 50 flag &rarr; drops off.</b> If the desk actively flags AVOID (View = 10), preference falls further &rarr; ~45. Being down hard is <em>not</em> a factor.</td></tr>
+    <tr><th>Component</th><th>Case 1 &mdash; no view</th><th>Case 2 &mdash; desk says AVOID</th></tr>
+    <tr><td>Trajectory</td><td class="num">46.25</td><td class="num">46.25</td></tr>
+    <tr class="alt"><td>View</td><td class="num">40 (none)</td><td class="num">10 (AVOID)</td></tr>
+    <tr><td><b>Preference</b></td><td class="num">43.75<br/><span class="small">0.6&times;46.25 + 0.4&times;40</span></td><td class="num">31.75<br/><span class="small">0.6&times;46.25 + 0.4&times;10</span></td></tr>
+    <tr class="alt"><td>Gap</td><td class="num">15</td><td class="num">15</td></tr>
+    <tr><td>Conc. contribution</td><td class="num">40</td><td class="num">40</td></tr>
+    <tr class="alt"><td>Risk suitability</td><td class="num">90</td><td class="num">90</td></tr>
+    <tr><td><b>Base</b></td><td class="num">49.0<br/><span class="small">0.40&times;43.75 + 0.20&times;15 + 0.15&times;40 + 0.25&times;90<br/>= 17.5 + 3 + 6 + 22.5</span></td><td class="num">44.2<br/><span class="small">0.40&times;31.75 + 3 + 6 + 22.5<br/>= 12.7 + 31.5</span></td></tr>
+    <tr class="alt"><td>Goal dial &times; Tradability</td><td class="num">1.00 &times; 1</td><td class="num">1.00 &times; 1</td></tr>
+    <tr class="total"><td><b>FinalFit</b></td><td class="num">49</td><td class="num">44</td></tr>
   </table>
-  <p class="small">The &ldquo;~49/45&rdquo; band reflects the two view states: a neutral/absent view lands ~48&ndash;49, an active AVOID
-  pulls it to ~45 &mdash; either way under the flag, on weak preference rather than P&amp;L.</p>
+  <p class="small"><b>Trajectory 46.25</b> from &Delta; &asymp; &minus;2 (position faded as it fell): 20 + (&minus;2+5)/4&times;35.
+  Either way the score lands <b>under the 50 flag &mdash; on weak preference, not on the loss</b>. A neutral/absent view
+  gives <b>~49</b>; an active AVOID pulls it to <b>~45</b>. Being down hard is <em>not</em> a factor: there is no P&amp;L term
+  and no ownership bonus.</p>
 
   <!-- ============================ SECTION 4 ============================ -->
   <h2 class="pagebreak">4 &nbsp;&middot;&nbsp; Current vs proposed &mdash; summary</h2>
