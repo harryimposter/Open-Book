@@ -543,7 +543,7 @@ const STRUCTURED_KEYWORDS = ["structured note","structured re-entry","buffered",
   "credit-linked","twin-win","shark-fin","booster","halo"];
 const OTC_KEYWORDS = ["collar","risk reversal","seagull","accumulator","decumulator","prepaid","variable forward",
   "fx forward","forward / collar","dcd","dcs","dual currency","covered call","overwrite","cash-secured",
-  "call spread","protective put"];
+  "call spread","protective put","strangle","straddle","fx put","fx call","fx option","put spread"];
 
 function complexityOf(structure) {
   const s = String(structure || "").toLowerCase();

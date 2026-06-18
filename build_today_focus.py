@@ -28,6 +28,11 @@ COVERAGE SPEC (what every sweep MUST span — not just US equity/earnings):
   at least one idea tagged sector "FX", and at least one rates idea (sector "Rates"
   or assetClass "Fixed Income"). The coverage check below WARNS when either is absent.
 
+  TACTICAL TRADES must be represented: short-dated, directional/vol OPTION trades with
+  a concrete construction (strikes/tenor/premium) and a defined entry / target (early
+  unwind) / stop — carried in a `levels` block — primarily across FX (and where relevant
+  rates/equity). The coverage check WARNS if no tactical idea (or no tactical FX idea) is present.
+
   EARNINGS must include BOTH stances:
     - "pre-position" — enter INTO the print (report date in the FUTURE);
     - "post-print"   — play the REACTION of a name that has ALREADY reported (report
@@ -263,6 +268,14 @@ def check_coverage(data, warns):
             warns.append("COVERAGE: no PRE-print (pre-position) earnings idea — include both pre- and post-print.")
         if "post-print" not in stances:
             warns.append("COVERAGE: no POST-print (reaction) earnings idea — include both pre- and post-print.")
+    # tactical, short-dated OPTION trades with a defined entry/target/stop (the `levels`
+    # block) — keep surfacing this style, primarily across FX (and where relevant rates/equity).
+    ideas = list(earnings) + list(data.get("exEarnings", []))
+    tactical = [i for i in ideas if i.get("levels")]
+    if not tactical:
+        warns.append("COVERAGE: no tactical short-dated option trade (an idea with a `levels` block: defined entry/target/stop) — include tactical FX/rates/equity option trades each run.")
+    elif not any(str(i.get("sector", "")).lower() == "fx" for i in tactical):
+        warns.append("COVERAGE: tactical trades present but none in FX — surface tactical FX option trades (entry/target/stop) too.")
     return has_fx and has_rates
 
 

@@ -680,6 +680,58 @@
       cons: ["Converted into the weaker currency if the pair moves through the strike (capped upside, real FX risk)", "OTC / complex — not MiFID Retail eligible; needs Professional classification", "Bank credit and roll risk"],
       whenToUse: "Professional income books wanting to monetise a wide rate differential on a pair they'd hold either side of — get paid to wait for a target FX level.",
       context: (u) => `On ${u.name}: a 1-month dual-currency deposit at a strike near spot — an enhanced coupon for agreeing to convert at your target level if the pair moves through it.`
+    },
+
+    "fx-option": {
+      label: "FX option (vanilla call / put)", complex: true,
+      what: "A short-dated, defined-risk directional bet on a currency pair via a bought call or put.",
+      mechanics: "Buy a vanilla OTC FX option — a put to play downside in the pair, a call to play upside — struck a touch out-of-the-money for a short tenor. You pay a premium (your entire max loss); the payoff is geared to a fast move toward the strike and beyond. Tactical: defined entry near spot, a take-profit / early-unwind level, and a hard time-stop at expiry.",
+      underlying: "A liquid G10 pair (e.g. USD/JPY, EUR/USD, GBP/USD).",
+      tenor: "2–6 weeks — short-dated, sized to a specific catalyst (a central-bank meeting, intervention threshold).",
+      example: "Buy 4–6wk ~1–2% OTM options on the pair for ~0.8–1.2% premium; unwind into the target, let it expire (max loss = premium) if the move doesn't come.",
+      pros: ["Defined risk — premium is the most you can lose", "Geared to a fast directional move", "Clean tactical entry/target/stop discipline"],
+      cons: ["Premium decays (theta) if the move stalls", "Needs the catalyst to land inside the tenor", "OTC / complex — not MiFID Retail eligible"],
+      whenToUse: "A short-dated, high-conviction directional FX view around a dated catalyst — when you want leverage with a capped, known downside.",
+      context: (u) => `Short-dated (4–6wk) ${u.ticker} options struck ~1–2% out-of-the-money (~1% premium) — geared to a fast directional move, premium-at-risk only; unwind on the target break.`
+    },
+
+    "fx-option-spread": {
+      label: "FX option spread (call / put spread)", complex: true,
+      what: "A cheaper, fully-defined-risk FX directional play using two options — buy one, sell a further-OTM one.",
+      mechanics: "Buy a near-the-money option and sell one further out-of-the-money (same expiry, same pair) — a call spread for upside, a put spread for downside. The sold leg cheapens the trade; profit accrues between the strikes and is capped at the far strike. Net premium is the entire cost and max loss.",
+      underlying: "A liquid G10 pair with a defined target band.",
+      tenor: "4–6 weeks.",
+      example: "Buy the near-the-money / sell ~3% OTM strike on the pair for ~0.6–0.8% net — capped payoff in the target band, max loss = the net premium.",
+      pros: ["Cheaper than an outright option; fully defined risk", "Ideal when you expect a move to a level, not a melt", "Lower theta drag than a single option"],
+      cons: ["Upside capped at the short strike", "Still expires worthless if the pair doesn't move", "OTC / complex — not Retail eligible"],
+      whenToUse: "A defined-risk, bounded directional FX view to a specific level over a few weeks.",
+      context: (u) => `A 4–6wk ${u.ticker} option spread (buy near-the-money, sell ~3% further OTM) for ~0.7% net — capped, defined-risk payoff in the target band.`
+    },
+
+    "fx-risk-reversal": {
+      label: "FX risk reversal", complex: true,
+      what: "A geared, near-zero-cost directional FX trade — sell an OTM option on one side to fund buying one on the other.",
+      mechanics: "To play upside in a pair: sell an OTM put and use the premium to buy an OTM call (reverse for downside) — for ≈zero net cost. You get leveraged participation beyond the long strike; the risk is being assigned/long the pair at the short strike if it moves against you (so it carries real directional risk, not just premium).",
+      underlying: "A liquid G10 pair with a clear directional lean and carry.",
+      tenor: "4–6 weeks, rolled.",
+      example: "Sell the ~2% OTM put / buy the ~2% OTM call (≈zero premium); profit above the call strike, but obliged at the put strike if it sells off — unwind on the target or if spot breaks the short strike.",
+      pros: ["≈zero upfront premium; geared to the directional view", "Leans with the carry/skew", "Efficient way to express a strong lean"],
+      cons: ["Assignment risk at the short strike — real downside, not just premium", "Skew can move against you", "OTC / complex — not Retail eligible"],
+      whenToUse: "A strong, carry-supported directional FX lean where you'll accept being put the pair at a worse level in exchange for zero-cost upside.",
+      context: (u) => `A 4–6wk ${u.ticker} risk reversal — sell the OTM put, buy the OTM call (≈zero premium) — geared and directional, with assignment risk at the short strike; unwind on the target.`
+    },
+
+    "fx-strangle": {
+      label: "FX strangle / straddle (long vol)", complex: true,
+      what: "A long-volatility FX trade that profits from a large move in EITHER direction — own an OTM put and an OTM call.",
+      mechanics: "Buy an out-of-the-money put AND an out-of-the-money call on the pair (a strangle; same strike = a straddle), short-dated into an event. You're long volatility: a big move either way pays; the cost (both premiums) is the max loss and decays if the pair sits still. Non-directional — the bet is on the SIZE of the move, not its sign.",
+      underlying: "A liquid pair pinned into a binary event (e.g. a central-bank decision, an intervention threshold).",
+      tenor: "2–4 weeks — tight around the event.",
+      example: "Buy a 2–4wk strangle (~OTM put + ~OTM call, ~1.2–1.5% total) — profit on a break beyond either wing, max loss = both premiums if it expires inside.",
+      pros: ["Profits on a large move either direction", "Defined risk (both premiums)", "Ideal around a binary event with uncertain sign"],
+      cons: ["Needs a BIG move to beat the double premium", "Theta-heavy — decays fast if it sits", "OTC / complex — not Retail eligible"],
+      whenToUse: "A high-uncertainty binary FX event where the move could be large but the direction is genuinely two-sided.",
+      context: (u) => `A 2–4wk ${u.ticker} strangle — buy an OTM put AND an OTM call (~1.3% total) — long volatility into the event; profits on a large move either way, premium decays if it sits.`
     }
   };
 
@@ -720,6 +772,10 @@
     "gold (physical/etc)": "physical-gold",
     "gold accumulator": "gold-accumulator",
     "fx forward / collar": "fx-forward-collar",
+    "fx option (vanilla call / put)": "fx-option",
+    "fx option spread (call / put spread)": "fx-option-spread",
+    "fx risk reversal": "fx-risk-reversal",
+    "fx strangle / straddle (long vol)": "fx-strangle",
     "dual currency deposit / dcd": "dual-currency-deposit",
     "dual-currency deposit (dcd)": "dual-currency-deposit",
     "dual currency deposit": "dual-currency-deposit",
@@ -762,6 +818,11 @@
      resolve to a real, sensible entry rather than the generic placeholder. */
   function keywordResolve(n) {
     const has = (k) => n.indexOf(k) !== -1;
+    // tactical FX option structures resolve FIRST (before generic call-spread / put / collar)
+    if (has("risk reversal") || has("seagull")) return "fx-risk-reversal";
+    if (has("strangle") || has("straddle")) return "fx-strangle";
+    if (has("fx") && has("spread")) return "fx-option-spread";
+    if (has("fx") && (has("put") || has("call") || has("option"))) return "fx-option";
     if (has("collar")) return "zero-cost-collar";
     if (has("halo")) return "halo-basket";
     if (has("buffer")) return "buffered-note";
@@ -825,7 +886,8 @@
   const STRUCTURED_IDS = ["structured-note", "buffered-note", "phoenix-autocall", "leveraged-certificate",
     "halo-basket", "reverse-convertible", "capital-protected-note"];
   const OTC_IDS = ["call-overwrite", "zero-cost-collar", "gold-accumulator", "fx-forward-collar",
-    "prepaid-variable-forward", "protective-put", "cash-secured-puts", "call-spread", "dual-currency-deposit"];
+    "prepaid-variable-forward", "protective-put", "cash-secured-puts", "call-spread", "dual-currency-deposit",
+    "fx-option", "fx-option-spread", "fx-risk-reversal", "fx-strangle"];
   const PRIVATE_IDS = ["private-markets", "private-real-estate"];
   function clsOf(id) {
     if (STRUCTURED_IDS.indexOf(id) !== -1) return "structured";

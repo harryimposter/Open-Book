@@ -191,11 +191,12 @@
     "extend-duration": { g: 0, i: 2, p: 1 }, "listed-infrastructure": { g: 1, i: 2, p: 1 }, "phoenix-autocall": { g: 1, i: 2, p: 0 },
     "call-spread": { g: 2, i: 0, p: 0 }, "leveraged-certificate": { g: 2, i: 0, p: 0 }, "halo-basket": { g: 1, i: 2, p: 0 },
     "reverse-convertible": { g: 0, i: 2, p: 0 }, "capital-protected-note": { g: 1, i: 0, p: 2 },
-    "fx-forward-collar": { g: 0, i: 1, p: 2 }, "currency-hedged-sleeve": { g: 0, i: 0, p: 2 }, "dual-currency-deposit": { g: 0, i: 2, p: 0 }
+    "fx-forward-collar": { g: 0, i: 1, p: 2 }, "currency-hedged-sleeve": { g: 0, i: 0, p: 2 }, "dual-currency-deposit": { g: 0, i: 2, p: 0 },
+    "fx-option": { g: 2, i: 0, p: 1 }, "fx-option-spread": { g: 2, i: 0, p: 0 }, "fx-risk-reversal": { g: 2, i: 0, p: 0 }, "fx-strangle": { g: 2, i: 0, p: 1 }
   };
   const PROTECTIVE = new Set(["capital-protected-note", "zero-cost-collar", "buffered-note", "protective-put", "prepaid-variable-forward", "fx-forward-collar", "currency-hedged-sleeve"]);
   const COUPON = new Set(["phoenix-autocall", "reverse-convertible", "halo-basket", "call-overwrite", "dual-currency-deposit"]);
-  const DIRECTIONAL = new Set(["direct-equity", "thematic-basket", "equal-weight-index", "leveraged-certificate", "call-spread", "index-core"]);
+  const DIRECTIONAL = new Set(["direct-equity", "thematic-basket", "equal-weight-index", "leveraged-certificate", "call-spread", "index-core", "fx-option", "fx-option-spread", "fx-risk-reversal"]);
   function exprScore(profile, id) {
     const f = EXPR_FIT[id];
     let base = f ? (profile === "growth" ? f.g : profile === "income" ? f.i : f.p) : 1;
@@ -293,6 +294,7 @@
       <div class="rec-line"><span class="rec-k">Action</span><span class="rec-v"><span class="rec-action">${esc(action)}</span></span></div>
       ${pref ? `<div class="rec-line"><span class="rec-k">Preferred</span><span class="rec-v">${esc(exprLabel(pref))}${why ? ` <span class="rec-why">— ${esc(why)}</span>` : ""}</span></div>` : ""}
       ${profs ? `<div class="rec-line"><span class="rec-k">By profile</span><span class="rec-v rec-prof">${profs}</span></div>` : ""}
+      ${idea.levels ? `<div class="rec-line"><span class="rec-k">Levels</span><span class="rec-v rec-levels">${[idea.levels.tenor ? `Tenor ${esc(idea.levels.tenor)}` : "", idea.levels.entry ? `Entry ${esc(idea.levels.entry)}` : "", idea.levels.target ? `Target ${esc(idea.levels.target)}` : "", idea.levels.stop ? `Stop ${esc(idea.levels.stop)}` : ""].filter(Boolean).join(" · ")}</span></div>` : ""}
       ${(() => { const cap = window.MAPPING.sectorPeg(null, idea.sector); return `<div class="rec-line"><span class="rec-k">Comfort cap</span><span class="rec-v">${esc(idea.sector)} <b>${cap}%</b> <span class="rec-why">— your single-sector limit (editable in “How scoring works”)</span></span></div>`; })()}
     </div>`;
   }
