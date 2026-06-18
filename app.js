@@ -190,10 +190,31 @@
     w = w.split(" — ")[0].split(/(?<=\w), /)[0].replace(/\.$/, "");
     return w.length > 84 ? w.slice(0, 81).trim() + "…" : w;
   }
+  /* the SPECIFIC directional trade (instrument + direction + the actual view) — explicit
+     idea.tradeStatement wins; else a derived one. The explicit field is authored for the
+     daily board (and required by the generator); this backfill covers standing Views. */
+  function ideaTradeStatement(idea) {
+    if (idea.tradeStatement) return idea.tradeStatement;
+    const nm = idea.name || idea.title || "the idea";
+    const inst = idea.ticker && idea.ticker !== "—" ? `${nm} (${idea.ticker})` : nm;
+    const why = String(idea.thesis || "").split(/(?<=\.)\s/)[0].replace(/\s+/g, " ").trim();
+    const tail = why ? ` — ${why}` : "";
+    const a = ideaAction(idea);
+    if (idea.sector === "FX") {
+      return /income|carry|yield/i.test(nm + " " + a)
+        ? `Earn the FX carry — long the higher-yielding currency vs the lower-yielding one via ${nm}; a bet on the rate differential holding while the pair stays range-bound, NOT a directional spot call.`
+        : `Hedge the currency mismatch via ${nm} — reduce the non-base (USD) exposure; a view that the base currency weakens against you, NOT a single-pair spot punt.`;
+    }
+    if (/hedge/i.test(a)) return `Hedge ${inst} — protecting the existing exposure through the event, not a directional short.`;
+    if (/reduce|sell|trim/i.test(a)) return `Reduce ${inst}${tail}.`;
+    if (/income/i.test(a)) return `Generate income from ${inst}${tail}.`;
+    return `Long ${inst}${tail}.`;
+  }
   // FEATURE 1 — the Recommendation block (placed above conviction in every drawer)
   function recommendationHTML(idea) {
     const structs = (idea.structures || []).filter(Boolean);
     if (!structs.length) return "";
+    const trade = ideaTradeStatement(idea);
     const action = ideaAction(idea);
     const pref = ideaPreferred(idea);
     const why = pref ? exprWhy(pref) : "";
@@ -202,6 +223,7 @@
       .filter(Boolean).join(" · ");
     return `<div class="drawer-section rec-block">
       <span class="eyebrow">Recommendation</span>
+      ${trade ? `<div class="rec-trade">${esc(trade)}</div>` : ""}
       <div class="rec-line"><span class="rec-k">Action</span><span class="rec-v"><span class="rec-action">${esc(action)}</span></span></div>
       ${pref ? `<div class="rec-line"><span class="rec-k">Preferred</span><span class="rec-v">${esc(exprLabel(pref))}${why ? ` <span class="rec-why">— ${esc(why)}</span>` : ""}</span></div>` : ""}
       ${profs ? `<div class="rec-line"><span class="rec-k">By profile</span><span class="rec-v rec-prof">${profs}</span></div>` : ""}

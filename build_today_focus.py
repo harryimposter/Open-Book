@@ -30,6 +30,8 @@ COVERAGE SPEC (what every sweep MUST span — not just US equity/earnings):
 
 This script also VALIDATES the payload (prints warnings, never silently passes):
   - every idea cites >=2 sources;
+  - every idea carries a tradeStatement (one precise sentence: instrument + direction
+    + the actual view; FX must name long-vs-short legs and spot-vs-carry);
   - every fact is tagged sourced|estimated;
   - earnings report dates are not in the past relative to asOf (a forward event must
     not be described as already happened);
@@ -192,6 +194,9 @@ def score_conviction(idea, warns):
 def validate(idea, as_of, warns):
     if len(idea.get("sources", [])) < 2:
         warns.append(f"{idea['id']}: fewer than 2 sources cited")
+    ts = idea.get("tradeStatement")
+    if not (ts and str(ts).strip()):
+        warns.append(f"{idea['id']}: no tradeStatement — REQUIRED (one precise sentence: instrument + direction + the actual view; for FX, name which currency is long vs short and whether it's a spot or differential/carry bet)")
     for f in idea.get("facts", []):
         if f.get("tag") not in ("sourced", "estimated"):
             warns.append(f"{idea['id']}: fact not tagged sourced/estimated -> {f.get('text','')[:50]}")

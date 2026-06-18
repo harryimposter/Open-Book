@@ -18,6 +18,7 @@ window.TODAY_FOCUS = {
   "earnings": [
     {
       "id": "mu-fq3",
+      "tradeStatement": "Long Micron (MU) into the 24-Jun FQ3 print — bullish on HBM / AI-memory pricing into 2027 — but expressed with a structure (autocall or collar), not naked stock, given the rich implied move.",
       "intent": "protect",
       "name": "Micron Technology",
       "ticker": "MU",
@@ -120,6 +121,7 @@ window.TODAY_FOCUS = {
     },
     {
       "id": "fdx-fq4",
+      "tradeStatement": "Long FedEx (FDX) into FQ4 — a bet the freight / industrial cycle is inflecting and the DRIVE cost program delivers; a global-trade read-through, not just the single stock.",
       "intent": "add",
       "name": "FedEx",
       "ticker": "FDX",
@@ -213,6 +215,7 @@ window.TODAY_FOCUS = {
     },
     {
       "id": "nke-fq4",
+      "tradeStatement": "Long Nike (NKE) into FQ4 — a single-name turnaround bet (inventory clean-up, China, the wholesale reset), not a sector or consumer-discretionary call.",
       "intent": "add",
       "name": "Nike",
       "ticker": "NKE",
@@ -304,6 +307,7 @@ window.TODAY_FOCUS = {
   "exEarnings": [
     {
       "id": "gold-pullback",
+      "tradeStatement": "Long gold (XAU) — accumulate the pullback as strategic ballast; a bet on continued central-bank buying and currency debasement, sized to the protection gap, not a tactical momentum trade.",
       "intent": "protect",
       "tickers": [
         "XAU",
@@ -438,6 +442,7 @@ window.TODAY_FOCUS = {
     },
     {
       "id": "ai-power",
+      "tradeStatement": "Long the power & grid build-out (utilities, gas, nuclear) — a lower-beta way to be long the AI theme that pays contracted income; a bet on structural datacenter electricity demand, not on interest rates.",
       "intent": "income",
       "name": "AI power & the grid",
       "ticker": "",
@@ -556,6 +561,7 @@ window.TODAY_FOCUS = {
     },
     {
       "id": "lock-yields",
+      "tradeStatement": "Long high-quality duration — extend from cash / bills into 5–10y govt / IG to lock ~4.4% yields; a bet that carry plus eventual cuts beats cash, accepting mark-to-market risk while the Fed stays hawkish.",
       "intent": "income",
       "name": "Quality carry — get paid to wait",
       "ticker": "",
@@ -678,6 +684,7 @@ window.TODAY_FOCUS = {
     },
     {
       "id": "energy-tactical",
+      "tradeStatement": "Long energy majors (XOM / SHEL) — a tactical hedge that the Hormuz risk premium is underpriced after Brent fell to ~$79; a bet on a re-escalation tail, held in income-paying majors, not a structural oil-bull call.",
       "intent": "income",
       "name": "Energy — tactical on Hormuz risk",
       "ticker": "",
@@ -796,6 +803,7 @@ window.TODAY_FOCUS = {
     },
     {
       "id": "fx-usd-hedge",
+      "tradeStatement": "Reduce / hedge USD exposure in EUR- and GBP-base books — effectively short the dollar against the home currency — a bet that the post-peak USD weakens into 2026 as the Fed-ECB spread narrows; this is NOT a call on any single pair's spot level, nor specifically a yen- or euro-strength view.",
       "intent": "protect",
       "tickers": [
         "DXY",
@@ -935,6 +943,7 @@ window.TODAY_FOCUS = {
     },
     {
       "id": "fx-carry-income",
+      "tradeStatement": "Earn the carry on the wide US rate differential — effectively long the high-yielding USD versus a low-yielder (JPY / EUR) via dual-currency deposits — a bet that the differential persists and the pair stays range-bound so you collect the coupon; it is NOT a directional spot view, and the worst case is converting into the currency you'd have bought anyway.",
       "intent": "income",
       "tickers": [
         "USDJPY",

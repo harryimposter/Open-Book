@@ -261,6 +261,10 @@ button { font-family: inherit; cursor: pointer; }
   padding: 13px 15px 14px;
 }
 .rec-block > .eyebrow { color: var(--gold); margin-bottom: 8px; }
+.rec-trade {
+  font-family: var(--serif); font-size: 14px; line-height: 1.45; color: var(--espresso);
+  font-weight: 700; margin: 0 0 9px; padding-bottom: 9px; border-bottom: 1px solid var(--line);
+}
 .rec-line { display: flex; gap: 10px; align-items: baseline; padding: 3px 0; }
 .rec-line + .rec-line { border-top: 1px dashed var(--line); }
 .rec-k {

@@ -112,6 +112,7 @@ const SEED_IDEAS = [
   /* ---- Resilience & Protection ---- */
   {
     id: "structured-protection", themeId: "resilience", intent: "protect", title: "Structured downside protection",
+    tradeStatement: "Buy downside protection on a concentrated equity winner — a buffered note or zero-cost collar to keep upside while defining the downside; protecting a gain (and deferring the tax), not a directional short.",
     type: "Strategic", assetClass: "Multi-Asset", sector: "Broad", bucket: "Preservation",
     conviction: "High", horizon: "Strategic",
     thesis: "After a strong run in risk assets, buffered notes and collars let concentrated holders keep upside participation while defining the downside — protect the gains without realising the tax.",
@@ -119,6 +120,7 @@ const SEED_IDEAS = [
   },
   {
     id: "diversifiers", themeId: "resilience", intent: "protect", title: "Diversifiers & hedges",
+    tradeStatement: "Add an uncorrelated ballast sleeve (macro / trend / market-neutral) — a bet on lower whole-book drawdown, not on any single market's direction; the point is the low correlation, not the return.",
     type: "Strategic", assetClass: "Alternatives", sector: "Broad", bucket: "Preservation",
     conviction: "Medium-High", horizon: "Strategic",
     thesis: "Macro, trend and relative-value strategies add a return stream that is genuinely uncorrelated to a 60/40 — ballast for the next drawdown.",
@@ -128,6 +130,7 @@ const SEED_IDEAS = [
   /* ---- Gold & Currency ---- */
   {
     id: "gold-hedge", themeId: "gold", intent: "protect", tickers: ["XAU", "GLD", "4GLD", "GDX", "IAU", "GLDM"], title: "Gold as a debasement hedge",
+    tradeStatement: "Long gold (XAU) — strategic ballast sized to the protection gap; a bet on debasement and central-bank demand as a tail hedge, held not traded, not a tactical price call.",
     type: "Strategic", assetClass: "Commodity", sector: "Gold", bucket: "Preservation",
     conviction: "High", horizon: "Strategic",
     thesis: "Persistent deficits, central-bank buying and geopolitical risk underpin gold as the cleanest tail hedge. We treat it as strategic ballast, sized to the book's protection gap.",
@@ -135,6 +138,7 @@ const SEED_IDEAS = [
   },
   {
     id: "fx-diversify", themeId: "gold", intent: "protect", title: "Currency diversification & FX overlays",
+    tradeStatement: "Reduce / hedge a concentrated single-currency (USD) exposure — effectively short the dollar against the base currency — a bet that an over-weighted currency mean-reverts; an overlay to bound the mismatch, NOT a directional single-pair spot trade.",
     type: "Opportunistic", assetClass: "Multi-Asset", sector: "FX", bucket: "Preservation",
     conviction: "Medium", horizon: "12m",
     thesis: "Books that have drifted heavily into one currency carry an unmanaged risk. A weaker-dollar regime argues for FX overlays and hedging the mismatch between base currency and asset currency.",
@@ -153,6 +157,7 @@ const SEED_IDEAS = [
   /* ---- Structured Outcomes ---- */
   {
     id: "halo-acm", themeId: "structured", intent: "income", title: "HALO equal-weight basket autocall — CEG · MP Materials · CAT",
+    tradeStatement: "Sell volatility for a 24% p.a. USD coupon via an equal-weight autocall on CEG / MP Materials / CAT — a bet the basket holds above 80% (range-bound to up) so you collect the coupon; capped upside, capital at risk below the barrier — an income trade, not a directional long.",
     type: "Opportunistic", assetClass: "Structured", sector: "Broad", bucket: "Income",
     conviction: "High", horizon: "12m",
     thesis: "The desk's flagship note: an Autocall Market Plus (ACM+) on an equally-weighted basket of Constellation Energy, MP Materials and Caterpillar — one-third each. It pays a fixed 24% p.a. coupon in USD while the basket holds above 80% of its start level, and autocalls early if it rallies. Three different drivers — power, rare-earth materials and industrials — combine into one volatile basket that funds the rich coupon, with a 20% cushion before any capital is at risk. A packaged note Retail can hold.",
@@ -160,6 +165,7 @@ const SEED_IDEAS = [
   },
   {
     id: "struct-income", themeId: "structured", intent: "income", title: "Defined-income autocalls on names you'd own",
+    tradeStatement: "Sell volatility for a high coupon via autocalls / reverse convertibles on quality names you'd happily own — a bet they stay flat-to-up so you collect the coupon; worst case you own the stock at the barrier, not a directional long.",
     type: "Strategic", assetClass: "Structured", sector: "Broad", bucket: "Income",
     conviction: "Medium-High", horizon: "Strategic",
     thesis: "Single-stock and worst-of autocalls (ACM+ / Phoenix) and reverse convertibles on quality names you'd be happy to own anyway — turning a flat-to-up view into a high contractual coupon with a soft capital barrier. The core building block of the structured-notes sleeve.",
@@ -167,6 +173,7 @@ const SEED_IDEAS = [
   },
   {
     id: "struct-protect", themeId: "structured", intent: "protect", title: "Protected & buffered participation",
+    tradeStatement: "Stay invested with a floor — buffered / capital-protected notes giving equity-index upside (to a cap) while protecting the downside; a bet on participation-with-protection, not an unprotected directional long.",
     type: "Strategic", assetClass: "Structured", sector: "Broad", bucket: "Preservation",
     conviction: "High", horizon: "Strategic",
     thesis: "Stay invested with a floor — buffered and capital-protected notes that give equity-index upside (often to a cap) while protecting some or all of the downside. The way to keep a concentrated winner's upside, or re-enter after a loss, without taking full drawdown risk.",

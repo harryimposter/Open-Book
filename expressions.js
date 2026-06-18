@@ -854,19 +854,71 @@
     return (id && E[id]) ? E[id] : fallback(raw);
   }
 
-  /* entry + a context line tailored to the idea/finding (ctx has .sector) */
+  /* ---- idea-aware EXAMPLE TERMS ----------------------------------------------
+     The generic `example` strings are sector-templated. When an expression is shown
+     INSIDE a specific idea's drawer we render concrete terms that name THAT idea's
+     underlying (u.ticker / u.name / pair) and plausible levels/tenor. Builders below
+     cover the common expressions; anything without a builder falls back to the entry's
+     own idea-aware `context(u)` line, and only to the generic `example` with no idea. */
+  function fmtPair(t) {
+    const s = String(t || "").toUpperCase().replace(/[^A-Z]/g, "");
+    const C = "(EUR|GBP|USD|JPY|CHF|AUD|CAD)";
+    if (new RegExp("^" + C + C + "$").test(s)) return s.slice(0, 3) + "/" + s.slice(3, 6);
+    if (/USD|EUR|JPY|GBP/.test(s)) return s;
+    return "EUR/USD";
+  }
+  const EXAMPLE_BUILDERS = {
+    "direct-equity": (u) => `Buy a 3–5% ${u.ticker} line, sized to stay under ~8% of the book — add into weakness, trim into strength.`,
+    "index-core": (u) => `A 5–10% ${u.etf}-type ETF tracking ${u.index} as the diversified core of the ${u.name} exposure (~0.1–0.35% fee).`,
+    "structured-note": (u) => `A 12-month note on ${u.ticker}: 80% barrier, rich quarterly coupon, autocall at the start level — a packaged way to play ${u.name}.`,
+    "phoenix-autocall": (u) => `1-year ACM+/Phoenix on ${u.ticker}: 80% capital barrier, ~12–18% p.a. memory coupon (quarterly) while above 80%, autocall at ≥100% — income on a range-bound ${u.name} view.`,
+    "buffered-note": (u) => `15-month buffered note on ${u.ticker}: 70% barrier (protected to −30%), full uncapped upside — a protected (re)entry into ${u.ticker}.`,
+    "capital-protected-note": (u, ctx) => `3-year note on ${ctx && ctx.sector === "Gold" ? "gold" : u.index}: 100% capital protected at maturity, ~60–70% participation — full downside protection with a defined share of the upside.`,
+    "zero-cost-collar": (u) => `On the ${u.ticker} holding: buy a 3–6m ~90% put, sell a ~110% call for ~zero premium — protected below −10%, capped above +10%, keep the shares and dividends.`,
+    "protective-put": (u) => `Buy a 3-month ~90% put on ${u.ticker} for ~2–3% — a hard floor at ~−10% through the event, full upside kept.`,
+    "call-overwrite": (u) => `Sell 1-month ~5% OTM calls on the ${u.ticker} line for ~1% premium/mo (~10–15% annualised), capping gains above the strike.`,
+    "cash-secured-puts": (u) => `Sell 1-month puts ~5% below spot on ${u.ticker} — ~1% premium, or assignment at your target add level.`,
+    "physical-gold": () => `A 3–7% allocated-gold / ETC (4GLD or GLD) position sized to the protection gap — strategic ballast, held not traded.`,
+    "gold-accumulator": () => `12-month gold accumulator: buy weekly at ~95% of spot, knock-out ~105%, double-up below the 95% strike — accumulate ~5% under market while range-bound.`,
+    "currency-hedged-sleeve": () => `Move the foreign (USD) sleeve into home-currency-hedged share classes (~0.1–0.2% cost) to strip out the FX mismatch — Retail-friendly, no derivatives account.`,
+    "fx-forward-collar": (u) => `A 6-month ${fmtPair(u.ticker)} forward, or a zero-cost collar (e.g. protect beyond 1.12, give up below 1.04), sized to the non-base exposure.`,
+    "dual-currency-deposit": (u) => `1-month DCD on ${fmtPair(u.ticker)}: strike near spot, ~6–9% annualised coupon vs ~2% cash — converts into the weaker leg at the strike if it trades through (your target add level).`,
+    "govt-ig-bonds": () => `5–10y Treasuries ~4.3% YTM plus A/BBB corporates ~5.3%, ~10–15% of book — lock the yield, add duration ballast.`,
+    "bond-ladder": () => `A 1–7y Treasury/IG ladder, ~equal per rung at ~4.4% blended YTM, rolling maturities out each year.`,
+    "extend-duration": () => `Rotate cash/bills into a 5–10y high-quality sleeve (~4.4% YTM, ~6y duration) — a 1% fall in yields adds ~6% price on top of carry.`,
+    "tbill-ladder": () => `Ladder idle cash across 1/3/6/12-month T-bills (~5%), or short munis for taxable books — yield without giving up liquidity.`,
+    "utility-basket": () => `An 8-name load-growth utility basket (~5–8% of book) yielding ~3% with rate-base growth, or an XLU-type core.`,
+    "thematic-basket": (u) => `A curated 8–15 name basket across the ${u.name} value chain, equal-weighted into a single ~5–7% sleeve.`,
+    "halo-basket": () => `Equal-weight ACM+ on CEG / MP Materials / CAT: 24% p.a. USD coupon while the basket ≥80%, autocall at ≥100%, 1-year — a ~$2–3m clip.`,
+    "reverse-convertible": (u) => `6-month RevCon on ${u.ticker}: 75% knock-in, ~10–12% p.a. coupon — keep coupon + capital unless it ends >25% down, in which case you own ${u.ticker} at the strike.`
+  };
+  function exampleFor(id, u, ctx) {
+    const b = EXAMPLE_BUILDERS[id];
+    if (!b) return null;
+    try { return b(u, ctx || {}); } catch (e) { return null; }
+  }
+
+  /* entry + idea-aware example terms + a context line tailored to the idea (ctx has .sector) */
   function detail(raw, ctx) {
     const id = resolve(raw);
     const base = (id && E[id]) ? E[id] : fallback(raw);
+    const u = uFor(ctx);
     let contextLine = null;
     if (typeof base.context === "function") {
-      try { contextLine = base.context(uFor(ctx), ctx || {}); } catch (e) { contextLine = null; }
+      try { contextLine = base.context(u, ctx || {}); } catch (e) { contextLine = null; }
     }
+    // Example terms: concrete idea-aware builder first; else the idea-aware context
+    // line (when shown inside an idea); else the generic catalogue example.
+    const builderExample = (id && ctx) ? exampleFor(id, u, ctx) : null;
+    const example = builderExample || (ctx ? (contextLine || base.example) : base.example);
+    // keep the "For this idea" callout only when it ADDS framing beyond the example
+    // (i.e. a concrete builder example is shown) — avoids printing the same line twice.
+    const showContext = !!(builderExample && contextLine);
     return {
       label: base.label, cls: clsOf(id), what: base.what, mechanics: base.mechanics,
-      underlying: base.underlying, tenor: base.tenor, example: base.example,
+      underlying: base.underlying, tenor: base.tenor, example: example,
       pros: base.pros || [], cons: base.cons || [], whenToUse: base.whenToUse,
-      contextLine, raw: raw
+      contextLine: showContext ? contextLine : null, raw: raw
     };
   }
 
