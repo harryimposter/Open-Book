@@ -155,7 +155,8 @@ Positioning (0–2) · Technical (0–2). `score = raw ÷ 15 × 100`; **High ≥
 
 **The view drives; technicals confirm.** Fundamental thesis + house view + the thesis-bearing
 pillars (Asymmetry, Catalyst, Consensus) carry **11/15 (≈73%)**; Positioning + Technical carry
-**4/15 (≈27%)** and are framed as *confirmation / veto, not drivers* — they can support or kill a view
+**4/15 (≈27%)** — **roughly a 70/30 fundamentals-to-technicals split** — and are framed as
+*confirmation / veto, not drivers* — they can support or kill a view
 but can't manufacture conviction. (Was ~60/40 before this rebalance.) The old Stop / risk-reward pillar
 was removed — a technical stop-loss construct that penalised strategic / thematic basket ideas for not
 being stop-and-target trades; Asymmetry already scores the upside. The **Fundamental thesis**

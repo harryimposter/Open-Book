@@ -917,7 +917,7 @@ window.TODAY_FOCUS = {
     "exEarnings": {
       "model": "exEarnings",
       "title": "Ex-earnings ideas — seven-pillar conviction",
-      "blurb": "Seven pillars summed to 15, scaled to 100. Fundamental thesis and house view lead (11/15 ≈ 73%); technicals and positioning are capped confirmation (4/15 ≈ 27%). High ≥ 75 · Medium ≥ 55 · Watch ≥ 0.",
+      "blurb": "Seven pillars summed to 15, scaled to 100, on roughly a 70/30 fundamentals-to-technicals split: fundamental thesis and house view lead (11/15 ≈ 73%); technicals and positioning are capped confirmation (4/15 ≈ 27%). High ≥ 75 · Medium ≥ 55 · Watch ≥ 0.",
       "maxRaw": 15,
       "pillars": [
         {

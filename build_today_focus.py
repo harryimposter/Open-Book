@@ -57,7 +57,7 @@ EARNINGS_RUBRIC = {
 EXEARN_RUBRIC = {
     "model": "exEarnings",
     "title": "Ex-earnings ideas — seven-pillar conviction",
-    "blurb": "Seven pillars summed to 15, scaled to 100. Fundamental thesis and house view lead (11/15 ≈ 73%); technicals and positioning are capped confirmation (4/15 ≈ 27%). High ≥ 75 · Medium ≥ 55 · Watch ≥ 0.",
+    "blurb": "Seven pillars summed to 15, scaled to 100, on roughly a 70/30 fundamentals-to-technicals split: fundamental thesis and house view lead (11/15 ≈ 73%); technicals and positioning are capped confirmation (4/15 ≈ 27%). High ≥ 75 · Medium ≥ 55 · Watch ≥ 0.",
     "maxRaw": 15,
     "pillars": [
         {"key": "asymmetry",   "label": "Gap / asymmetry",          "max": 3, "desc": "Thesis expected move (entry → target) ÷ the name's normal move over the same horizon. ≥2.0 → 3 · 1.5-2.0 → 2 · 1.0-1.5 → 1 · <1.0 → 0. The thesis target is a soft input → tagged estimated."},
