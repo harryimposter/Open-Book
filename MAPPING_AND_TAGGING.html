@@ -251,13 +251,17 @@
   so Mandate&nbsp;&amp;&nbsp;risk is 80 vs 75 and the final fit is 84 vs 82.</p>
 
   <!-- ============================ SECTION 2 ============================ -->
-  <h2 class="pagebreak">2 &nbsp;&middot;&nbsp; Current process &mdash; how the Views tab tags ideas to a client <span class="tag tag-current">Live</span></h2>
+  <h2 class="pagebreak">2 &nbsp;&middot;&nbsp; How the Views tab tags ideas to a client <span class="tag tag-current">Live &middot; one engine</span></h2>
 
-  <p>The Solutions Views tab uses the <b>same</b> <code>mapping.js</code> engine. <code>scanner.js</code> is a thin facade
-  that preserves the old output keys (<code>applies / score / reason / gap / secExp / acExp</code>) while sharing one
-  algorithm with Today's Focus:</p>
+  <p>The Solutions Views tab has <b>no scorer of its own</b>. It tags ideas through the <b>same</b>
+  <code>mapping.js</code> engine as Today's Focus (&sect;1). In <code>scanner.js</code>, <code>ideaFit()</code> is a
+  one-line delegate (<span class="mono">scanner.js:222&ndash;224</span>), and <code>clientsForIdea()</code> runs every
+  client through it, keeps the ones that pass the gate, and sorts them by fit. So a Solutions View idea is scored against
+  each client with the <b>identical four axes</b> (Affinity, Gap, Mandate&nbsp;&amp;&nbsp;risk,
+  Concentration-within-sector), the same <b>binary tradability gate</b>, and the same thresholds set out in &sect;1 &mdash;
+  there is no separate Views math.</p>
 
-  <pre class="formula">// scanner.js &mdash; the facade<br/>function ideaFit(idea, client) {<br/>  return window.MAPPING.scoreIdeaForClient(idea, client);   // delegates, no second formula<br/>}<br/><br/>// which clients does a View idea tag?<br/>function clientsForIdea(idea) {<br/>  return S().clients<br/>    .map(c =&gt; ({ client: c, ...ideaFit(idea, c) }))<br/>    .filter(x =&gt; x.applies)                                 // gate<br/>    .sort((a, b) =&gt; b.score - a.score);                    // rank by fit<br/>}</pre>
+  <pre class="formula">// scanner.js:222-224 &mdash; ideaFit delegates; there is no second formula<br/>function ideaFit(idea, client) {<br/>  return window.MAPPING.scoreIdeaForClient(idea, client);<br/>}<br/><br/>// scanner.js &mdash; which clients does a View idea tag?<br/>function clientsForIdea(idea) {<br/>  return S().clients<br/>    .map(c =&gt; ({ client: c, ...ideaFit(idea, c) }))<br/>    .filter(x =&gt; x.applies)                  // gate: tradable &amp;&amp; bracketFit &ge; 45<br/>    .sort((a, b) =&gt; b.score - a.score);     // rank by fit (= scoreIdeaForClient fit)<br/>}</pre>
 
   <div class="key">
     <b>The Views gate is <code>applies</code>, not the flag.</b> In the engine,
@@ -316,6 +320,28 @@
     <b>Does the Views tab tag her? Yes.</b> bracketFit 82 &ge; applyMin 45 and the idea is tradable &rarr;
     <code>applies = true</code>, so <code>clientsForIdea(gold-hedge)</code> returns Aurora, ranked by her score of 82.
     (She also clears the stricter Today's Focus flag of 50, which is why the &sect;1 Gold contrast also flags her.)
+  </div>
+
+  <h3>2.3 &nbsp; &hellip; and a View idea the same engine does <em>not</em> tag her</h3>
+  <p>Run the high-conviction Tech View <b>&ldquo;AI infrastructure &amp; compute leaders&rdquo;</b>
+  (<span class="mono">ai-compute</span>; sector Technology, Equity, bucket Growth, conviction High) through the same engine
+  for Aurora &mdash; whose book is already 41.4% Technology against a 15% income-mandate peg:</p>
+  <table class="data">
+    <tr><th>Axis</th><th>Computation</th><th>Score</th><th>&times; Weight</th><th>= Contribution</th></tr>
+    <tr><td><b>Gap fit</b></td><td>41.4% Tech vs income peg 15% &mdash; far over target, no headroom.</td><td class="num">0</td><td class="num">0.2353</td><td class="num">0.0</td></tr>
+    <tr class="alt"><td><b>Affinity fit</b></td><td>Affinity 93 &minus; over-peg penalty 100 (26.4pp over the 15% comfort &times;10, capped) = max(0, 93&minus;100).</td><td class="num">0</td><td class="num">0.2941</td><td class="num">0.0</td></tr>
+    <tr><td><b>Mandate &amp; risk</b></td><td>0.6&times;RiskSuit 45 (high-beta &mdash; too racy for income) + 0.4&times;IntentFit 60 (appreciation vs income).</td><td class="num">51</td><td class="num">0.2941</td><td class="num">15.0</td></tr>
+    <tr class="alt"><td><b>Conc. within sector</b></td><td>3 Tech names (MU/NVDA/SAP), HHI 0.46 &rarr; inverted.</td><td class="num">46</td><td class="num">0.1765</td><td class="num">8.1</td></tr>
+    <tr class="total"><td colspan="2">bracketFit &mdash; tradable (Direct equity, Retail-OK) &times;1</td><td colspan="3" class="num">Final Fit = 23</td></tr>
+  </table>
+  <div class="key">
+    <b>Does the Views tab tag her? No.</b> bracketFit 23 &lt; applyMin 45 &rarr; <code>applies = false</code>, so
+    <code>clientsForIdea(ai-compute)</code> does <b>not</b> return Aurora (and 23 is well under the 50 flag too). The
+    <em>old</em> standalone scanner formula would have tagged her hard &mdash; <span class="mono">secExp 41.4&times;1.4 +
+    acExp 70.9&times;0.4 + 0 + conv 3 = 89.3</span>, reason <em>&ldquo;Direct fit &mdash; holds 41.4% Technology&rdquo;</em> &mdash;
+    rewarding the very over-concentration the current engine penalises to zero on Gap and Affinity. <b>Same idea, same
+    client, opposite verdict</b>: that disagreement is exactly why the two engines were unified onto <code>mapping.js</code>
+    in <span class="mono">007131c</span>.
   </div>
 
   <!-- ============================ SECTION 3 ============================ -->
