@@ -1143,3 +1143,12 @@ button.struct-chip.struct-toggle:focus-visible { outline: 2px solid var(--gold);
 .btn-danger { background: var(--neg); color: #fff; border: none; }
 .btn-danger:hover { background: #863F35; }
 .link-btn { background: none; border: none; color: var(--bronze-deep); font-weight: 600; cursor: pointer; padding: 0; font-size: inherit; text-decoration: underline; }
+
+/* goal-derivation modal */
+.gd-src { display: inline-block; background: var(--bronze-deep); color: var(--paper);
+  font-family: Inter, sans-serif; font-size: 11px; font-weight: 600; letter-spacing: .3px;
+  padding: 2px 9px; border-radius: 10px; }
+.gd-drivers { margin: 6px 0 12px; padding-left: 20px; }
+.gd-drivers li { margin: 4px 0; color: var(--ink-soft, #5A3E2B); }
+.gd-now { margin-top: 12px; padding: 10px 12px; background: var(--paper-2, #F4ECE0);
+  border-left: 4px solid var(--bronze-deep); border-radius: var(--radius); font-size: 13px; }

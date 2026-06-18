@@ -27,6 +27,7 @@
 
   <script src="data.js"></script>
   <script src="charts.js"></script>
+  <script src="goals.js"></script>
   <script src="scanner.js"></script>
   <script src="expressions.js"></script>
   <script src="morgan.js"></script>
@@ -57,8 +58,8 @@
     const allocSeg = BPCharts.splitSegments(c.split);
 
     // goal buckets: current vs target
-    const curB = BPCharts.bucketAlloc(c.split);
-    const target = c.goals.target;
+    const curB = window.GOALS.currentBuckets(c);
+    const target = window.GOALS.goalsFor(c);
     const curBSeg = SEED.GOAL_BUCKETS.map(b => ({ label: b.key, value: curB[b.key] || 0, color: b.color }));
     const tgtSeg = SEED.GOAL_BUCKETS.map(b => ({ label: b.key, value: target[b.key] || 0, color: b.color }));
     const dist = BPCharts.targetDistance(curB, target);
@@ -133,13 +134,13 @@
           <div class="panel">
             <div class="panel-head"><h3>Strategic allocation — now vs target</h3></div>
             <div class="panel-body">
-              ${BPCharts.goalTargetBar(target, curB)}
+              ${BPCharts.goalTargetBar3(target, curB)}
             </div>
           </div>
         </div>
         <div class="panel" style="margin-top:16px">
           <div class="panel-head"><h3>What the goals mean</h3></div>
-          <div class="panel-body">${BPCharts.goalGlossary()}</div>
+          <div class="panel-body">${BPCharts.goalGlossary3()}</div>
         </div>
       </div>
 

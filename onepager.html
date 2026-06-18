@@ -52,6 +52,7 @@
 
   <script src="data.js"></script>
   <script src="charts.js"></script>
+  <script src="goals.js"></script>
   <script src="scanner.js"></script>
   <script>
   (function () {
@@ -73,9 +74,9 @@
       .map(([k, v]) => `${k.replace(/_/g, " ").toLowerCase()} (${v}%)`).join(", ");
 
     // target alignment
-    const curB = BPCharts.bucketAlloc(c.split);
-    const target = c.goals.target;
-    const gaps = SEED.GOAL_BUCKETS.map(b => ({ key: b.key, d: (curB[b.key] || 0) - (target[b.key] || 0) }))
+    const curB = window.GOALS.currentBuckets(c);
+    const target = window.GOALS.goalsFor(c);
+    const gaps = window.GOALS.GOALS3.map(b => ({ key: b.key, d: (curB[b.key] || 0) - (target[b.key] || 0) }))
       .filter(g => Math.abs(g.d) >= 5).sort((a, b) => Math.abs(b.d) - Math.abs(a.d));
     const alignText = gaps.length
       ? "Relative to the long-term plan we set together, the portfolio is currently " +

@@ -148,8 +148,45 @@
     ).join("") + `</div>`;
   }
 
+  /* ---- 3-bucket (Protection / Income / Growth) variants — driven by the inferred
+     goal vector (goals.js). Liquidity & Structured are folded by role, so they are
+     no longer their own rows. Same visual language as the 5-bucket versions. ---- */
+  function goalTargetBar3(target, current) {
+    const B = (window.GOALS && window.GOALS.GOALS3) || [];
+    const rows = B.map(b => {
+      const t = Math.round(target[b.key] || 0);
+      const n = Math.round(current[b.key] || 0);
+      const d = n - t;
+      const onPlan = Math.abs(d) < 4;
+      const deltaCls = onPlan ? "on" : (d > 0 ? "over" : "under");
+      const deltaTxt = onPlan ? "on plan" : (d > 0 ? `+${d} over` : `${d} under`);
+      return `<div class="gt-row">
+        <div class="gt-head">
+          <span class="gt-dot" style="background:${b.color}"></span>
+          <span class="gt-name">${b.name || b.key}</span>
+          <span class="gt-delta ${deltaCls}">Now <b>${n}%</b> · target ${t}% · ${deltaTxt}</span>
+        </div>
+        <div class="gt-track" title="Now ${n}% of book · inferred goal ${t}%">
+          <span class="gt-fill" style="width:${Math.min(100, n)}%;background:${b.color}"></span>
+          <span class="gt-target" style="left:${Math.min(100, t)}%"></span>
+        </div>
+      </div>`;
+    }).join("");
+    return `<div class="gt-wrap">${rows}
+      <p class="gt-note">The <b>bar</b> is the book's current weight in each goal; the <b>notch</b> ▏ marks its <b>inferred</b> goal (derived from the balance sheet &amp; risk appetite — see “How were these goals derived”). Cash folds into Protection; structured notes fold by purpose.</p>
+    </div>`;
+  }
+  function goalGlossary3() {
+    const B = (window.GOALS && window.GOALS.GOALS3) || [];
+    return `<div class="goal-gloss">` + B.map(b =>
+      `<div class="gg-item"><span class="gg-dot" style="background:${b.color}"></span>
+        <div><div class="gg-k">${b.name || b.key}</div><div class="gg-d">${b.desc || ""}</div></div></div>`
+    ).join("") + `</div>`;
+  }
+
   window.BPCharts = {
     PALETTE, donut, legend, splitSegments, bucketAlloc, bucketSegments,
-    bucketForClass, applyTrade, targetDistance, fundingBar, goalTargetBar, goalGlossary
+    bucketForClass, applyTrade, targetDistance, fundingBar, goalTargetBar, goalGlossary,
+    goalTargetBar3, goalGlossary3
   };
 })();

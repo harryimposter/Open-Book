@@ -405,9 +405,19 @@
        re-normalised. */
     const bracketFit = Math.round(axes.reduce((s, a) => s + a.score * a.weight, 0));
 
+    /* GOAL ALIGNMENT — goals-aware multiplier over the bracketed score. Reads the
+       client's DERIVED 3-bucket goal (goals.js) and boosts the fit when this idea fills
+       a bucket the client is UNDER goal on, trims it when the bucket is already over.
+       Bounded 0.85–1.15. This is what makes Today's Focus / Views / Advisor Book all tag
+       the clients whose GOALS the idea actually serves. goals.js loads after mapping.js,
+       but this runs at call time, so window.GOALS is present (guarded for safety). */
+    const align = (window.GOALS && window.GOALS.goalAlignment)
+      ? window.GOALS.goalAlignment(idea, client) : { mult: 1, gap: 0, bucket: null, goal: 0, current: 0 };
+    const alignedFit = bracketFit * align.mult;
+
     /* GLOBAL TRADABILITY GATE — binary multiplier over the whole score. */
     const trad = tradability(idea, client);
-    const fit = trad.ok ? bracketFit : 0;
+    const fit = trad.ok ? Math.round(alignedFit) : 0;
     const suppressed = !trad.ok;
 
     const tier = fit >= PARAMS.tierStrong ? "Strong" : fit >= PARAMS.tierGood ? "Good" : "Marginal";
@@ -418,8 +428,10 @@
       // global tradability gate
       tradable: !!trad.ok, suppressed, tradabilityReason: trad.reason,
       naturalExpression: trad.natural, bracketFit,
+      // goals-aware alignment multiplier (derived 3-bucket goal vs current)
+      goalAlignment: align,
       // back-compat fields for scanner.js / pre-trade / morgan.js
-      applies: trad.ok && bracketFit >= PARAMS.applyMin, score: fit, reason: why,
+      applies: trad.ok && alignedFit >= PARAMS.applyMin, score: fit, reason: why,
       gap: ctx.gap, secExp: ctx.sectorExp, acExp: ctx.acExp
     };
   }

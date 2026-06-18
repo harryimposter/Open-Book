@@ -230,28 +230,41 @@
 
     const concExcess = Math.max(0, rev.topName - PARAMS.concPivot);
     const caution = 1 - willingness;   // low appetite → ballast (bidirectional willingness)
+    const r2 = (n) => Math.round(n * 100) / 100;
 
-    const P = PARAMS.base
-      + PARAMS.nearBillW * liab.nearBillPct
-      + PARAMS.debtBallastW * liab.debtLoadPct
-      + PARAMS.concW * concExcess
-      + (isDrawdown ? PARAMS.drawdownBump : 0)
-      + PARAMS.shortHorizonW * Math.max(0, 5 - H)
-      + PARAMS.cautionProtW * caution;
-
-    const I = PARAMS.base
-      + PARAMS.incomeNeedW * incomeNeedPct
-      + PARAMS.serviceW * liab.servicePct
-      + PARAMS.debtMatchW * liab.debtLoadPct
-      + (isDrawdown ? PARAMS.drawdownBump : 0)
-      + PARAMS.cautionIncW * caution;
-
-    const G = PARAMS.base
-      + PARAMS.reqReturnW * reqReturn
-      + PARAMS.longHorizonW * Math.max(0, H - 6)
-      + willingCoef * willingness;
-
-    const raw = { Protection: +P.toFixed(1), Income: +I.toFixed(1), Growth: +G.toFixed(1) };
+    /* every raw score is the sum of named, inspectable terms (surfaced in the UI's
+       "How were these goals derived" panel) */
+    const components = {
+      Protection: {
+        base: PARAMS.base,
+        nearBill: r2(PARAMS.nearBillW * liab.nearBillPct),
+        debtBallast: r2(PARAMS.debtBallastW * liab.debtLoadPct),
+        concentration: r2(PARAMS.concW * concExcess),
+        drawdown: isDrawdown ? PARAMS.drawdownBump : 0,
+        shortHorizon: r2(PARAMS.shortHorizonW * Math.max(0, 5 - H)),
+        caution: r2(PARAMS.cautionProtW * caution)
+      },
+      Income: {
+        base: PARAMS.base,
+        incomeNeed: r2(PARAMS.incomeNeedW * incomeNeedPct),
+        service: r2(PARAMS.serviceW * liab.servicePct),
+        debtMatch: r2(PARAMS.debtMatchW * liab.debtLoadPct),
+        drawdown: isDrawdown ? PARAMS.drawdownBump : 0,
+        caution: r2(PARAMS.cautionIncW * caution)
+      },
+      Growth: {
+        base: PARAMS.base,
+        requiredReturn: r2(PARAMS.reqReturnW * reqReturn),
+        longHorizon: r2(PARAMS.longHorizonW * Math.max(0, H - 6)),
+        willingness: r2(willingCoef * willingness)
+      }
+    };
+    const sumComp = (o) => Object.keys(o).reduce((s, k) => s + o[k], 0);
+    const raw = {
+      Protection: r2(sumComp(components.Protection)),
+      Income: r2(sumComp(components.Income)),
+      Growth: r2(sumComp(components.Growth))
+    };
     const vector = normalizeTo100(raw);
 
     const source = hasGoalSignal ? "stated-goal" : (stated != null ? "stated-risk" : "revealed");
@@ -269,7 +282,7 @@
     drivers.push(`Willingness ${willingness.toFixed(2)} (${stated == null ? "revealed only" : "stated+revealed"}: ${Math.round(rev.riskShare * 100)}% risk assets, ${Math.round(rev.defenseShare * 100)}% defensive, ${rev.topName.toFixed(0)}% top name) → Growth`);
 
     return {
-      vector, raw, source, confidence, drivers,
+      vector, raw, components, willingCoef, source, confidence, drivers,
       willingness: { value: +willingness.toFixed(3), stated, revealed: +rev.value.toFixed(3), R: +rev.R.toFixed(3), D: +rev.D.toFixed(3), C: +rev.C.toFixed(3) },
       inputs: {
         aum: client.aum, horizonYears: H, phase,
@@ -280,5 +293,80 @@
     };
   }
 
-  return { deriveGoals, parseHorizon, parseFunding, parseLiabilities, revealedWillingness, statedWillingness, PARAMS };
+  /* ===================== 3-bucket consumers (display + tagging) ===================== */
+
+  /* the three goal buckets, in display order, with colours matching the legacy palette */
+  const GOALS3 = [
+    { key: "Growth",     name: "Growth",     color: "#29211A",
+      desc: "Capital appreciation — the surplus that can take risk for long-term growth. Equities and growth alternatives (incl. crypto / venture) and participation notes." },
+    { key: "Income",     name: "Income",     color: "#9A7B4F",
+      desc: "Recurring cash the book must throw off — to fund spending or service debt. Bonds, dividend / real-asset income, and yield-style structured notes." },
+    { key: "Protection", name: "Protection", color: "#3F6B4E",
+      desc: "Downside defence and capital that can't be lost — ballast, near-term reserves and hedges. Cash, gold and capital-protected notes fold in here." }
+  ];
+
+  /* the canonical goal vector for a client (override-aware) */
+  function goalsFor(client) { return deriveGoals(client).vector; }
+
+  /* fold the CURRENT book into the same three buckets (the "now" side of the bar).
+     Liquidity (cash) and Structured are NOT their own buckets any more — they fold by
+     ROLE: cash + gold → Protection, structured notes by their purpose, risk assets
+     (equity + alternatives incl. crypto/venture) → Growth, fixed income / real assets → Income. */
+  function classBucket3(cls) {
+    cls = String(cls || "").replace(/_/g, " ");
+    if (cls === "Equity" || cls === "Alternatives") return "Growth";
+    if (cls === "Fixed Income" || cls === "Credit" || cls === "Real Assets") return "Income";
+    return "Protection"; // Commodity (gold), Cash, Structured (refined below)
+  }
+  function structuredBucket3(pos) {
+    const txt = ((pos.name || "") + " " + ((pos.structures || []).join(" ")) + " " + (pos.note || "")).toLowerCase();
+    if (/buffer|protect|capital|defensive|collar|principal/.test(txt)) return "Protection";
+    if (/autocall|coupon|reverse conv|phoenix|memory|income|yield/.test(txt)) return "Income";
+    return "Growth";
+  }
+  function currentBuckets(client) {
+    const out = { Growth: 0, Income: 0, Protection: 0 };
+    const pos = client.positions || [];
+    if (pos.length) {
+      pos.forEach((p) => {
+        const cls = String(p.assetClass || "").replace(/_/g, " ");
+        const b = cls === "Structured" ? structuredBucket3(p) : classBucket3(cls);
+        out[b] += (+p.weightPct || 0);
+      });
+    } else if (client.split) {
+      Object.keys(client.split).forEach((k) => { out[classBucket3(k)] += client.split[k]; });
+    }
+    return { Growth: Math.round(out.Growth), Income: Math.round(out.Income), Protection: Math.round(out.Protection) };
+  }
+
+  /* which of the three goals does an idea SERVE? (from its goal type) */
+  function ideaGoalType(idea) {
+    if (window.MAPPING && window.MAPPING.goalTypeOf) return window.MAPPING.goalTypeOf(idea);
+    const b = idea.bucket;
+    if (b === "Protection") return "protection";
+    if (b === "Income" || b === "Liquidity") return "yield";
+    return "appreciation";
+  }
+  function goalBucketOfIdea(idea) {
+    const g = ideaGoalType(idea);
+    return g === "protection" ? "Protection" : g === "yield" ? "Income" : "Growth";
+  }
+
+  /* GOAL ALIGNMENT — the new goals-aware tagging signal used across every tab.
+     An idea that fills a bucket where the client is UNDER its derived goal should tag
+     that client MORE; one that piles into a bucket already over goal, LESS. Returns a
+     bounded multiplier (0.85–1.15) applied to the client-fit score in mapping.js. */
+  function goalAlignment(idea, client) {
+    const b = goalBucketOfIdea(idea);
+    const goal = goalsFor(client);
+    const cur = currentBuckets(client);
+    const gap = (goal[b] || 0) - (cur[b] || 0);          // + = under-allocated → idea helps close the gap
+    const mult = Math.max(0.85, Math.min(1.15, 1 + gap / 200));
+    return { bucket: b, goal: goal[b] || 0, current: cur[b] || 0, gap: Math.round(gap * 10) / 10, mult: Math.round(mult * 1000) / 1000 };
+  }
+
+  return {
+    deriveGoals, parseHorizon, parseFunding, parseLiabilities, revealedWillingness, statedWillingness, PARAMS,
+    GOALS3, goalsFor, currentBuckets, goalBucketOfIdea, goalAlignment
+  };
 });
