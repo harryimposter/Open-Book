@@ -1367,8 +1367,8 @@
     if (i.topNamePct > 0) inP.push(`top single name <b>${i.topNamePct}%</b>`);
     inP.push(`willingness <b>${w.value}</b>`);
     const willCalc = w.stated == null
-      ? `0.5 × ${w.R} + 0.3 × ${w.D} + 0.2 × ${w.C} = <b>${w.revealed}</b> &nbsp;·&nbsp; no stated profile, so willingness = <b>${w.value}</b>`
-      : `0.5 × ${w.R} + 0.3 × ${w.D} + 0.2 × ${w.C} = ${w.revealed} (revealed), then 0.5 × ${w.stated} (stated) + 0.5 × ${w.revealed} = <b>${w.value}</b>`;
+      ? `0.5 × ${w.R} <span class="gd-term">(risk-asset share)</span> + 0.3 × ${w.D} <span class="gd-term">(low-defensiveness)</span> + 0.2 × ${w.C} <span class="gd-term">(concentration appetite)</span> = <b>${w.revealed}</b> &nbsp;·&nbsp; no stated profile, so willingness = <b>${w.value}</b>`
+      : `0.5 × ${w.R} <span class="gd-term">(risk-asset share)</span> + 0.3 × ${w.D} <span class="gd-term">(low-defensiveness)</span> + 0.2 × ${w.C} <span class="gd-term">(concentration appetite)</span> = ${w.revealed} <span class="gd-term">(revealed)</span>, then 0.5 × ${w.stated} <span class="gd-term">(stated)</span> + 0.5 × ${w.revealed} = <b>${w.value}</b>`;
     const calcHTML = `
       <div class="gd-inputs">Measured off the book: ${inP.join(" &nbsp;·&nbsp; ")}</div>
       <div class="gd-step"><div class="gd-step-k">Willingness (0–1)</div><div class="gd-calc">= ${willCalc}</div></div>
