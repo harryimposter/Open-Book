@@ -370,6 +370,55 @@
       ]
     },
     {
+      "id": "rate-range-accrual",
+      "tradeStatement": "Buy a ~12-month SOFR range accrual note — earn an enhanced ~7.5% p.a. coupon (vs ~4.0% on cash) for each day SOFR fixes inside a 3.50–4.25% band; you are paid to hold the view that the hawkish June hold keeps the front end range-bound at elevated levels, forgoing the coupon on any day the rate fixes outside the band.",
+      "intent": "income",
+      "action": "Generate income",
+      "preferredExpression": "Range accrual note",
+      "name": "SOFR range accrual",
+      "ticker": "SOFR",
+      "sector": "Rates",
+      "assetClass": "Fixed Income",
+      "bucket": "Income",
+      "goalType": "yield",
+      "riskProfile": { "vol": "low", "beta": "low", "structured": true },
+      "naturalExpression": "Range accrual note",
+      "trigger": "Yesterday's hawkish FOMC hold (Warsh's first meeting, dot-plot up, cuts pushed toward 2027) pins the front end range-bound at elevated levels — exactly the regime a range accrual is paid to harvest.",
+      "headline": "The hawkish hold pins the front end — get paid an enhanced coupon to hold the range",
+      "thesis": "The FOMC held at 3.50-3.75% on 17 June, but the June dots turned hawkish in Warsh's first meeting — the median now implies a possible hike, no cuts in 2026, and the easing cycle pushed into 2027 on a 4.2% energy-driven CPI. With the policy rate anchored and cuts pushed out, the front end is set to stay range-bound at elevated levels — the ideal regime for a range accrual. A 12-month SOFR range accrual pays an enhanced ~7.5% p.a. coupon (vs ~4.0% on cash) for each day SOFR fixes inside a 3.50–4.25% band: you are effectively paid to hold the higher-for-longer view, with the coupon forgone only on days the rate breaks out. Capital is returned at par at maturity (issuer credit aside) — income for a book that wants more than cash without taking duration or equity risk.",
+      "themeId": "duration",
+      "offThemeWhy": null,
+      "structures": ["Range accrual note", "Reverse convertible", "Current-coupon ladder", "T-bill / muni ladder"],
+      "variant": { "street": "Higher-for-longer keeps the front end anchored; cash and bills are the default income parking spot", "us": "Don't just park in cash — monetise the range: a range accrual pays ~7.5% vs ~4% for the same range-bound view", "gap": "The market under-pays for selling front-end rate-range optionality when the Fed has explicitly pinned the path" },
+      "changeMyMind": "A clear break in the data — inflation rolling over (pulling the first cut forward) or an actual hawkish hike — that drives SOFR out of the 3.50–4.25% band and zeros the accrual.",
+      "conviction": {
+        "pillars": [
+          { "key": "asymmetry", "score": 1, "dq": "estimated", "note": "An enhanced coupon (~7.5% vs ~4% cash) for a range-bound view — a steady carry pickup with capped, income-style upside rather than a large directional move." },
+          { "key": "catalyst", "score": 2, "dq": "sourced", "note": "Dated, landed catalyst — the 17 Jun FOMC hawkish hold (dots up, cuts to 2027) that pins the front-end range." },
+          { "key": "consensus", "score": 1, "dq": "estimated", "note": "The higher-for-longer / range-bound front-end read is broadly shared, but the precise band and the coupon edge are an estimated structuring call." },
+          { "key": "thesis", "score": 2, "dq": "sourced", "note": "Quantified, sourced drivers (held 3.50-3.75%, hawkish dots, cuts to 2027, 4.2% CPI) and a clear variant: monetise the pinned range rather than sit in cash." },
+          { "key": "houseview", "score": 2, "dq": "sourced", "note": "Core Fixed Income / income house view — paid carry from a range-bound front end, no duration or equity risk." },
+          { "key": "positioning", "score": 1, "dq": "estimated", "note": "The crowd is parked in cash and bills; selling front-end rate-range optionality for an enhanced coupon is the contrarian-leaning income move." },
+          { "key": "technical", "score": 1, "dq": "estimated", "note": "SOFR fixing in the upper part of the policy band and coiled after the hold — consistent with a pinned range, the accrual's friend." }
+        ]
+      },
+      "macro": {
+        "metric": "FOMC held 3.50-3.75%; hawkish dots, cuts to 2027",
+        "detail": "12-month SOFR range accrual: ~3.50–4.25% band, ~7.5% p.a. enhanced coupon vs ~4.0% on cash, A-rated issuer, capital at par. Coupon accrues daily for each in-range fixing; forgone on out-of-range days.",
+        "source": "sourced",
+        "watch": "The 14 Jul CPI and the 29-30 Jul FOMC — a hike or cut surprise that breaks SOFR out of the band and zeros the accrual."
+      },
+      "facts": [
+        { "text": "FOMC held at 3.50-3.75% on 17 June (Warsh's first meeting as Chair) — fourth consecutive hold", "tag": "sourced" },
+        { "text": "The June dot plot turned hawkish: median end-2026 ~3.8%, implying a possible hike and no cuts in 2026; easing pushed to 2027", "tag": "sourced" },
+        { "text": "SOFR fixing in the upper part of the 3.50-3.75% policy band with the front end range-bound after the hold", "tag": "estimated" }
+      ],
+      "sources": [
+        { "name": "Federal Reserve / FOMC", "kind": "data" },
+        { "name": "CNBC / Reuters", "kind": "news" }
+      ]
+    },
+    {
       "id": "energy-tactical",
       "tradeStatement": "Long energy majors (XOM / SHEL) — a tactical hedge that the Hormuz risk premium is underpriced after Brent fell to ~$79; a bet on a re-escalation tail, held in income-paying majors, not a structural oil-bull call.",
       "intent": "income",

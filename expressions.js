@@ -97,6 +97,19 @@
       context: (u) => `On ${u.index}: e.g. a 12-month ACM+ on ${u.ticker} — 80% barrier, rich quarterly coupon, autocall at the start level — a packaged way to monetise the ${u.name} view without holding the stock outright.`
     },
 
+    "range-accrual": {
+      label: "Range accrual note",
+      what: "A packaged senior bank note that pays an enhanced coupon for each day a reference rate (SOFR / the policy rate) fixes INSIDE a defined band — income for a range-bound-rates view.",
+      mechanics: "An unsecured senior note (an ISIN you book like a bond) whose coupon accrues only on days the reference rate fixes within a set band: coupon ≈ (max rate) × (days in range ÷ total days). You are effectively short rate-volatility — paid an above-cash coupon to hold the view that the front end stays range-bound, forgoing the coupon on out-of-range days. Capital is typically returned at par at maturity (issuer credit risk aside). Because it's a packaged SECURITY, a MiFID Retail client can hold it (unlike an OTC rates option) — it's complex, so the appropriateness test still applies.",
+      underlying: "An interest-rate reference — overnight SOFR or the policy-rate band — with an upper/lower accrual barrier.",
+      tenor: "6–18 months. Short enough to re-strike the band as the rate path evolves, long enough to bank a meaningful enhanced-coupon pickup over cash.",
+      example: "12-month SOFR range accrual: ~7.5% p.a. coupon accrued daily for each day SOFR fixes in 3.50–4.25%, ~4.0% on cash, A-rated issuer, capital returned at par — paid to hold the range-bound-front-end view.",
+      pros: ["Enhanced coupon well above cash while rates stay range-bound", "Packaged security — Retail eligible (it is not an OTC derivative)", "Defined, rules-based payoff you can show the client"],
+      cons: ["Coupon forgone on any day the rate fixes OUTSIDE the band", "Issuer credit risk (unsecured bank note); illiquid to maturity", "A breakout (Fed hike/cut surprise) can zero the coupon while you stay locked in"],
+      whenToUse: "An income book that wants an above-cash coupon and shares the view that a hawkish-hold Fed keeps the front end range-bound at elevated levels.",
+      context: (u) => `On SOFR / the policy band: e.g. a 12-month note paying an enhanced coupon for each day the rate fixes inside the band — monetising a range-bound front end.`
+    },
+
     "buffered-note": {
       label: "Buffered note",
       what: "A structured note that participates in the upside with a soft floor — the desk's go-to loss-repair / protected re-entry structure.",
@@ -825,6 +838,7 @@
     if (has("fx") && (has("put") || has("call") || has("option"))) return "fx-option";
     if (has("collar")) return "zero-cost-collar";
     if (has("halo")) return "halo-basket";
+    if (has("range accrual") || has("accrual")) return "range-accrual";
     if (has("buffer")) return "buffered-note";
     if (has("reverse convertible") || has("revcon") || has("fcn")) return "reverse-convertible";
     if (has("capital-protected") || has("capital protected") || has("cpn")) return "capital-protected-note";
@@ -884,7 +898,7 @@
   /* MiFID class by canonical id — structured products are Retail-eligible
      packaged securities; OTC derivatives are not; private = qualified-investor. */
   const STRUCTURED_IDS = ["structured-note", "buffered-note", "phoenix-autocall", "leveraged-certificate",
-    "halo-basket", "reverse-convertible", "capital-protected-note"];
+    "halo-basket", "reverse-convertible", "capital-protected-note", "range-accrual"];
   const OTC_IDS = ["call-overwrite", "zero-cost-collar", "gold-accumulator", "fx-forward-collar",
     "prepaid-variable-forward", "protective-put", "cash-secured-puts", "call-spread", "dual-currency-deposit",
     "fx-option", "fx-option-spread", "fx-risk-reversal", "fx-strangle"];
@@ -952,7 +966,8 @@
     "utility-basket": () => `An 8-name load-growth utility basket (~5–8% of book) yielding ~3% with rate-base growth, or an XLU-type core.`,
     "thematic-basket": (u) => `A curated 8–15 name basket across the ${u.name} value chain, equal-weighted into a single ~5–7% sleeve.`,
     "halo-basket": () => `Equal-weight ACM+ on CEG / MP Materials / CAT: 24% p.a. USD coupon while the basket ≥80%, autocall at ≥100%, 1-year — a ~$2–3m clip.`,
-    "reverse-convertible": (u) => `6-month RevCon on ${u.ticker}: 75% knock-in, ~10–12% p.a. coupon — keep coupon + capital unless it ends >25% down, in which case you own ${u.ticker} at the strike.`
+    "reverse-convertible": (u) => `6-month RevCon on ${u.ticker}: 75% knock-in, ~10–12% p.a. coupon — keep coupon + capital unless it ends >25% down, in which case you own ${u.ticker} at the strike.`,
+    "range-accrual": () => `12-month SOFR range accrual: ~7.5% p.a. coupon accrued daily for each day SOFR fixes inside 3.50–4.25% (vs ~4.0% on cash), A-rated issuer, capital at par — paid to hold the range-bound-front-end view; coupon forgone on out-of-range days.`
   };
   function exampleFor(id, u, ctx) {
     const b = EXAMPLE_BUILDERS[id];
@@ -1083,11 +1098,12 @@
     "diversifiers": { g: 0, i: 0, p: 2 }, "extend-duration": { g: 0, i: 2, p: 1 }, "listed-infrastructure": { g: 1, i: 2, p: 1 },
     "phoenix-autocall": { g: 1, i: 2, p: 0 }, "call-spread": { g: 2, i: 0, p: 0 }, "leveraged-certificate": { g: 2, i: 0, p: 0 },
     "halo-basket": { g: 1, i: 2, p: 0 }, "reverse-convertible": { g: 0, i: 2, p: 0 }, "capital-protected-note": { g: 1, i: 0, p: 2 },
+    "range-accrual": { g: 0, i: 2, p: 1 },
     "fx-forward-collar": { g: 0, i: 1, p: 2 }, "currency-hedged-sleeve": { g: 0, i: 0, p: 2 }, "dual-currency-deposit": { g: 0, i: 2, p: 0 },
     "fx-option": { g: 2, i: 0, p: 1 }, "fx-option-spread": { g: 2, i: 0, p: 0 }, "fx-risk-reversal": { g: 2, i: 0, p: 0 }, "fx-strangle": { g: 2, i: 0, p: 1 }
   };
   const PF_PROTECTIVE = new Set(["capital-protected-note", "zero-cost-collar", "buffered-note", "protective-put", "prepaid-variable-forward", "fx-forward-collar", "currency-hedged-sleeve"]);
-  const PF_COUPON = new Set(["phoenix-autocall", "reverse-convertible", "halo-basket", "call-overwrite", "dual-currency-deposit"]);
+  const PF_COUPON = new Set(["phoenix-autocall", "reverse-convertible", "halo-basket", "call-overwrite", "dual-currency-deposit", "range-accrual"]);
   const PF_DIRECTIONAL = new Set(["direct-equity", "thematic-basket", "equal-weight-index", "leveraged-certificate", "call-spread", "index-core", "fx-option", "fx-option-spread", "fx-risk-reversal"]);
   /* raw profile score (0..~2.3) for a canonical id + small style bonus (protective for
      preservation, coupon for income, directional for growth) to sharpen ties. */
