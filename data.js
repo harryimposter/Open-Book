@@ -152,10 +152,10 @@ const SEED_IDEAS = [
 
   /* ---- Structured Outcomes ---- */
   {
-    id: "halo-acm", themeId: "structured", intent: "income", title: "HALO worst-of autocall — CEG · MP Materials · CAT",
+    id: "halo-acm", themeId: "structured", intent: "income", title: "HALO equal-weight basket autocall — CEG · MP Materials · CAT",
     type: "Opportunistic", assetClass: "Structured", sector: "Broad", bucket: "Structured",
     conviction: "High", horizon: "12m",
-    thesis: "The desk's flagship note: an Autocall Market Plus (ACM+) on the worst-of Constellation Energy, MP Materials and Caterpillar, equally weighted. It pays a fixed 24% p.a. coupon in USD while all three hold above 80% of their start level, and autocalls early if they rally. Three different drivers — power, rare-earth materials and industrials — fund the rich coupon, with a 20% cushion before any capital is at risk. A packaged note Retail can hold.",
+    thesis: "The desk's flagship note: an Autocall Market Plus (ACM+) on an equally-weighted basket of Constellation Energy, MP Materials and Caterpillar — one-third each. It pays a fixed 24% p.a. coupon in USD while the basket holds above 80% of its start level, and autocalls early if it rallies. Three different drivers — power, rare-earth materials and industrials — combine into one volatile basket that funds the rich coupon, with a 20% cushion before any capital is at risk. A packaged note Retail can hold.",
     structures: ["HALO basket (ACM+)", "Phoenix autocall", "Reverse convertible", "Capital-protected note"]
   },
   {

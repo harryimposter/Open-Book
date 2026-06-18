@@ -597,7 +597,7 @@
       mechanics: "An Autocall Market Plus (ACM+) / Phoenix note on a single name or worst-of basket. On each observation it pays a fixed coupon if the underlying is above the coupon barrier (e.g. 70–80%); if it's at/above the autocall level (usually the start level) the note redeems early at par + coupon. At maturity capital is returned in full unless the underlying is below the capital barrier (e.g. 65–80%), where you take the loss. 'Phoenix / memory' means missed coupons are recovered once the barrier is regained.",
       underlying: "A single stock or worst-of basket of names you'd be happy to own — ideally range-bound to firm.",
       tenor: "12 months with quarterly observations. Why: a year banks a meaningful coupon and the quarterly autocall gives four early-exit chances; you re-underwrite the names annually rather than locking in for years.",
-      example: "Recommended on a constructive single name: 1-year ACM+, 80% capital barrier, ~12–16% p.a. coupon (memory) paid quarterly while above 80%, autocall at ≥100% on any quarterly observation. Worst-of baskets pay far more (see the HALO basket).",
+      example: "Recommended on a constructive single name: 1-year ACM+, 80% capital barrier, ~12–16% p.a. coupon (memory) paid quarterly while above 80%, autocall at ≥100% on any quarterly observation. Multi-name baskets pay more (see the HALO basket).",
       pros: ["High contractual income on a flat/range-bound view", "Soft barrier (e.g. 80%) gives a cushion before capital is at risk", "Early autocall frees capital; packaged security — Retail eligible"],
       cons: ["Capital at risk below the barrier (worst-of is more so)", "Upside capped at the coupons — no equity participation", "Issuer credit risk; hold to call/maturity"],
       whenToUse: "Generating yield on names or baskets you expect to trade sideways-to-up within a band — not for a strongly directional view.",
@@ -632,15 +632,15 @@
 
     "halo-basket": {
       label: "HALO basket (ACM+)",
-      what: "The desk's flagship structured note: a high-coupon worst-of autocall on Constellation Energy, MP Materials and Caterpillar.",
-      mechanics: "An Autocall Market Plus (ACM+) referencing the WORST performer of three equally-weighted names — CEG (power), MP Materials (rare-earth materials) and CAT (industrials). It pays a fixed 24% p.a. coupon in USD on each observation while all three sit above 80% of their start level, and autocalls (redeems early at par + coupon) if the worst-of is back at/above its start level on an observation date. At maturity capital is returned in full unless the worst-of closes below the 80% barrier, in which case you're delivered that stock (or its cash loss). The cross-name dispersion of three different drivers is what funds the rich coupon.",
-      underlying: "Worst-of CEG · MP Materials · CAT, equally weighted, USD.",
+      what: "The desk's flagship structured note: a high-coupon autocall on an equally-weighted basket of Constellation Energy, MP Materials and Caterpillar.",
+      mechanics: "An Autocall Market Plus (ACM+) referencing an equally-weighted basket of three names — CEG (power), MP Materials (rare-earth materials) and CAT (industrials), one-third each. It pays a fixed 24% p.a. coupon in USD on each observation while the basket sits above 80% of its start level, and autocalls (redeems early at par + coupon) if the basket is back at/above its start level on an observation date. At maturity capital is returned in full unless the basket closes below the 80% barrier, in which case you take the basket's loss. The combined volatility of three high-beta names with different drivers is what funds the rich coupon.",
+      underlying: "Equally-weighted basket of CEG · MP Materials · CAT (one-third each), USD.",
       tenor: "12 months, quarterly autocall observations. Why: long enough to bank a serious coupon, short enough to re-underwrite three fast-moving names each year.",
-      example: "Equal-weight worst-of ACM+: 24% p.a. coupon (≈6%/quarter) paid while all three ≥80% of strike; autocall at ≥100% of the worst-of on any quarterly observation; 80% capital barrier at maturity with memory coupon. A ~$2–3m clip as the core of the structured-notes sleeve.",
+      example: "Equal-weight basket ACM+: 24% p.a. coupon (≈6%/quarter) paid while the basket ≥80% of strike; autocall at ≥100% of the basket on any quarterly observation; 80% capital barrier at maturity with memory coupon. A ~$2–3m clip as the core of the structured-notes sleeve.",
       pros: ["Very high 24% USD coupon vs a single-name autocall", "20% cushion before any capital is at risk; memory coupon", "Packaged note — MiFID Retail eligible (it is not OTC)", "Early autocall frees capital to redeploy"],
-      cons: ["Worst-of: your payoff tracks the WEAKEST of the three names", "Capital at risk if any one name falls more than 20%", "Coupon-capped — no equity upside beyond the 24%", "Issuer credit risk; hold to call/maturity"],
-      whenToUse: "Books under their structured-notes target wanting high contractual USD income, who'd be comfortable owning CEG, MP Materials or CAT at a 20% discount if put to them.",
-      context: (u) => `Sits in the structured-notes sleeve: 24% p.a. USD coupon on the worst-of CEG / MP Materials / CAT, 80% barrier, 1-year — a high-income complement to the ${u.name} exposure.`
+      cons: ["Capital at risk if the equally-weighted basket ends more than 20% down", "Three high-beta names — the basket can move sharply", "Coupon-capped — no equity upside beyond the 24%", "Issuer credit risk; hold to call/maturity"],
+      whenToUse: "Books under their structured-notes target wanting high contractual USD income, comfortable with a 20% cushion on an equally-weighted basket of CEG, MP Materials and CAT.",
+      context: (u) => `Sits in the structured-notes sleeve: 24% p.a. USD coupon on an equally-weighted basket of CEG / MP Materials / CAT, 80% barrier, 1-year — a high-income complement to the ${u.name} exposure.`
     },
 
     "reverse-convertible": {
