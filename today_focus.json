@@ -9,6 +9,7 @@
   "earnings": [
     {
       "id": "mu-fq3",
+      "stance": "pre-position",
       "tradeStatement": "Long Micron (MU) into the 24-Jun FQ3 print — bullish on HBM / AI-memory pricing into 2027 — but expressed with a structure (autocall or collar), not naked stock, given the rich implied move.",
       "intent": "protect",
       "name": "Micron Technology",
@@ -53,6 +54,7 @@
     },
     {
       "id": "fdx-fq4",
+      "stance": "pre-position",
       "tradeStatement": "Long FedEx (FDX) into FQ4 — a bet the freight / industrial cycle is inflecting and the DRIVE cost program delivers; a global-trade read-through, not just the single stock.",
       "intent": "add",
       "name": "FedEx",
@@ -95,6 +97,7 @@
     },
     {
       "id": "nke-fq4",
+      "stance": "pre-position",
       "tradeStatement": "Long Nike (NKE) into FQ4 — a single-name turnaround bet (inventory clean-up, China, the wholesale reset), not a sector or consumer-discretionary call.",
       "intent": "add",
       "name": "Nike",
@@ -132,6 +135,106 @@
       "sources": [
         { "name": "Nasdaq", "kind": "calendar" },
         { "name": "MarketChameleon", "kind": "calendar" }
+      ]
+    },
+    {
+      "id": "orcl-q4-react",
+      "stance": "post-print",
+      "tradeStatement": "Buy the post-earnings dip in Oracle (ORCL) — a record Q4 (cloud +47%, OCI +93%, AI/RPO backlog surging) sold off ~5–7% purely on capex/funding fear ($55.7B FY26 capex vs a ~$50B guide); the reaction overshoots a thesis that is intact, so fade the drop and accumulate, with a stop below the post-print low.",
+      "intent": "add",
+      "action": "Buy the dip",
+      "preferredExpression": "Direct equity",
+      "name": "Oracle",
+      "ticker": "ORCL",
+      "sector": "Technology",
+      "assetClass": "Equity",
+      "bucket": "Growth",
+      "goalType": "appreciation",
+      "riskProfile": { "vol": "high", "beta": "high", "structured": false },
+      "naturalExpression": "Direct equity",
+      "headline": "Oracle beat a record quarter — and fell ~5–7% on capex fear. The dip looks buyable.",
+      "thesis": "Oracle reported Q4 FY26 on 10 June: record revenue $19.2B (+21%), total cloud $9.9B (+47%) and OCI/IaaS $5.8B (+93%), with non-GAAP EPS $2.11 beating ~$1.89 and FY27 revenue guided to ~$90B on a surging AI/RPO backlog. The stock still fell ~5–7% — entirely on the funding of that growth: FY26 capex hit $55.7B (above the ~$50B guide) and gross margins dipped as data centres ramp. That is a price-reaction, not a thesis break: the capex IS the backlog. Play the post-print overshoot — buy the first-day dip and accumulate, stop below the reaction low; the risk is that AI-capex doubt persists and compresses the multiple further.",
+      "themeId": "ai",
+      "offThemeWhy": null,
+      "structures": ["Direct equity", "Buffered note", "Call spread"],
+      "variant": { "street": "Analysts raised price targets on the record cloud/RPO print despite the selloff", "us": "The capex-driven drop overshoots — accumulate the dip; the buildout funds the backlog", "gap": "Market is pricing capex as cost, not as the contracted-revenue engine it backs" },
+      "changeMyMind": "Evidence the AI-capex isn't converting — RPO/bookings stalling or OCI gross margins deteriorating further rather than ramping — would turn the dip into a value trap.",
+      "conviction": {
+        "pillars": [
+          { "key": "asymmetry", "score": 1, "dq": "estimated", "note": "A ~5–7% drop on a record beat is a real dip-buy edge, but not a clean misprice — the capex concern is legitimate." },
+          { "key": "consensus", "score": 2, "dq": "sourced", "note": "Sell-side raised price targets after the print; the cloud/RPO trajectory is broadly endorsed." },
+          { "key": "catalyst", "score": 2, "dq": "sourced", "note": "Dated, just-landed reaction (10 Jun) — a record print sold off, the classic post-print overshoot setup." },
+          { "key": "positioning", "score": 1, "dq": "estimated", "note": "A 5–7% flush clears some weak longs, but AI-capex skeptics remain an overhang — not a washout." }
+        ]
+      },
+      "earnings": {
+        "reportDate": "2026-06-10",
+        "reportWhen": "after close",
+        "result": "Beat — record Q4 revenue $19.2B (+21%), total cloud $9.9B (+47%), OCI $5.8B (+93%); non-GAAP EPS $2.11 vs ~$1.89 est; FY27 revenue guided ~$90B",
+        "resultSource": "sourced",
+        "reaction": "Shares fell ~5–7% after the print despite the beat — FY26 capex $55.7B (above the ~$50B guide) and margin/funding concerns",
+        "reactionSource": "sourced",
+        "watch": "OCI backlog/RPO conversion, the capex trajectory and whether gross margins recover as data centres ramp."
+      },
+      "facts": [
+        { "text": "Oracle reported Q4 FY26 on 10 Jun 2026: record revenue $19.2B (+21%), total cloud $9.9B (+47%), OCI/IaaS $5.8B (+93%)", "tag": "sourced" },
+        { "text": "Non-GAAP EPS $2.11 beat consensus ~$1.89; FY27 revenue guided ~$90B with Q1 FY27 cloud +57–63% in constant currency", "tag": "sourced" },
+        { "text": "Shares fell ~5–7% after the print on FY26 capex of $55.7B (above the ~$50B guide) and margin concerns", "tag": "sourced" }
+      ],
+      "sources": [
+        { "name": "Reuters / CNBC", "kind": "news" },
+        { "name": "Oracle Investor Relations", "kind": "company" },
+        { "name": "Investing.com / TradingKey", "kind": "analysis" }
+      ]
+    },
+    {
+      "id": "adbe-q2-react",
+      "stance": "post-print",
+      "tradeStatement": "Don't chase Adobe (ADBE) on the post-print dip — Q2 beat with AI-first ARR tripling past $500M, but the stock fell ~5.5% on the CFO's departure layered onto the open CEO search; play the reaction cautiously with a defined-risk re-entry (buffered note, or cash-secured puts into a lower strike), not a naked add, until leadership clarity.",
+      "intent": "add",
+      "action": "Wait / defined-risk entry",
+      "preferredExpression": "Buffered note",
+      "name": "Adobe",
+      "ticker": "ADBE",
+      "sector": "Technology",
+      "assetClass": "Equity",
+      "bucket": "Growth",
+      "goalType": "appreciation",
+      "riskProfile": { "vol": "high", "beta": "high", "structured": false },
+      "naturalExpression": "Buffered note",
+      "headline": "Adobe beat and AI ARR tripled — but a CFO exit sent it down ~5.5%. Don't chase the dip.",
+      "thesis": "Adobe reported Q2 FY26 on 11 June: record revenue $6.62B (beating ~$6.46–6.58B), non-GAAP EPS $5.96 (beating ~$5.82–5.94), AI-first ARR tripled YoY past $500M, and full-year targets were raised. Yet the stock fell ~5.5% — CFO Dan Durn's departure (effective 15 June) opened a second top-seat vacancy alongside the ongoing CEO search, and the beats were modest against an elevated bar. Unlike a clean capex-overshoot dip, this selloff carries an unresolved governance overhang. Play the reaction with discipline: don't chase the relief bounce — express a defined-risk re-entry (a buffered note, or cash-secured puts struck lower to get paid to wait), and size up only once leadership clarity lands.",
+      "themeId": "ai",
+      "offThemeWhy": null,
+      "structures": ["Buffered note", "Cash-secured puts", "Direct equity"],
+      "variant": { "street": "Bulls point to tripling AI ARR and raised guidance as proof the AI monetisation is working", "us": "The operating story is fine, but a CFO+CEO vacuum is a real de-rating risk — wait, don't chase", "gap": "Market may under-price how long a dual leadership vacancy weighs on the multiple" },
+      "changeMyMind": "A credible permanent CEO/CFO appointment (removing the overhang), or AI-first ARR growth clearly re-accelerating, would turn this from wait-and-see into an add.",
+      "conviction": {
+        "pillars": [
+          { "key": "asymmetry", "score": 1, "dq": "estimated", "note": "Beat but sold off — the dip is tempting, yet the leadership overhang caps the clean-misprice case." },
+          { "key": "consensus", "score": 1, "dq": "estimated", "note": "Sell-side constructive on AI ARR, but the beat was modest vs a high bar and the management vacuum splits views." },
+          { "key": "catalyst", "score": 2, "dq": "sourced", "note": "Dated, just-landed reaction (11 Jun) — a beat overshadowed by the CFO exit; a clear post-print setup." },
+          { "key": "positioning", "score": 1, "dq": "estimated", "note": "The leadership vacuum is unresolved — not a washed-out, contrarian-buy setup." }
+        ]
+      },
+      "earnings": {
+        "reportDate": "2026-06-11",
+        "reportWhen": "after close",
+        "result": "Beat — record revenue $6.62B (vs ~$6.46–6.58B), non-GAAP EPS $5.96 (vs ~$5.82–5.94); AI-first ARR tripled YoY past $500M; FY targets raised",
+        "resultSource": "sourced",
+        "reaction": "Shares fell ~5.5% after-hours — CFO Dan Durn's exit (effective 15 Jun) atop the open CEO search; beats modest vs a high bar",
+        "reactionSource": "sourced",
+        "watch": "Leadership clarity (permanent CFO/CEO), AI-first ARR durability, and whether the de-rating finds support."
+      },
+      "facts": [
+        { "text": "Adobe reported Q2 FY26 on 11 Jun 2026: record revenue $6.62B (beat ~$6.46–6.58B), non-GAAP EPS $5.96 (beat ~$5.82–5.94)", "tag": "sourced" },
+        { "text": "AI-first ARR tripled YoY to over $500M; full-year revenue and EPS targets were raised", "tag": "sourced" },
+        { "text": "Shares fell ~5.5% after-hours on CFO Dan Durn's departure (effective 15 Jun) atop the CEO search, with beats modest vs elevated expectations", "tag": "sourced" }
+      ],
+      "sources": [
+        { "name": "Adobe Investor Relations (8-K)", "kind": "company" },
+        { "name": "Business Wire", "kind": "news" },
+        { "name": "TechTimes / Investing.com", "kind": "analysis" }
       ]
     }
   ],

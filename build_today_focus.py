@@ -28,6 +28,13 @@ COVERAGE SPEC (what every sweep MUST span — not just US equity/earnings):
   at least one idea tagged sector "FX", and at least one rates idea (sector "Rates"
   or assetClass "Fixed Income"). The coverage check below WARNS when either is absent.
 
+  EARNINGS must include BOTH stances:
+    - "pre-position" — enter INTO the print (report date in the FUTURE);
+    - "post-print"   — play the REACTION of a name that has ALREADY reported (report
+      date in the PAST), with the actual result stated as a VERIFIED, sourced fact
+      (earnings.result + resultSource="sourced") — never fabricated numbers.
+  The coverage check WARNS if either stance is missing; the date check is stance-aware.
+
 This script also VALIDATES the payload (prints warnings, never silently passes):
   - every idea cites >=2 sources;
   - every idea carries a tradeStatement (one precise sentence: instrument + direction
@@ -108,6 +115,10 @@ def tier_for(score, rubric):
 # Each idea declares an intent so the mapping engine can read concentration + P&L
 # through the right lens. Mirrors defaultIntent() in mapping.js for the fallback.
 ALLOWED_INTENTS = ("add", "protect", "trim", "income")
+
+# Earnings STANCE — pre-position (enter into the print) or post-print (play the
+# already-reported reaction, Shark-Tank style). Required on every earnings idea.
+ALLOWED_STANCES = ("pre-position", "post-print")
 
 
 def default_intent(idea):
@@ -200,14 +211,29 @@ def validate(idea, as_of, warns):
     for f in idea.get("facts", []):
         if f.get("tag") not in ("sourced", "estimated"):
             warns.append(f"{idea['id']}: fact not tagged sourced/estimated -> {f.get('text','')[:50]}")
-    e = idea.get("earnings")
-    if e and e.get("reportDate"):
-        try:
-            d = datetime.date.fromisoformat(e["reportDate"])
-            if d < as_of:
-                warns.append(f"{idea['id']}: report date {e['reportDate']} is BEFORE asOf {as_of} — a forward event must stay future-tense")
-        except ValueError:
-            warns.append(f"{idea['id']}: bad reportDate {e['reportDate']}")
+    # earnings-stance-aware date check. pre-position (into the print) → report must be
+    # in the FUTURE (a forward event can't be described as already happened). post-print
+    # (play the reaction) → report must be in the PAST, AND its result must be stated as
+    # a VERIFIED, sourced fact (no fabricated/unverified numbers).
+    if idea.get("kind") == "earnings":
+        stance = idea.get("stance")
+        if stance not in ALLOWED_STANCES:
+            warns.append(f"{idea['id']}: earnings idea needs a stance in {ALLOWED_STANCES} (pre-position into the print, or post-print reaction)")
+        e = idea.get("earnings") or {}
+        rd = e.get("reportDate")
+        if rd:
+            try:
+                d = datetime.date.fromisoformat(rd)
+                if stance == "post-print":
+                    if d >= as_of:
+                        warns.append(f"{idea['id']}: stance=post-print but report date {rd} is not before asOf {as_of} — a reaction idea needs a report that has already happened")
+                    if not (e.get("result") and e.get("resultSource") == "sourced"):
+                        warns.append(f"{idea['id']}: post-print needs earnings.result stated as a VERIFIED fact (resultSource='sourced') — no fabricated/unverified results")
+                else:  # pre-position (or unset)
+                    if d < as_of:
+                        warns.append(f"{idea['id']}: report date {rd} is BEFORE asOf {as_of} — a forward (pre-position) event must stay future-tense (or set stance='post-print')")
+            except ValueError:
+                warns.append(f"{idea['id']}: bad reportDate {rd}")
 
 
 # ---- Coverage spec: every sweep must span all asset classes / global markets -----
@@ -228,6 +254,15 @@ def check_coverage(data, warns):
         warns.append("COVERAGE: no FX idea in this sweep — every run must include FX (sector 'FX').")
     if not has_rates:
         warns.append("COVERAGE: no rates idea — every run must include rates (sector 'Rates' or assetClass 'Fixed Income').")
+    # earnings book must carry BOTH stances: pre-print (into the report) and post-print
+    # (play the already-reported reaction). Don't ship an all-upcoming or all-reacted board.
+    earnings = data.get("earnings", [])
+    if earnings:
+        stances = {i.get("stance") for i in earnings}
+        if "pre-position" not in stances:
+            warns.append("COVERAGE: no PRE-print (pre-position) earnings idea — include both pre- and post-print.")
+        if "post-print" not in stances:
+            warns.append("COVERAGE: no POST-print (reaction) earnings idea — include both pre- and post-print.")
     return has_fx and has_rates
 
 

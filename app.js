@@ -270,6 +270,13 @@
     return `Long ${inst}${tail}.`;
   }
   // FEATURE 1 — the Recommendation block (placed above conviction in every drawer)
+  /* PRE-PRINT / POST-PRINT earnings-stance chip (earnings ideas only). */
+  function stanceTag(idea) {
+    const s = idea && idea.stance;
+    if (s === "post-print") return `<span class="stance-tag post" title="The name has already reported — play the post-print reaction">POST-PRINT</span>`;
+    if (s === "pre-position") return `<span class="stance-tag pre" title="Position before the report — the print is still ahead">PRE-PRINT</span>`;
+    return "";
+  }
   function recommendationHTML(idea) {
     const structs = (idea.structures || []).filter(Boolean);
     if (!structs.length) return "";
@@ -281,7 +288,7 @@
       .map(([lbl, p]) => { const b = bestExpr(structs, p, null); return b ? `<b>${esc(lbl)}</b> ${esc(exprLabel(b))}` : null; })
       .filter(Boolean).join(" · ");
     return `<div class="drawer-section rec-block">
-      <span class="eyebrow">Recommendation</span>
+      <span class="eyebrow">Recommendation</span>${stanceTag(idea)}
       ${trade ? `<div class="rec-trade">${esc(trade)}</div>` : ""}
       <div class="rec-line"><span class="rec-k">Action</span><span class="rec-v"><span class="rec-action">${esc(action)}</span></span></div>
       ${pref ? `<div class="rec-line"><span class="rec-k">Preferred</span><span class="rec-v">${esc(exprLabel(pref))}${why ? ` <span class="rec-why">— ${esc(why)}</span>` : ""}</span></div>` : ""}
@@ -1244,7 +1251,17 @@
 
   function earningsIntelHTML(idea) {
     const e = idea.earnings; if (!e) return "";
-    const vsCls = /rich/.test(e.impliedVsHist) ? "rich" : /cheap/.test(e.impliedVsHist) ? "cheap" : "";
+    // POST-PRINT: the name has already reported — show the verified result + the reaction
+    if (idea.stance === "post-print" || e.result) {
+      return `<div class="fc-intel">
+        <div class="intel-cell"><div class="ic-k">Reported</div><div class="ic-v">${fmtFocusDate(e.reportDate)} · ${esc(e.reportWhen || "")}</div></div>
+        <div class="intel-cell intel-wide"><div class="ic-k">Result ${srcFlag(e.resultSource)}</div><div class="ic-v">${esc(e.result || "")}</div></div>
+        <div class="intel-cell intel-wide"><div class="ic-k">Reaction ${srcFlag(e.reactionSource)}</div><div class="ic-v">${esc(e.reaction || "")}</div></div>
+      </div>
+      ${e.watch ? `<div class="fc-watch"><b>What to watch:</b> ${esc(e.watch)}</div>` : ""}`;
+    }
+    // PRE-PRINT: the print is still ahead — show implied vs realised move
+    const vsCls = /rich/.test(e.impliedVsHist || "") ? "rich" : /cheap/.test(e.impliedVsHist || "") ? "cheap" : "";
     return `<div class="fc-intel">
       <div class="intel-cell"><div class="ic-k">Reports</div><div class="ic-v">${fmtFocusDate(e.reportDate)} · ${esc(e.reportWhen)}</div></div>
       <div class="intel-cell"><div class="ic-k">Implied move ${srcFlag(e.impliedSource)}</div><div class="ic-v">±${e.impliedMovePct}%</div></div>
@@ -1295,6 +1312,7 @@
       </div>
       <div class="ft-tags">
         <span class="fc-tag ${idea.kind === "earnings" ? "earn" : "macro"}">${idea.kind === "earnings" ? "Earnings" : "Ex-earnings"}</span>
+        ${stanceTag(idea)}
         ${idea.themeId ? `<span class="fc-tag theme nolink">${esc(theme ? theme.name : "House view")}</span>` : `<span class="fc-tag offtheme">Off-theme</span>`}
         ${rightChip}
       </div>

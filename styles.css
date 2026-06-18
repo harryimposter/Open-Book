@@ -314,6 +314,14 @@ button { font-family: inherit; cursor: pointer; }
 .cap-sel { font-size: 12.5px; padding: 5px 8px; border: 1px solid var(--line-strong); border-radius: 6px; background: var(--paper); }
 .cap-add-btn { font-size: 12px; padding: 5px 11px; }
 .cap-reset { margin-top: 13px; font-size: 12px; }
+
+/* ===== earnings stance chip (PRE-PRINT / POST-PRINT) ===== */
+.stance-tag { display: inline-block; font-size: 9.5px; font-weight: 700; letter-spacing: .07em;
+  text-transform: uppercase; padding: 2px 7px; border-radius: 20px; vertical-align: middle; }
+.stance-tag.pre { background: #EEF1F5; color: #4A5A6B; border: 1px solid #D4DCE5; }
+.stance-tag.post { background: #F3ECF7; color: #6B4A86; border: 1px solid #DDCBE8; }
+.rec-block .stance-tag { margin-left: 8px; }
+.intel-cell.intel-wide { grid-column: 1 / -1; }
 .struct-row { display: flex; flex-wrap: wrap; gap: 7px; }
 .struct-chip {
   font-size: 12px; background: var(--paper); border: 1px solid var(--line-strong);
