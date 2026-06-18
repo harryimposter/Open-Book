@@ -309,14 +309,14 @@
         : `${bucket} bucket ${cur}% vs goal ${tgt}% → ${Math.round(score)}% headroom toward the goal.`;
       return { score, note };
     }
-    // fallback: no goal target for this bucket → sector headroom to the mandate comfort peg
+    // fallback: no goal target for this bucket → sector headroom to the asset's comfort limit
     const cur = ctx.sectorExp;
     const peg = sectorPeg(client, idea.sector);
-    const mc = mandateClass(client);
+    const assetBucket = sectorBucket(idea.sector);
     const score = peg > 0 ? Math.max(0, (peg - cur) / peg * 100) : 0;
     const note = cur >= peg
-      ? `${cur}% in ${idea.sector} vs the ${mc}-mandate comfort ${peg}% — at/over, no headroom.`
-      : `${cur}% in ${idea.sector} vs the ${mc}-mandate comfort ${peg}% → ${Math.round(score)}% headroom.`;
+      ? `${cur}% in ${idea.sector} vs the ${assetBucket} comfort limit ${peg}% — at/over, no headroom.`
+      : `${cur}% in ${idea.sector} vs the ${assetBucket} comfort limit ${peg}% → ${Math.round(score)}% headroom.`;
     return { score, note };
   }
 

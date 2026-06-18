@@ -96,6 +96,123 @@
   const convClass = (c) => "conv-" + String(c).toLowerCase().replace(/[^a-z]/g, "");
   const fmtAum = (c) => (c.ccy === "EUR" ? "€" : c.ccy === "GBP" ? "£" : "$") + c.aum.toFixed(1) + "m";
   function avatar(name, cls = "") { return `<span class="avatar ${cls}" title="${esc(name)}">${esc(initials(name))}</span>`; }
+
+  /* ===================== recommendation + best-implementation engine =========
+     Reusable, data-driven. Picks the single best expression for a goal profile
+     (growth | income | preservation) from an idea's own `structures`, honouring
+     per-client tradability (MiFID). Drives (1) the drawer "Recommendation" block
+     and (2) the per-client "Best for {client}" tag. No scoring/engine changes. */
+  const XP = () => window.EXPRESSIONS;
+  function exprId(s) { try { return XP().resolve(s); } catch (e) { return null; } }
+  function exprLabel(s) { try { return XP().get(s).label || String(s); } catch (e) { return String(s); } }
+  function exprCls(s) { try { return XP().detail(s, {}).cls; } catch (e) { return "non-complex"; } }
+  // a Retail client can hold structured notes + non-complex, but NOT OTC or private
+  function exprTradableFor(s, client) {
+    if (!client || client.classification !== "Retail") return true;
+    const cls = exprCls(s);
+    return cls === "structured" || cls === "non-complex";
+  }
+  /* per-expression suitability by goal profile: g/i/p in {0,1,2} (2=ideal). Unknown
+     ids fall back to neutral 1. Small style bonuses sharpen ties (a genuine collar
+     beats plain stock for preservation; an autocall beats a bond for income, etc.). */
+  const EXPR_FIT = {
+    "direct-equity": { g: 2, i: 0, p: 0 }, "index-core": { g: 2, i: 1, p: 1 }, "structured-note": { g: 1, i: 1, p: 1 },
+    "buffered-note": { g: 1, i: 0, p: 2 }, "call-overwrite": { g: 0, i: 2, p: 1 }, "utility-basket": { g: 1, i: 2, p: 1 },
+    "thematic-basket": { g: 2, i: 0, p: 0 }, "govt-ig-bonds": { g: 0, i: 2, p: 1 }, "bond-ladder": { g: 0, i: 2, p: 1 },
+    "ig-corporates": { g: 0, i: 2, p: 0 }, "securitised-sleeve": { g: 0, i: 2, p: 0 }, "equal-weight-index": { g: 2, i: 0, p: 0 },
+    "quality-basket": { g: 2, i: 0, p: 1 }, "international-etf": { g: 2, i: 0, p: 0 }, "value-basket": { g: 2, i: 1, p: 0 },
+    "infrastructure-fund": { g: 1, i: 2, p: 1 }, "private-markets": { g: 2, i: 0, p: 0 }, "reit-basket": { g: 1, i: 2, p: 0 },
+    "private-real-estate": { g: 0, i: 2, p: 1 }, "zero-cost-collar": { g: 0, i: 0, p: 2 }, "liquid-alternatives": { g: 0, i: 0, p: 2 },
+    "macro-sleeve": { g: 0, i: 0, p: 2 }, "physical-gold": { g: 1, i: 0, p: 2 }, "gold-accumulator": { g: 1, i: 1, p: 1 },
+    "fx-forward-collar": { g: 0, i: 0, p: 2 }, "currency-hedged-sleeve": { g: 0, i: 0, p: 2 }, "healthcare-basket": { g: 2, i: 0, p: 1 },
+    "prepaid-variable-forward": { g: 0, i: 1, p: 2 }, "protective-put": { g: 1, i: 0, p: 2 }, "tax-loss-harvest": { g: 1, i: 0, p: 0 },
+    "peer-rotation": { g: 1, i: 0, p: 0 }, "bond-swap": { g: 0, i: 2, p: 1 }, "current-coupon-ladder": { g: 0, i: 2, p: 1 },
+    "staged-trim": { g: 0, i: 0, p: 2 }, "tbill-ladder": { g: 0, i: 2, p: 2 }, "short-duration-bonds": { g: 0, i: 2, p: 1 },
+    "cash-secured-puts": { g: 1, i: 2, p: 0 }, "securities-backed-line": { g: 0, i: 1, p: 0 }, "diversifiers": { g: 0, i: 0, p: 2 },
+    "extend-duration": { g: 0, i: 2, p: 1 }, "listed-infrastructure": { g: 1, i: 2, p: 1 }, "phoenix-autocall": { g: 1, i: 2, p: 0 },
+    "call-spread": { g: 2, i: 0, p: 0 }, "leveraged-certificate": { g: 2, i: 0, p: 0 }, "halo-basket": { g: 1, i: 2, p: 0 },
+    "reverse-convertible": { g: 0, i: 2, p: 0 }, "capital-protected-note": { g: 1, i: 0, p: 2 }
+  };
+  const PROTECTIVE = new Set(["capital-protected-note", "zero-cost-collar", "buffered-note", "protective-put", "prepaid-variable-forward"]);
+  const COUPON = new Set(["phoenix-autocall", "reverse-convertible", "halo-basket", "call-overwrite"]);
+  const DIRECTIONAL = new Set(["direct-equity", "thematic-basket", "equal-weight-index", "leveraged-certificate", "call-spread", "index-core"]);
+  function exprScore(profile, id) {
+    const f = EXPR_FIT[id];
+    let base = f ? (profile === "growth" ? f.g : profile === "income" ? f.i : f.p) : 1;
+    if (profile === "preservation" && PROTECTIVE.has(id)) base += 0.5;
+    else if (profile === "income" && COUPON.has(id)) base += 0.3;
+    else if (profile === "growth" && DIRECTIONAL.has(id)) base += 0.3;
+    return base;
+  }
+  /* the best structure STRING for a profile, tradable for `client` if given.
+     First listed wins ties (respects the idea author's ordering). null if none. */
+  function bestExpr(structures, profile, client) {
+    let best = null, bestScore = -1;
+    (structures || []).filter(Boolean).forEach(s => {
+      if (client && !exprTradableFor(s, client)) return;
+      const sc = exprScore(profile, exprId(s));
+      if (sc > bestScore) { bestScore = sc; best = s; }
+    });
+    return best;
+  }
+  const clientProfile = (client) => window.MAPPING.mandateClass(client); // growth | income | preservation
+  /* ACTION verb from the idea's direction/intent (explicit `action` wins). */
+  function ideaAction(idea) {
+    if (idea.action) return idea.action;
+    const intent = window.MAPPING.ideaIntent ? window.MAPPING.ideaIntent(idea) : (idea.intent || "add");
+    if (intent === "trim") return "Reduce / Sell";
+    if (intent === "income") return "Generate income";
+    if (intent === "protect") {
+      const txt = ((idea.headline || "") + " " + (idea.title || idea.name || "") + " " + (idea.thesis || "")).toLowerCase();
+      return /accumulate|add to|build|window|under-?owned|increase|top up|initiate/.test(txt)
+        ? "Buy — add protection / ballast" : "Hedge";
+    }
+    return "Buy / Overweight"; // add / default
+  }
+  // the goal profile the idea's DEFAULT (desk) expression should serve
+  function preferredProfile(idea) {
+    const a = ideaAction(idea);
+    if (/hedge/i.test(a)) return "preservation";
+    if (/reduce|sell|trim/i.test(a)) return "preservation";
+    if (/income/i.test(a)) return "income";
+    return "growth";
+  }
+  // single best default expression for the idea (explicit `preferredExpression` wins)
+  function ideaPreferred(idea) {
+    if (idea.preferredExpression) return idea.preferredExpression;
+    return bestExpr(idea.structures, preferredProfile(idea), null) || (idea.structures || [])[0] || null;
+  }
+  // a short "why" clause for an expression (first clause of its catalogue description)
+  function exprWhy(s) {
+    let w = ""; try { w = XP().get(s).what || ""; } catch (e) { w = ""; }
+    if (!w) return "";
+    w = w.split(" — ")[0].split(/(?<=\w), /)[0].replace(/\.$/, "");
+    return w.length > 84 ? w.slice(0, 81).trim() + "…" : w;
+  }
+  // FEATURE 1 — the Recommendation block (placed above conviction in every drawer)
+  function recommendationHTML(idea) {
+    const structs = (idea.structures || []).filter(Boolean);
+    if (!structs.length) return "";
+    const action = ideaAction(idea);
+    const pref = ideaPreferred(idea);
+    const why = pref ? exprWhy(pref) : "";
+    const profs = [["Growth", "growth"], ["Income", "income"], ["Preservation", "preservation"]]
+      .map(([lbl, p]) => { const b = bestExpr(structs, p, null); return b ? `<b>${esc(lbl)}</b> ${esc(exprLabel(b))}` : null; })
+      .filter(Boolean).join(" · ");
+    return `<div class="drawer-section rec-block">
+      <span class="eyebrow">Recommendation</span>
+      <div class="rec-line"><span class="rec-k">Action</span><span class="rec-v"><span class="rec-action">${esc(action)}</span></span></div>
+      ${pref ? `<div class="rec-line"><span class="rec-k">Preferred</span><span class="rec-v">${esc(exprLabel(pref))}${why ? ` <span class="rec-why">— ${esc(why)}</span>` : ""}</span></div>` : ""}
+      ${profs ? `<div class="rec-line"><span class="rec-k">By profile</span><span class="rec-v rec-prof">${profs}</span></div>` : ""}
+    </div>`;
+  }
+  // FEATURE 2 — the per-client best-implementation tag (client context only)
+  function bestForClientTag(idea, client) {
+    const b = bestExpr(idea.structures, clientProfile(client), client);
+    if (!b) return "";
+    return `<span class="best-impl">Best for ${esc(client.name)}: <b>${esc(exprLabel(b))}</b></span>`;
+  }
+
   const sourceTag = (src) => src === "Portfolio"
     ? `<span class="src-tag portfolio">Portfolio</span>`
     : `<span class="src-tag view">View</span>`;
@@ -228,6 +345,7 @@
         </div>
         <p class="why">${esc(x.reason)}</p>
         ${blocked ? `<p class="why" style="color:var(--neg)">⚠️ Retail — complex structure; needs a non-complex alternative.</p>` : ""}
+        ${bestForClientTag(idea, cl)}
         <div class="go">View in Advisor Book ›</div>
       </div>`;
     }).join("") || `<p class="why">No books are a strong fit right now (derived from exposure + goals).</p>`;
@@ -246,6 +364,7 @@
           <span class="tag type">${esc(idea.type || "Thematic")}</span>
           <span class="tag horizon">${esc(idea.horizon)}</span>
         </div>
+        ${recommendationHTML(idea)}
         <div class="drawer-section">
           <span class="eyebrow">The view</span>
           <p class="thesis-full">${esc(idea.thesis)}</p>
@@ -963,6 +1082,7 @@
         <span class="fcl-fit ${fitTierClass(flag.tier)}" title="Client-fit score">${flag.fit}<span class="fcl-fit-lbl">fit</span></span>
       </div>
       <p class="fcl-why">${esc(flag.why)}</p>
+      ${bestForClientTag(idea, c)}
       <button type="button" class="fcl-expand">Why ${esc(c.name)}? See the per-axis breakdown ›</button>
       <div class="fcl-axes" hidden>
         ${flag.axes.map(axisRowHTML).join("")}
@@ -1053,6 +1173,7 @@
         ${idea.themeId ? `<span class="fc-tag theme nolink">${esc(theme ? theme.name : "House view")}</span>` : `<span class="fc-tag offtheme">Off-theme</span>`}
         ${rightChip}
       </div>
+      ${opts.client ? bestForClientTag(idea, opts.client) : ""}
     </div>`;
   }
 
@@ -1073,6 +1194,8 @@
         <span class="eyebrow">The idea</span>
         <p class="fc-thesis">${esc(idea.thesis)}</p>
       </div>
+
+      ${recommendationHTML(idea)}
 
       <div class="drawer-section">
         <span class="eyebrow">Conviction</span>
