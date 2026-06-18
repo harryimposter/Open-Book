@@ -1062,5 +1062,48 @@
     });
   }
 
-  window.EXPRESSIONS = { resolve, get, detail, itemHTML, accordionHTML, wire, E, SECTOR_U };
+  /* --------- per-expression PROFILE FIT (shared by mapping.js + app.js) ----------
+     How well each canonical expression serves a goal profile (growth | income |
+     preservation), 0–2. Directional → growth; coupon/yield → income; protected/hedge →
+     preservation. The single source of truth so the engine's mandate axis, the per-client
+     "best implementation" and the recommendation block all agree. */
+  const PROFILE_FIT = {
+    "direct-equity": { g: 2, i: 0, p: 0 }, "index-core": { g: 2, i: 1, p: 1 }, "structured-note": { g: 1, i: 1, p: 1 },
+    "buffered-note": { g: 1, i: 0, p: 2 }, "call-overwrite": { g: 0, i: 2, p: 1 }, "utility-basket": { g: 1, i: 2, p: 1 },
+    "thematic-basket": { g: 2, i: 0, p: 0 }, "govt-ig-bonds": { g: 0, i: 2, p: 1 }, "bond-ladder": { g: 0, i: 2, p: 1 },
+    "ig-corporates": { g: 0, i: 2, p: 0 }, "securitised-sleeve": { g: 0, i: 2, p: 0 }, "equal-weight-index": { g: 2, i: 0, p: 0 },
+    "quality-basket": { g: 2, i: 0, p: 1 }, "international-etf": { g: 2, i: 0, p: 0 }, "value-basket": { g: 2, i: 1, p: 0 },
+    "infrastructure-fund": { g: 1, i: 2, p: 1 }, "private-markets": { g: 2, i: 0, p: 0 }, "reit-basket": { g: 1, i: 2, p: 0 },
+    "private-real-estate": { g: 0, i: 2, p: 1 }, "zero-cost-collar": { g: 0, i: 0, p: 2 }, "liquid-alternatives": { g: 0, i: 0, p: 2 },
+    "macro-sleeve": { g: 0, i: 0, p: 2 }, "physical-gold": { g: 1, i: 0, p: 2 }, "gold-accumulator": { g: 1, i: 1, p: 1 },
+    "healthcare-basket": { g: 2, i: 0, p: 1 }, "prepaid-variable-forward": { g: 0, i: 1, p: 2 }, "protective-put": { g: 1, i: 0, p: 2 },
+    "tax-loss-harvest": { g: 1, i: 0, p: 0 }, "peer-rotation": { g: 1, i: 0, p: 0 }, "bond-swap": { g: 0, i: 2, p: 1 },
+    "current-coupon-ladder": { g: 0, i: 2, p: 1 }, "staged-trim": { g: 0, i: 0, p: 2 }, "tbill-ladder": { g: 0, i: 2, p: 2 },
+    "short-duration-bonds": { g: 0, i: 2, p: 1 }, "cash-secured-puts": { g: 1, i: 2, p: 0 }, "securities-backed-line": { g: 0, i: 1, p: 0 },
+    "diversifiers": { g: 0, i: 0, p: 2 }, "extend-duration": { g: 0, i: 2, p: 1 }, "listed-infrastructure": { g: 1, i: 2, p: 1 },
+    "phoenix-autocall": { g: 1, i: 2, p: 0 }, "call-spread": { g: 2, i: 0, p: 0 }, "leveraged-certificate": { g: 2, i: 0, p: 0 },
+    "halo-basket": { g: 1, i: 2, p: 0 }, "reverse-convertible": { g: 0, i: 2, p: 0 }, "capital-protected-note": { g: 1, i: 0, p: 2 },
+    "fx-forward-collar": { g: 0, i: 1, p: 2 }, "currency-hedged-sleeve": { g: 0, i: 0, p: 2 }, "dual-currency-deposit": { g: 0, i: 2, p: 0 },
+    "fx-option": { g: 2, i: 0, p: 1 }, "fx-option-spread": { g: 2, i: 0, p: 0 }, "fx-risk-reversal": { g: 2, i: 0, p: 0 }, "fx-strangle": { g: 2, i: 0, p: 1 }
+  };
+  const PF_PROTECTIVE = new Set(["capital-protected-note", "zero-cost-collar", "buffered-note", "protective-put", "prepaid-variable-forward", "fx-forward-collar", "currency-hedged-sleeve"]);
+  const PF_COUPON = new Set(["phoenix-autocall", "reverse-convertible", "halo-basket", "call-overwrite", "dual-currency-deposit"]);
+  const PF_DIRECTIONAL = new Set(["direct-equity", "thematic-basket", "equal-weight-index", "leveraged-certificate", "call-spread", "index-core", "fx-option", "fx-option-spread", "fx-risk-reversal"]);
+  /* raw profile score (0..~2.3) for a canonical id + small style bonus (protective for
+     preservation, coupon for income, directional for growth) to sharpen ties. */
+  function profileScore(profile, id) {
+    const f = PROFILE_FIT[id];
+    let base = f ? (profile === "growth" ? f.g : profile === "income" ? f.i : f.p) : 1;
+    if (profile === "preservation" && PF_PROTECTIVE.has(id)) base += 0.5;
+    else if (profile === "income" && PF_COUPON.has(id)) base += 0.3;
+    else if (profile === "growth" && PF_DIRECTIONAL.has(id)) base += 0.3;
+    return base;
+  }
+  /* 0–100 suitability of an expression for a goal profile (used by the mandate axis). */
+  function implFit(structure, profile) {
+    const id = resolve(structure);
+    return Math.max(0, Math.min(100, Math.round(40 + 30 * profileScore(profile, id))));
+  }
+
+  window.EXPRESSIONS = { resolve, get, detail, itemHTML, accordionHTML, wire, E, SECTOR_U, profileScore, implFit };
 })();

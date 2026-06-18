@@ -109,7 +109,7 @@
       "thesis": "Nike reports fiscal Q4 after the close on 30 June. This is a company-specific turnaround story — inventory clean-up, China and the wholesale reset — rather than a desk theme. Lower conviction and off-theme, but a real catalyst for any book with consumer-discretionary exposure.",
       "themeId": null,
       "offThemeWhy": "No standing desk theme on consumer discretionary — this is a single-name turnaround catalyst, judged on its own merit, not a strategic house view.",
-      "structures": ["Direct equity", "Cash-secured puts", "Buffered note"],
+      "structures": ["Direct equity", "Reverse convertible", "Cash-secured puts", "Buffered note"],
       "changeMyMind": "Gross margins failing to recover or China deteriorating further — the turnaround thesis depends on margin and China inflecting, not the wholesale reset alone.",
       "conviction": {
         "pillars": [

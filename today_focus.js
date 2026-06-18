@@ -231,6 +231,7 @@ window.TODAY_FOCUS = {
       "offThemeWhy": "No standing desk theme on consumer discretionary — this is a single-name turnaround catalyst, judged on its own merit, not a strategic house view.",
       "structures": [
         "Direct equity",
+        "Reverse convertible",
         "Cash-secured puts",
         "Buffered note"
       ],

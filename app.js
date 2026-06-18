@@ -171,39 +171,10 @@
     const cls = exprCls(s);
     return cls === "structured" || cls === "non-complex";
   }
-  /* per-expression suitability by goal profile: g/i/p in {0,1,2} (2=ideal). Unknown
-     ids fall back to neutral 1. Small style bonuses sharpen ties (a genuine collar
-     beats plain stock for preservation; an autocall beats a bond for income, etc.). */
-  const EXPR_FIT = {
-    "direct-equity": { g: 2, i: 0, p: 0 }, "index-core": { g: 2, i: 1, p: 1 }, "structured-note": { g: 1, i: 1, p: 1 },
-    "buffered-note": { g: 1, i: 0, p: 2 }, "call-overwrite": { g: 0, i: 2, p: 1 }, "utility-basket": { g: 1, i: 2, p: 1 },
-    "thematic-basket": { g: 2, i: 0, p: 0 }, "govt-ig-bonds": { g: 0, i: 2, p: 1 }, "bond-ladder": { g: 0, i: 2, p: 1 },
-    "ig-corporates": { g: 0, i: 2, p: 0 }, "securitised-sleeve": { g: 0, i: 2, p: 0 }, "equal-weight-index": { g: 2, i: 0, p: 0 },
-    "quality-basket": { g: 2, i: 0, p: 1 }, "international-etf": { g: 2, i: 0, p: 0 }, "value-basket": { g: 2, i: 1, p: 0 },
-    "infrastructure-fund": { g: 1, i: 2, p: 1 }, "private-markets": { g: 2, i: 0, p: 0 }, "reit-basket": { g: 1, i: 2, p: 0 },
-    "private-real-estate": { g: 0, i: 2, p: 1 }, "zero-cost-collar": { g: 0, i: 0, p: 2 }, "liquid-alternatives": { g: 0, i: 0, p: 2 },
-    "macro-sleeve": { g: 0, i: 0, p: 2 }, "physical-gold": { g: 1, i: 0, p: 2 }, "gold-accumulator": { g: 1, i: 1, p: 1 },
-    "fx-forward-collar": { g: 0, i: 0, p: 2 }, "currency-hedged-sleeve": { g: 0, i: 0, p: 2 }, "healthcare-basket": { g: 2, i: 0, p: 1 },
-    "prepaid-variable-forward": { g: 0, i: 1, p: 2 }, "protective-put": { g: 1, i: 0, p: 2 }, "tax-loss-harvest": { g: 1, i: 0, p: 0 },
-    "peer-rotation": { g: 1, i: 0, p: 0 }, "bond-swap": { g: 0, i: 2, p: 1 }, "current-coupon-ladder": { g: 0, i: 2, p: 1 },
-    "staged-trim": { g: 0, i: 0, p: 2 }, "tbill-ladder": { g: 0, i: 2, p: 2 }, "short-duration-bonds": { g: 0, i: 2, p: 1 },
-    "cash-secured-puts": { g: 1, i: 2, p: 0 }, "securities-backed-line": { g: 0, i: 1, p: 0 }, "diversifiers": { g: 0, i: 0, p: 2 },
-    "extend-duration": { g: 0, i: 2, p: 1 }, "listed-infrastructure": { g: 1, i: 2, p: 1 }, "phoenix-autocall": { g: 1, i: 2, p: 0 },
-    "call-spread": { g: 2, i: 0, p: 0 }, "leveraged-certificate": { g: 2, i: 0, p: 0 }, "halo-basket": { g: 1, i: 2, p: 0 },
-    "reverse-convertible": { g: 0, i: 2, p: 0 }, "capital-protected-note": { g: 1, i: 0, p: 2 },
-    "fx-forward-collar": { g: 0, i: 1, p: 2 }, "currency-hedged-sleeve": { g: 0, i: 0, p: 2 }, "dual-currency-deposit": { g: 0, i: 2, p: 0 },
-    "fx-option": { g: 2, i: 0, p: 1 }, "fx-option-spread": { g: 2, i: 0, p: 0 }, "fx-risk-reversal": { g: 2, i: 0, p: 0 }, "fx-strangle": { g: 2, i: 0, p: 1 }
-  };
-  const PROTECTIVE = new Set(["capital-protected-note", "zero-cost-collar", "buffered-note", "protective-put", "prepaid-variable-forward", "fx-forward-collar", "currency-hedged-sleeve"]);
-  const COUPON = new Set(["phoenix-autocall", "reverse-convertible", "halo-basket", "call-overwrite", "dual-currency-deposit"]);
-  const DIRECTIONAL = new Set(["direct-equity", "thematic-basket", "equal-weight-index", "leveraged-certificate", "call-spread", "index-core", "fx-option", "fx-option-spread", "fx-risk-reversal"]);
+  // shared per-expression profile fit (single source of truth in expressions.js) so the
+  // recommendation by-profile lines, the per-client tag and the mapping engine all agree.
   function exprScore(profile, id) {
-    const f = EXPR_FIT[id];
-    let base = f ? (profile === "growth" ? f.g : profile === "income" ? f.i : f.p) : 1;
-    if (profile === "preservation" && PROTECTIVE.has(id)) base += 0.5;
-    else if (profile === "income" && COUPON.has(id)) base += 0.3;
-    else if (profile === "growth" && DIRECTIONAL.has(id)) base += 0.3;
-    return base;
+    return (window.EXPRESSIONS && window.EXPRESSIONS.profileScore) ? window.EXPRESSIONS.profileScore(profile, id) : 1;
   }
   /* the best structure STRING for a profile, tradable for `client` if given.
      First listed wins ties (respects the idea author's ordering). null if none. */
@@ -300,7 +271,11 @@
   }
   // FEATURE 2 — the per-client best-implementation tag (client context only)
   function bestForClientTag(idea, client) {
-    const b = bestExpr(idea.structures, clientProfile(client), client);
+    // use the ENGINE's chosen best suitable implementation so the tag, the mandate axis
+    // and the recommendation all agree; fall back to the local picker if unavailable.
+    let b = null;
+    try { b = window.MAPPING.scoreIdeaForClient(idea, client).bestImpl; } catch (e) { b = null; }
+    if (!b) b = bestExpr(idea.structures, clientProfile(client), client);
     if (!b) return "";
     return `<span class="best-impl">Best for ${esc(client.name)}: <b>${esc(exprLabel(b))}</b></span>`;
   }
