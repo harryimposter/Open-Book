@@ -36,6 +36,7 @@
     u.ideas = u.ideas || [];
     u.hiddenIdeas = u.hiddenIdeas || [];        // seed-idea ids removed by the user
     u.dismissedFocus = u.dismissedFocus || [];  // Today's-Focus idea ids dismissed
+    u.reactions = u.reactions || {};            // ideaId -> "like" | "dislike" (advisor's own vote)
     return u;
   }
   function saveUser(u) { localStorage.setItem(LS_KEY, JSON.stringify(u)); }
@@ -85,6 +86,50 @@
     if (selectedClientId) renderClientDetail(clientById(selectedClientId));
   }
   const isDismissed = (id) => (userData.dismissedFocus || []).includes(id);
+
+  /* ---------- social reactions (like / dislike) ----------
+     The advisor's own 👍/👎 on a Today's-Focus idea, persisted in localStorage.
+     A deterministic synthetic baseline (hashed off the id) makes the counts read
+     like social proof; the advisor's vote nudges the count and lights the button. */
+  let focusLikedOnly = false;                                  // "Liked only" filter
+  function hashInt(str) { let h = 0; const s = String(str); for (let i = 0; i < s.length; i++) { h = (h * 31 + s.charCodeAt(i)) | 0; } return Math.abs(h); }
+  function baseReactions(id) { const h = hashInt(id); return { like: 8 + (h % 41), dislike: 1 + (Math.floor(h / 41) % 9) }; } // ~8-48 likes, ~1-9 dislikes
+  const getReaction = (id) => (userData.reactions || {})[id] || null;
+  function reactionCounts(id) {
+    const b = baseReactions(id), r = getReaction(id);
+    return { like: b.like + (r === "like" ? 1 : 0), dislike: b.dislike + (r === "dislike" ? 1 : 0), mine: r };
+  }
+  function setReaction(id, vote) {
+    const cur = getReaction(id);
+    if (cur === vote) delete userData.reactions[id];            // tapping the active vote clears it
+    else userData.reactions[id] = vote;
+    saveUser(userData);
+    // repaint the affected tile(s) + drawer in place (no full re-render needed)
+    $$(`[data-react-tile="${cssId(id)}"]`).forEach(el => { el.outerHTML = reactionsHTML(id, el.dataset.reactPlace); });
+    rewireReactions();
+    renderFocusFilters();                                       // keep the "Liked" count in sync
+    if (focusLikedOnly) renderFocus();                          // a cleared like can drop it from the filter
+    if (selectedClientId) renderClientDetail(clientById(selectedClientId));
+  }
+  // CSS.escape-ish for our attribute selectors (ids are simple slugs, but be safe)
+  function cssId(id) { return String(id).replace(/["\\]/g, "\\$&"); }
+  function reactionsHTML(id, place) {
+    const c = reactionCounts(id);
+    return `<div class="reactions" data-react-tile="${esc(id)}" data-react-place="${esc(place || "tile")}">
+      <button type="button" class="rx rx-like ${c.mine === "like" ? "on" : ""}" data-react="like" data-react-id="${esc(id)}" aria-pressed="${c.mine === "like"}" title="Like this idea">
+        <span class="rx-ico" aria-hidden="true">▲</span><span class="rx-n">${c.like}</span>
+      </button>
+      <button type="button" class="rx rx-dislike ${c.mine === "dislike" ? "on" : ""}" data-react="dislike" data-react-id="${esc(id)}" aria-pressed="${c.mine === "dislike"}" title="Not for my book">
+        <span class="rx-ico" aria-hidden="true">▼</span><span class="rx-n">${c.dislike}</span>
+      </button>
+    </div>`;
+  }
+  function rewireReactions(root) {
+    $$(".rx[data-react]", root || document).forEach(btn => {
+      if (btn._rxWired) return; btn._rxWired = true;
+      btn.addEventListener("click", (e) => { e.stopPropagation(); setReaction(btn.dataset.reactId, btn.dataset.react); });
+    });
+  }
 
   /* ---------- advisor comfort / concentration limits (editable, persisted) ----------
      The per-bucket single-sector caps (+ optional per-sector overrides) live in
@@ -241,6 +286,241 @@
     if (/income/i.test(a)) return `Generate income from ${inst}${tail}.`;
     return `Long ${inst}${tail}.`;
   }
+
+  /* ===================== CLIENT EMAIL DRAFTING =============================
+     Turn any Today's-Focus idea into a personalised, per-client email draft.
+     Two choices drive it (dropdowns in the drawer): the CLIENT and the
+     IMPLEMENTATION type (only structures that client can actually trade). The
+     copy is built from the same engine data the tiles use — relevantHolding +
+     theme for the personalised hook, the idea's thesis (clamped to 3 lines), and
+     the chosen expression for the implementation line. Export as copy / .eml
+     (opens as a real draft) / a print-to-PDF letterhead. No scoring changes. */
+  const firstName = (c) => String(c.name || "").trim().split(/\s+/)[0];
+  const aOrAn = (w) => {
+    const s = String(w || "").trim(), first = s.split(/\s+/)[0];
+    if (/^[A-Z]{2,4}$/.test(first)) return /^[AEFHILMNORSX]/.test(first) ? "an" : "a"; // initialism → spoken sound (FX, IG…)
+    return /^[aeiou]/i.test(s) ? "an" : "a";
+  };
+  // clamp prose to at most `maxSentences` sentences (and ~`maxChars`), WITHOUT splitting
+  // on decimals/abbreviations — only break on .!? that is followed by a space + capital.
+  function clampSentences(text, maxSentences, maxChars) {
+    const t = String(text || "").replace(/\s+/g, " ").trim();
+    if (!t) return "";
+    const parts = t.split(/(?<=[.!?])\s+(?=[A-Z"“'(])/);
+    let out = "";
+    for (let i = 0; i < parts.length && i < maxSentences; i++) {
+      const next = (out ? out + " " : "") + parts[i];
+      if (maxChars && out && next.length > maxChars) break;
+      out = next;
+    }
+    if (maxChars && out.length > maxChars) out = out.slice(0, maxChars - 1).replace(/\s+\S*$/, "").trim() + "…";
+    return out;
+  }
+  // structures the client can actually trade (MiFID), in the idea's authored order
+  function implChoicesFor(idea, client) {
+    const out = (idea.structures || []).filter(Boolean).filter(s => exprTradableFor(s, client));
+    return out.length ? out : (idea.structures || []).filter(Boolean);
+  }
+  function defaultImplFor(idea, client) {
+    let b = null; try { b = window.MAPPING.scoreIdeaForClient(idea, client).bestImpl; } catch (e) {}
+    const choices = implChoicesFor(idea, client);
+    return (b && choices.includes(b)) ? b : (choices[0] || ideaPreferred(idea));
+  }
+  // the personalised 1-2 line "why this is relevant to YOU"
+  function relevanceLine(idea, client) {
+    const theme = idea.themeId ? themeById(idea.themeId) : null;
+    const themeNm = theme ? theme.name : null;
+    if (idea.sector === "FX") {
+      let mm = 0; try { (client.positions || []).forEach(p => { if (p.ccy && p.ccy !== client.ccy && p.ccy !== "Cash") mm += (+p.weightPct || 0); }); } catch (e) {}
+      return `Given your book carries meaningful non-base-currency exposure${mm ? ` (~${Math.round(mm)}% in other currencies)` : ""}, I wanted to flag a currency idea from this week's desk sweep${themeNm ? ` that sits within our ${themeNm} view` : ""} and looks relevant to how you're positioned.`;
+    }
+    let rh = null; try { rh = window.MAPPING.relevantHolding(idea, client); } catch (e) {}
+    if (rh && rh.name) {
+      const own = rh.ownPct ? ` (~${Math.round(rh.ownPct)}% of the book)` : "";
+      const tie = themeNm ? ` — closely tied to our ${themeNm} theme` : "";
+      const pnl = (typeof rh.pnlPct === "number")
+        ? (rh.pnlPct >= 15 ? ", where you're sitting on a strong gain," : rh.pnlPct <= -10 ? ", which has lagged of late," : "")
+        : "";
+      return `Given your existing position in ${rh.name}${own}${tie}${pnl} I wanted to flag a related idea that may be worth a look.`;
+    }
+    try {
+      const goal = window.GOALS.goalsFor(client) || {}, cur = window.GOALS.currentBuckets(client) || {};
+      const b = idea.bucket, gap = Math.round((goal[b] || 0) - (cur[b] || 0));
+      if (gap >= 3) return `Given your ${String(b).toLowerCase()} allocation currently sits a little under your target, I wanted to flag an idea${themeNm ? ` from our ${themeNm} view` : ""} that could help close that gap.`;
+    } catch (e) {}
+    return `I wanted to flag an idea from this week's desk sweep${themeNm ? ` — part of our ${themeNm} view —` : ""} that looks well-suited to your mandate.`;
+  }
+  function implLineFor(idea, client, impl) {
+    const label = exprLabel(impl), why = exprWhy(impl);
+    const lvl = idea.levels ? ` Indicative levels: ${[idea.levels.tenor && "tenor " + idea.levels.tenor, idea.levels.entry && "entry " + idea.levels.entry, idea.levels.target && "target " + idea.levels.target, idea.levels.stop && "stop " + idea.levels.stop].filter(Boolean).join(", ")}.` : "";
+    return `For your book I'd look to implement this via ${aOrAn(label)} ${label}${why ? ` — ${why}` : ""}.${lvl}`;
+  }
+  // assemble the email parts (+ a plain-text rendering) for one idea×client×impl
+  function buildEmail(idea, client, impl) {
+    const subject = `An idea worth a look — ${idea.name}${idea.ticker && idea.ticker !== "—" ? ` (${idea.ticker})` : ""}`;
+    const greeting = `Dear ${firstName(client)},`;
+    const relevance = relevanceLine(idea, client);
+    const ideaLine = `The idea: ${idea.headline}`;
+    const thesis = clampSentences(idea.thesis, 3, 300);
+    const impLine = implLineFor(idea, client, impl);
+    const signoff = `Happy to walk through the detail whenever suits.\n\nBest regards,\n[Your name]\nJ.P. Morgan Private Bank`;
+    const plainText = [greeting, "", relevance, "", ideaLine, thesis, "", impLine, "", signoff].join("\n");
+    return { subject, greeting, relevance, ideaLine, thesis, impLine, signoff, plainText };
+  }
+  // a standalone, inline-styled letterhead document — used for the PDF print view and the .eml body
+  function emailDocHTML(idea, client, impl, opts) {
+    opts = opts || {};
+    const em = buildEmail(idea, client, impl);
+    const toolbar = opts.print
+      ? `<div class="noprint" style="margin:0 0 18px;display:flex;gap:8px;align-items:center;font:500 13px Inter,system-ui,sans-serif">
+           <button onclick="window.print()" style="background:#0b1f3a;color:#fff;border:0;border-radius:8px;padding:9px 16px;font:600 13px Inter,sans-serif;cursor:pointer">⤓ Save as PDF / Print</button>
+           <span style="color:#667">Use your browser's “Save as PDF” in the print dialog.</span>
+         </div>` : "";
+    const p = (t) => `<p style="margin:0 0 12px">${esc(t).replace(/\n/g, "<br>")}</p>`;
+    return `<!doctype html><html><head><meta charset="utf-8"><title>${esc(em.subject)}</title>
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      <style>
+        @media print { .noprint { display:none !important; } @page { margin: 18mm; } }
+        body { font:400 15px/1.6 Inter,Georgia,system-ui,sans-serif; color:#16263b; background:#f4f1ea; margin:0; padding:28px; }
+        .sheet { max-width:680px; margin:0 auto; background:#fff; border:1px solid #e6e0d4; border-radius:12px; padding:40px 44px; box-shadow:0 8px 28px rgba(20,30,50,.06); }
+        .lh { display:flex; align-items:baseline; gap:10px; border-bottom:2px solid #0b1f3a; padding-bottom:12px; margin-bottom:22px; }
+        .lh .br { font:700 22px 'Libre Baskerville',Georgia,serif; color:#0b1f3a; letter-spacing:.2px; }
+        .lh .sub { font:600 11px Inter,sans-serif; letter-spacing:.14em; text-transform:uppercase; color:#9a7b3f; }
+        .subj { font:700 17px 'Libre Baskerville',Georgia,serif; color:#0b1f3a; margin:0 0 18px; }
+        .idea { background:#faf7f0; border-left:3px solid #9a7b3f; border-radius:6px; padding:12px 16px; margin:4px 0 14px; }
+        .idea .k { font:600 11px Inter,sans-serif; letter-spacing:.1em; text-transform:uppercase; color:#9a7b3f; display:block; margin-bottom:4px; }
+        .meta { margin-top:18px; padding-top:14px; border-top:1px solid #ece6da; color:#7a8190; font-size:12px; }
+        .impl { background:#0b1f3a06; border-radius:6px; padding:12px 16px; margin:4px 0 14px; }
+        .impl .k { font:600 11px Inter,sans-serif; letter-spacing:.1em; text-transform:uppercase; color:#0b1f3a; display:block; margin-bottom:4px; }
+      </style></head>
+      <body>${toolbar}
+        <div class="sheet">
+          <div class="lh"><span class="br">J.P.Morgan</span><span class="sub">Private Bank</span></div>
+          <div class="subj">${esc(em.subject)}</div>
+          ${p(em.greeting)}
+          ${p(em.relevance)}
+          <div class="idea"><span class="k">The idea — ${esc(idea.name)}${idea.ticker && idea.ticker !== "—" ? ` · ${esc(idea.ticker)}` : ""}</span>${esc(idea.headline)}<br><span style="color:#43506a">${esc(em.thesis)}</span></div>
+          <div class="impl"><span class="k">How we'd implement it for you</span>${esc(em.impLine)}</div>
+          ${p(em.signoff)}
+          <div class="meta">Prepared for ${esc(client.name)} · ${esc(client.classification)} · ${esc(fmtAum(client))}. Conviction ${idea.conviction ? idea.conviction.score + "/100" : "—"}. For discussion only — not an offer, recommendation, or research. Marks indicative.</div>
+        </div>
+      </body></html>`;
+  }
+
+  /* ---- tiny utilities for the export buttons ---- */
+  function downloadBlob(filename, mime, content) {
+    const blob = new Blob([content], { type: mime });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = filename; document.body.appendChild(a); a.click();
+    setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 1000);
+  }
+  const slug = (s) => String(s).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  let _toastT = null;
+  function toast(msg) {
+    let t = $("#bpToast");
+    if (!t) { t = document.createElement("div"); t.id = "bpToast"; t.className = "bp-toast"; document.body.appendChild(t); }
+    t.textContent = msg; t.classList.add("show");
+    clearTimeout(_toastT); _toastT = setTimeout(() => t.classList.remove("show"), 1900);
+  }
+  function copyEmail(idea, client, impl) {
+    const em = buildEmail(idea, client, impl);
+    const done = () => toast("Email copied to clipboard");
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(em.plainText).then(done, () => fallbackCopy(em.plainText, done));
+    else fallbackCopy(em.plainText, done);
+  }
+  function fallbackCopy(text, done) {
+    const ta = document.createElement("textarea"); ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand("copy"); done(); } catch (e) { toast("Copy failed"); }
+    ta.remove();
+  }
+  function downloadEml(idea, client, impl) {
+    const em = buildEmail(idea, client, impl);
+    const html = emailDocHTML(idea, client, impl);
+    const eml = ["To: ", "Subject: " + em.subject, "X-Unsent: 1", "MIME-Version: 1.0", "Content-Type: text/html; charset=utf-8", "", html].join("\r\n");
+    downloadBlob(`${slug(client.name + "-" + idea.id)}.eml`, "message/rfc822", eml);
+    toast("Draft downloaded — opens in your mail app");
+  }
+  function openEmailPDF(idea, client, impl) {
+    const w = window.open("", "_blank");
+    if (!w) { toast("Allow pop-ups to open the PDF view"); return; }
+    w.document.open(); w.document.write(emailDocHTML(idea, client, impl, { print: true })); w.document.close(); w.focus();
+  }
+
+  /* email-composer state for the open drawer (which client + which implementation) */
+  let emailState = null;   // { ideaId, clientId, impl }
+  function emailComposerHTML(idea) {
+    const flags = window.MAPPING.flagClients(idea);   // genuinely-flagged clients (default threshold)
+    const flaggedIds = flags.map(f => f.client.id);
+    const allClients = (window.SEED.clients || []);
+    // default client = top-flagged, else first client
+    if (!emailState || emailState.ideaId !== idea.id) {
+      const dc = flags[0] ? flags[0].client : allClients[0];
+      emailState = { ideaId: idea.id, clientId: dc ? dc.id : null, impl: null };
+    }
+    const client = clientById(emailState.clientId) || allClients[0];
+    if (!emailState.impl) emailState.impl = defaultImplFor(idea, client);
+    const choices = implChoicesFor(idea, client);
+    if (!choices.includes(emailState.impl)) emailState.impl = choices[0] || emailState.impl;
+    const fitFor = (c) => { try { return window.MAPPING.scoreIdeaForClient(idea, c).fit; } catch (e) { return 0; } };
+    const optClient = (c) => `<option value="${esc(c.id)}"${c.id === emailState.clientId ? " selected" : ""}>${esc(c.name)} · ${esc(c.classification)}${flaggedIds.includes(c.id) ? ` · fit ${fitFor(c)}` : ""}</option>`;
+    const flaggedClients = allClients.filter(c => flaggedIds.includes(c.id));
+    const otherClients = allClients.filter(c => !flaggedIds.includes(c.id));
+    const clientOpts = (flaggedClients.length ? `<optgroup label="Flagged for this idea">${flaggedClients.map(optClient).join("")}</optgroup>` : "")
+      + (otherClients.length ? `<optgroup label="Other clients">${otherClients.map(optClient).join("")}</optgroup>` : "");
+    const implOpts = choices.map(s => `<option value="${esc(s)}"${s === emailState.impl ? " selected" : ""}>${esc(exprLabel(s))}</option>`).join("");
+    return `<div class="drawer-section email-composer" data-email-idea="${esc(idea.id)}">
+      <span class="eyebrow">Draft a client email</span>
+      <p class="ec-help">Pick a client and how you'd implement it — the draft personalises itself. Export as a copy, an <b>.eml</b> draft (opens in your mail app), or a print-ready PDF.</p>
+      <div class="ec-controls">
+        <label class="ec-field"><span class="ec-lbl">Client</span>
+          <select class="ec-sel" id="ecClient">${clientOpts}</select></label>
+        <label class="ec-field"><span class="ec-lbl">Implementation</span>
+          <select class="ec-sel" id="ecImpl">${implOpts}</select></label>
+      </div>
+      <div class="ec-preview" id="ecPreview">${emailPreviewHTML(idea, client, emailState.impl)}</div>
+      <div class="ec-actions">
+        <button type="button" class="btn btn-ghost" id="ecCopy">⧉ Copy</button>
+        <button type="button" class="btn btn-ghost" id="ecEml">⤓ Download .eml</button>
+        <button type="button" class="btn btn-primary" id="ecPdf">▢ View / Save as PDF</button>
+      </div>
+    </div>`;
+  }
+  function emailPreviewHTML(idea, client, impl) {
+    const em = buildEmail(idea, client, impl);
+    return `<div class="ecp-doc">
+      <p class="ecp-greet">${esc(em.greeting)}</p>
+      <p>${esc(em.relevance)}</p>
+      <div class="ecp-idea"><span class="ecp-k">The idea — ${esc(idea.name)}${idea.ticker && idea.ticker !== "—" ? ` · ${esc(idea.ticker)}` : ""}</span>${esc(idea.headline)}<div class="ecp-thesis">${esc(em.thesis)}</div></div>
+      <div class="ecp-impl"><span class="ecp-k">How we'd implement it for you</span>${esc(em.impLine)}</div>
+      <p class="ecp-sign">${esc(em.signoff).replace(/\n/g, "<br>")}</p>
+    </div>`;
+  }
+  function wireEmailComposer(root) {
+    const wrap = $(".email-composer", root); if (!wrap) return;
+    const idea = FOCUS_BY_ID[wrap.dataset.emailIdea]; if (!idea) return;
+    const refreshPreview = () => {
+      const client = clientById(emailState.clientId);
+      $("#ecPreview", root).innerHTML = emailPreviewHTML(idea, client, emailState.impl);
+    };
+    const cl = $("#ecClient", root), im = $("#ecImpl", root);
+    if (cl) cl.addEventListener("change", () => {
+      emailState.clientId = cl.value;
+      const client = clientById(emailState.clientId);
+      emailState.impl = defaultImplFor(idea, client);   // tradable set changes with the client
+      // rebuild the implementation dropdown for the new client
+      const choices = implChoicesFor(idea, client);
+      im.innerHTML = choices.map(s => `<option value="${esc(s)}"${s === emailState.impl ? " selected" : ""}>${esc(exprLabel(s))}</option>`).join("");
+      refreshPreview();
+    });
+    if (im) im.addEventListener("change", () => { emailState.impl = im.value; refreshPreview(); });
+    const withSel = (fn) => () => { const c = clientById(emailState.clientId); if (c) fn(idea, c, emailState.impl); };
+    const cp = $("#ecCopy", root); if (cp) cp.addEventListener("click", withSel(copyEmail));
+    const el = $("#ecEml", root); if (el) el.addEventListener("click", withSel(downloadEml));
+    const pf = $("#ecPdf", root); if (pf) pf.addEventListener("click", withSel(openEmailPDF));
+  }
+
   // FEATURE 1 — the Recommendation block (placed above conviction in every drawer)
   /* PRE-PRINT / POST-PRINT earnings-stance chip (earnings ideas only). */
   function stanceTag(idea) {
@@ -1296,6 +1576,7 @@
         ${rightChip}
       </div>
       ${opts.client ? bestForClientTag(idea, opts.client) : ""}
+      <div class="ft-foot">${reactionsHTML(idea.id, "tile")}</div>
     </div>`;
   }
 
@@ -1317,7 +1598,11 @@
         <p class="fc-thesis">${esc(idea.thesis)}</p>
       </div>
 
+      <div class="drawer-react">${reactionsHTML(idea.id, "drawer")}<span class="dr-react-lbl">Was this idea useful?</span></div>
+
       ${recommendationHTML(idea)}
+
+      ${emailComposerHTML(idea)}
 
       <div class="drawer-section">
         <span class="eyebrow">Conviction</span>
@@ -1370,6 +1655,8 @@
     const root = $("#drawer");
     $("#drawerClose").addEventListener("click", closeDrawer);
     window.EXPRESSIONS.wire(root);
+    rewireReactions(root);
+    wireEmailComposer(root);
     $$(".fcl-expand", root).forEach(btn => btn.addEventListener("click", (e) => {
       e.stopPropagation();
       const ax = btn.closest(".fc-client").querySelector(".fcl-axes");
@@ -1434,12 +1721,28 @@
     $("#focusAsOf").textContent = "as of " + fmtFocusDate(TF.asOf) + " " + TF.asOf.slice(0, 4);
     $("#focusSweepNote").innerHTML =
       `<span class="fsn-k">Market sweep</span> ${esc(TF.sweep.sources.join(" · "))}. <span class="fsn-rule">${esc(TF.sweep.rule)}</span>`;
-    const keep = (i) => !isDismissed(i.id) && focusIdeaMatches(i, focusQuery);
+    const keep = (i) => !isDismissed(i.id) && focusIdeaMatches(i, focusQuery) && (!focusLikedOnly || getReaction(i.id) === "like");
     const earn = (TF.earnings || []).filter(keep), ex = (TF.exEarnings || []).filter(keep);
     $("#focusEarnings").innerHTML = earn.length ? earn.map(i => focusTileHTML(i, { deletable: true })).join("") : focusEmptyHTML();
     $("#focusExEarnings").innerHTML = ex.length ? ex.map(i => focusTileHTML(i, { deletable: true })).join("") : focusEmptyHTML();
+    renderFocusFilters();
     wireFocusTiles($("#view-focus"));
     $$("#view-focus .focusClearInline").forEach(b => b.addEventListener("click", () => clearFocusSearch()));
+  }
+
+  /* the All / Liked filter chips above the focus tiles */
+  function renderFocusFilters() {
+    const host = $("#focusFilters"); if (!host) return;
+    const TF = window.TODAY_FOCUS || {};
+    const all = (TF.earnings || []).concat(TF.exEarnings || []).filter(i => !isDismissed(i.id));
+    const likedN = all.filter(i => getReaction(i.id) === "like").length;
+    host.innerHTML =
+      `<button type="button" class="ff-chip ${focusLikedOnly ? "" : "on"}" data-ff="all">All ideas</button>
+       <button type="button" class="ff-chip ${focusLikedOnly ? "on" : ""}" data-ff="liked">♥ Liked${likedN ? ` <span class="ff-n">${likedN}</span>` : ""}</button>`;
+    $$(".ff-chip", host).forEach(b => b.addEventListener("click", () => {
+      focusLikedOnly = b.dataset.ff === "liked";
+      renderFocus();
+    }));
   }
 
   /* wire compact tiles (Today's Focus + Advisor-Book top-3) -> open the side drawer */
@@ -1456,6 +1759,7 @@
       const id = el.closest(".focus-tile").dataset.ftile, idea = FOCUS_BY_ID[id];
       confirmAction("Dismiss this idea?", `“${esc(idea ? idea.name : "")}” will be hidden from Today's Focus.`, () => dismissFocusIdea(id));
     }));
+    rewireReactions(root);
   }
 
   /* ----------------------- rubric / methodology modal ----------------- */

@@ -1293,3 +1293,83 @@ button.struct-chip.struct-toggle:focus-visible { outline: 2px solid var(--gold);
 .calc-pop .gd-calc b { color: var(--bronze-deep, #7C6038); }
 .calc-pop .gd-term { color: var(--ink-faint, #8A8073); }
 .calc-pop .gd-step.gd-final { background: #FBF8F2; border: 1px solid var(--gold, #C2A661); border-left: 4px solid var(--gold, #C2A661); }
+
+/* ============================================================================
+   SOCIAL REACTIONS · LIKED FILTER · CLIENT-EMAIL COMPOSER · TOAST
+   Added with the "social + email draft" feature. Reuses the existing tokens. */
+
+/* --- like / dislike reactions (tiles + drawer) --- */
+.reactions { display: inline-flex; gap: 6px; align-items: center; }
+.ft-foot { margin-top: 10px; padding-top: 9px; border-top: 1px solid var(--line); display: flex; }
+.rx {
+  display: inline-flex; align-items: center; gap: 5px; cursor: pointer;
+  background: var(--cream); border: 1px solid var(--line-strong); border-radius: 999px;
+  padding: 3px 10px; font: 600 12px var(--sans); color: var(--ink-soft);
+  transition: background .12s, color .12s, border-color .12s, transform .08s;
+}
+.rx:hover { background: var(--cream-2); color: var(--ink); }
+.rx:active { transform: scale(.94); }
+.rx .rx-ico { font-size: 9px; line-height: 1; opacity: .7; }
+.rx .rx-n { font-variant-numeric: tabular-nums; }
+.rx.rx-like.on { background: #EAF1EC; border-color: var(--pos); color: var(--pos); }
+.rx.rx-like.on .rx-ico { opacity: 1; }
+.rx.rx-dislike.on { background: #F6EBE9; border-color: var(--neg); color: var(--neg); }
+.rx.rx-dislike.on .rx-ico { opacity: 1; }
+
+/* drawer reaction strip */
+.drawer-react { display: flex; align-items: center; gap: 12px; margin: 4px 0 18px; }
+.dr-react-lbl { font-size: 12.5px; color: var(--ink-faint); }
+
+/* --- All / Liked filter chips --- */
+.focus-filters { display: flex; gap: 8px; margin: 0 0 18px; }
+.focus-filters:empty { display: none; }
+.ff-chip {
+  cursor: pointer; background: var(--paper); border: 1px solid var(--line-strong);
+  border-radius: 999px; padding: 6px 14px; font: 600 12.5px var(--sans); color: var(--ink-soft);
+  transition: background .12s, color .12s, border-color .12s;
+}
+.ff-chip:hover { background: var(--cream); color: var(--ink); }
+.ff-chip.on { background: var(--espresso); color: #fff; border-color: var(--espresso); }
+.ff-chip .ff-n {
+  display: inline-block; min-width: 16px; text-align: center; margin-left: 3px;
+  background: rgba(255,255,255,.22); border-radius: 999px; padding: 0 5px; font-size: 11px;
+}
+.ff-chip:not(.on) .ff-n { background: var(--cream-2); color: var(--bronze-deep); }
+
+/* --- email composer --- */
+.email-composer .ec-help { margin: 2px 0 12px; font-size: 12.5px; color: var(--ink-soft); }
+.ec-controls { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+.ec-field { flex: 1 1 200px; display: flex; flex-direction: column; gap: 5px; }
+.ec-lbl { font: 600 10.5px var(--sans); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-faint); }
+.ec-sel {
+  appearance: none; -webkit-appearance: none;
+  background: var(--paper) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6'><path d='M0 0l5 6 5-6z' fill='%238A8073'/></svg>") no-repeat right 12px center;
+  border: 1px solid var(--line-strong); border-radius: 6px; padding: 9px 30px 9px 12px;
+  font: 500 13.5px var(--sans); color: var(--ink); cursor: pointer; width: 100%;
+}
+.ec-sel:focus { outline: none; border-color: var(--bronze); box-shadow: 0 0 0 3px rgba(154,123,79,.12); }
+.ec-preview {
+  background: var(--cream); border: 1px solid var(--line); border-radius: 8px;
+  padding: 18px 20px; margin-bottom: 14px;
+}
+.ecp-doc { font-size: 13.5px; line-height: 1.6; color: var(--ink); }
+.ecp-doc p { margin: 0 0 11px; }
+.ecp-greet { font-weight: 600; }
+.ecp-idea, .ecp-impl { border-radius: 6px; padding: 10px 13px; margin: 0 0 11px; }
+.ecp-idea { background: #FBF8F2; border-left: 3px solid var(--gold); }
+.ecp-impl { background: var(--paper); border-left: 3px solid var(--espresso); }
+.ecp-k { display: block; font: 600 10px var(--sans); letter-spacing: .1em; text-transform: uppercase; color: var(--bronze-deep); margin-bottom: 4px; }
+.ecp-impl .ecp-k { color: var(--espresso); }
+.ecp-thesis { margin-top: 5px; color: var(--ink-soft); }
+.ecp-sign { color: var(--ink-soft); font-size: 13px; }
+.ec-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.ec-actions .btn { font-size: 13px; }
+
+/* --- toast --- */
+.bp-toast {
+  position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%) translateY(14px);
+  background: var(--espresso); color: #fff; padding: 11px 20px; border-radius: 999px;
+  font: 500 13px var(--sans); box-shadow: 0 8px 28px rgba(41,33,26,.28);
+  opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; z-index: 9999;
+}
+.bp-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
