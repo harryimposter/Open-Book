@@ -207,16 +207,16 @@ const SEED_CLIENTS = [
       funding: { headline: "Grow to $75m by 2034", metricLabel: "Projected value", current: 38, target: 75, unit: "$m", status: "On track" }
     },
     positions: [
-      { name: "NVIDIA",   ticker: "NVDA US", assetClass: "Equity", sector: "Technology", ccy: "USD", weightPct: 24.0, pnlPct: 15,  entryDate: "2025-11-04", entrySpot: 178.00, mat: null, note: "Largest position; near its highs ~$205." },
-      { name: "Broadcom", ticker: "AVGO US", assetClass: "Equity", sector: "Technology", ccy: "USD", weightPct: 14.0, pnlPct: 30,  entryDate: "2026-02-10", entrySpot: 295.00, mat: null, note: "Dipped ~15% after the 3-Jun print, since recovered to ~$384." },
-      { name: "Micron",   ticker: "MU US",   assetClass: "Equity", sector: "Technology", ccy: "USD", weightPct: 13.0, pnlPct: 142, entryDate: "2023-05-15", entrySpot: 62.00, mat: null, note: "HBM supercycle; ~2.4x unrealised gain at ~$150." },
+      { name: "NVIDIA",   ticker: "NVDA US", assetClass: "Equity", sector: "Technology", ccy: "USD", weightPct: 24.0, pnlPct: 8,   entryDate: "2025-11-04", entrySpot: 178.00, mat: null, note: "Largest position; pulled back to ~$193 in the week's AI/semis sell-off." },
+      { name: "Broadcom", ticker: "AVGO US", assetClass: "Equity", sector: "Technology", ccy: "USD", weightPct: 14.0, pnlPct: 24,  entryDate: "2026-02-10", entrySpot: 295.00, mat: null, note: "Gave back ground to ~$366 in the AI/semis pullback." },
+      { name: "Micron",   ticker: "MU US",   assetClass: "Equity", sector: "Technology", ccy: "USD", weightPct: 13.0, pnlPct: 142, entryDate: "2023-05-15", entrySpot: 62.00, mat: null, note: "HBM supercycle; record FQ3 (24-Jun) confirmed and now priced — ~2.4x unrealised at the book's basis." },
       { name: "ASML",     ticker: "ASML NA", assetClass: "Equity", sector: "Technology", ccy: "EUR", weightPct: 19.0, pnlPct: 121, entryDate: "2024-09-20", entrySpot: 720.00, mat: null, note: "Semi-cap leader; ~€1,591." },
       { name: "Microsoft",ticker: "MSFT US", assetClass: "Equity", sector: "Technology", ccy: "USD", weightPct: 18.0, pnlPct: -4,  entryDate: "2024-03-12", entrySpot: 410.00, mat: null, note: "AI monetization core; modest drawdown YTD." },
       { name: "Phoenix autocall (semis)", ticker: "—", assetClass: "Structured", sector: "Technology", ccy: "USD", weightPct: 6.0, pnlPct: 4, entryDate: "2025-12-01", entrySpot: null, mat: "2027-12-01", note: "Yield on range-bound semis." },
       { name: "Short IG bonds", ticker: "—", assetClass: "Fixed Income", sector: "Credit", ccy: "USD", weightPct: 2.0, pnlPct: 0, entryDate: "2025-10-01", entrySpot: null, mat: "2027-10-01", note: "Thin core sleeve." },
       { name: "USD cash", ticker: "—", assetClass: "Cash", sector: "Cash", ccy: "USD", weightPct: 4.0, pnlPct: 0, entryDate: null, entrySpot: null, mat: null, note: "Idle." }
     ],
-    summary: "Concentrated, options-fluent AI-growth book — NVDA, AVGO and the semis supply chain at high single-stock weights, almost no cash. Micron is now a ~2.4x position after the memory supercycle and ASML has more than doubled, while AVGO has recovered from its post-print dip. The agenda is to keep the upside but get paid for the volatility: protect the outsized Micron and ASML gains, overwrite rich premium, and diversify the single-sector risk into the broader AI build-out."
+    summary: "Concentrated, options-fluent AI-growth book — NVDA, AVGO and the semis supply chain at high single-stock weights, almost no cash. Micron is a ~2.4x position after a record, now-priced FQ3, and ASML has more than doubled, but the complex just took a ~4-5% weekly hit (NVDA back to ~$193, AVGO ~$366) on a reported OpenAI-IPO delay. The agenda is to keep the upside but get paid for the volatility: protect the outsized Micron and ASML gains, overwrite rich premium, and diversify the single-sector risk into the broader AI build-out — the pullback underlines the concentration risk."
   },
 
   /* =========================== AURORA (real book) ======================== */
@@ -233,9 +233,9 @@ const SEED_CLIENTS = [
       funding: { headline: "Grow to €70m by 2035 while drawing income", metricLabel: "Projected value", current: 50.2, target: 70, unit: "€m", status: "On track" }
     },
     positions: [
-      { name: "Micron",        ticker: "MU US",  assetClass: "Equity", sector: "Technology", ccy: "USD", weightPct: 25.8, pnlPct: 295, entryDate: "2019-06-10", entrySpot: 38.00, mat: null, note: "~4x gain at ~$150; FQ3 earnings 24-Jun; IVol rich." },
-      { name: "SPDR S&P 500",  ticker: "SPY US", assetClass: "Equity", sector: "Broad",     ccy: "USD", weightPct: 25.2, pnlPct: 106, entryDate: "2021-02-01", entrySpot: 360.00, mat: null, note: "Core beta anchor." },
-      { name: "NVIDIA",        ticker: "NVDA US",assetClass: "Equity", sector: "Technology", ccy: "USD", weightPct: 7.2,  pnlPct: 0,   entryDate: "2026-01-20", entrySpot: 205.00, mat: null, note: "Roughly flat since January; house still likes it." },
+      { name: "Micron",        ticker: "MU US",  assetClass: "Equity", sector: "Technology", ccy: "USD", weightPct: 25.8, pnlPct: 295, entryDate: "2019-06-10", entrySpot: 38.00, mat: null, note: "~4x gain at the book's basis; record FQ3 (24-Jun) confirmed and now priced — protect the concentration." },
+      { name: "SPDR S&P 500",  ticker: "SPY US", assetClass: "Equity", sector: "Broad",     ccy: "USD", weightPct: 25.2, pnlPct: 104, entryDate: "2021-02-01", entrySpot: 360.00, mat: null, note: "Core beta anchor; S&P ~7,354 after a ~2% down week." },
+      { name: "NVIDIA",        ticker: "NVDA US",assetClass: "Equity", sector: "Technology", ccy: "USD", weightPct: 7.2,  pnlPct: -6,  entryDate: "2026-01-20", entrySpot: 205.00, mat: null, note: "Slipped to ~$193 in the AI/semis sell-off; house still likes it." },
       { name: "US Treasury 1.25% '31", ticker: "T 1.25 08/31", assetClass: "Fixed Income", sector: "Rates", ccy: "USD", weightPct: 6.0, pnlPct: -15, entryDate: "2021-08-15", entrySpot: 98.50, mat: "2031-08-31", note: "Underwater on rates — bond-swap candidate." },
       { name: "Xetra-Gold ETC",ticker: "4GLD GY",assetClass: "Commodity", sector: "Gold",  ccy: "EUR", weightPct: 5.2,  pnlPct: 180, entryDate: "2020-03-01", entrySpot: 42.00, mat: null, note: "Tail hedge — protective." },
       { name: "TotalEnergies", ticker: "TTE FP", assetClass: "Equity", sector: "Energy",    ccy: "EUR", weightPct: 4.3,  pnlPct: 50,  entryDate: "2022-05-10", entrySpot: 48.00, mat: null, note: "Energy hedge." },
@@ -243,7 +243,7 @@ const SEED_CLIENTS = [
       { name: "US IG corporates", ticker: "—", assetClass: "Fixed Income", sector: "Credit", ccy: "USD", weightPct: 7.8, pnlPct: 0, entryDate: "2025-09-01", entrySpot: null, mat: "2030-09-01", note: "Core USD income sleeve." },
       { name: "EUR cash",      ticker: "—", assetClass: "Cash", sector: "Cash", ccy: "EUR", weightPct: 10.1, pnlPct: 0, entryDate: null, entrySpot: null, mat: null, note: "Idle; ~€5m equivalent." }
     ],
-    summary: "EMEA book dominated by a 25.8% Micron position on a ~4x gain into a 24-Jun print, 72% USD against an EUR base, with a bond underwater on rates and gold and TotalEnergies as deliberate hedges. The agenda: protect the outsized MU concentration, hedge the USD/EUR mismatch, harvest the underwater bond, monetize SAP's gain, and put idle cash to work — while protecting the gold and energy hedges, not trimming them."
+    summary: "EMEA book dominated by a 25.8% Micron position on a ~4x gain — the 24-Jun record FQ3 is now confirmed and priced — 72% USD against an EUR base, with a bond underwater on rates and gold and TotalEnergies as deliberate hedges. The agenda: protect the outsized MU concentration, hedge the USD/EUR mismatch, harvest the underwater bond, monetize SAP's gain, and put idle cash to work — while protecting the gold and energy hedges, not trimming them."
   },
 
   /* =========================== SCOTT (biggest book) ====================== */
@@ -269,7 +269,7 @@ const SEED_CLIENTS = [
       { name: "Realty Income (REIT)", ticker: "O US",   assetClass: "Real Assets",  sector: "Real Estate",ccy: "USD", weightPct: 5.0,  pnlPct: -11, entryDate: "2021-09-01", entrySpot: 68.00, mat: null, note: "Underwater on rates; high yield." },
       { name: "Listed infra fund",    ticker: "—",      assetClass: "Real Assets",  sector: "Infrastructure", ccy: "USD", weightPct: 4.0, pnlPct: 9, entryDate: "2023-03-01", entrySpot: null, mat: null, note: "Inflation-linked income." },
       { name: "Procter & Gamble",     ticker: "PG US",  assetClass: "Equity",       sector: "Consumer",   ccy: "USD", weightPct: 9.0,  pnlPct: 22,  entryDate: "2022-02-01", entrySpot: 138.00, mat: null, note: "Defensive dividend." },
-      { name: "Gold ETF",             ticker: "GLD US", assetClass: "Commodity",    sector: "Gold",       ccy: "USD", weightPct: 3.0,  pnlPct: 130, entryDate: "2021-06-01", entrySpot: 168.00, mat: null, note: "Small hedge sleeve; gold ~$4,180 after a third weekly dip on the strong dollar." },
+      { name: "Gold ETF",             ticker: "GLD US", assetClass: "Commodity",    sector: "Gold",       ccy: "USD", weightPct: 3.0,  pnlPct: 130, entryDate: "2021-06-01", entrySpot: 168.00, mat: null, note: "Small hedge sleeve; gold ~$4,067, firming on the weekend Middle-East safe-haven bid." },
       { name: "IG corporate bonds",   ticker: "—",      assetClass: "Fixed Income", sector: "Credit",     ccy: "USD", weightPct: 10.0, pnlPct: 0,   entryDate: "2025-08-01", entrySpot: null, mat: "2030-08-01", note: "Core fixed income." },
       { name: "USD cash",             ticker: "—",      assetClass: "Cash",         sector: "Cash",       ccy: "USD", weightPct: 10.0, pnlPct: 0,   entryDate: null, entrySpot: null, mat: null, note: "Drawdown buffer; some redeployable." }
     ],
@@ -290,8 +290,8 @@ const SEED_CLIENTS = [
       funding: { headline: "Preserve real value, grow to $90m by 2036", metricLabel: "Projected value", current: 71, target: 90, unit: "$m", status: "Slightly behind" }
     },
     positions: [
-      { name: "Bitcoin",            ticker: "BTC",     assetClass: "Alternatives", altKind: "directional", sector: "Crypto",         ccy: "USD", weightPct: 16.0, pnlPct: -30, entryDate: "2024-11-01", entrySpot: 92000.00, mat: null, note: "Bought near the highs; ~$64k now — the book's problem child." },
-      { name: "Gold (allocated)",   ticker: "XAU",     assetClass: "Commodity",    sector: "Gold",           ccy: "USD", weightPct: 12.0, pnlPct: 126, entryDate: "2022-01-01", entrySpot: 1850.00, mat: null, note: "Strategic hard-asset core; gold ~$4,180 on the strong-dollar pullback." },
+      { name: "Bitcoin",            ticker: "BTC",     assetClass: "Alternatives", altKind: "directional", sector: "Crypto",         ccy: "USD", weightPct: 16.0, pnlPct: -35, entryDate: "2024-11-01", entrySpot: 92000.00, mat: null, note: "Bought near the highs; ~$60k now (~-18% on the month) — the book's problem child." },
+      { name: "Gold (allocated)",   ticker: "XAU",     assetClass: "Commodity",    sector: "Gold",           ccy: "USD", weightPct: 12.0, pnlPct: 120, entryDate: "2022-01-01", entrySpot: 1850.00, mat: null, note: "Strategic hard-asset core; gold ~$4,067, firming on the weekend safe-haven bid." },
       { name: "Global infra fund",  ticker: "—",       assetClass: "Real Assets",  sector: "Infrastructure", ccy: "USD", weightPct: 13.0, pnlPct: 12,  entryDate: "2023-05-01", entrySpot: null, mat: null, note: "Listed infrastructure." },
       { name: "Shell",              ticker: "SHEL LN", assetClass: "Equity",       sector: "Energy",         ccy: "GBP", weightPct: 8.0,  pnlPct: 42,  entryDate: "2022-06-01", entrySpot: 22.50, mat: null, note: "Majors / energy premium; ~£32." },
       { name: "EM equity sleeve",   ticker: "—",       assetClass: "Equity",       sector: "Broad",          ccy: "USD", weightPct: 12.0, pnlPct: 5,   entryDate: "2024-02-01", entrySpot: null, mat: null, note: "APAC / EM growth." },
@@ -301,7 +301,7 @@ const SEED_CLIENTS = [
       { name: "Macro hedge fund",   ticker: "—",       assetClass: "Alternatives", altKind: "uncorrelated", sector: "Broad",          ccy: "USD", weightPct: 7.0,  pnlPct: 8,   entryDate: "2023-01-01", entrySpot: null, mat: null, note: "Uncorrelated sleeve." },
       { name: "USD cash",           ticker: "—",       assetClass: "Cash",         sector: "Cash",           ccy: "USD", weightPct: 8.0,  pnlPct: 0,   entryDate: null, entrySpot: null, mat: null, note: "Dry powder." }
     ],
-    summary: "Multi-currency real-assets family office with a hard-asset core (gold, energy, infrastructure) and an uncorrelated alternatives sleeve — but the standout issue is a 16% Bitcoin position down 30%. As a Professional client we can be creative: harvest the crypto loss and re-enter with a downside-defined structure, collar or partially monetize it, and keep building the gold and infrastructure core. The gold core and the miners (now caught up to spot, +122%) have done the heavy lifting."
+    summary: "Multi-currency real-assets family office with a hard-asset core (gold, energy, infrastructure) and an uncorrelated alternatives sleeve — but the standout issue is a 16% Bitcoin position down 35% (~$60k, ~-18% on the month). As a Professional client we can be creative: harvest the crypto loss and re-enter with a downside-defined structure, collar or partially monetize it, and keep building the gold and infrastructure core. The gold core and the miners (now caught up to spot, +122%) have done the heavy lifting."
   },
 
   /* =========================== JACOB (very big + liabilities) =========== */
@@ -350,7 +350,7 @@ const SEED_CLIENTS = [
       funding: { headline: "Grow to $70m by 2034; $4m house deposit by 2028", metricLabel: "Projected value", current: 44, target: 70, unit: "$m", status: "On track" }
     },
     positions: [
-      { name: "NVIDIA",          ticker: "NVDA US", assetClass: "Equity",       sector: "Technology", ccy: "USD", weightPct: 22.0, pnlPct: 294, entryDate: "2023-08-01", entrySpot: 52.00, mat: null, note: "Concentrated; huge unrealised gain — needs protecting." },
+      { name: "NVIDIA",          ticker: "NVDA US", assetClass: "Equity",       sector: "Technology", ccy: "USD", weightPct: 22.0, pnlPct: 271, entryDate: "2023-08-01", entrySpot: 52.00, mat: null, note: "Concentrated; ~$193 after the AI/semis pullback — still a huge unrealised gain that needs protecting." },
       { name: "Constellation Energy", ticker: "CEG US", assetClass: "Equity",   sector: "Utilities",  ccy: "USD", weightPct: 15.0, pnlPct: 181, entryDate: "2023-04-01", entrySpot: 95.00, mat: null, note: "Concentrated; datacenter-power winner." },
       { name: "S&P 500 index core", ticker: "VOO US",assetClass: "Equity",      sector: "Broad",      ccy: "USD", weightPct: 26.0, pnlPct: 72,  entryDate: "2023-01-01", entrySpot: 400.00, mat: null, note: "Diversified core." },
       { name: "ASML",            ticker: "ASML NA", assetClass: "Equity",       sector: "Technology", ccy: "EUR", weightPct: 7.0,  pnlPct: 115, entryDate: "2024-10-01", entrySpot: 740.00, mat: null, note: "Semi-cap." },
@@ -358,7 +358,7 @@ const SEED_CLIENTS = [
       { name: "Listed infra fund", ticker: "—",      assetClass: "Real Assets",  sector: "Infrastructure", ccy: "USD", weightPct: 8.0, pnlPct: 7, entryDate: "2024-01-01", entrySpot: null, mat: null, note: "Diversifier." },
       { name: "USD cash",        ticker: "—",        assetClass: "Cash",         sector: "Cash",       ccy: "USD", weightPct: 7.0,  pnlPct: 0,   entryDate: null, entrySpot: null, mat: null, note: "House-deposit reserve building." }
     ],
-    summary: "The most goals-aligned book at the top line — bucket allocation sits almost exactly on its strategic target. The whole job here is bottom-up risk management: NVDA (22%, +294%) and Constellation (15%, +181%) are two concentrated, deep-in-the-money winners that should be protected with collars to lock in gains ahead of the house-deposit goal. Because Prahnav is Retail, the collar needs reclassification or a non-complex protective alternative — that's the key conversation."
+    summary: "The most goals-aligned book at the top line — bucket allocation sits almost exactly on its strategic target. The whole job here is bottom-up risk management: NVDA (22%, +271% after the AI/semis pullback to ~$193) and Constellation (15%, +181%) are two concentrated, deep-in-the-money winners that should be protected with collars to lock in gains ahead of the house-deposit goal. Because Prahnav is Retail, the collar needs reclassification or a non-complex protective alternative — that's the key conversation."
   },
 
   /* =========================== BEN (retail, equity-heavy) =============== */
@@ -405,8 +405,8 @@ const SEED_CLIENTS = [
          → source "stated-risk"). */
     },
     positions: [
-      { name: "NVIDIA",                ticker: "NVDA US", assetClass: "Equity",       sector: "Technology", ccy: "USD", weightPct: 24.0, pnlPct: 327, entryDate: "2022-11-01", entrySpot: 48.00, mat: null, note: "Core AI position — ~3.3x unrealised gain (~$205), deliberately unhedged." },
-      { name: "Bitcoin",               ticker: "BTC",     assetClass: "Alternatives", altKind: "directional", sector: "Crypto",     ccy: "USD", weightPct: 18.0, pnlPct: 94,  entryDate: "2021-02-01", entrySpot: 33000.00, mat: null, note: "Direct digital-asset holding in custody; ~$64k." },
+      { name: "NVIDIA",                ticker: "NVDA US", assetClass: "Equity",       sector: "Technology", ccy: "USD", weightPct: 24.0, pnlPct: 302, entryDate: "2022-11-01", entrySpot: 48.00, mat: null, note: "Core AI position — ~$193 after the AI/semis sell-off, still ~4x, deliberately unhedged." },
+      { name: "Bitcoin",               ticker: "BTC",     assetClass: "Alternatives", altKind: "directional", sector: "Crypto",     ccy: "USD", weightPct: 18.0, pnlPct: 82,  entryDate: "2021-02-01", entrySpot: 33000.00, mat: null, note: "Direct digital-asset holding in custody; ~$60k (~-18% on the month)." },
       { name: "Tesla",                 ticker: "TSLA US", assetClass: "Equity",       sector: "Consumer",   ccy: "USD", weightPct: 11.0, pnlPct: 230, entryDate: "2023-01-01", entrySpot: 120.00, mat: null, note: "High-beta growth." },
       { name: "S&P 500 index core",    ticker: "VOO US",  assetClass: "Equity",       sector: "Broad",      ccy: "USD", weightPct: 12.0, pnlPct: 92,  entryDate: "2022-06-01", entrySpot: 360.00, mat: null, note: "The only diversified sleeve." },
       { name: "2x Nasdaq leveraged ETF", ticker: "—",     assetClass: "Equity",       sector: "Technology", ccy: "USD", weightPct: 10.0, pnlPct: 60,  entryDate: "2023-03-01", entrySpot: null, mat: null, note: "Daily-leveraged Nasdaq — tactical, high decay risk." },
@@ -440,7 +440,7 @@ const SEED_CLIENTS = [
       { name: "IG corporate bonds",  ticker: "—",       assetClass: "Fixed Income", sector: "Credit",     ccy: "USD", weightPct: 12.0, pnlPct: 0,  entryDate: "2025-06-01", entrySpot: null, mat: "2030-06-01", note: "Core income sleeve." },
       { name: "US Treasury ladder",  ticker: "—",       assetClass: "Fixed Income", sector: "Rates",      ccy: "USD", weightPct: 8.0,  pnlPct: 1,  entryDate: "2024-02-01", entrySpot: null, mat: "2031-02-01", note: "2–7yr ladder." },
       { name: "Listed infra fund",   ticker: "—",       assetClass: "Real Assets",  sector: "Infrastructure", ccy: "USD", weightPct: 8.0, pnlPct: 6, entryDate: "2023-04-01", entrySpot: null, mat: null, note: "Contracted income diversifier." },
-      { name: "Gold ETF",            ticker: "GLD US",  assetClass: "Commodity",    sector: "Gold",       ccy: "USD", weightPct: 3.0,  pnlPct: 130, entryDate: "2021-06-01", entrySpot: 168.00, mat: null, note: "Small hedge sleeve; gold ~$4,180 after a third weekly dip on the strong dollar." },
+      { name: "Gold ETF",            ticker: "GLD US",  assetClass: "Commodity",    sector: "Gold",       ccy: "USD", weightPct: 3.0,  pnlPct: 130, entryDate: "2021-06-01", entrySpot: 168.00, mat: null, note: "Small hedge sleeve; gold ~$4,067, firming on the weekend Middle-East safe-haven bid." },
       { name: "USD cash",            ticker: "—",       assetClass: "Cash",         sector: "Cash",       ccy: "USD", weightPct: 12.0, pnlPct: 0,  entryDate: null, entrySpot: null, mat: null, note: "Idle buffer." }
     ],
     summary: "A textbook 'no stated goal' case: never risk-profiled, no targets, no funding goal, no liabilities. The book itself is the only signal — broadly balanced (~57% equity, ~35% defensive, no concentrated name), which reads as a moderate appetite. The whole point of Fotis is to watch the system infer a moderate goal from the portfolio alone, with no form to read off."
