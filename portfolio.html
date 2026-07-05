@@ -29,7 +29,7 @@
     .pf-goalsbtn:hover { background: #6B3C21; }
 
     /* ---- compact idea cards (echo the Idea Feed look) ---- */
-    .pf-recos { display: grid; grid-template-columns: repeat(auto-fill, minmax(212px, 1fr)); gap: 12px; }
+    .pf-recos { display: grid; grid-template-columns: repeat(auto-fill, minmax(212px, 1fr)); gap: 12px; align-items: start; }
     .pf-card { display: flex; flex-direction: column; border: 1px solid #E5E1DA; border-radius: 11px; overflow: hidden; background: #fff; box-shadow: 0 2px 5px rgba(30,27,22,.04); text-align: left; }
     .pf-card.clickable { cursor: pointer; transition: border-color .15s ease, box-shadow .15s ease, transform .15s ease; }
     .pf-card.clickable:hover { border-color: #C7A97A; box-shadow: 0 10px 24px -14px rgba(30,27,22,.3); transform: translateY(-2px); }
@@ -43,7 +43,12 @@
     .pf-card-why { font: 400 11.5px/1.5 Inter, sans-serif; color: #6B675F; margin: 0 0 11px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
     .pf-card-foot { margin-top: auto; display: flex; align-items: center; justify-content: space-between; gap: 8px; font: 500 10.5px/1 Inter, sans-serif; color: #A8A29A; }
     .pf-card-cta { font-weight: 600; color: #996F3D; }
-    .pf-card.reco-static .pf-card-cta { color: #A8A29A; }
+    .pf-card.open { border-color: #C7A97A; box-shadow: 0 10px 24px -14px rgba(30,27,22,.3); }
+    .pf-card-exp { border-top: 1px solid #F0ECE4; margin-top: 10px; padding-top: 10px; }
+    .pf-card-detail { font: 400 11.5px/1.55 Inter, sans-serif; color: #3A362F; margin: 0 0 9px; }
+    .pf-card-chips { margin-bottom: 9px; }
+    .pf-card-suit { background: #1E1B16; color: #fff; border: 0; border-radius: 7px; padding: 6px 11px; font: 600 11px Inter, sans-serif; cursor: pointer; }
+    .pf-card-suit:hover { background: #33291f; }
 
     /* ---- goals-glossary popup ---- */
     .pf-modal-ov { position: fixed; inset: 0; z-index: 200; background: rgba(23,21,15,.5); backdrop-filter: blur(3px); display: flex; align-items: flex-start; justify-content: center; padding: 8vh 20px 20px; overflow-y: auto; }
@@ -150,24 +155,24 @@
     const gatedViews = rec.viewItems.map(it => {
       const idea = SEED.ideas.find(i => i.id === it.ideaId);
       const r = idea ? fitGate(idea) : null;
-      return (idea && r) ? Object.assign({}, it, { fit: r.fit }) : null;
+      return (idea && r) ? Object.assign({}, it, { fit: r.fit, detail: idea.thesis }) : null;
     }).filter(Boolean);
     const TFOC = window.TODAY_FOCUS ? [].concat(window.TODAY_FOCUS.earnings || [], window.TODAY_FOCUS.exEarnings || []) : [];
     const focusItems = TFOC.map(idea => {
       const r = fitGate(idea);
-      return r ? { source: "Focus", title: idea.name, rationale: idea.headline, fit: r.fit,
+      return r ? { source: "Focus", title: idea.name, rationale: idea.headline, detail: idea.thesis, fit: r.fit,
         structures: idea.structures, sector: idea.sector, assetClass: idea.assetClass, conviction: null, ideaId: idea.id } : null;
     }).filter(Boolean);
     const allRecs = focusItems.concat(rec.findings, gatedViews);
 
     // compact idea cards — echo the Idea Feed look (top strip + fit chip),
-    // small enough that several fit per row
+    // small enough that several fit per row; click to expand the full read +
+    // how we'd express it (Focus ideas also open the Suitability flowchart)
     const stripColor = (s) => s === "Focus" ? "#2FBF71" : s === "View" ? "#996F3D" : "#1E1B16";
     const srcLabel = (s) => s === "Focus" ? "Today's idea" : s === "View" ? "House view" : "Book action";
     const fitBand = (f) => f >= 80 ? "" : f >= 68 ? "mid" : "low";
-    const cta = (s) => s === "Focus" ? "Idea Suitability ›" : s === "View" ? "View idea ›" : "From the book";
     const recos = allRecs.length ? `<div class="pf-recos">` + allRecs.map(it => `
-      <article class="pf-card${it.source === "Focus" ? " clickable" : ""}" data-source="${esc(it.source)}" data-ideaid="${esc(it.ideaId || "")}" data-href="${it.source === "View" ? `index.html?tab=ideas&idea=${esc(it.ideaId)}` : it.source === "Focus" ? `index.html` : `index.html?tab=book&client=${esc(c.id)}`}">
+      <article class="pf-card clickable" data-source="${esc(it.source)}" data-ideaid="${esc(it.ideaId || "")}">
         <span class="pf-card-strip" style="background:${stripColor(it.source)}"></span>
         <div class="pf-card-body">
           <div class="pf-card-eyebrow">
@@ -176,7 +181,12 @@
           </div>
           <h4 class="pf-card-title">${esc(it.title)}</h4>
           <p class="pf-card-why">${esc(it.rationale)}</p>
-          <div class="pf-card-foot"><span>${esc(it.assetClass || it.sector || "")}</span><span class="pf-card-cta">${cta(it.source)}</span></div>
+          <div class="pf-card-foot"><span>${esc(it.assetClass || it.sector || "")}</span><span class="pf-card-cta">Details ▾</span></div>
+          <div class="pf-card-exp" hidden>
+            ${(it.detail || it.rationale) ? `<p class="pf-card-detail">${esc(it.detail || it.rationale)}</p>` : ""}
+            ${(it.structures && it.structures.length) ? `<div class="pf-card-chips">${window.EXPRESSIONS.accordionHTML((it.structures || []).slice(0, 3), { sector: it.sector, assetClass: it.assetClass, title: it.title }, { sm: true })}</div>` : ""}
+            ${it.source === "Focus" && it.ideaId ? `<button type="button" class="pf-card-suit" data-suit="${esc(it.ideaId)}">⑃ Open Idea Suitability ›</button>` : ""}
+          </div>
         </div>
       </article>`).join("") + `</div>` : `<p class="rec-why">No recommendations — book is on plan.</p>`;
 
@@ -248,7 +258,7 @@
               <p>${esc(c.summary)}</p>
             </div>
             <div class="panel">
-              <div class="panel-head"><h3>Recommended actions</h3><span class="rec-theme" style="margin-left:auto">${focusItems.length} from today's focus · ${rec.findings.length} from the book · ${gatedViews.length} from Views — same fit bar as the Idea Feed</span></div>
+              <div class="panel-head"><h3>Recommended actions</h3><button type="button" class="pf-goalsbtn" id="toolkitBtn" style="margin-left:14px;padding:8px 13px;font-size:11.5px" hidden>✉ Build a client email →</button><span class="rec-theme" style="margin-left:auto">${focusItems.length} from today's focus · ${rec.findings.length} from the book · ${gatedViews.length} from Views — same fit bar as the Idea Feed</span></div>
               <div class="panel-body">${recos}</div>
             </div>
           </div>
@@ -263,27 +273,37 @@
         </div>
       </div>`;
 
-    // navigation: standalone → follow the old hrefs; embedded in Open Book →
-    // today's-focus idea cards open the SAME Suitability popup the feed uses
-    // (via the parent's OB API), so the idea universe is one consistent thing.
-    // Book-derived actions and standing views have no Open Book detail surface,
-    // so they read as static info cards when embedded.
     const EMBED = params.get("embed") === "1";
     const OB = (EMBED && window.parent && window.parent.OB) ? window.parent.OB : null;
-    document.querySelectorAll(".pf-card").forEach(el => {
-      if (EMBED) {
-        const src = el.dataset.source, iid = el.dataset.ideaid;
-        if (src === "Focus" && iid && OB && OB.openSuit) {
-          el.addEventListener("click", () => OB.openSuit(iid));
-        } else {
-          el.classList.remove("clickable");
-          el.classList.add("reco-static");
-        }
-      } else if (el.dataset.href) {
-        el.classList.add("clickable");
-        el.addEventListener("click", () => { location.href = el.dataset.href; });
-      }
+
+    // every card expands in place on click to reveal the full read + how we'd
+    // express it; clicks inside the expanded panel (chips / Suitability button)
+    // don't collapse it
+    document.querySelectorAll(".pf-card").forEach(card => {
+      const exp = card.querySelector(".pf-card-exp");
+      const ctaEl = card.querySelector(".pf-card-cta");
+      card.addEventListener("click", (e) => {
+        if (e.target.closest(".pf-card-exp")) return;
+        const opening = exp && exp.hasAttribute("hidden");
+        if (!exp) return;
+        if (opening) { exp.removeAttribute("hidden"); card.classList.add("open"); if (ctaEl) ctaEl.textContent = "Hide ▴"; }
+        else { exp.setAttribute("hidden", ""); card.classList.remove("open"); if (ctaEl) ctaEl.textContent = "Details ▾"; }
+      });
     });
+    // Focus ideas: open the shared Suitability flowchart (embedded → parent popup)
+    document.querySelectorAll(".pf-card-suit").forEach(b => b.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const iid = b.dataset.suit;
+      if (OB && OB.openSuit) OB.openSuit(iid);
+      else location.href = "index.html";
+    }));
+    // "Build a client email" → the Client Toolkit for this client (embedded only,
+    // where the toolkit lives). It carries the SAME ideas shown here.
+    const toolkitBtn = document.getElementById("toolkitBtn");
+    if (toolkitBtn && OB && OB.openToolkit) {
+      toolkitBtn.hidden = false;
+      toolkitBtn.addEventListener("click", () => OB.openToolkit(id));
+    }
 
     // "What the goals mean" → popup
     const goalsBtn = document.getElementById("goalsBtn");
