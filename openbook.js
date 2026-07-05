@@ -1081,9 +1081,16 @@
     const obj = client.goals && client.goals.objective;
     const intro = `I've been through your portfolio in full${obj ? ` — with your objective of “${obj}” in mind —` : ""} and pulled together the ${ideas.length === 1 ? "idea" : ideas.length + " ideas"} below as one coordinated plan rather than piecemeal. Each one ties directly to something you hold or to how the book is positioned today.`;
     const parts = ideas.map((raw, i) => {
+      const tick = raw.ticker && raw.ticker !== "—" ? ` (${raw.ticker})` : "";
+      /* book-derived ideas already read straight from the client's holdings —
+         keep their grounded scan rationale rather than the sweep framing */
+      if (raw._book) {
+        const structs = (raw.structures || []).slice(0, 3);
+        const impl = structs.length ? `\nFor your book I'd look to implement this via ${structs.join(", ")}.` : "";
+        return `${i + 1}) ${raw.name}${tick}\nLooking at your book directly: ${clampSentences(raw.thesis, 4, 480)}${impl}`;
+      }
       const idea = asEmailIdea(raw);
       const em = buildEmail(idea, client, defaultImplFor(idea, client));
-      const tick = idea.ticker && idea.ticker !== "—" ? ` (${idea.ticker})` : "";
       return `${i + 1}) ${idea.name}${tick}\n${em.relevance}\n${em.ideaLine}\n${em.thesis}\n${em.impLine}`;
     }).join("\n\n");
     return [`Dear ${firstName(client)},`, "", intro, "", parts, "",
@@ -1308,6 +1315,31 @@
       if (block) { e.tier = tier; block.ideas.push(e); } else extras.push(e);
     });
 
+    /* book-derived findings mix onto the SAME lines as the market ideas. A
+       finding that names a held position (protect / harvest / swap) sits on that
+       sleeve at tier 1 — the "what your book already tells you to do" anchor —
+       above the market ideas for the same line. FX / liability findings attach
+       to the liability line; idle-cash to the cash sleeve. */
+    ((tk && tk.book) || []).forEach(e => {
+      const f = e.finding;
+      if (f.retailBlocked) { extras.push(e); return; }  // rendered blocked below
+      if ((f.kind === "fx" || f.kind === "liability") && liabs.length) {
+        const tgt = f.kind === "fx"
+          ? (liabs.find(l => /(EUR|GBP|CHF|JPY|USD|currency|FX)/i.test(l.name + " " + (l.note || ""))) || liabs[0])
+          : liabs[0];
+        if (tgt) { e.tier = 1; tgt.ideas.push(e); return; }
+      }
+      const refName = f.ref && f.ref.name;
+      if (refName) {
+        const pos = (c.positions || []).find(p => p.name === refName);
+        if (pos) { const blk = blocks.find(b => b.key === pos.assetClass); if (blk) { e.tier = 1; blk.ideas.push(e); return; } }
+      }
+      if (f.kind === "cash") { const blk = blocks.find(b => b.key === "Cash"); if (blk) { e.tier = 1; blk.ideas.push(e); return; } }
+      const blk = blocks.find(b => b.key === f.assetClass);
+      if (blk) { e.tier = 2; blk.ideas.push(e); return; }
+      extras.push(e);
+    });
+
     // keep each line readable: held-name links outrank sleeve matches, then fit;
     // top 3 stay on the line, overflow stays selectable below
     blocks.concat(liabs).forEach(b => {
@@ -1337,10 +1369,51 @@
     return out.sort((a, b) => b.res.fit - a.res.fit);
   }
 
+  /* book-derived ideas: the portfolio scan (protect a concentrated position,
+     hedge the FX/liability mismatch, put idle cash to work …). These come from
+     the client's ACTUAL holdings, not this week's market sweep, and are exactly
+     the "what does my book already tell me to do" ideas. Normalised into the
+     same entry shape the toolkit uses so they mix onto each balance-sheet line
+     and flow through the same coordinated email. */
+  const BOOK_RESERVED = ["FX", "CASH", "LIAB", "PROT", "INC", "SECT"];
+  function bookIdeaFrom(f) {
+    const ref = f.ref || {};
+    const realTicker = /^[A-Z.]{1,6}$/.test(ref.ticker || "") && !BOOK_RESERVED.includes(ref.ticker) ? ref.ticker : "";
+    return {
+      id: "bk_" + f.kind + "_" + slug(ref.ticker || ref.name || f.title),
+      name: f.title, title: f.title, headline: f.title,
+      thesis: f.rationale, ticker: realTicker,
+      assetClass: f.assetClass, sector: f.sector, bucket: f.bucket,
+      structures: f.structures || [], _book: true,
+    };
+  }
+  function bookEntriesFor(c) {
+    let findings = [];
+    try { findings = window.Scanner.scanBook(c) || []; } catch (e) {}
+    return findings.map(f => ({
+      idea: bookIdeaFrom(f), finding: f, book: true,
+      /* synthetic score so severe findings sort near the top of a line; a
+         Retail-blocked finding renders as suppressed, same as any OTC idea */
+      res: {
+        fit: 70 + Math.min(3, f.severity) * 6,
+        suppressed: !!f.retailBlocked,
+        tradabilityReason: f.retailBlocked ? "Every route to express this is an OTC derivative — not appropriate for a Retail client." : null,
+        bestImpl: null,
+      },
+    }));
+  }
+
   /* toolkit popup state — reset each time a client is opened */
-  let tk = null; // { client, selected:{}, expanded:{}, pool:{id->idea} }
+  let tk = null; // { client, selected:{}, expanded:{}, pool:{id->idea}, book:[], deskPicks:Set }
 
   function tkWhy(entry, client) {
+    /* book-derived ideas already carry their grounded rationale (from the
+       portfolio scan) — show it verbatim plus the ways to implement */
+    if (entry.book) {
+      const structs = (entry.idea.structures || []).slice(0, 3);
+      const impl = structs.length ? ` Ways to implement: ${structs.join(", ")}.` : "";
+      return clampSentences(entry.idea.thesis, 4, 480) + impl;
+    }
     /* engine flag reasoning for THIS client; unflagged ideas fall back to the
        same client-specific relevance hook the emails use — never generic */
     let why = "";
@@ -1355,9 +1428,13 @@
 
   function tkIdeaRow(entry, key, client) {
     const { idea, res } = entry;
-    const a = authorOf(idea);
+    const isBook = !!entry.book;
+    const a = isBook ? null : authorOf(idea);
     const title = idea.name || idea.title || "";
-    const tag = idea.ticker || (entry.standing ? (idea.sector || "House view") : "—");
+    const tag = idea.ticker || (isBook ? (idea.sector || "Book") : entry.standing ? (idea.sector || "House view") : "—");
+    const srcLabel = isBook ? "From your book" : entry.standing ? "House view" : (a ? a.name : "Desk");
+    const pick = tk.deskPicks && tk.deskPicks.has(idea.id);
+    const pickChip = pick ? `<span class="tk-pick" style="display:inline-block;font:600 9px/1.4 var(--sans,system-ui);letter-spacing:.08em;color:#2C7A4B;border:1px solid #2C7A4B;border-radius:3px;padding:1px 5px;margin-left:8px;vertical-align:middle">DESK PICK</span>` : "";
     if (res && res.suppressed) {
       return `<div class="cd-irow blocked">
         <div class="cd-irow-top">
@@ -1374,8 +1451,8 @@
       <div class="cd-irow-top">
         <button type="button" class="cd-check" data-tksel="${esc(key)}">${sel ? "✓" : ""}</button>
         <div class="cd-imid" data-tkexp="${esc(key)}">
-          <div class="cd-ititle">${esc(title)}</div>
-          <div class="cd-isub">${esc(tag)} · ${entry.standing ? "House view" : esc(a.name)}${res ? ` · fit ${res.fit}` : ""}</div>
+          <div class="cd-ititle">${esc(title)}${pickChip}</div>
+          <div class="cd-isub">${esc(tag)} · ${esc(srcLabel)}${!isBook && res ? ` · fit ${res.fit}` : ""}</div>
         </div>
         <button type="button" class="cd-caret" data-tkexp="${esc(key)}">▾</button>
       </div>
@@ -1394,6 +1471,28 @@
     tk = { client: c, selected: {}, expanded: {}, pool: Object.assign({}, FOCUS_BY_ID) };
     tk.standing = standingViewsFor(c);
     tk.standing.forEach(e => { tk.pool[e.idea.id] = e.idea; });
+    tk.book = bookEntriesFor(c);
+    tk.book.forEach(e => { tk.pool[e.idea.id] = e.idea; });
+
+    /* Desk picks — the recommended starting set, pre-ticked so the user opens to
+       a defensible selection rather than a wall of blank checkboxes. It leads
+       with the most severe book findings (protect / hedge / liability) and adds
+       the single best-fitting market idea from today's sweep. */
+    tk.deskPicks = new Set();
+    /* lead with the most severe actionable book findings (protect / hedge /
+       harvest / liability); severity-1 housekeeping (overwrite / cash) is left
+       for the user to add. scanBook already returns findings severity-desc. */
+    tk.book.filter(e => e.finding.severity >= 2 && !e.res.suppressed)
+      .slice(0, 2).forEach(e => tk.deskPicks.add(e.idea.id));
+    let bestFocus = null;
+    FOCUS.forEach(idea => {
+      let r = null; try { r = window.MAPPING.scoreIdeaForClient(idea, c); } catch (e) {}
+      if (r && !r.suppressed && r.fit >= window.MAPPING.PARAMS.flagMin && (!bestFocus || r.fit > bestFocus.fit)) {
+        bestFocus = { id: idea.id, fit: r.fit };
+      }
+    });
+    if (bestFocus) tk.deskPicks.add(bestFocus.id);
+    tk.deskPicks.forEach(id => { tk.selected[id] = true; });
     const pnl = clientPnl(c);
     openModal(`<div class="ob-overlay ob-scroll">
       <div class="ob-pop tkp-pop">
@@ -1413,7 +1512,9 @@
   }
 
   function tkSelectedIdeas() {
-    const ids = [...new Set(Object.keys(tk.selected).filter(k => tk.selected[k]).map(k => k.split("::")[1]))];
+    /* keyed directly by idea id (each idea renders exactly once), so selection
+       survives re-renders and pre-ticked desk picks resolve cleanly */
+    const ids = Object.keys(tk.selected).filter(k => tk.selected[k]);
     return ids.map(id => tk.pool[id]).filter(Boolean);
   }
 
@@ -1428,7 +1529,7 @@
         <div class="cd-blockval${neg ? " neg" : ""}">${neg ? esc(b.valTxt) : esc(ccySym(c.ccy) + b.val.toFixed(1) + "m")}</div>
       </div>
       <div class="cd-blocknote">${esc(b.note)}</div>
-      ${b.ideas.map(e => tkIdeaRow(e, b.key + "::" + e.idea.id, c)).join("")}
+      ${b.ideas.map(e => tkIdeaRow(e, e.idea.id, c)).join("")}
     </div>`;
 
     /* only the parts of the balance sheet that CARRY ideas are shown — this is
@@ -1458,7 +1559,7 @@
         </div>
       </div>
       <div class="tkp-selbar${nSel ? "" : " idle"}">
-        <div class="txt">${nSel ? `<b>${nSel}</b> idea${nSel === 1 ? "" : "s"} selected for ${esc(c.name)}` : `Tick the ideas to include — then export them as one coherent email`}</div>
+        <div class="txt">${nSel ? `<b>${nSel}</b> idea${nSel === 1 ? "" : "s"} selected for ${esc(c.name)} · <span style="opacity:.75">the <b style="color:#2C7A4B">desk picks</b> are pre-ticked — adjust as you like</span>` : `Tick the ideas to include — then export them as one coherent email`}</div>
         <div class="cd-selbtns">${nSel ? `
           <button type="button" class="cd-clear" id="tkClear">Clear</button>
           <button type="button" class="cd-export" id="tkExport">✉&nbsp; Export to one email</button>` : ""}
@@ -1468,12 +1569,12 @@
       ${(tk.standing && tk.standing.length) ? `<div class="tkp-more">
         <div class="tkp-more-head"><span class="sq" style="background:#996F3D"></span><h2 style="font-family:var(--serif);font-weight:600;font-size:16px;margin:0;color:var(--ink)">Standing house views that fit</h2></div>
         <div class="tkp-more-note">The desk's permanent themes matched to ${esc(c.name)}'s book — the same house views shown on the portfolio, selectable here too.</div>
-        <div class="tkp-more-grid">${tk.standing.map(e => tkIdeaRow(e, "view::" + e.idea.id, c)).join("")}</div>
+        <div class="tkp-more-grid">${tk.standing.map(e => tkIdeaRow(e, e.idea.id, c)).join("")}</div>
       </div>` : ""}
       <div class="tkp-more">
         <div class="tkp-more-head"><span class="sq"></span><h2 style="font-family:var(--serif);font-weight:600;font-size:16px;margin:0;color:var(--ink)">More ideas from today's sweep</h2></div>
         <div class="tkp-more-note">Everything else on today's board, scored live for ${esc(c.name)} — tick any to fold them into the same email.</div>
-        <div class="tkp-more-grid">${extras.map(e => tkIdeaRow(e, "extra::" + e.idea.id, c)).join("") || `<div class="cd-blocknote">Every idea on today's board is already mapped above.</div>`}</div>
+        <div class="tkp-more-grid">${extras.map(e => tkIdeaRow(e, e.idea.id, c)).join("") || `<div class="cd-blocknote">Every idea on today's board is already mapped above.</div>`}</div>
       </div>`;
 
     $$("#tkpBody [data-tksel]", root).forEach(el => el.addEventListener("click", () => {
