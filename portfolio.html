@@ -12,7 +12,53 @@
        duplicate masthead; the shell provides the "← All clients" bar. -->
   <style>
     html.embed .masthead { display: none; }
-    html.embed .reco-card.reco-static { cursor: default; }
+    html { scroll-behavior: smooth; }
+
+    /* ---- report layout with a left section tracker ---- */
+    .pf-shell { display: grid; grid-template-columns: 172px 1fr; gap: 30px; align-items: start; margin-top: 8px; }
+    .pf-toc { position: sticky; top: 12px; display: flex; flex-direction: column; gap: 2px; }
+    .pf-toc-h { font: 600 10px/1 Inter, sans-serif; letter-spacing: .16em; text-transform: uppercase; color: #A8A29A; margin-bottom: 8px; padding-left: 10px; }
+    .pf-toc a { font: 500 13px/1.2 Inter, sans-serif; color: #6B675F; text-decoration: none; padding: 8px 12px; border-left: 2px solid transparent; border-radius: 0 6px 6px 0; }
+    .pf-toc a:hover { background: rgba(154,123,79,.08); color: #17150F; }
+    .pf-toc a.active { border-left-color: #996F3D; color: #17150F; font-weight: 600; background: rgba(154,123,79,.10); }
+    .pf-main > .report-section { scroll-margin-top: 14px; }
+    #sec-glance { scroll-margin-top: 14px; }
+
+    /* ---- brown "what the goals mean" button ---- */
+    .pf-goalsbtn { flex: none; background: #54301A; color: #fff; border: 0; border-radius: 9px; padding: 10px 16px; font: 600 12.5px Inter, sans-serif; cursor: pointer; }
+    .pf-goalsbtn:hover { background: #6B3C21; }
+
+    /* ---- compact idea cards (echo the Idea Feed look) ---- */
+    .pf-recos { display: grid; grid-template-columns: repeat(auto-fill, minmax(212px, 1fr)); gap: 12px; }
+    .pf-card { display: flex; flex-direction: column; border: 1px solid #E5E1DA; border-radius: 11px; overflow: hidden; background: #fff; box-shadow: 0 2px 5px rgba(30,27,22,.04); text-align: left; }
+    .pf-card.clickable { cursor: pointer; transition: border-color .15s ease, box-shadow .15s ease, transform .15s ease; }
+    .pf-card.clickable:hover { border-color: #C7A97A; box-shadow: 0 10px 24px -14px rgba(30,27,22,.3); transform: translateY(-2px); }
+    .pf-card-strip { height: 4px; }
+    .pf-card-body { padding: 12px 13px 11px; display: flex; flex-direction: column; flex: 1; }
+    .pf-card-eyebrow { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 7px; }
+    .pf-card-src { font: 700 9px/1 Inter, sans-serif; letter-spacing: .13em; text-transform: uppercase; }
+    .pf-card-fit { font: 700 10px/1 Inter, sans-serif; color: #fff; background: #2C7A4B; border-radius: 5px; padding: 3px 6px; }
+    .pf-card-fit.mid { background: #996F3D; } .pf-card-fit.low { background: #A97D48; }
+    .pf-card-title { font: 600 14px/1.25 'Libre Baskerville', Georgia, serif; color: #17150F; margin: 0 0 6px; }
+    .pf-card-why { font: 400 11.5px/1.5 Inter, sans-serif; color: #6B675F; margin: 0 0 11px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    .pf-card-foot { margin-top: auto; display: flex; align-items: center; justify-content: space-between; gap: 8px; font: 500 10.5px/1 Inter, sans-serif; color: #A8A29A; }
+    .pf-card-cta { font-weight: 600; color: #996F3D; }
+    .pf-card.reco-static .pf-card-cta { color: #A8A29A; }
+
+    /* ---- goals-glossary popup ---- */
+    .pf-modal-ov { position: fixed; inset: 0; z-index: 200; background: rgba(23,21,15,.5); backdrop-filter: blur(3px); display: flex; align-items: flex-start; justify-content: center; padding: 8vh 20px 20px; overflow-y: auto; }
+    .pf-modal { width: 100%; max-width: 640px; background: #FBFAF7; border-radius: 14px; overflow: hidden; box-shadow: 0 30px 80px -20px rgba(23,21,15,.6); }
+    .pf-modal-head { background: #1E1B16; padding: 16px 22px; display: flex; align-items: center; justify-content: space-between; }
+    .pf-modal-head h3 { margin: 0; font: 600 18px/1 'Libre Baskerville', Georgia, serif; color: #F4F1EA; }
+    .pf-modal-x { background: rgba(255,255,255,.1); border: 0; color: #F4F1EA; width: 30px; height: 30px; border-radius: 50%; font-size: 15px; cursor: pointer; }
+    .pf-modal-body { padding: 20px 22px; }
+
+    @media (max-width: 900px) {
+      .pf-shell { grid-template-columns: 1fr; }
+      .pf-toc { position: static; flex-direction: row; flex-wrap: wrap; gap: 4px; margin-bottom: 8px; }
+      .pf-toc-h { display: none; }
+      .pf-toc a { border-left: 0; border-radius: 6px; background: #F2EEE6; }
+    }
   </style>
   <script>if (new URLSearchParams(location.search).get("embed") === "1") document.documentElement.classList.add("embed");</script>
 </head>
@@ -101,95 +147,119 @@
         return (!r.suppressed && r.fit >= flagMin) ? r : null;
       } catch (e) { return null; }
     };
-    const gatedViews = rec.viewItems.filter(it => {
+    const gatedViews = rec.viewItems.map(it => {
       const idea = SEED.ideas.find(i => i.id === it.ideaId);
-      return idea ? !!fitGate(idea) : true;
-    });
+      const r = idea ? fitGate(idea) : null;
+      return (idea && r) ? Object.assign({}, it, { fit: r.fit }) : null;
+    }).filter(Boolean);
     const TFOC = window.TODAY_FOCUS ? [].concat(window.TODAY_FOCUS.earnings || [], window.TODAY_FOCUS.exEarnings || []) : [];
     const focusItems = TFOC.map(idea => {
       const r = fitGate(idea);
-      return r ? { source: "Focus", title: idea.name, rationale: `${idea.headline} (fit ${r.fit} for ${c.name})`,
+      return r ? { source: "Focus", title: idea.name, rationale: idea.headline, fit: r.fit,
         structures: idea.structures, sector: idea.sector, assetClass: idea.assetClass, conviction: null, ideaId: idea.id } : null;
     }).filter(Boolean);
-    const allRecs = rec.findings.concat(focusItems, gatedViews);
-    const recos = allRecs.length ? `<div class="reco-tiles">` + allRecs.map(it => `
-      <article class="reco-card" data-source="${esc(it.source)}" data-ideaid="${esc(it.ideaId || "")}" data-href="${it.source === "View" ? `index.html?tab=ideas&idea=${esc(it.ideaId)}` : it.source === "Focus" ? `index.html` : `index.html?tab=book&client=${esc(c.id)}`}">
-        <div class="rc-top">
-          <span class="src-tag ${it.source === "Portfolio" ? "portfolio" : "view"}">${esc(it.source)}</span>
-          ${it.conviction ? `<span class="tag ${convClass(it.conviction)}">${esc(it.conviction)}</span>` : ""}
+    const allRecs = focusItems.concat(rec.findings, gatedViews);
+
+    // compact idea cards — echo the Idea Feed look (top strip + fit chip),
+    // small enough that several fit per row
+    const stripColor = (s) => s === "Focus" ? "#2FBF71" : s === "View" ? "#996F3D" : "#1E1B16";
+    const srcLabel = (s) => s === "Focus" ? "Today's idea" : s === "View" ? "House view" : "Book action";
+    const fitBand = (f) => f >= 80 ? "" : f >= 68 ? "mid" : "low";
+    const cta = (s) => s === "Focus" ? "Idea Suitability ›" : s === "View" ? "View idea ›" : "From the book";
+    const recos = allRecs.length ? `<div class="pf-recos">` + allRecs.map(it => `
+      <article class="pf-card${it.source === "Focus" ? " clickable" : ""}" data-source="${esc(it.source)}" data-ideaid="${esc(it.ideaId || "")}" data-href="${it.source === "View" ? `index.html?tab=ideas&idea=${esc(it.ideaId)}` : it.source === "Focus" ? `index.html` : `index.html?tab=book&client=${esc(c.id)}`}">
+        <span class="pf-card-strip" style="background:${stripColor(it.source)}"></span>
+        <div class="pf-card-body">
+          <div class="pf-card-eyebrow">
+            <span class="pf-card-src" style="color:${stripColor(it.source)}">${srcLabel(it.source)}</span>
+            ${typeof it.fit === "number" ? `<span class="pf-card-fit ${fitBand(it.fit)}">FIT ${it.fit}</span>` : it.conviction ? `<span class="tag ${convClass(it.conviction)}">${esc(it.conviction)}</span>` : ""}
+          </div>
+          <h4 class="pf-card-title">${esc(it.title)}</h4>
+          <p class="pf-card-why">${esc(it.rationale)}</p>
+          <div class="pf-card-foot"><span>${esc(it.assetClass || it.sector || "")}</span><span class="pf-card-cta">${cta(it.source)}</span></div>
         </div>
-        <h4>${esc(it.title)}</h4>
-        <p class="rc-why">${esc(it.rationale)}</p>
-        <div class="rc-structs">${window.EXPRESSIONS.accordionHTML((it.structures || []).slice(0, 3), { sector: it.sector, assetClass: it.assetClass, title: it.title }, { sm: true })}</div>
-        <div class="rc-foot"><span class="rc-bucket">${esc(it.assetClass)}</span><span class="rc-cta">${it.source === "View" ? "View idea ›" : it.source === "Focus" ? "View in the feed ›" : "Open client ›"}</span></div>
       </article>`).join("") + `</div>` : `<p class="rec-why">No recommendations — book is on plan.</p>`;
 
     document.getElementById("report").innerHTML = `
       <div class="report-masthead">
-        <span class="eyebrow">${esc(c.ccy)} base · ${esc(c.mifid)}</span>
-        <h1>${esc(c.name)} <span style="font-weight:400;color:var(--ink-faint)">/ Portfolio</span></h1>
-        <div class="rm-meta"><b>${esc(fmtAum)}</b> across ${(c.positions || []).length} holdings · ${esc(c.goals.objective)} · ${esc(c.goals.horizon)}</div>
-      </div>
-
-      <div class="report-glance">
-        <div class="glance-cell"><div class="k">Book AUM</div><div class="v">${esc(fmtAum)}</div></div>
-        <div class="glance-cell"><div class="k">Holdings</div><div class="v">${(c.positions || []).length}</div></div>
-        <div class="glance-cell"><div class="k">Largest position</div><div class="v">${top.weightPct || 0}% <small>${esc(top.ticker || top.name || "—")}</small></div></div>
-        <div class="glance-cell"><div class="k">Cash</div><div class="v">${cashPct}%</div></div>
-        <div class="glance-cell"><div class="k">Risk</div><div class="v" style="font-size:15px">${esc(c.risk)}</div></div>
-      </div>
-
-      <div class="report-section">
-        <h2>Allocation</h2>
-        <div class="pie-row">
-          <div class="pie-card"><div class="pc-t">By asset class</div>${BPCharts.donut(allocSeg)}${BPCharts.legend(allocSeg)}</div>
-          <div class="pie-card"><div class="pc-t">Inferred goal · by goal</div>${BPCharts.donut(tgtSeg)}${BPCharts.legend(tgtSeg)}</div>
-          <div class="pie-card"><div class="pc-t">Current · by goal</div>${BPCharts.donut(curBSeg)}${BPCharts.legend(curBSeg)}</div>
-        </div>
-        <div class="pt-verdict ${onTarget ? "toward" : "away"}" style="margin-top:14px">
-          <span class="vch">${onTarget ? "✓" : "▲"}</span>
-          <div>${gapText}</div>
-        </div>
-      </div>
-
-      <div class="report-section">
-        <h2>Long-term goals</h2>
-        <div class="report-two">
-          <div class="agenda" style="margin:0">
-            <span class="eyebrow">Objective</span>
-            <p>${esc(c.goals.objective)}. Horizon: ${esc(c.goals.horizon)}.</p>
-            <div style="background:#fff;color:var(--ink);border-radius:var(--radius);padding:14px 16px;margin-top:14px">${BPCharts.fundingBar(c.goals.funding)}</div>
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:18px">
+          <div>
+            <span class="eyebrow">${esc(c.ccy)} base · ${esc(c.mifid)}</span>
+            <h1>${esc(c.name)} <span style="font-weight:400;color:var(--ink-faint)">/ Portfolio</span></h1>
+            <div class="rm-meta"><b>${esc(fmtAum)}</b> across ${(c.positions || []).length} holdings · ${esc(c.goals.objective)} · ${esc(c.goals.horizon)}</div>
           </div>
-          <div class="panel">
-            <div class="panel-head"><h3>Strategic allocation — now vs target</h3></div>
-            <div class="panel-body">
-              ${BPCharts.goalTargetBar3(target, curB)}
+          <button class="pf-goalsbtn" id="goalsBtn" type="button">What the goals mean ›</button>
+        </div>
+      </div>
+
+      <div class="pf-shell">
+        <aside class="pf-toc" id="pfToc">
+          <div class="pf-toc-h">On this page</div>
+          <a href="#sec-glance" data-sec="sec-glance">Overview</a>
+          <a href="#sec-alloc" data-sec="sec-alloc">Allocation</a>
+          <a href="#sec-goals" data-sec="sec-goals">Long-term goals</a>
+          <a href="#sec-advisor" data-sec="sec-advisor">Advisor view</a>
+          <a href="#sec-holdings" data-sec="sec-holdings">Holdings</a>
+        </aside>
+
+        <div class="pf-main">
+          <div class="report-glance" id="sec-glance">
+            <div class="glance-cell"><div class="k">Book AUM</div><div class="v">${esc(fmtAum)}</div></div>
+            <div class="glance-cell"><div class="k">Holdings</div><div class="v">${(c.positions || []).length}</div></div>
+            <div class="glance-cell"><div class="k">Largest position</div><div class="v">${top.weightPct || 0}% <small>${esc(top.ticker || top.name || "—")}</small></div></div>
+            <div class="glance-cell"><div class="k">Cash</div><div class="v">${cashPct}%</div></div>
+            <div class="glance-cell"><div class="k">Risk</div><div class="v" style="font-size:15px">${esc(c.risk)}</div></div>
+          </div>
+
+          <div class="report-section" id="sec-alloc">
+            <h2>Allocation</h2>
+            <div class="pie-row">
+              <div class="pie-card"><div class="pc-t">By asset class</div>${BPCharts.donut(allocSeg)}${BPCharts.legend(allocSeg)}</div>
+              <div class="pie-card"><div class="pc-t">Inferred goal · by goal</div>${BPCharts.donut(tgtSeg)}${BPCharts.legend(tgtSeg)}</div>
+              <div class="pie-card"><div class="pc-t">Current · by goal</div>${BPCharts.donut(curBSeg)}${BPCharts.legend(curBSeg)}</div>
+            </div>
+            <div class="pt-verdict ${onTarget ? "toward" : "away"}" style="margin-top:14px">
+              <span class="vch">${onTarget ? "✓" : "▲"}</span>
+              <div>${gapText}</div>
             </div>
           </div>
-        </div>
-        <div class="panel" style="margin-top:16px">
-          <div class="panel-head"><h3>What the goals mean</h3></div>
-          <div class="panel-body">${BPCharts.goalGlossary3()}</div>
-        </div>
-      </div>
 
-      <div class="report-section">
-        <h2>Holdings</h2>
-        <table class="holdings-table">
-          <thead><tr><th>Position</th><th>Asset class</th><th class="r">P&amp;L</th><th class="r">Weight</th></tr></thead>
-          <tbody>${holdings}</tbody>
-        </table>
-      </div>
+          <div class="report-section" id="sec-goals">
+            <h2>Long-term goals</h2>
+            <div class="report-two">
+              <div class="agenda" style="margin:0">
+                <span class="eyebrow">Objective</span>
+                <p>${esc(c.goals.objective)}. Horizon: ${esc(c.goals.horizon)}.</p>
+                <div style="background:#fff;color:var(--ink);border-radius:var(--radius);padding:14px 16px;margin-top:14px">${BPCharts.fundingBar(c.goals.funding)}</div>
+              </div>
+              <div class="panel">
+                <div class="panel-head"><h3>Strategic allocation — now vs target</h3></div>
+                <div class="panel-body">
+                  ${BPCharts.goalTargetBar3(target, curB)}
+                </div>
+              </div>
+            </div>
+          </div>
 
-      <div class="report-section">
-        <h2>Advisor view</h2>
-        <div class="agenda" style="margin-bottom:16px">
-          <span class="eyebrow">The desk's agenda for this book</span>
-          <p>${esc(c.summary)}</p>
-        </div>
-        <div class="panel">
-          <div class="panel-head"><h3>Recommended actions</h3><span class="rec-theme" style="margin-left:auto">${rec.findings.length} from the book · ${focusItems.length} from today's focus · ${gatedViews.length} from Views — same fit bar as the Idea Feed</span></div>
-          <div class="panel-body">${recos}</div>
+          <div class="report-section" id="sec-advisor">
+            <h2>Advisor view</h2>
+            <div class="agenda" style="margin-bottom:16px">
+              <span class="eyebrow">The desk's agenda for this book</span>
+              <p>${esc(c.summary)}</p>
+            </div>
+            <div class="panel">
+              <div class="panel-head"><h3>Recommended actions</h3><span class="rec-theme" style="margin-left:auto">${focusItems.length} from today's focus · ${rec.findings.length} from the book · ${gatedViews.length} from Views — same fit bar as the Idea Feed</span></div>
+              <div class="panel-body">${recos}</div>
+            </div>
+          </div>
+
+          <div class="report-section" id="sec-holdings">
+            <h2>Holdings</h2>
+            <table class="holdings-table">
+              <thead><tr><th>Position</th><th>Asset class</th><th class="r">P&amp;L</th><th class="r">Weight</th></tr></thead>
+              <tbody>${holdings}</tbody>
+            </table>
+          </div>
         </div>
       </div>`;
 
@@ -200,18 +270,49 @@
     // so they read as static info cards when embedded.
     const EMBED = params.get("embed") === "1";
     const OB = (EMBED && window.parent && window.parent.OB) ? window.parent.OB : null;
-    document.querySelectorAll(".reco-card").forEach(el => {
+    document.querySelectorAll(".pf-card").forEach(el => {
       if (EMBED) {
         const src = el.dataset.source, iid = el.dataset.ideaid;
         if (src === "Focus" && iid && OB && OB.openSuit) {
           el.addEventListener("click", () => OB.openSuit(iid));
         } else {
+          el.classList.remove("clickable");
           el.classList.add("reco-static");
         }
       } else if (el.dataset.href) {
+        el.classList.add("clickable");
         el.addEventListener("click", () => { location.href = el.dataset.href; });
       }
     });
+
+    // "What the goals mean" → popup
+    const goalsBtn = document.getElementById("goalsBtn");
+    if (goalsBtn) goalsBtn.addEventListener("click", () => {
+      const ov = document.createElement("div");
+      ov.className = "pf-modal-ov";
+      ov.innerHTML = `<div class="pf-modal"><div class="pf-modal-head"><h3>What the goals mean</h3><button class="pf-modal-x" type="button" aria-label="Close">✕</button></div><div class="pf-modal-body">${BPCharts.goalGlossary3()}</div></div>`;
+      document.body.appendChild(ov);
+      ov.addEventListener("click", (e) => { if (e.target === ov || e.target.classList.contains("pf-modal-x")) ov.remove(); });
+      document.addEventListener("keydown", function esc(e) { if (e.key === "Escape") { ov.remove(); document.removeEventListener("keydown", esc); } });
+    });
+
+    // section tracker. The jump is done by NATIVE hash anchors (href="#sec-…"):
+    // the browser scrolls the section into view itself — reliable in every
+    // context (embedded iframe, standalone, throttled tab) with no scripted
+    // scrolling to fail. Sections carry scroll-margin-top so they land cleanly.
+    // We only manage the active-highlight (immediate on click + a best-effort
+    // scroll-spy).
+    const tocLinks = Array.from(document.querySelectorAll(".pf-toc a[data-sec]"));
+    tocLinks.forEach(a => a.addEventListener("click", () =>
+      tocLinks.forEach(x => x.classList.toggle("active", x === a))));
+    const spy = () => {
+      let cur = tocLinks[0];
+      tocLinks.forEach(a => { const s = document.getElementById(a.dataset.sec); if (s && s.getBoundingClientRect().top <= 100) cur = a; });
+      tocLinks.forEach(a => a.classList.toggle("active", a === cur));
+    };
+    window.addEventListener("scroll", spy, { passive: true });
+    spy();
+
     window.EXPRESSIONS.wire(document.getElementById("report"));
   })();
   </script>
