@@ -327,46 +327,12 @@
     return (b && choices.includes(b)) ? b : (choices[0] || ideaPreferred(idea));
   }
   // the personalised 1-2 line "why this is relevant to YOU"
-  function relevanceLine(idea, client) {
-    const theme = idea.themeId ? themeById(idea.themeId) : null;
-    const themeNm = theme ? theme.name : null;
-    if (idea.sector === "FX") {
-      let mm = 0; try { (client.positions || []).forEach(p => { if (p.ccy && p.ccy !== client.ccy && p.ccy !== "Cash") mm += (+p.weightPct || 0); }); } catch (e) {}
-      return `Given your book carries meaningful non-base-currency exposure${mm ? ` (~${Math.round(mm)}% in other currencies)` : ""}, I wanted to flag a currency idea from this week's desk sweep${themeNm ? ` that sits within our ${themeNm} view` : ""} and looks relevant to how you're positioned.`;
-    }
-    let rh = null; try { rh = window.MAPPING.relevantHolding(idea, client); } catch (e) {}
-    if (rh && rh.name) {
-      const own = rh.ownPct ? ` (~${Math.round(rh.ownPct)}% of the book)` : "";
-      const tie = themeNm ? ` — closely tied to our ${themeNm} theme` : "";
-      const pnl = (typeof rh.pnlPct === "number")
-        ? (rh.pnlPct >= 15 ? ", where you're sitting on a strong gain," : rh.pnlPct <= -10 ? ", which has lagged of late," : "")
-        : "";
-      return `Given your existing position in ${rh.name}${own}${tie}${pnl} I wanted to flag a related idea that may be worth a look.`;
-    }
-    try {
-      const goal = window.GOALS.goalsFor(client) || {}, cur = window.GOALS.currentBuckets(client) || {};
-      const b = idea.bucket, gap = Math.round((goal[b] || 0) - (cur[b] || 0));
-      if (gap >= 3) return `Given your ${String(b).toLowerCase()} allocation currently sits a little under your target, I wanted to flag an idea${themeNm ? ` from our ${themeNm} view` : ""} that could help close that gap.`;
-    } catch (e) {}
-    return `I wanted to flag an idea from this week's desk sweep${themeNm ? ` — part of our ${themeNm} view —` : ""} that looks well-suited to your mandate.`;
-  }
-  function implLineFor(idea, client, impl) {
-    const label = exprLabel(impl), why = exprWhy(impl);
-    const lvl = idea.levels ? ` Indicative levels: ${[idea.levels.tenor && "tenor " + idea.levels.tenor, idea.levels.entry && "entry " + idea.levels.entry, idea.levels.target && "target " + idea.levels.target, idea.levels.stop && "stop " + idea.levels.stop].filter(Boolean).join(", ")}.` : "";
-    return `For your book I'd look to implement this via ${aOrAn(label)} ${label}${why ? ` — ${why}` : ""}.${lvl}`;
-  }
-  // assemble the email parts (+ a plain-text rendering) for one idea×client×impl
-  function buildEmail(idea, client, impl) {
-    const subject = `An idea worth a look — ${idea.name}${idea.ticker && idea.ticker !== "—" ? ` (${idea.ticker})` : ""}`;
-    const greeting = `Dear ${firstName(client)},`;
-    const relevance = relevanceLine(idea, client);
-    const ideaLine = `The idea: ${idea.headline}`;
-    const thesis = clampSentences(idea.thesis, 3, 300);
-    const impLine = implLineFor(idea, client, impl);
-    const signoff = `Happy to walk through the detail whenever suits.\n\nBest regards,\n[Your name]\nJ.P. Morgan Private Bank`;
-    const plainText = [greeting, "", relevance, "", ideaLine, thesis, "", impLine, "", signoff].join("\n");
-    return { subject, greeting, relevance, ideaLine, thesis, impLine, signoff, plainText };
-  }
+  /* Email drafting now lives in the shared window.EMAIL engine (email.js) so the
+     copy is book-aware and can never drift between app.js and openbook.js. These
+     thin wrappers keep every existing call site (incl. emailDocHTML) working. */
+  function relevanceLine(idea, client) { return window.EMAIL.relevanceLine(idea, client); }
+  function implLineFor(idea, client, impl) { return window.EMAIL.implLineFor(idea, client, impl); }
+  function buildEmail(idea, client, impl) { return window.EMAIL.buildEmail(idea, client, impl); }
   // a standalone, inline-styled letterhead document — used for the PDF print view and the .eml body
   function emailDocHTML(idea, client, impl, opts) {
     opts = opts || {};

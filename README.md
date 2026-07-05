@@ -62,6 +62,7 @@ mapping is computed in the browser, so it always reflects the current book.
 | `scanner.js` | Portfolio scan + idea↔client fit (Advisor Book) |
 | `expressions.js` | "How to express it" knowledge base (clickable expressions) |
 | `mapping.js` | Transparent idea→client scoring engine (Today's Focus) |
+| `email.js`   | Book-aware client-email engine (`window.EMAIL`) — turns any idea×client into a personalised letter (real-holding hook, tax-swap / loss-harvest / cash-redeploy / FX-sizing actions, concrete implementation terms, balanced risk line, disclosure). Shared by `app.js` and `openbook.js` so the copy can't drift. |
 | `today_focus.js` / `today_focus.json` / `build_today_focus.py` | Daily focus data + generator |
 | `app.js`     | Rendering, tab/drawer/modal logic, Today's Focus, draft-a-view |
 
