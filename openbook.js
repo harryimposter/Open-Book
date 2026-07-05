@@ -1076,11 +1076,21 @@
     const parts = ideas.map((raw, i) => {
       const tick = raw.ticker && raw.ticker !== "—" ? ` (${raw.ticker})` : "";
       /* book-derived ideas already read straight from the client's holdings —
-         keep their grounded scan rationale rather than the sweep framing */
+         keep their grounded scan rationale, but run the implementation through the
+         SAME window.EMAIL engine (one concrete expression + example terms) so the
+         line matches the sweep ideas below instead of listing raw structures. */
       if (raw._book) {
-        const structs = (raw.structures || []).slice(0, 3);
-        const impl = structs.length ? `\nFor your book I'd look to implement this via ${structs.join(", ")}.` : "";
-        return `${i + 1}) ${raw.name}${tick}\nLooking at your book directly: ${clampSentences(raw.thesis, 4, 480)}${impl}`;
+        // the action's NAME is a verb phrase ("Harvest the loss in Pfizer"); the
+        // implementation example wants the UNDERLYING holding (Pfizer + its ticker,
+        // so the expression KB applies the name rather than the sector proxy).
+        const underlying = raw.underlying || "";
+        const implIdea = underlying
+          ? Object.assign({}, asEmailIdea(raw), { name: underlying, ticker: raw.underlyingTicker || raw.ticker || "" })
+          : asEmailIdea(raw);
+        const impl = (raw.structures && raw.structures[0]) || defaultImplFor(implIdea, client);
+        const thesis = window.EMAIL.takeSentences(raw.thesis, 3, 400) || raw.thesis;
+        const impLine = impl ? "\n" + window.EMAIL.implLineFor(implIdea, client, impl) : "";
+        return `${i + 1}) ${raw.name}${tick}\nLooking at your book directly: ${thesis}${impLine}`;
       }
       const idea = asEmailIdea(raw);
       const em = buildEmail(idea, client, defaultImplFor(idea, client));
@@ -1372,10 +1382,16 @@
   function bookIdeaFrom(f) {
     const ref = f.ref || {};
     const realTicker = /^[A-Z.]{1,6}$/.test(ref.ticker || "") && !BOOK_RESERVED.includes(ref.ticker) ? ref.ticker : "";
+    // a single-name action ("Harvest the loss in Pfizer") carries the holding on ref
+    // (name "Pfizer" + ticker "PFE US"); keep both so the impl example reads about it.
+    const firstTok = String(ref.ticker || "").split(" ")[0];
+    const isRealName = /^[A-Z.]{1,6}$/.test(firstTok) && !BOOK_RESERVED.includes(firstTok);
     return {
       id: "bk_" + f.kind + "_" + slug(ref.ticker || ref.name || f.title),
       name: f.title, title: f.title, headline: f.title,
       thesis: f.rationale, ticker: realTicker,
+      underlying: isRealName ? (ref.name || "") : "",           // e.g. "Pfizer"
+      underlyingTicker: isRealName ? (ref.ticker || "") : "",   // e.g. "PFE US"
       assetClass: f.assetClass, sector: f.sector, bucket: f.bucket,
       structures: f.structures || [], _book: true,
     };
