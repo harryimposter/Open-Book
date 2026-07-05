@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="openbook.css?v=20260705c" />
+  <link rel="stylesheet" href="openbook.css?v=20260705d" />
 </head>
 <body>
 
@@ -121,9 +121,18 @@
     </div>
   </main>
 
-  <!-- ===== ADVISOR BOOK (the original, pre-redesign implementation) ===== -->
-  <main class="view ob-bookframe-wrap" id="view-book" hidden>
-    <iframe id="classicFrame" class="ob-bookframe" title="Advisor Book"></iframe>
+  <!-- ===== ADVISOR BOOK: client-tile grid → classic portfolio detail ===== -->
+  <main class="view" id="view-book" hidden>
+    <div class="ob-main" id="bookGridWrap">
+      <div class="ob-eyebrow">COVERAGE</div>
+      <h1 class="ob-h1 tight">Advisor Book</h1>
+      <p class="ob-lede">Your coverage at a glance — tap a client to open their full book, portfolio and recommendations.</p>
+      <div class="bkg-grid" id="bookGrid"></div>
+    </div>
+    <div id="bookFrameWrap" hidden>
+      <div class="bkf-topbar"><button type="button" class="cd-back" id="bookBackAll" style="margin:0">← All clients</button></div>
+      <iframe id="classicFrame" class="ob-bookframe" title="Client book"></iframe>
+    </div>
   </main>
 
   <!-- modal mounts -->
@@ -139,6 +148,6 @@
   <script src="today_focus.js?v=20260705a"></script>
   <script src="methodology.js?v=20260705a"></script>
   <script src="morgan.js?v=20260705a"></script>
-  <script src="openbook.js?v=20260705c"></script>
+  <script src="openbook.js?v=20260705d"></script>
 </body>
 </html>

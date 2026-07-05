@@ -1171,19 +1171,44 @@
      SECTION 7 — classic Advisor Book (embedded) + Client Toolkit
      ======================================================================== */
 
-  /* the Advisor Book tab hosts the ORIGINAL pre-redesign app, untouched —
-     classic.html is the old index.html; ?embed=1 only hides its masthead */
+  /* the Advisor Book tab lands on a grid of client profile tiles; opening a
+     tile loads the ORIGINAL pre-redesign client detail (classic.html is the
+     old index.html, untouched — ?embed=1 only hides its chrome) */
   function classicUrl(clientId) {
     return "classic.html?embed=1&tab=book" + (clientId ? "&client=" + encodeURIComponent(clientId) : "");
   }
-  function ensureClassicLoaded() {
-    const f = $("#classicFrame");
-    if (f && !f.getAttribute("src")) f.src = classicUrl(null);
+  const initials2 = (name) => String(name).trim().split(/\s+/).map(w => w[0]).slice(0, 2).join("").toUpperCase();
+  function renderBookGrid() {
+    const host = $("#bookGrid");
+    host.innerHTML = (window.SEED.clients || []).map(c => {
+      let nba = null;
+      try { nba = window.Scanner.nextBestAction(c); } catch (e) {}
+      return `<button type="button" class="bkg-tile" data-bkg="${esc(c.id)}">
+        <span class="bkg-av">${esc(initials2(c.name))}</span>
+        <span class="bkg-nm">${esc(c.name)}</span>
+        <span class="bkg-risk">${esc(c.risk)} · ${esc(c.classification)}</span>
+        <span class="bkg-aum-k">BOOK AUM</span>
+        <span class="bkg-aum">${esc(fmtAum(c))}</span>
+        <span class="bkg-nba">
+          <span class="bkg-nba-k">NEXT BEST ACTION</span>
+          <span class="bkg-nba-v">${esc(nba ? nba.title : "On plan — no urgent action flagged")}</span>
+        </span>
+      </button>`;
+    }).join("");
+    $$(".bkg-tile", host).forEach(el => el.addEventListener("click", () => openClient(el.dataset.bkg)));
+  }
+  function showBookGrid() {
+    $("#bookGridWrap").hidden = false;
+    $("#bookFrameWrap").hidden = true;
+    renderBookGrid();
   }
   function openClient(id) {
     switchTab("book");
+    $("#bookGridWrap").hidden = true;
+    $("#bookFrameWrap").hidden = false;
     const f = $("#classicFrame");
     if (f) f.src = classicUrl(id);
+    window.scrollTo({ top: 0 });
   }
 
   /* ---- Client Toolkit rail (feed page, under the Top 3) ------------------ */
@@ -1459,7 +1484,8 @@
     const d = new Date();
     $("#asOf").textContent = "As of " + d.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
 
-    $$(".obh-tab").forEach(b => b.addEventListener("click", () => { switchTab(b.dataset.tab); if (b.dataset.tab === "book") ensureClassicLoaded(); }));
+    $$(".obh-tab").forEach(b => b.addEventListener("click", () => { switchTab(b.dataset.tab); if (b.dataset.tab === "book") showBookGrid(); }));
+    $("#bookBackAll").addEventListener("click", showBookGrid);
     $("#cmdBtn").addEventListener("click", openCmd);
     document.addEventListener("keydown", onGlobalKey);
 
@@ -1480,7 +1506,7 @@
     if (p.get("tab") === "book") {
       const qc = p.get("client");
       if (qc && clientById(qc)) openClient(qc);
-      else { switchTab("book"); ensureClassicLoaded(); }
+      else { switchTab("book"); showBookGrid(); }
     }
   }
 
