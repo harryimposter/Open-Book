@@ -579,6 +579,7 @@
     const off = (97.39 * (1 - conv / 100)).toFixed(2);
     const liked = getReaction(idea.id) === "like";
     const rec = ideaTradeStatement(idea);
+    const open = !!state.expanded[idea.id];
     return `<div class="ob-post" id="post-${esc(idea.id)}">
       <article class="ob-card">
         <div class="ip-head">
@@ -600,7 +601,7 @@
         </div>
         <div class="ip-window">
           <div class="ob-strip4"></div>
-          <div class="ip-wbody">
+          <div class="ip-wbody${open ? " is-open" : ""}">
             <div class="ip-wtags">
               <span class="ip-wtk">${esc(idea.ticker || "—")}</span>
               <span class="ip-wdot"></span>
@@ -612,6 +613,7 @@
               <div class="ip-wrec-k">RECOMMENDATION</div>
               <div class="ip-wrec-v">${esc(rec)}</div>
             </div>
+            <button type="button" class="ip-more" data-more="${esc(idea.id)}" hidden>${open ? "– Show less" : "＋ Full thesis &amp; recommendation"}</button>
           </div>
         </div>
         <div class="ip-actions">
@@ -674,6 +676,30 @@
     $$("[data-suit]", root).forEach(el => el.addEventListener("click", () => openSuit(el.dataset.suit)));
     $$("[data-email]", root).forEach(el => el.addEventListener("click", () => openTailoredEmail(el.dataset.email)));
     $$("[data-score]", root).forEach(el => el.addEventListener("click", () => openConvScore(el.dataset.score)));
+    $$("[data-more]", root).forEach(el => el.addEventListener("click", () => {
+      const id = el.dataset.more;
+      const open = !state.expanded[id];
+      if (open) state.expanded[id] = true; else delete state.expanded[id];
+      const body = el.closest(".ip-wbody");
+      if (body) body.classList.toggle("is-open", open);
+      el.innerHTML = open ? "– Show less" : "＋ Full thesis &amp; recommendation";
+    }));
+    /* only surface the toggle on cards whose thesis or recommendation is
+       actually clamped — short ideas don't need a pointless button */
+    syncMoreButtons(root);
+  }
+
+  function syncMoreButtons(root) {
+    $$(".ip-wbody", root).forEach(body => {
+      const btn = body.querySelector(".ip-more");
+      if (!btn) return;
+      if (body.classList.contains("is-open")) { btn.hidden = false; return; }
+      const clamped = ["ip-wthesis", "ip-wrec-v"].some(cls => {
+        const el = body.querySelector("." + cls);
+        return el && el.scrollHeight - el.clientHeight > 1;
+      });
+      btn.hidden = !clamped;
+    });
   }
 
   /* ========================================================================
@@ -1523,9 +1549,14 @@
     const { blocks, liabs, extras } = clientBlocks(c);
     const nSel = Object.keys(tk.selected).filter(k => tk.selected[k]).length;
 
+    /* how many ideas in a set are currently ticked — drives the per-section
+       "N selected" pills so each header shows its share of the selection */
+    const selCount = (entries) => entries.filter(e => tk.selected[e.idea.id]).length;
+    const selPill = (n) => n ? `<span class="tk-selcount">${n} selected</span>` : "";
+
     const blockHTML = (b, neg) => `<div class="cd-block">
       <div class="cd-blockrow">
-        <div class="cd-blocknm">${esc(b.name)}</div>
+        <div class="cd-blocknm">${esc(b.name)}${selPill(selCount(b.ideas))}</div>
         <div class="cd-blockval${neg ? " neg" : ""}">${neg ? esc(b.valTxt) : esc(ccySym(c.ccy) + b.val.toFixed(1) + "m")}</div>
       </div>
       <div class="cd-blocknote">${esc(b.note)}</div>
@@ -1534,21 +1565,26 @@
 
     /* only the parts of the balance sheet that CARRY ideas are shown — this is
        an idea-flagging surface, not a portfolio statement (the full book lives
-       in the Advisor Book tab) */
+       in the Advisor Book tab). Blocks lay out as compact cards in a grid so the
+       whole balance sheet fits in a row or two, not one tall stack. */
     const assetLines = blocks.filter(b => b.ideas.length);
     const liabLines = liabs.filter(b => b.ideas.length);
     const hasA = assetLines.length > 0, hasL = liabLines.length > 0;
-    const assetCol = hasA ? `<div>
-        <div class="cd-colhead"><span class="sq ink"></span><h2>Assets</h2></div>
-        ${assetLines.map(b => blockHTML(b, false)).join("")}
+    const sumSel = (lines) => lines.reduce((s, b) => s + selCount(b.ideas), 0);
+    const assetCol = hasA ? `<div class="cd-section">
+        <div class="cd-colhead"><span class="sq ink"></span><h2>Assets</h2>${selPill(sumSel(assetLines))}</div>
+        <div class="cd-blockgrid">${assetLines.map(b => blockHTML(b, false)).join("")}</div>
       </div>` : "";
-    const liabCol = hasL ? `<div>
-        <div class="cd-colhead"><span class="sq brick"></span><h2>Liabilities</h2><span class="cd-liabtag">IDEAS TOO</span></div>
-        ${liabLines.map(b => blockHTML(b, true)).join("")}
+    const liabCol = hasL ? `<div class="cd-section">
+        <div class="cd-colhead"><span class="sq brick"></span><h2>Liabilities</h2><span class="cd-liabtag">IDEAS TOO</span>${selPill(sumSel(liabLines))}</div>
+        <div class="cd-blockgrid">${liabLines.map(b => blockHTML(b, true)).join("")}</div>
       </div>` : "";
     const colsHTML = (hasA || hasL)
-      ? `<div class="cd-cols"${hasA && hasL ? "" : ` style="grid-template-columns:1fr"`}>${assetCol}${liabCol}</div>`
+      ? `${assetCol}${liabCol}`
       : `<div class="cd-blocknote" style="margin:2px 0 6px">None of today's ideas ties directly to a line of ${esc(c.name)}'s balance sheet — pick from the board below.</div>`;
+
+    const stdSel = tk.standing ? selCount(tk.standing) : 0;
+    const stdOpen = !!tk.stdOpen;
 
     $("#tkpBody", root).innerHTML = `
       <div class="tkp-read">
@@ -1566,15 +1602,18 @@
         </div>
       </div>
       ${colsHTML}
-      ${(tk.standing && tk.standing.length) ? `<div class="tkp-more">
-        <div class="tkp-more-head"><span class="sq" style="background:#996F3D"></span><h2 style="font-family:var(--serif);font-weight:600;font-size:16px;margin:0;color:var(--ink)">Standing house views that fit</h2></div>
-        <div class="tkp-more-note">The desk's permanent themes matched to ${esc(c.name)}'s book — the same house views shown on the portfolio, selectable here too.</div>
-        <div class="tkp-more-grid">${tk.standing.map(e => tkIdeaRow(e, e.idea.id, c)).join("")}</div>
+      ${(tk.standing && tk.standing.length) ? `<div class="tkp-more tkp-collapse">
+        <button type="button" class="tkp-more-head tkp-toggle${stdOpen ? " open" : ""}" data-tktoggle="std">
+          <span class="sq" style="background:#996F3D"></span>
+          <h2 style="font-family:var(--serif);font-weight:600;font-size:15px;margin:0;color:var(--ink)">Standing house views that fit</h2>
+          ${selPill(stdSel)}<span class="tkp-count">${tk.standing.length}</span><span class="tkp-caret">▾</span>
+        </button>
+        ${stdOpen ? `<div class="tkp-more-note">The desk's permanent themes matched to ${esc(c.name)}'s book — the same house views shown on the portfolio, selectable here too.</div>
+        <div class="tkp-more-grid">${tk.standing.map(e => tkIdeaRow(e, e.idea.id, c)).join("")}</div>` : ""}
       </div>` : ""}
-      <div class="tkp-more">
-        <div class="tkp-more-head"><span class="sq"></span><h2 style="font-family:var(--serif);font-weight:600;font-size:16px;margin:0;color:var(--ink)">More ideas from today's sweep</h2></div>
-        <div class="tkp-more-note">Everything else on today's board, scored live for ${esc(c.name)} — tick any to fold them into the same email.</div>
-        <div class="tkp-more-grid">${extras.map(e => tkIdeaRow(e, e.idea.id, c)).join("") || `<div class="cd-blocknote">Every idea on today's board is already mapped above.</div>`}</div>
+      <div class="tkp-more tkp-sweep">
+        <div class="tkp-more-head"><span class="sq"></span><h2 style="font-family:var(--serif);font-weight:600;font-size:15px;margin:0;color:var(--ink)">More ideas from today's sweep</h2>${selPill(selCount(extras.filter(e => !(e.res && e.res.suppressed))))}</div>
+        <div class="tkp-more-grid tkp-grid-3">${extras.map(e => tkIdeaRow(e, e.idea.id, c)).join("") || `<div class="cd-blocknote">Every idea on today's board is already mapped above.</div>`}</div>
       </div>`;
 
     $$("#tkpBody [data-tksel]", root).forEach(el => el.addEventListener("click", () => {
@@ -1585,6 +1624,10 @@
     $$("#tkpBody [data-tkexp]", root).forEach(el => el.addEventListener("click", () => {
       const k = el.dataset.tkexp;
       tk.expanded[k] = !tk.expanded[k];
+      renderTkBody(root);
+    }));
+    $$("#tkpBody [data-tktoggle]", root).forEach(el => el.addEventListener("click", () => {
+      if (el.dataset.tktoggle === "std") tk.stdOpen = !tk.stdOpen;
       renderTkBody(root);
     }));
     const clearBtn = $("#tkClear", root);

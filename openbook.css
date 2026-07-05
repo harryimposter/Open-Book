@@ -194,6 +194,9 @@ button { font-family: var(--sans); }
 .ip-wrec { margin-top: 13px; border-top: 1px solid rgba(244,241,234,.12); padding-top: 11px; }
 .ip-wrec-k { font-size: 9.5px; font-weight: 600; letter-spacing: .22em; color: var(--green); margin-bottom: 7px; }
 .ip-wrec-v { font-family: var(--serif); font-size: 14.5px; line-height: 1.48; color: var(--cream2); font-weight: 500; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.ip-wbody.is-open .ip-wthesis, .ip-wbody.is-open .ip-wrec-v { display: block; -webkit-line-clamp: unset; overflow: visible; }
+.ip-more { appearance: none; background: none; border: none; cursor: pointer; margin-top: 12px; padding: 0; font-family: var(--sans); font-size: 11.5px; font-weight: 600; letter-spacing: .04em; color: var(--gold); }
+.ip-more:hover { text-decoration: underline; }
 
 .ip-actions { display: flex; align-items: center; gap: 6px; padding: 11px 12px 3px; }
 .ip-like { appearance: none; background: none; border: none; cursor: pointer; display: flex; align-items: center; gap: 6px; padding: 6px 7px; font-size: 13px; color: var(--grey); }
@@ -395,6 +398,28 @@ button { font-family: var(--sans); }
 .tkp-more-head .sq { width: 9px; height: 9px; border-radius: 2px; background: var(--bronze-l); }
 .tkp-more-note { font-size: 11px; color: var(--grey-faint); margin: -6px 0 12px; }
 .tkp-more-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 14px; }
+
+/* --- compact balance-sheet cards: asset/liability blocks in a grid --- */
+.tkp-body .cd-section { margin-bottom: 16px; }
+.tkp-body .cd-blockgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; align-items: start; }
+.tkp-body .cd-blockgrid .cd-block { margin-bottom: 0; }
+
+/* --- per-section "N selected" pill --- */
+.tk-selcount { display: inline-block; margin-left: 8px; font: 600 9.5px/1.4 var(--sans, system-ui); letter-spacing: .03em; color: #2C7A4B; background: #EAF3EC; border: 1px solid #CBE3D2; border-radius: 20px; padding: 1px 8px; vertical-align: middle; white-space: nowrap; }
+
+/* --- collapsible section header (Standing house views) --- */
+.tkp-toggle { display: flex; align-items: center; gap: 10px; width: 100%; appearance: none; background: none; border: none; padding: 0; cursor: pointer; text-align: left; margin-bottom: 0; }
+.tkp-collapse { border-top: 1px solid var(--hairline); padding-top: 14px; }
+.tkp-count { font-size: 10.5px; font-weight: 700; color: var(--grey-faint); background: #F1ECE2; border-radius: 20px; padding: 1px 8px; }
+.tkp-caret { margin-left: auto; color: var(--grey-faint); font-size: 12px; transition: transform .15s ease; }
+.tkp-toggle.open .tkp-caret { transform: rotate(180deg); }
+
+/* --- denser "today's sweep" grid --- */
+.tkp-grid-3 { grid-template-columns: 1fr 1fr 1fr; gap: 8px 10px; }
+@media (max-width: 720px) {
+  .tkp-body .cd-blockgrid { grid-template-columns: 1fr; }
+  .tkp-grid-3 { grid-template-columns: 1fr; }
+}
 .cd-irow.blocked { opacity: .55; }
 .cd-irow.blocked .cd-check { cursor: not-allowed; background: #F0ECE4; }
 .cd-isupp { font-size: 10.5px; color: var(--brick); margin-top: 2px; }

@@ -6,6 +6,12 @@
       "runtimeExecutable": "python",
       "runtimeArgs": ["-m", "http.server", "5544", "--directory", "C:/Users/harin/OneDrive/Desktop/Claude Code/brokerageplayground"],
       "port": 5544
+    },
+    {
+      "name": "openbook",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "5546", "--directory", "C:/Users/harin/OneDrive/Desktop/Claude Code/Open Book"],
+      "port": 5546
     }
   ]
 }
