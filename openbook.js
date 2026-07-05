@@ -1172,10 +1172,10 @@
      ======================================================================== */
 
   /* the Advisor Book tab lands on a grid of client profile tiles; opening a
-     tile loads the ORIGINAL pre-redesign client detail (classic.html is the
-     old index.html, untouched — ?embed=1 only hides its chrome) */
-  function classicUrl(clientId) {
-    return "classic.html?embed=1&tab=book" + (clientId ? "&client=" + encodeURIComponent(clientId) : "");
+     tile goes STRAIGHT to that client's current-portfolio report (portfolio.html,
+     embedded — ?embed=1 hides its own masthead so it sits inside the shell) */
+  function clientPortfolioUrl(clientId) {
+    return "portfolio.html?embed=1&client=" + encodeURIComponent(clientId);
   }
   const initials2 = (name) => String(name).trim().split(/\s+/).map(w => w[0]).slice(0, 2).join("").toUpperCase();
   function renderBookGrid() {
@@ -1203,11 +1203,12 @@
     renderBookGrid();
   }
   function openClient(id) {
+    if (!id) return;
     switchTab("book");
     $("#bookGridWrap").hidden = true;
     $("#bookFrameWrap").hidden = false;
     const f = $("#classicFrame");
-    if (f) f.src = classicUrl(id);
+    if (f) f.src = clientPortfolioUrl(id);
     window.scrollTo({ top: 0 });
   }
 
@@ -1487,6 +1488,13 @@
 
     $$(".obh-tab").forEach(b => b.addEventListener("click", () => { switchTab(b.dataset.tab); if (b.dataset.tab === "book") showBookGrid(); }));
     $("#bookBackAll").addEventListener("click", showBookGrid);
+
+    /* small API the embedded portfolio report calls so its idea cards open the
+       SAME Suitability popup the feed uses (same idea universe, one behaviour) */
+    window.OB = {
+      openSuit: (ideaId) => openSuit(ideaId),
+      openToolkit: (clientId) => openToolkit(clientId),
+    };
     $("#cmdBtn").addEventListener("click", openCmd);
     document.addEventListener("keydown", onGlobalKey);
 

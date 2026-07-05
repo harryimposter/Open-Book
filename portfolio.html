@@ -8,6 +8,13 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
+  <!-- embed mode: shown inside the Open Book shell's Advisor Book tab. Hide the
+       duplicate masthead; the shell provides the "← All clients" bar. -->
+  <style>
+    html.embed .masthead { display: none; }
+    html.embed .reco-card.reco-static { cursor: default; }
+  </style>
+  <script>if (new URLSearchParams(location.search).get("embed") === "1") document.documentElement.classList.add("embed");</script>
 </head>
 <body>
   <header class="masthead">
@@ -106,7 +113,7 @@
     }).filter(Boolean);
     const allRecs = rec.findings.concat(focusItems, gatedViews);
     const recos = allRecs.length ? `<div class="reco-tiles">` + allRecs.map(it => `
-      <article class="reco-card" data-href="${it.source === "View" ? `index.html?tab=ideas&idea=${esc(it.ideaId)}` : it.source === "Focus" ? `index.html` : `index.html?tab=book&client=${esc(c.id)}`}">
+      <article class="reco-card" data-source="${esc(it.source)}" data-ideaid="${esc(it.ideaId || "")}" data-href="${it.source === "View" ? `index.html?tab=ideas&idea=${esc(it.ideaId)}` : it.source === "Focus" ? `index.html` : `index.html?tab=book&client=${esc(c.id)}`}">
         <div class="rc-top">
           <span class="src-tag ${it.source === "Portfolio" ? "portfolio" : "view"}">${esc(it.source)}</span>
           ${it.conviction ? `<span class="tag ${convClass(it.conviction)}">${esc(it.conviction)}</span>` : ""}
@@ -186,8 +193,25 @@
         </div>
       </div>`;
 
-    document.querySelectorAll(".reco-card[data-href]").forEach(el =>
-      el.addEventListener("click", () => { location.href = el.dataset.href; }));
+    // navigation: standalone → follow the old hrefs; embedded in Open Book →
+    // today's-focus idea cards open the SAME Suitability popup the feed uses
+    // (via the parent's OB API), so the idea universe is one consistent thing.
+    // Book-derived actions and standing views have no Open Book detail surface,
+    // so they read as static info cards when embedded.
+    const EMBED = params.get("embed") === "1";
+    const OB = (EMBED && window.parent && window.parent.OB) ? window.parent.OB : null;
+    document.querySelectorAll(".reco-card").forEach(el => {
+      if (EMBED) {
+        const src = el.dataset.source, iid = el.dataset.ideaid;
+        if (src === "Focus" && iid && OB && OB.openSuit) {
+          el.addEventListener("click", () => OB.openSuit(iid));
+        } else {
+          el.classList.add("reco-static");
+        }
+      } else if (el.dataset.href) {
+        el.addEventListener("click", () => { location.href = el.dataset.href; });
+      }
+    });
     window.EXPRESSIONS.wire(document.getElementById("report"));
   })();
   </script>
