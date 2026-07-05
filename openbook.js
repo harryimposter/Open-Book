@@ -570,9 +570,11 @@
 
   function ideaPostHTML(idea) {
     const a = authorOf(idea);
-    const bf = bookFit(idea);
-    const col = scoreColor(bf.fit);
-    const off = (97.39 * (1 - bf.fit / 100)).toFixed(2);
+    /* the card ring is the IDEA's conviction score (the desk's rubric), not a
+       client-fit number — per-client fit lives on the suitability flowchart */
+    const conv = (idea.conviction && idea.conviction.score) || 0;
+    const col = scoreColor(conv);
+    const off = (97.39 * (1 - conv / 100)).toFixed(2);
     const liked = getReaction(idea.id) === "like";
     const rec = ideaTradeStatement(idea);
     return `<div class="ob-post" id="post-${esc(idea.id)}">
@@ -583,14 +585,14 @@
             <div class="ip-author">${esc(a.name)}</div>
             <div class="ip-meta">${esc(idea.assetClass)} · ${timeAgo()}</div>
           </div>
-          <button type="button" class="ip-fit" data-score="${esc(idea.id)}" title="How this was scored">
-            <span class="ip-fit-lbl">FIT</span>
+          <button type="button" class="ip-fit" data-score="${esc(idea.id)}" title="How the desk scored this idea">
+            <span class="ip-fit-lbl">CONV</span>
             <span class="ip-ring">
               <svg width="36" height="36">
                 <circle cx="18" cy="18" r="15.5" fill="none" stroke="#EDE7DC" stroke-width="3"></circle>
                 <circle class="ip-ring-arc" cx="18" cy="18" r="15.5" fill="none" stroke="${col}" stroke-width="3" stroke-linecap="round" transform="rotate(-90 18 18)" style="stroke-dasharray:97.39;stroke-dashoffset:${off}"></circle>
               </svg>
-              <span class="ip-ring-n">${bf.fit}</span>
+              <span class="ip-ring-n">${conv}</span>
             </span>
           </button>
         </div>
@@ -669,7 +671,7 @@
     }));
     $$("[data-suit]", root).forEach(el => el.addEventListener("click", () => openSuit(el.dataset.suit)));
     $$("[data-email]", root).forEach(el => el.addEventListener("click", () => openTailoredEmail(el.dataset.email)));
-    $$("[data-score]", root).forEach(el => el.addEventListener("click", () => openScore(el.dataset.score)));
+    $$("[data-score]", root).forEach(el => el.addEventListener("click", () => openConvScore(el.dataset.score)));
   }
 
   /* ========================================================================
@@ -734,7 +736,7 @@
   }
   function buildTree(idea) {
     const flow = suitFlow(idea);
-    const gap = 196, cW = 162, oW = 172, iW = 200, rW = 336;
+    const gap = 200, cW = 188, oW = 172, iW = 200, rW = 336;
     const rH = 58, oH = 58, iH = 58;
     const rTop = 10, oTop = 152, iTop = 304, cTop = 458, cH = 64;
     const shift = cW / 2;
@@ -769,7 +771,7 @@
           lines.push(elbow(sc(imn.c), iTop + iH, sc(cn.c), cTop, "#996F3D", "0.74s"));
           const why = whyChip(cn.f.why);
           if (why) whys.push({ text: esc(why), left: sc(cn.c) - 90, top: cTop - 32, w: 180, delay: "0.84s" });
-          nodes.push({ cls: "tree-client", client: cn.f.client, w: cW, left: sc(cn.c) - cW / 2, top: cTop, delay: "0.9s" });
+          nodes.push({ cls: "tree-client", client: cn.f.client, fit: cn.f.fit, w: cW, left: sc(cn.c) - cW / 2, top: cTop, delay: "0.9s" });
         });
       });
     });
@@ -790,7 +792,8 @@
         return `<div class="tree-node" style="left:${n.left}px;top:${n.top}px;width:${n.w}px;animation-delay:${n.delay}">
           <div class="tree-client" data-treeclient="${esc(n.client.id)}">
             <span class="av">${esc(initials(n.client.name))}</span>
-            <span style="min-width:0"><span class="nm">${esc(n.client.name)}</span><span class="cta">draft email →</span></span>
+            <span style="min-width:0;flex:1"><span class="nm">${esc(n.client.name)}</span><span class="cta">draft email →</span></span>
+            <span class="fitb" data-fitwhy="${esc(n.client.id)}" title="Why this fit — the four live axes" style="background:${scoreColor(n.fit)}">${n.fit}</span>
           </div>
         </div>`;
       }
@@ -799,13 +802,13 @@
         <div class="${n.cls}"${n.style ? ` style="${n.style}"` : ""}>${ovl}${n.label}</div>
       </div>`;
     }).join("");
-    const bf = bookFit(idea);
+    const conv = (idea.conviction && idea.conviction.score) || 0;
     return `<div class="suit-flow ob-scroll">
       <div class="suit-legendrow">
-        <div class="suit-legend">IDEA → OBJECTIVE → IMPLEMENTATION → CLIENT&nbsp;&nbsp;·&nbsp;&nbsp;TAP A CLIENT TO DRAFT THEIR EMAIL</div>
+        <div class="suit-legend">IDEA → OBJECTIVE → IMPLEMENTATION → CLIENT&nbsp;&nbsp;·&nbsp;&nbsp;TAP A CLIENT TO DRAFT THEIR EMAIL · TAP A FIT SCORE TO SEE WHY</div>
         <button type="button" class="suit-whypill" data-whyscore="${esc(idea.id)}">
-          <span class="dot" style="background:${scoreColor(bf.fit)}">${bf.fit}</span>
-          <span class="lbl">Why this score</span>
+          <span class="dot" style="background:${scoreColor(conv)}">${conv}</span>
+          <span class="lbl">Conviction — why this score</span>
         </button>
       </div>
       <div class="suit-stage" style="width:${tree.outW}px;height:${tree.outH}px">
@@ -858,6 +861,10 @@
     });
   }
   function wireSuitBody(root, idea) {
+    $$("[data-fitwhy]", root).forEach(el => el.addEventListener("click", (e) => {
+      e.stopPropagation();
+      openFitScore(idea.id, el.dataset.fitwhy);
+    }));
     $$("[data-treeclient]", root).forEach(el => el.addEventListener("click", () => {
       const client = clientById(el.dataset.treeclient);
       if (!client) return;
@@ -866,7 +873,7 @@
       wireSuitEmail(root, idea, client);
     }));
     const why = $("[data-whyscore]", root);
-    if (why) why.addEventListener("click", () => openScore(idea.id));
+    if (why) why.addEventListener("click", () => openConvScore(idea.id));
     const back = $("#suitBack", root);
     if (back) back.addEventListener("click", () => {
       $("#suitBody", root).innerHTML = treeHTML(idea);
@@ -892,30 +899,15 @@
     });
   }
 
-  /* ---- score breakdown: the engine's real per-axis numbers --------------- */
-  function openScore(ideaId) {
-    const idea = FOCUS_BY_ID[ideaId];
-    if (!idea) return;
-    const bf = bookFit(idea);
-    let axes = [];
-    if (bf.client) {
-      try { axes = window.MAPPING.scoreIdeaForClient(idea, bf.client).axes || []; } catch (e) { axes = []; }
-    }
-    const col = scoreColor(bf.fit);
-    const off = (163.4 * (1 - bf.fit / 100)).toFixed(1);
-    const factors = axes.map((a, i) => {
-      const v = Math.round(a.score);
-      const c = scoreColor(v);
-      return `<div class="score-factor">
-        <div class="score-frow">
-          <span class="score-flbl">${esc(a.label)}</span>
-          <span class="score-fval" style="color:${c}">${v} × ${(+a.weight).toFixed(2)}</span>
-        </div>
-        <div class="score-track"><div class="score-fill" style="width:${v}%;background:${c};animation-delay:${(0.15 + i * 0.1).toFixed(2)}s"></div></div>
-        <div class="score-fnote">${esc(a.note)}</div>
-      </div>`;
-    }).join("");
-    openModal(`<div class="ob-overlay ob-scroll" style="padding-top:8vh">
+  /* ---- score breakdowns ----------------------------------------------------
+     Two DIFFERENT scores, never conflated:
+       · conviction (idea-level) — the desk rubric's real pillars
+       · client fit (pair-level) — the mapping engine's four live axes
+     Both popups only re-present numbers the engines already computed. */
+  function scorePopHTML(opts) {
+    const col = scoreColor(opts.score);
+    const off = (163.4 * (1 - opts.score / 100)).toFixed(1);
+    return `<div class="ob-overlay ob-scroll" style="padding-top:8vh">
       <div class="ob-pop score-pop">
         <div class="score-head">
           <div class="score-donut">
@@ -923,24 +915,72 @@
               <circle cx="33" cy="33" r="26" fill="none" stroke="#3A362E" stroke-width="5.5"></circle>
               <circle class="arc" cx="33" cy="33" r="26" fill="none" stroke="${col}" stroke-width="5.5" stroke-linecap="round" transform="rotate(-90 33 33)" style="stroke-dasharray:163.4;stroke-dashoffset:${off}"></circle>
             </svg>
-            <div class="mid"><span class="n">${bf.fit}</span><span class="k">FIT</span></div>
+            <div class="mid"><span class="n">${opts.score}</span><span class="k">${opts.kind}</span></div>
           </div>
           <div class="score-headmid">
-            <div class="score-eyebrow">HOW CLAUDE SCORED THIS · ${esc(idea.ticker || "—")}</div>
-            <div class="score-title">${esc(idea.name)}</div>
+            <div class="score-eyebrow">${opts.eyebrow}</div>
+            <div class="score-title">${opts.title}</div>
           </div>
           <button type="button" class="ob-pop-x" data-close aria-label="Close" style="width:30px;height:30px;font-size:15px">✕</button>
         </div>
         <div class="score-body">
-          <div class="score-note">${bf.client ? `BEST FIT IN YOUR BOOK — ${esc(bf.client.name).toUpperCase()} · THE FOUR LIVE FIT AXES` : "SCORED LIVE AGAINST YOUR COVERAGE"}</div>
-          ${factors || `<div class="score-fnote" style="margin-bottom:14px">No axis breakdown available for this idea.</div>`}
+          <div class="score-note">${opts.note}</div>
+          ${opts.factors || `<div class="score-fnote" style="margin-bottom:14px">No breakdown available.</div>`}
         </div>
         <div class="score-foot">
-          <button type="button" class="score-cta" id="scoreToSuit">⑃&nbsp; See the suitability flowchart</button>
+          <button type="button" class="score-cta" id="scoreCta">${opts.cta}</button>
         </div>
       </div>
-    </div>`, (root) => {
-      $("#scoreToSuit", root).addEventListener("click", () => openSuit(ideaId));
+    </div>`;
+  }
+  function factorHTML(label, valTxt, pct, note, i) {
+    const c = scoreColor(pct);
+    return `<div class="score-factor">
+      <div class="score-frow">
+        <span class="score-flbl">${esc(label)}</span>
+        <span class="score-fval" style="color:${c}">${esc(valTxt)}</span>
+      </div>
+      <div class="score-track"><div class="score-fill" style="width:${pct}%;background:${c};animation-delay:${(0.15 + i * 0.1).toFixed(2)}s"></div></div>
+      <div class="score-fnote">${esc(note || "")}</div>
+    </div>`;
+  }
+  /* conviction — the idea's own rubric pillars (earnings / seven-pillar) */
+  function openConvScore(ideaId) {
+    const idea = FOCUS_BY_ID[ideaId];
+    if (!idea || !idea.conviction) return;
+    const conv = idea.conviction;
+    const factors = (conv.pillars || []).map((p, i) =>
+      factorHTML(p.label, `${p.score}/${p.max}`, Math.round(p.score / p.max * 100), `${p.note}${p.dq ? ` [${p.dq}]` : ""}`, i)).join("");
+    const model = conv.model === "earnings" ? "FOUR-PILLAR PRINT RUBRIC" : "SEVEN-PILLAR MODEL";
+    openModal(scorePopHTML({
+      score: conv.score || 0, kind: "CONV",
+      eyebrow: `HOW THE DESK SCORED THIS IDEA · ${esc(idea.ticker || "—")}`,
+      title: esc(idea.name),
+      note: `${model} · RAW ${conv.raw}/${conv.maxRaw} · ${esc(String(conv.label || conv.tier || "").toUpperCase())}${conv.capped ? " · DATA-QUALITY CAP APPLIED" : ""}`,
+      factors, cta: "⑃&nbsp; See which clients this fits — the flowchart",
+    }), (root) => {
+      $("#scoreCta", root).addEventListener("click", () => openSuit(ideaId));
+      return null;
+    });
+  }
+  /* client fit — the mapping engine's four live axes for one idea × client */
+  function openFitScore(ideaId, clientId) {
+    const idea = FOCUS_BY_ID[ideaId];
+    const client = clientById(clientId);
+    if (!idea || !client) return;
+    let res = null;
+    try { res = window.MAPPING.scoreIdeaForClient(idea, client); } catch (e) {}
+    if (!res) return;
+    const factors = (res.axes || []).map((a, i) =>
+      factorHTML(a.label, `${Math.round(a.score)} × ${(+a.weight).toFixed(2)}`, Math.round(a.score), a.note, i)).join("");
+    openModal(scorePopHTML({
+      score: res.fit, kind: "FIT",
+      eyebrow: `CLIENT FIT · ${esc(client.name).toUpperCase()} · ${esc(idea.ticker || "—")}`,
+      title: esc(idea.name),
+      note: `THE FOUR LIVE FIT AXES FOR ${esc(client.name).toUpperCase()} — WEIGHTED SUM ${res.bracketFit != null ? res.bracketFit : res.fit}/100`,
+      factors, cta: "←&nbsp; Back to the flowchart",
+    }), (root) => {
+      $("#scoreCta", root).addEventListener("click", () => openSuit(ideaId));
       return null;
     });
   }
@@ -1093,9 +1133,13 @@
     msgs.appendChild(ai);
     const body = $("#askBody");
     body.scrollTop = body.scrollHeight;
+    /* follow the stream only while the user is already at the bottom — never
+       fight an upward scroll */
+    const nearBottom = () => body.scrollHeight - body.scrollTop - body.clientHeight < 60;
+    const follow = () => { if (nearBottom()) body.scrollTop = body.scrollHeight; };
     const answer = window.Morgan ? window.Morgan.answer(q) : "Morgan AI is unavailable.";
     const refs = answerRefs(q, answer);
-    streamInto($(".ask-ai-body", ai), answer, { scroll: () => { body.scrollTop = body.scrollHeight; } }, () => {
+    streamInto($(".ask-ai-body", ai), answer, { scroll: follow }, () => {
       if (refs.length) {
         const wrap = $(".ask-refs", ai);
         wrap.hidden = false;
@@ -1110,7 +1154,7 @@
           else openSuit(r.id);
         }));
       }
-      body.scrollTop = body.scrollHeight;
+      follow();
     });
   }
 
@@ -1325,12 +1369,30 @@
       ${b.ideas.map(e => tkIdeaRow(e, b.key + "::" + e.idea.id, c)).join("")}
     </div>`;
 
+    /* only the parts of the balance sheet that CARRY ideas are shown — this is
+       an idea-flagging surface, not a portfolio statement (the full book lives
+       in the Advisor Book tab) */
+    const assetLines = blocks.filter(b => b.ideas.length);
+    const liabLines = liabs.filter(b => b.ideas.length);
+    const hasA = assetLines.length > 0, hasL = liabLines.length > 0;
+    const assetCol = hasA ? `<div>
+        <div class="cd-colhead"><span class="sq ink"></span><h2>Assets</h2></div>
+        ${assetLines.map(b => blockHTML(b, false)).join("")}
+      </div>` : "";
+    const liabCol = hasL ? `<div>
+        <div class="cd-colhead"><span class="sq brick"></span><h2>Liabilities</h2><span class="cd-liabtag">IDEAS TOO</span></div>
+        ${liabLines.map(b => blockHTML(b, true)).join("")}
+      </div>` : "";
+    const colsHTML = (hasA || hasL)
+      ? `<div class="cd-cols"${hasA && hasL ? "" : ` style="grid-template-columns:1fr"`}>${assetCol}${liabCol}</div>`
+      : `<div class="cd-blocknote" style="margin:2px 0 6px">None of today's ideas ties directly to a line of ${esc(c.name)}'s balance sheet — pick from the board below.</div>`;
+
     $("#tkpBody", root).innerHTML = `
       <div class="tkp-read">
         <div class="ob-strip5"></div>
         <div class="tkp-read-body">
           <div class="cd-read-k">THE READ ON THIS BOOK</div>
-          <div class="cd-read-v" style="font-size:16.5px">${esc(c.summary)}</div>
+          <div class="cd-read-v tkp-read-v">${esc(clampSentences(c.summary, 2, 320))}</div>
         </div>
       </div>
       <div class="tkp-selbar${nSel ? "" : " idle"}">
@@ -1340,18 +1402,9 @@
           <button type="button" class="cd-export" id="tkExport">✉&nbsp; Export to one email</button>` : ""}
         </div>
       </div>
-      <div class="cd-cols">
-        <div>
-          <div class="cd-colhead"><span class="sq ink"></span><h2>Assets</h2></div>
-          ${blocks.map(b => blockHTML(b, false)).join("") || `<div class="cd-blocknote">No positions on file.</div>`}
-        </div>
-        <div>
-          <div class="cd-colhead"><span class="sq brick"></span><h2>Liabilities</h2><span class="cd-liabtag">IDEAS TOO</span></div>
-          ${liabs.map(b => blockHTML(b, true)).join("") || `<div class="cd-blocknote">No liabilities on file — the whole balance sheet is on the asset side.</div>`}
-        </div>
-      </div>
+      ${colsHTML}
       <div class="tkp-more">
-        <div class="tkp-more-head"><span class="sq"></span><h2 style="font-family:var(--serif);font-weight:600;font-size:18px;margin:0;color:var(--ink)">More ideas from today's sweep</h2></div>
+        <div class="tkp-more-head"><span class="sq"></span><h2 style="font-family:var(--serif);font-weight:600;font-size:16px;margin:0;color:var(--ink)">More ideas from today's sweep</h2></div>
         <div class="tkp-more-note">Everything else on today's board, scored live for ${esc(c.name)} — tick any to fold them into the same email.</div>
         <div class="tkp-more-grid">${extras.map(e => tkIdeaRow(e, "extra::" + e.idea.id, c)).join("") || `<div class="cd-blocknote">Every idea on today's board is already mapped above.</div>`}</div>
       </div>`;
