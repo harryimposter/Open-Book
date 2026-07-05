@@ -110,7 +110,7 @@ button { font-family: var(--sans); }
 .obb-k { font-size: 10.5px; font-weight: 600; letter-spacing: .24em; color: var(--green); }
 .obb-dot { width: 4px; height: 4px; border-radius: 50%; background: #4A463E; }
 .obb-t { font-size: 10.5px; font-weight: 600; letter-spacing: .14em; color: var(--grey-soft); }
-.ob-brief-text { font-family: var(--serif); font-size: 19px; line-height: 1.5; color: var(--cream); font-weight: 500; max-width: 1000px; }
+.ob-brief-text { font-family: var(--serif); font-size: 19px; line-height: 1.5; color: var(--cream); font-weight: 500; }
 
 /* 3-column grid */
 .ob-grid3 { display: grid; grid-template-columns: minmax(0,420px) minmax(min(520px,55vw),1fr) minmax(0,440px); gap: clamp(16px, 2.5vw, 40px); align-items: start; }
