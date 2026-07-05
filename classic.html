@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Brokerage Playground — Private Bank Investment Desk</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css?v=20260626a" />
+  <!-- embed mode: hosted inside the redesigned shell's Advisor Book tab; hide
+       the duplicate masthead only, everything else stays exactly as before -->
+  <style>html.embed .masthead { display: none; }</style>
+  <script>if (new URLSearchParams(location.search).get("embed") === "1") document.documentElement.classList.add("embed");</script>
+</head>
+<body>
+
+  <!-- Masthead -->
+  <header class="masthead">
+    <div class="masthead-inner">
+      <div class="brand">
+        <span class="jpm-wordmark">J.P.Morgan</span>
+        <span class="jpm-sub">Private Bank</span>
+      </div>
+      <div class="masthead-meta">
+        <div><strong>Advisor view</strong> · Coverage book</div>
+        <div id="asOf">As of —</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Tabs -->
+  <nav class="tabs">
+    <div class="tabs-inner">
+      <button class="tab" data-tab="ideas">Solutions Views</button>
+      <button class="tab active" data-tab="focus">Today's Focus</button>
+      <button class="tab" data-tab="book">Advisor Book</button>
+      <button class="tab" data-tab="pretrade">Pre-Trade Analysis</button>
+    </div>
+  </nav>
+
+  <!-- ================= TODAY'S FOCUS ================= -->
+  <main class="view" id="view-focus">
+    <div class="view-head focus-head">
+      <div>
+        <div class="eyebrow">AI-generated · <span id="focusAsOf">—</span></div>
+        <h1>Today's Focus</h1>
+        <p>The desk's daily idea sweep — earnings catalysts and ex-earnings ideas, each <b>scored</b>, <b>tagged to the clients it fits</b> with a per-client fit score, and expressible in one click. Generated from a market scan; the client mapping is computed live against your book.</p>
+      </div>
+      <button class="rubric-btn" id="rubricBtn" type="button">How scoring works</button>
+    </div>
+
+    <div class="focus-sweepnote" id="focusSweepNote"></div>
+
+    <div class="search-bar">
+      <span class="search-ico" aria-hidden="true">⌕</span>
+      <input id="focusSearch" class="search-input" type="search" placeholder="Search today's ideas — name, ticker, theme, sector or flagged client…" aria-label="Search Today's Focus ideas" />
+      <button class="search-clear" id="focusSearchClear" type="button" hidden aria-label="Clear search">✕</button>
+    </div>
+
+    <div class="focus-filters" id="focusFilters"></div>
+
+    <section class="focus-section">
+      <div class="focus-section-head"><span class="fs-kicker">Earnings</span><h2>Reporting now — catalyst ideas</h2></div>
+      <div class="focus-tiles" id="focusEarnings"></div>
+    </section>
+
+    <section class="focus-section">
+      <div class="focus-section-head"><span class="fs-kicker ex">Ex-earnings</span><h2>Macro &amp; thematic ideas</h2></div>
+      <div class="focus-tiles" id="focusExEarnings"></div>
+    </section>
+  </main>
+
+  <!-- ================= SOLUTIONS VIEWS ================= -->
+  <main class="view" id="view-ideas" hidden>
+    <div class="view-head">
+      <div class="eyebrow">House Strategy</div>
+      <h1>Solutions Views</h1>
+      <p>The desk's standing investment themes — the human strategy input the daily focus leans on. Select a theme to filter its ideas; open any idea to see how we'd express it and which client books it fits. <b>Draft a view</b> from a one-line thesis and the app suggests the structure, expressions and candidate clients for you to keep or edit.</p>
+    </div>
+
+    <div class="search-bar">
+      <span class="search-ico" aria-hidden="true">⌕</span>
+      <input id="viewsSearch" class="search-input" type="search" placeholder="Search views across all themes — name, theme, asset class, expression or flagged client…" aria-label="Search Solutions Views" />
+      <button class="search-clear" id="viewsSearchClear" type="button" hidden aria-label="Clear search">✕</button>
+    </div>
+
+    <div class="draftbar">
+      <input id="draftThesis" class="draft-input" placeholder="Type a one-line thesis — e.g. “copper supply deficit into the energy transition” — and let the desk draft it" />
+      <button class="draft-go" id="draftGoBtn">✎ Draft a view</button>
+    </div>
+
+    <div class="ideas-grid">
+      <!-- LHS theme rail -->
+      <aside class="theme-rail">
+        <div class="theme-rail-head"><span class="eyebrow">Themes</span></div>
+        <ul class="theme-list" id="themeList"></ul>
+        <button class="add-btn" id="addThemeBtn"><span class="plus">+</span> Add theme</button>
+      </aside>
+
+      <!-- RHS idea panel -->
+      <section class="idea-panel">
+        <div class="idea-panel-head">
+          <div>
+            <span class="eyebrow" id="ideaThemeEyebrow">Theme</span>
+            <h2 id="ideaThemeTitle">—</h2>
+            <p id="ideaThemeBlurb"></p>
+          </div>
+          <button class="add-idea" id="addIdeaBtn"><span class="plus">+</span> Add idea</button>
+        </div>
+        <div class="tiles" id="tiles"></div>
+      </section>
+    </div>
+  </main>
+
+  <!-- ================= ADVISOR BOOK ================= -->
+  <main class="view" id="view-book" hidden>
+    <div class="view-head">
+      <div>
+        <div class="eyebrow">Coverage</div>
+        <h1>Advisor Book</h1>
+        <p>Your full book as line items. Choose a client to see their portfolio, the desk's agenda for the book, and the ideas that apply to them — with the reasoning behind each.</p>
+      </div>
+    </div>
+
+    <div class="book-viewtoggle">
+      <button class="seg active" data-bookview="list">Client list</button>
+      <button class="seg" data-bookview="coverage">Coverage grid</button>
+    </div>
+
+    <div id="bookListWrap">
+      <div class="book-controls">
+        <div class="select-wrap">
+          <label class="eyebrow">Client</label>
+          <select class="client-select" id="clientSelect"></select>
+        </div>
+        <div class="book-stats" id="bookStats"></div>
+      </div>
+
+      <div class="book-table" id="bookTable"></div>
+      <div class="client-detail" id="clientDetail" hidden></div>
+    </div>
+
+    <div id="coverageWrap" hidden></div>
+  </main>
+
+  <!-- ================= PRE-TRADE ANALYSIS ================= -->
+  <main class="view" id="view-pretrade" hidden>
+    <div class="view-head">
+      <div class="eyebrow">Suitability &amp; Impact</div>
+      <h1>Pre-Trade Analysis</h1>
+      <p>Stage a trade against a client book before you place it. Pick a client, an idea or instrument, and a structure to see a first-pass read on suitability, concentration, currency and the desk view.</p>
+    </div>
+
+    <div class="pretrade-grid">
+      <form class="pt-form panel" id="ptForm">
+        <div class="panel-head"><span class="eyebrow">Stage a trade</span></div>
+        <div class="panel-body">
+          <div class="field">
+            <label class="field-label">Client</label>
+            <select id="ptClient"></select>
+          </div>
+          <div class="field">
+            <label class="field-label">Idea</label>
+            <select id="ptIdea"></select>
+          </div>
+          <div class="pt-custom" id="ptCustom" hidden>
+            <div class="field">
+              <label class="field-label">Instrument / description</label>
+              <input id="ptCustomName" placeholder="e.g. Copper miners ETF" />
+            </div>
+            <div class="field">
+              <label class="field-label">Asset class</label>
+              <select id="ptCustomClass">
+                <option>Equity</option><option>Fixed Income</option><option>Commodity</option>
+                <option>Real Assets</option><option>Structured</option><option>Cash</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label class="field-label">Structure</label>
+            <select id="ptStructure"></select>
+          </div>
+          <div class="field">
+            <label class="field-label">Notional (% of book)</label>
+            <input id="ptNotional" type="number" min="0" max="100" step="0.5" value="5" />
+          </div>
+          <button class="pt-run" type="submit">Run pre-trade check</button>
+        </div>
+      </form>
+
+      <section class="pt-result" id="ptResult">
+        <div class="pt-placeholder">
+          <div class="big">No trade staged</div>
+          <div>Choose a client and an idea, then run the check.</div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Overlay + drawer + modal mounts -->
+  <div class="overlay" id="overlay"></div>
+  <aside class="drawer" id="drawer" aria-hidden="true"></aside>
+  <div class="modal-card" id="modal" role="dialog" aria-modal="true"></div>
+
+  <!-- ?v= cache-buster: bump when JS/CSS changes so browsers fetch fresh (python http.server sends no Cache-Control) -->
+  <script src="data.js?v=20260626a"></script>
+  <script src="charts.js?v=20260626a"></script>
+  <script src="scanner.js?v=20260626a"></script>
+  <script src="expressions.js?v=20260626a"></script>
+  <script src="mapping.js?v=20260626a"></script>
+  <script src="goals.js?v=20260626a"></script>
+  <script src="today_focus.js?v=20260626a"></script>
+  <script src="methodology.js?v=20260626a"></script>
+  <script src="app.js?v=20260626a"></script>
+  <script src="morgan.js?v=20260626a"></script>
+</body>
+</html>

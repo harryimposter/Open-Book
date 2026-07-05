@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="openbook.css?v=20260705a" />
+  <link rel="stylesheet" href="openbook.css?v=20260705b" />
 </head>
 <body>
 
@@ -67,6 +67,12 @@
         </div>
         <div class="top3-tiles" id="top3Rail"></div>
         <div class="top3-note">Scored live against your coverage. Tap a tile to show only that idea in the feed; tap again for all ideas.</div>
+
+        <div class="tk-head">
+          <span class="top3-chip">CLIENT TOOLKIT</span>
+          <span class="top3-sub">TAP A CLIENT TO BUILD THEIR EMAIL</span>
+        </div>
+        <div class="tk-list" id="toolkitList"></div>
       </aside>
 
       <!-- MIDDLE: the feed -->
@@ -115,16 +121,9 @@
     </div>
   </main>
 
-  <!-- ===== ADVISOR BOOK ===== -->
-  <main class="ob-main view" id="view-book" hidden>
-    <div id="bookList">
-      <div class="ob-eyebrow">COVERAGE</div>
-      <h1 class="ob-h1 tight">Advisor Book</h1>
-      <p class="ob-lede">Your full book at a glance. Open a client to see a plain-language read on their portfolio and the ideas mapped to each holding — assets and liabilities.</p>
-      <div class="bk-stats" id="bookStats"></div>
-      <div class="bk-tablecard" id="bookTable"></div>
-    </div>
-    <div id="bookDetail" hidden></div>
+  <!-- ===== ADVISOR BOOK (the original, pre-redesign implementation) ===== -->
+  <main class="view ob-bookframe-wrap" id="view-book" hidden>
+    <iframe id="classicFrame" class="ob-bookframe" title="Advisor Book"></iframe>
   </main>
 
   <!-- modal mounts -->
@@ -140,6 +139,6 @@
   <script src="today_focus.js?v=20260705a"></script>
   <script src="methodology.js?v=20260705a"></script>
   <script src="morgan.js?v=20260705a"></script>
-  <script src="openbook.js?v=20260705a"></script>
+  <script src="openbook.js?v=20260705b"></script>
 </body>
 </html>

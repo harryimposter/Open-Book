@@ -265,22 +265,27 @@
     else ok();
   }
 
-  /* ---- typewriter streaming (HTML-safe: tags emitted atomically) -------- */
+  /* ---- typewriter streaming (HTML-safe: tags emitted atomically) --------
+     Time-based rather than tick-count-based, so browser timer throttling
+     (background tabs clamp intervals to ≥1s) only makes it chunkier — the
+     stream always completes in ~DURATION ms of wall-clock time. */
   function streamInto(el, html, opts, onDone) {
     opts = opts || {};
     const tokens = String(html).match(/<[^>]*>|\s+|[^<\s]+/g) || [];
     const total = tokens.filter(t => t[0] !== "<").length;
-    const step = Math.max(1, Math.round(total / 120));
-    let idx = 0, emitted = "";
+    const DURATION = Math.min(2600, Math.max(900, total * 18));
+    const t0 = performance.now();
+    let idx = 0, words = 0, emitted = "";
     if (el._streamT) clearInterval(el._streamT);
     const finish = () => {
       clearInterval(el._streamT); el._streamT = null;
       el.innerHTML = html;
+      if (opts.scroll) opts.scroll();
       if (onDone) onDone();
     };
     el._streamT = setInterval(() => {
-      let words = 0;
-      while (idx < tokens.length && words < step) {
+      const target = Math.ceil(total * Math.min(1, (performance.now() - t0) / DURATION));
+      while (idx < tokens.length && words < target) {
         const t = tokens[idx++];
         emitted += t;
         if (t[0] !== "<") words++;
@@ -663,7 +668,7 @@
       refreshEngage(id);
     }));
     $$("[data-suit]", root).forEach(el => el.addEventListener("click", () => openSuit(el.dataset.suit)));
-    $$("[data-email]", root).forEach(el => el.addEventListener("click", () => openGenericEmail(el.dataset.email)));
+    $$("[data-email]", root).forEach(el => el.addEventListener("click", () => openTailoredEmail(el.dataset.email)));
     $$("[data-score]", root).forEach(el => el.addEventListener("click", () => openScore(el.dataset.score)));
   }
 
@@ -940,104 +945,96 @@
     });
   }
 
-  /* ---- generic (non-client) email ----------------------------------------
-     Assembled from the idea's own existing copy: headline, clamped thesis and
-     the desk's preferred expression — the same fields the old drawer showed. */
-  function genericEmailText(idea) {
-    const pref = ideaPreferred(idea);
-    const label = pref ? exprLabel(pref) : null;
-    const why = pref ? exprWhy(pref) : "";
-    const lvl = idea.levels ? ` Indicative levels: ${[idea.levels.tenor && "tenor " + idea.levels.tenor, idea.levels.entry && "entry " + idea.levels.entry, idea.levels.target && "target " + idea.levels.target, idea.levels.stop && "stop " + idea.levels.stop].filter(Boolean).join(", ")}.` : "";
-    const impl = label ? `In practice we'd look at ${aOrAn(label)} ${label}${why ? ` — ${why}` : ""}.${lvl}` : "";
-    return [`Dear [Client],`, "",
-      `I wanted to share an idea from this week's desk sweep.`, "",
-      `The idea: ${idea.headline}`, clampSentences(idea.thesis, 3, 300), "",
-      impl, "",
-      `If this is relevant to your objectives, I'd be glad to tailor it to your specific holdings and walk you through it on a short call.`, "",
-      `Best regards,\n[Your name]\nJ.P. Morgan Private Bank`].filter(s => s !== null).join("\n");
-  }
-  function openGenericEmail(ideaId) {
+  /* ---- tailored email (the feed's ✉ button) -------------------------------
+     Never generic: always drafted for a specific client via the SAME buildEmail
+     engine the old drawer used — the relevance hook reads the client's real
+     holdings, weights and goal gaps. Client defaults to the idea's best fit;
+     the implementation list honours MiFID tradability for that client. */
+  function openTailoredEmail(ideaId, presetClientId) {
     const idea = FOCUS_BY_ID[ideaId];
     if (!idea) return;
     bumpCounter("drafted", ideaId);
-    const text = genericEmailText(idea);
-    const subject = `An idea worth a look — ${idea.name}${idea.ticker && idea.ticker !== "—" ? ` (${idea.ticker})` : ""}`;
+    const flags = bookFit(idea).flags;
+    const flaggedIds = flags.map(f => f.client.id);
+    const allClients = window.SEED.clients || [];
+    let clientId = presetClientId || (flags[0] ? flags[0].client.id : (allClients[0] || {}).id);
+    let impl = null;
+    const fitFor = (c) => { try { return window.MAPPING.scoreIdeaForClient(idea, c).fit; } catch (e) { return 0; } };
     openModal(`<div class="ob-overlay ob-scroll" style="padding-top:44px">
       <div class="ob-pop email-pop">
         <div class="ob-pop-head">
           <div>
-            <div class="ob-pop-eyebrow">CLIENT-READY DRAFT · GENERIC</div>
+            <div class="ob-pop-eyebrow">CLIENT-READY DRAFT · TAILORED</div>
             <div class="ob-pop-title" style="font-size:20px">${esc(idea.name)}</div>
           </div>
           <button type="button" class="ob-pop-x" data-close aria-label="Close">✕</button>
         </div>
         <div class="email-pad">
-          <div class="email-note">A non-client-specific draft — personalise it per client from the Suitability flowchart.</div>
-          <div class="ob-letter" id="genLetter"></div>
-          <div class="ob-mailbtns" id="genBtns" style="opacity:.4">
-            <button type="button" class="ob-btn-dark" id="genOutlook">Open in Outlook</button>
-            <button type="button" class="ob-btn-line" id="genCopy">Copy</button>
+          <div class="email-note">Drafted for one client at a time — the hook line reads their actual holdings and goals.</div>
+          <div class="tep-controls">
+            <label class="tep-field"><span class="tep-lbl">CLIENT</span><select class="tep-sel" id="tepClient"></select></label>
+            <label class="tep-field"><span class="tep-lbl">IMPLEMENTATION</span><select class="tep-sel" id="tepImpl"></select></label>
+          </div>
+          <div class="ob-letter" id="tepLetter" style="min-height:220px"></div>
+          <div class="ob-mailbtns" id="tepBtns" style="opacity:.4">
+            <button type="button" class="ob-btn-dark" id="tepOutlook">Open in Outlook</button>
+            <button type="button" class="ob-btn-line" id="tepCopy">Copy</button>
           </div>
         </div>
       </div>
     </div>`, (root) => {
-      streamInto($("#genLetter", root), esc(text), {}, () => { $("#genBtns", root).style.opacity = "1"; });
-      $("#genOutlook", root).addEventListener("click", () => downloadEmlText(`${slug(idea.id)}-draft.eml`, subject, text));
-      const cp = $("#genCopy", root);
-      cp.addEventListener("click", () => copyText(text, () => {
+      const clSel = $("#tepClient", root), imSel = $("#tepImpl", root);
+      const optClient = (c) => `<option value="${esc(c.id)}"${c.id === clientId ? " selected" : ""}>${esc(c.name)} · ${esc(c.classification)}${flaggedIds.includes(c.id) ? ` · fit ${fitFor(c)}` : ""}</option>`;
+      const flagged = allClients.filter(c => flaggedIds.includes(c.id));
+      const others = allClients.filter(c => !flaggedIds.includes(c.id));
+      clSel.innerHTML =
+        (flagged.length ? `<optgroup label="Flagged for this idea">${flagged.map(optClient).join("")}</optgroup>` : "") +
+        (others.length ? `<optgroup label="Other clients">${others.map(optClient).join("")}</optgroup>` : "");
+      const rebuildImpls = () => {
+        const client = clientById(clientId);
+        impl = defaultImplFor(idea, client);
+        const choices = implChoicesFor(idea, client);
+        if (!choices.includes(impl)) impl = choices[0] || impl;
+        imSel.innerHTML = choices.map(s => `<option value="${esc(s)}"${s === impl ? " selected" : ""}>${esc(exprLabel(s))}</option>`).join("");
+      };
+      let currentEm = null;
+      const restream = () => {
+        const client = clientById(clientId);
+        currentEm = buildEmail(idea, client, impl);
+        $("#tepBtns", root).style.opacity = ".4";
+        streamInto($("#tepLetter", root), esc(currentEm.plainText), {}, () => { $("#tepBtns", root).style.opacity = "1"; });
+      };
+      rebuildImpls(); restream();
+      clSel.addEventListener("change", () => { clientId = clSel.value; rebuildImpls(); restream(); });
+      imSel.addEventListener("change", () => { impl = imSel.value; restream(); });
+      $("#tepOutlook", root).addEventListener("click", () => {
+        if (currentEm) downloadEmlText(`${slug(clientById(clientId).name + "-" + idea.id)}.eml`, currentEm.subject, currentEm.plainText);
+      });
+      const cp = $("#tepCopy", root);
+      cp.addEventListener("click", () => { if (currentEm) copyText(currentEm.plainText, () => {
         cp.textContent = "Copied ✓"; setTimeout(() => { cp.textContent = "Copy"; }, 1600);
-      }));
+      }); });
       return null;
     });
   }
 
   /* ---- combined multi-action email ----------------------------------------
-     One coordinated note assembled from the SAME per-idea email parts
-     (buildEmail) the tailored drafts use — no new generation logic. */
+     One coordinated note assembled ONLY from grounded parts: the client's
+     stated objective (on file), each idea's client-specific relevance hook
+     (real holdings / weights / goal gaps via relevanceLine), the idea's own
+     authored headline + thesis, and the engine-chosen implementation. No
+     invented market commentary or synthesis. */
   function combinedEmailText(client, ideas) {
-    const nums = ["First", "Second", "Third", "Fourth", "Fifth"];
-    const agenda = clampSentences(client.summary, 1, 220);
-    const body = ideas.map((idea, i) => {
+    const obj = client.goals && client.goals.objective;
+    const intro = `I've been through your portfolio in full${obj ? ` — with your objective of “${obj}” in mind —` : ""} and pulled together the ${ideas.length === 1 ? "idea" : ideas.length + " ideas"} below as one coordinated plan rather than piecemeal. Each one ties directly to something you hold or to how the book is positioned today.`;
+    const parts = ideas.map((idea, i) => {
       const em = buildEmail(idea, client, defaultImplFor(idea, client));
-      return `${nums[i] || "Also"} — ${em.ideaLine}\n${em.thesis}\n${em.impLine}`;
+      const tick = idea.ticker && idea.ticker !== "—" ? ` (${idea.ticker})` : "";
+      return `${i + 1}) ${idea.name}${tick}\n${em.relevance}\n${em.ideaLine}\n${em.thesis}\n${em.impLine}`;
     }).join("\n\n");
-    return [`Dear ${firstName(client)},`, "",
-      `I've been through your portfolio in full and pulled together the moves I think are worth making now — as one coordinated plan rather than piecemeal. The read on the book: ${agenda}`, "",
-      body, "",
-      `None of these is urgent to the day, but each is time-sensitive to current pricing. Could we find twenty minutes this week to go through them? I'll bring the detail for each.`, "",
+    return [`Dear ${firstName(client)},`, "", intro, "", parts, "",
+      `Happy to walk through the detail on any of these — twenty minutes this week would cover them all.`, "",
       `Best regards,\n[Your name]\nJ.P. Morgan Private Bank`].join("\n");
-  }
-  function openCombine(client, ideas) {
-    if (!client || !ideas.length) return;
-    const text = combinedEmailText(client, ideas);
-    const subject = `${ideas.length} coordinated ideas for your portfolio`;
-    openModal(`<div class="ob-overlay ob-scroll" style="padding-top:44px">
-      <div class="ob-pop combine-pop">
-        <div class="ob-strip5"></div>
-        <div class="ob-pop-head">
-          <div>
-            <div class="ob-pop-eyebrow">ONE EMAIL · ${ideas.length} ACTION${ideas.length === 1 ? "" : "S"}</div>
-            <div class="ob-pop-title" style="font-size:20px">A coordinated note to ${esc(client.name)}</div>
-          </div>
-          <button type="button" class="ob-pop-x" data-close aria-label="Close">✕</button>
-        </div>
-        <div class="email-pad">
-          <div class="ob-letter" id="combLetter" style="min-height:260px"></div>
-          <div class="ob-mailbtns" id="combBtns" style="opacity:.4">
-            <button type="button" class="ob-btn-dark" id="combOutlook">Open in Outlook</button>
-            <button type="button" class="ob-btn-line" id="combCopy">Copy</button>
-          </div>
-        </div>
-      </div>
-    </div>`, (root) => {
-      streamInto($("#combLetter", root), esc(text), {}, () => { $("#combBtns", root).style.opacity = "1"; });
-      $("#combOutlook", root).addEventListener("click", () => downloadEmlText(`${slug(client.name)}-coordinated.eml`, subject, text));
-      const cp = $("#combCopy", root);
-      cp.addEventListener("click", () => copyText(text, () => {
-        cp.textContent = "Copied ✓"; setTimeout(() => { cp.textContent = "Copy"; }, 1600);
-      }));
-      return null;
-    });
   }
 
   /* ========================================================================
@@ -1127,43 +1124,42 @@
   }
 
   /* ========================================================================
-     SECTION 7 — Advisor Book (restyled, same engine data)
+     SECTION 7 — classic Advisor Book (embedded) + Client Toolkit
      ======================================================================== */
 
-  function bookFlags(c) {
-    let rec = null;
-    try { rec = window.Scanner.recommendations(c); } catch (e) { rec = { findings: [], all: [] }; }
-    return rec;
+  /* the Advisor Book tab hosts the ORIGINAL pre-redesign app, untouched —
+     classic.html is the old index.html; ?embed=1 only hides its masthead */
+  function classicUrl(clientId) {
+    return "classic.html?embed=1&tab=book" + (clientId ? "&client=" + encodeURIComponent(clientId) : "");
+  }
+  function ensureClassicLoaded() {
+    const f = $("#classicFrame");
+    if (f && !f.getAttribute("src")) f.src = classicUrl(null);
+  }
+  function openClient(id) {
+    switchTab("book");
+    const f = $("#classicFrame");
+    if (f) f.src = classicUrl(id);
   }
 
-  function renderBookList() {
-    const clients = window.SEED.clients || [];
-    const totalUsd = clients.reduce((s, c) => s + c.aum * (c.ccy === "EUR" ? 1.154 : c.ccy === "GBP" ? 1.27 : 1), 0);
-    $("#bookStats").innerHTML = `
-      <div class="bk-stat"><div class="k">CLIENTS</div><div class="v">${clients.length}</div></div>
-      <div class="bk-stat"><div class="k">BOOK AUM</div><div class="v">$${totalUsd.toFixed(0)}M</div></div>
-      <div class="bk-stat"><div class="k">LIVE IDEAS</div><div class="v">${FOCUS.length}</div></div>`;
-    const rows = clients.map(c => {
-      const rec = bookFlags(c);
-      const pnl = clientPnl(c);
-      const flags = [...new Set(rec.findings.map(f => f.kind))].slice(0, 3).map(k => `<span class="bk-flag">${esc(k)}</span>`).join("");
-      const nIdeas = FOCUS.filter(i => { try { return bookFit(i).flags.some(f => f.client.id === c.id); } catch (e) { return false; } }).length;
-      return `<div class="bk-row" data-client="${esc(c.id)}">
-        <div class="bk-cl">
-          <span class="bk-av">${esc(initials(c.name))}</span>
-          <div>
-            <div class="bk-nm">${esc(c.name)}</div>
-            <div class="bk-prof">${esc(c.relationship)}</div>
-          </div>
-        </div>
-        <div class="bk-aum">${esc(fmtAum(c))}</div>
-        <div class="bk-pnl ${pnl >= 0 ? "up" : "dn"}">${fmtPnl(pnl)}</div>
-        <div class="bk-flags">${flags}</div>
-        <div class="bk-recs">${nIdeas} recs&nbsp;›</div>
-      </div>`;
+  /* ---- Client Toolkit rail (feed page, under the Top 3) ------------------ */
+  function renderToolkit() {
+    const host = $("#toolkitList");
+    host.innerHTML = (window.SEED.clients || []).map(c => {
+      const n = FOCUS.filter(i => { try { return bookFit(i).flags.some(f => f.client.id === c.id); } catch (e) { return false; } }).length;
+      return `<button type="button" class="tk-row" data-tk="${esc(c.id)}">
+        <span class="tk-av">${esc(initials(c.name))}</span>
+        <span class="tk-mid">
+          <span class="tk-nm">${esc(c.name)}</span>
+          <span class="tk-sub">${esc(c.relationship || "")}</span>
+        </span>
+        <span class="tk-right">
+          <span class="tk-aum">${esc(fmtAum(c))}</span><br>
+          <span class="tk-n">${n} idea${n === 1 ? "" : "s"} fit</span>
+        </span>
+      </button>`;
     }).join("");
-    $("#bookTable").innerHTML = `<div class="bk-hrow"><div>CLIENT</div><div>AUM</div><div>P&amp;L</div><div>FLAGS</div><div style="text-align:right">IDEAS</div></div>` + rows;
-    $$("#bookTable .bk-row").forEach(el => el.addEventListener("click", () => openClient(el.dataset.client)));
+    $$(".tk-row", host).forEach(el => el.addEventListener("click", () => openToolkit(el.dataset.tk)));
   }
 
   /* group the client's positions by asset class into "blocks", and attach the
@@ -1216,45 +1212,94 @@
   }
 
   const ccySym = (ccy) => ({ USD: "$", EUR: "€", GBP: "£" }[ccy] || "$");
-  function ideaRowHTML(c, blockKey, entry) {
-    const { idea } = entry;
-    const key = blockKey + "::" + idea.id;
-    const sel = !!state.selected[key], exp = !!state.expanded[key];
-    const a = authorOf(idea);
-    return `<div class="cd-irow${sel ? " sel" : ""}${exp ? " open" : ""}" data-irow="${esc(key)}">
-      <div class="cd-irow-top">
-        <button type="button" class="cd-check" data-selrow="${esc(key)}">${sel ? "✓" : ""}</button>
-        <div class="cd-imid" data-exprow="${esc(key)}">
-          <div class="cd-ititle">${esc(idea.name)}</div>
-          <div class="cd-isub">${esc(idea.ticker || "—")} · ${esc(a.name)} · fit ${entry.res.fit}</div>
-        </div>
-        <button type="button" class="cd-caret" data-exprow="${esc(key)}">▾</button>
-      </div>
-      ${exp ? `<div class="cd-iexp">
-        <div class="cd-iplain">${esc(entry.res && entryWhy(entry) || "")}</div>
-        <button type="button" class="cd-idraft" data-draftrow="${esc(idea.id)}">✉&nbsp; Draft this email</button>
-      </div>` : ""}
-    </div>`;
-  }
-  function entryWhy(entry) {
-    /* the engine's flag reasoning + its chosen implementation — existing text */
+
+  /* toolkit popup state — reset each time a client is opened */
+  let tk = null; // { client, selected:{}, expanded:{} }
+
+  function tkWhy(entry, client) {
+    /* engine flag reasoning for THIS client; unflagged ideas fall back to the
+       same client-specific relevance hook the emails use — never generic */
     let why = "";
     try {
-      const flags = bookFit(entry.idea).flags;
-      const f = flags.find(x => x.client.id === state.bookClientId);
+      const f = bookFit(entry.idea).flags.find(x => x.client.id === client.id);
       why = f ? f.why : "";
     } catch (e) {}
-    const impl = entry.res.bestImpl ? ` Best implementation here: ${exprLabel(entry.res.bestImpl)}.` : "";
+    if (!why) { try { why = relevanceLine(entry.idea, client).replace(/^Given/, "Given that").replace(/ I wanted to flag.*$/, "."); } catch (e) {} }
+    const impl = entry.res && entry.res.bestImpl ? ` Best implementation for ${client.name}: ${exprLabel(entry.res.bestImpl)}.` : "";
     return (why || clampSentences(entry.idea.thesis, 2, 220)) + impl;
   }
 
-  function renderClientDetail() {
-    const c = clientById(state.bookClientId);
+  function tkIdeaRow(entry, key, client) {
+    const { idea, res } = entry;
+    const a = authorOf(idea);
+    if (res && res.suppressed) {
+      return `<div class="cd-irow blocked">
+        <div class="cd-irow-top">
+          <button type="button" class="cd-check" disabled aria-disabled="true"></button>
+          <div class="cd-imid">
+            <div class="cd-ititle">${esc(idea.name)}</div>
+            <div class="cd-isupp">⚠ ${esc(res.tradabilityReason || "Not tradable for this client (MiFID gate)")}</div>
+          </div>
+        </div>
+      </div>`;
+    }
+    const sel = !!tk.selected[key], exp = !!tk.expanded[key];
+    return `<div class="cd-irow${sel ? " sel" : ""}${exp ? " open" : ""}">
+      <div class="cd-irow-top">
+        <button type="button" class="cd-check" data-tksel="${esc(key)}">${sel ? "✓" : ""}</button>
+        <div class="cd-imid" data-tkexp="${esc(key)}">
+          <div class="cd-ititle">${esc(idea.name)}</div>
+          <div class="cd-isub">${esc(idea.ticker || "—")} · ${esc(a.name)}${res ? ` · fit ${res.fit}` : ""}</div>
+        </div>
+        <button type="button" class="cd-caret" data-tkexp="${esc(key)}">▾</button>
+      </div>
+      ${exp ? `<div class="cd-iexp"><div class="cd-iplain" style="margin-bottom:0">${esc(tkWhy(entry, client))}</div></div>` : ""}
+    </div>`;
+  }
+
+  /* ---- the Client Toolkit pop-up ------------------------------------------
+     Assets & liabilities with the LIVE flagged ideas attached, checkboxes to
+     compose, a "more ideas" picker covering the rest of today's board (scored
+     live for this client, MiFID-suppressed ones shown blocked with the
+     reason), and export to ONE coordinated grounded email. */
+  function openToolkit(clientId) {
+    const c = clientById(clientId);
     if (!c) return;
-    const { blocks, liabs } = clientBlocks(c);
+    tk = { client: c, selected: {}, expanded: {} };
     const pnl = clientPnl(c);
-    const selKeys = Object.keys(state.selected).filter(k => state.selected[k]);
-    const nSel = selKeys.length;
+    openModal(`<div class="ob-overlay ob-scroll">
+      <div class="ob-pop tkp-pop">
+        <div class="ob-pop-head">
+          <div>
+            <div class="ob-pop-eyebrow">CLIENT TOOLKIT · ${esc(fmtAum(c))} · ${fmtPnl(pnl)} P&amp;L · ${esc(c.classification)}</div>
+            <div class="ob-pop-title">${esc(c.name)}</div>
+          </div>
+          <button type="button" class="ob-pop-x" data-close aria-label="Close">✕</button>
+        </div>
+        <div class="tkp-body" id="tkpBody"></div>
+      </div>
+    </div>`, (root) => {
+      renderTkBody(root);
+      return () => { tk = null; };
+    });
+  }
+
+  function tkSelectedIdeas() {
+    const ids = [...new Set(Object.keys(tk.selected).filter(k => tk.selected[k]).map(k => k.split("::")[1]))];
+    return ids.map(id => FOCUS_BY_ID[id]).filter(Boolean);
+  }
+
+  function renderTkBody(root) {
+    const c = tk.client;
+    const { blocks, liabs } = clientBlocks(c);
+    const attached = new Set();
+    blocks.forEach(b => b.ideas.forEach(e => attached.add(e.idea.id)));
+    liabs.forEach(b => b.ideas.forEach(e => attached.add(e.idea.id)));
+    const extras = FOCUS.filter(i => !attached.has(i.id)).map(i => {
+      let res = null; try { res = window.MAPPING.scoreIdeaForClient(i, c); } catch (e) {}
+      return { idea: i, res };
+    }).sort((a, b) => ((b.res && !b.res.suppressed) ? b.res.fit : -1) - ((a.res && !a.res.suppressed) ? a.res.fit : -1));
+    const nSel = Object.keys(tk.selected).filter(k => tk.selected[k]).length;
 
     const blockHTML = (b, neg) => `<div class="cd-block">
       <div class="cd-blockrow">
@@ -1262,39 +1307,24 @@
         <div class="cd-blockval${neg ? " neg" : ""}">${neg ? esc(b.valTxt) : esc(ccySym(c.ccy) + b.val.toFixed(1) + "m")}</div>
       </div>
       <div class="cd-blocknote">${esc(b.note)}</div>
-      ${b.ideas.map(e => ideaRowHTML(c, b.key, e)).join("")}
+      ${b.ideas.map(e => tkIdeaRow(e, b.key + "::" + e.idea.id, c)).join("")}
     </div>`;
 
-    $("#bookDetail").innerHTML = `
-      <button type="button" class="cd-back" id="cdBack">← Advisor Book</button>
-      <div class="cd-head">
-        <div class="cd-idrow">
-          <span class="cd-av">${esc(initials(c.name))}</span>
-          <div>
-            <h1 class="cd-name">${esc(c.name)}</h1>
-            <div class="cd-prof">${esc(c.relationship)}</div>
-          </div>
-        </div>
-        <div class="cd-aumcol">
-          <div class="cd-aumk">BOOK AUM</div>
-          <div class="cd-aumv">${esc(fmtAum(c))}</div>
-          <div class="cd-pnl ${pnl >= 0 ? "up" : "dn"}">${fmtPnl(pnl)} P&amp;L</div>
-        </div>
-      </div>
-      <div class="cd-read">
+    $("#tkpBody", root).innerHTML = `
+      <div class="tkp-read">
         <div class="ob-strip5"></div>
-        <div class="cd-read-body">
+        <div class="tkp-read-body">
           <div class="cd-read-k">THE READ ON THIS BOOK</div>
-          <div class="cd-read-v">${esc(c.summary)}</div>
+          <div class="cd-read-v" style="font-size:16.5px">${esc(c.summary)}</div>
         </div>
       </div>
-      ${nSel ? `<div class="cd-selbar">
-        <div class="txt"><b>${nSel}</b> ${nSel === 1 ? "action" : "actions"} selected across this book</div>
-        <div class="cd-selbtns">
-          <button type="button" class="cd-clear" id="cdClear">Clear</button>
-          <button type="button" class="cd-export" id="cdExport">✉&nbsp; Export to one email</button>
+      <div class="tkp-selbar${nSel ? "" : " idle"}">
+        <div class="txt">${nSel ? `<b>${nSel}</b> idea${nSel === 1 ? "" : "s"} selected for ${esc(c.name)}` : `Tick the ideas to include — then export them as one coherent email`}</div>
+        <div class="cd-selbtns">${nSel ? `
+          <button type="button" class="cd-clear" id="tkClear">Clear</button>
+          <button type="button" class="cd-export" id="tkExport">✉&nbsp; Export to one email</button>` : ""}
         </div>
-      </div>` : ""}
+      </div>
       <div class="cd-cols">
         <div>
           <div class="cd-colhead"><span class="sq ink"></span><h2>Assets</h2></div>
@@ -1304,46 +1334,53 @@
           <div class="cd-colhead"><span class="sq brick"></span><h2>Liabilities</h2><span class="cd-liabtag">IDEAS TOO</span></div>
           ${liabs.map(b => blockHTML(b, true)).join("") || `<div class="cd-blocknote">No liabilities on file — the whole balance sheet is on the asset side.</div>`}
         </div>
+      </div>
+      <div class="tkp-more">
+        <div class="tkp-more-head"><span class="sq"></span><h2 style="font-family:var(--serif);font-weight:600;font-size:18px;margin:0;color:var(--ink)">More ideas from today's sweep</h2></div>
+        <div class="tkp-more-note">Everything else on today's board, scored live for ${esc(c.name)} — tick any to fold them into the same email.</div>
+        <div class="tkp-more-grid">${extras.map(e => tkIdeaRow(e, "extra::" + e.idea.id, c)).join("") || `<div class="cd-blocknote">Every idea on today's board is already mapped above.</div>`}</div>
       </div>`;
 
-    $("#cdBack").addEventListener("click", () => { state.bookClientId = null; state.selected = {}; state.expanded = {}; renderBook(); });
-    $$("#bookDetail [data-selrow]").forEach(el => el.addEventListener("click", () => {
-      const k = el.dataset.selrow;
-      state.selected[k] = !state.selected[k];
-      if (!state.selected[k]) delete state.selected[k];
-      renderClientDetail();
+    $$("#tkpBody [data-tksel]", root).forEach(el => el.addEventListener("click", () => {
+      const k = el.dataset.tksel;
+      if (tk.selected[k]) delete tk.selected[k]; else tk.selected[k] = true;
+      renderTkBody(root);
     }));
-    $$("#bookDetail [data-exprow]").forEach(el => el.addEventListener("click", () => {
-      const k = el.dataset.exprow;
-      state.expanded[k] = !state.expanded[k];
-      renderClientDetail();
+    $$("#tkpBody [data-tkexp]", root).forEach(el => el.addEventListener("click", () => {
+      const k = el.dataset.tkexp;
+      tk.expanded[k] = !tk.expanded[k];
+      renderTkBody(root);
     }));
-    $$("#bookDetail [data-draftrow]").forEach(el => el.addEventListener("click", () => {
-      bumpCounter("drafted", el.dataset.draftrow);
-      openSuit(el.dataset.draftrow, c.id);
-    }));
-    const clearBtn = $("#cdClear");
-    if (clearBtn) clearBtn.addEventListener("click", () => { state.selected = {}; renderClientDetail(); });
-    const exportBtn = $("#cdExport");
-    if (exportBtn) exportBtn.addEventListener("click", () => {
-      const ids = [...new Set(selKeys.map(k => k.split("::")[1]))];
-      const ideas = ids.map(id => FOCUS_BY_ID[id]).filter(Boolean);
-      openCombine(c, ideas);
-    });
+    const clearBtn = $("#tkClear", root);
+    if (clearBtn) clearBtn.addEventListener("click", () => { tk.selected = {}; renderTkBody(root); });
+    const exportBtn = $("#tkExport", root);
+    if (exportBtn) exportBtn.addEventListener("click", () => renderTkEmail(root));
   }
 
-  function openClient(id) {
-    state.bookClientId = id; state.selected = {}; state.expanded = {};
-    switchTab("book");
-    renderBook();
-    window.scrollTo({ top: 0 });
-  }
-  function renderBook() {
-    const showDetail = !!state.bookClientId;
-    $("#bookList").hidden = showDetail;
-    $("#bookDetail").hidden = !showDetail;
-    if (showDetail) renderClientDetail();
-    else renderBookList();
+  function renderTkEmail(root) {
+    const c = tk.client;
+    const ideas = tkSelectedIdeas();
+    if (!ideas.length) return;
+    ideas.forEach(i => bumpCounter("drafted", i.id));
+    const text = combinedEmailText(c, ideas);
+    const subject = ideas.length === 1
+      ? `An idea worth a look — ${ideas[0].name}`
+      : `${ideas.length} coordinated ideas for your portfolio`;
+    $("#tkpBody", root).innerHTML = `
+      <button type="button" class="suit-back" id="tkBack">← back to ${esc(c.name)}'s toolkit</button>
+      <div class="email-note">One coordinated note · ${ideas.length} idea${ideas.length === 1 ? "" : "s"} · every line reads from ${esc(c.name)}'s actual book and the desk's authored copy — nothing invented.</div>
+      <div class="ob-letter" id="tkLetter" style="min-height:260px"></div>
+      <div class="ob-mailbtns" id="tkBtns" style="opacity:.4">
+        <button type="button" class="ob-btn-dark" id="tkOutlook">Open in Outlook</button>
+        <button type="button" class="ob-btn-line" id="tkCopy">Copy</button>
+      </div>`;
+    streamInto($("#tkLetter", root), esc(text), {}, () => { $("#tkBtns", root).style.opacity = "1"; });
+    $("#tkBack", root).addEventListener("click", () => renderTkBody(root));
+    $("#tkOutlook", root).addEventListener("click", () => downloadEmlText(`${slug(c.name)}-coordinated.eml`, subject, text));
+    const cp = $("#tkCopy", root);
+    cp.addEventListener("click", () => copyText(text, () => {
+      cp.textContent = "Copied ✓"; setTimeout(() => { cp.textContent = "Copy"; }, 1600);
+    }));
   }
 
   /* ========================================================================
@@ -1354,17 +1391,17 @@
     const d = new Date();
     $("#asOf").textContent = "As of " + d.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
 
-    $$(".obh-tab").forEach(b => b.addEventListener("click", () => { switchTab(b.dataset.tab); if (b.dataset.tab === "book") renderBook(); }));
+    $$(".obh-tab").forEach(b => b.addEventListener("click", () => { switchTab(b.dataset.tab); if (b.dataset.tab === "book") ensureClassicLoaded(); }));
     $("#cmdBtn").addEventListener("click", openCmd);
     document.addEventListener("keydown", onGlobalKey);
 
     startTicker();
     renderBrief();
     renderTop3();
+    renderToolkit();
     renderFilters();
     renderFeed();
     initAsk();
-    renderBook();
 
     const inp = $("#feedSearch");
     inp.addEventListener("input", () => { state.search = inp.value; renderFeed(); });
@@ -1373,10 +1410,9 @@
     /* deep links kept working: ?tab=book&client=… */
     const p = new URLSearchParams(location.search);
     if (p.get("tab") === "book") {
-      switchTab("book");
       const qc = p.get("client");
       if (qc && clientById(qc)) openClient(qc);
-      else renderBook();
+      else { switchTab("book"); ensureClassicLoaded(); }
     }
   }
 
