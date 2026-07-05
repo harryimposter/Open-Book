@@ -1,0 +1,1255 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#FBFAF7;color:#17150F;font-family:'Archivo',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  ::selection{background:#996F3D;color:#fff}
+  @keyframes caret{0%,100%{opacity:1}50%{opacity:0}}
+  @keyframes popIn{from{opacity:0;transform:translateY(14px) scale(.985)}to{opacity:1;transform:none}}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  @keyframes heartPop{0%{transform:scale(1)}40%{transform:scale(1.35)}100%{transform:scale(1)}}
+  @keyframes treePop{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes drawLine{to{stroke-dashoffset:0}}
+  @keyframes ringSm{from{stroke-dashoffset:97.39}}
+  @keyframes ringLg{from{stroke-dashoffset:188.5}}
+  @keyframes ringMd{from{stroke-dashoffset:163.4}}
+  @keyframes slideRight{from{transform:translateX(100%)}to{transform:translateX(0)}}
+  @keyframes floatUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes growBar{from{width:0}}
+  @keyframes tickerIn{from{opacity:0}to{opacity:1}}
+  .bp-scroll::-webkit-scrollbar{width:9px;height:9px}
+  .bp-scroll::-webkit-scrollbar-thumb{background:#D8D2C7;border-radius:6px}
+  .bp-scroll::-webkit-scrollbar-track{background:transparent}
+  input::placeholder{color:#A8A29A}
+</style>
+</helmet>
+
+<div style="min-height:100vh;background:#FBFAF7">
+
+  <!-- ===== HEADER ===== -->
+  <header style="background:#fff;border-bottom:1px solid #E5E1DA;position:sticky;top:0;z-index:40">
+    <div style="max-width:1920px;margin:0 auto;padding:18px 32px 0;display:flex;align-items:flex-start;justify-content:space-between">
+      <div style="display:flex;align-items:baseline;gap:14px">
+        <span style="font-family:'Source Serif 4',serif;font-weight:700;font-size:25px;letter-spacing:-.01em;color:#17150F">Playground</span>
+        <span style="width:1px;height:16px;background:#E5E1DA;align-self:center"></span>
+        <span style="font-size:11px;font-weight:600;letter-spacing:.28em;color:#996F3D">PRIVATE&nbsp;BANK</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:16px">
+        <button onClick="{{ onOpenCmd }}" style="appearance:none;display:flex;align-items:center;gap:9px;background:#F4F1EA;border:1px solid #E5E1DA;border-radius:9px;padding:8px 11px;cursor:pointer;font-family:'Archivo',sans-serif;font-size:12px;color:#8A857C" style-hover="border-color:#C7A97A;background:#EFEAE0">
+          <span style="font-size:13px;color:#A8A29A">&#9906;</span><span>Search everything</span>
+          <span style="font-size:10.5px;font-weight:700;color:#996F3D;background:#fff;border:1px solid #E5E1DA;border-radius:5px;padding:1px 6px">&#8984;K</span>
+        </button>
+        <div style="text-align:right;line-height:1.5">
+          <div style="font-size:12px;font-weight:600;color:#17150F">Advisor view <span style="color:#A8A29A;font-weight:400">· Coverage book</span></div>
+          <div style="font-size:11px;color:#A8A29A">As of 05 Jul 2026</div>
+        </div>
+      </div>
+    </div>
+    <nav style="max-width:1920px;margin:0 auto;padding:0 32px;display:flex;gap:34px;margin-top:14px">
+      <sc-for list="{{ nav }}" as="t" hint-placeholder-count="3">
+        <button onClick="{{ t.onClick }}" style="appearance:none;background:none;border:none;cursor:pointer;padding:13px 0 12px;font-family:'Source Serif 4',serif;font-size:16px;color:{{ t.color }};border-bottom:2px solid {{ t.underline }};font-weight:{{ t.weight }}">{{ t.label }}</button>
+      </sc-for>
+    </nav>
+    <div style="background:#1A1712;border-top:1px solid #2C271F">
+      <div style="max-width:1920px;margin:0 auto;padding:7px 32px;display:flex;align-items:center;gap:24px;overflow-x:auto" class="bp-scroll">
+        <span style="flex:none;display:flex;align-items:center;gap:6px;font-size:9.5px;font-weight:600;letter-spacing:.16em;color:#5F5A50"><span style="width:6px;height:6px;border-radius:50%;background:#2FBF71;box-shadow:0 0 0 3px rgba(47,191,113,.18)"></span>LIVE</span>
+        <sc-for list="{{ tickers }}" as="tk" hint-placeholder-count="7">
+          <div style="flex:none;display:flex;align-items:center;gap:8px;white-space:nowrap;animation:tickerIn .5s ease">
+            <span style="font-size:11px;font-weight:700;letter-spacing:.03em;color:#EBC98D">{{ tk.sym }}</span>
+            <span style="font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#E6E1D6;font-variant-numeric:tabular-nums">{{ tk.pxTxt }}</span>
+            <svg width="46" height="16" style="display:block"><polyline points="{{ tk.spark }}" fill="none" stroke="{{ tk.chgColor }}" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round"></polyline></svg>
+            <span style="font-size:10.5px;font-weight:600;color:{{ tk.chgColor }};font-variant-numeric:tabular-nums">{{ tk.chgTxt }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </header>
+
+  <main style="max-width:1920px;margin:0 auto;padding:34px 32px 90px">
+
+    <!-- ===== IDEA FEED (unified) ===== -->
+    <sc-if value="{{ isFeed }}" hint-placeholder-val="{{ true }}">
+      <div style="animation:fadeIn .4s ease">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.22em;color:#996F3D;border-bottom:1px dotted #C7A97A;display:inline-block;padding-bottom:3px;margin-bottom:12px">ORIGINATION FEED&nbsp;·&nbsp;AS OF 5 JUL 2026</div>
+        <h1 style="font-family:'Source Serif 4',serif;font-weight:600;font-size:40px;line-height:1.05;letter-spacing:-.02em;margin:0 0 22px;color:#17150F">Idea Feed</h1>
+
+        <div style="border-radius:10px;overflow:hidden;box-shadow:0 12px 34px -18px rgba(30,27,22,.6);margin-bottom:38px">
+          <div style="height:5px;background:#2FBF71"></div>
+          <div style="background:#1E1B16;padding:26px 32px">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:13px">
+              <span style="font-size:10.5px;font-weight:600;letter-spacing:.24em;color:#2FBF71">MARKET BRIEF</span>
+              <span style="width:4px;height:4px;border-radius:50%;background:#4A463E"></span>
+              <span style="font-size:10.5px;font-weight:600;letter-spacing:.14em;color:#8E8A80">05 JUL 2026 · 08:10 ET</span>
+            </div>
+            <div style="font-family:'Source Serif 4',serif;font-size:21px;line-height:1.5;color:#F4F1EA;font-weight:500;max-width:1000px">{{ briefing }}</div>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:minmax(0,420px) minmax(min(520px,55vw),1fr) minmax(0,440px);gap:clamp(16px,2.5vw,40px);align-items:start">
+
+          <!-- LEFT RAIL: top 3 ranked -->
+          <aside style="position:sticky;top:158px">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+              <span style="font-size:10px;font-weight:600;letter-spacing:.14em;color:#fff;background:#1E1B16;padding:3px 8px;border-radius:4px">TOP 3</span>
+              <span style="font-size:9.5px;font-weight:600;letter-spacing:.14em;color:#996F3D">RANKED FOR YOUR BOOK · TAP TO FOCUS THE FEED</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <sc-for list="{{ top3Rail }}" as="r" hint-placeholder-count="3">
+                <button onClick="{{ r.onFocus }}" style="appearance:none;cursor:pointer;text-align:left;background:#1E1B16;border:1.5px solid {{ r.border }};border-radius:12px;padding:0;font-family:'Archivo',sans-serif;width:100%;overflow:hidden" style-hover="border-color:#C7A97A;box-shadow:0 10px 26px -14px rgba(30,27,22,.6)">
+                  <span style="display:block;height:4px;background:{{ r.strip }}"></span>
+                  <span style="display:flex;gap:13px;align-items:flex-start;padding:14px 16px 15px">
+                    <span style="flex:none;font-family:'Source Serif 4',serif;font-size:26px;font-weight:600;color:#C7A97A;line-height:1">{{ r.rank }}</span>
+                    <span style="min-width:0;flex:1">
+                      <span style="display:block;font-family:'Source Serif 4',serif;font-size:15.5px;font-weight:600;color:#F4F1EA;line-height:1.28">{{ r.title }}</span>
+                      <span style="display:block;font-size:11px;color:#B08A55;margin-top:5px;letter-spacing:.04em">{{ r.tk }} · FIT <span style="font-weight:700;color:#EBC98D">{{ r.score }}</span>{{ r.focusLabel }}</span>
+                    </span>
+                  </span>
+                </button>
+              </sc-for>
+            </div>
+            <div style="margin-top:13px;font-size:10.5px;color:#B8B2A8;line-height:1.5">Scored live against your coverage. Tap a tile to show only that idea in the feed; tap again for all ideas.</div>
+          </aside>
+
+          <!-- MIDDLE: the feed -->
+          <div style="min-width:0">
+            <div style="max-width:820px;margin:0 auto">
+            <div style="position:relative;margin-bottom:12px">
+              <span style="position:absolute;left:15px;top:50%;transform:translateY(-50%);font-size:14px;color:#A8A29A">&#9906;</span>
+              <input value="{{ search }}" onChange="{{ onSearch }}" placeholder="Search ideas — &ldquo;gold&rdquo;, &ldquo;CEG&rdquo;, &ldquo;autocall&rdquo; or a client…" style="width:100%;border:1px solid #E5E1DA;background:#fff;border-radius:10px;padding:12px 15px 12px 40px;font-family:'Archivo',sans-serif;font-size:13.5px;color:#17150F;outline:none" style-focus="border-color:#996F3D" />
+            </div>
+            <div style="display:flex;flex-wrap:wrap;align-items:center;gap:7px;margin-bottom:8px">
+              <sc-for list="{{ assetChips }}" as="c" hint-placeholder-count="5">
+                <button onClick="{{ c.onClick }}" style="appearance:none;cursor:pointer;font-family:'Archivo',sans-serif;font-size:11.5px;font-weight:600;padding:6px 12px;border-radius:20px;border:1px solid {{ c.border }};background:{{ c.bg }};color:{{ c.color }}">{{ c.label }}</button>
+              </sc-for>
+              <div style="flex:1"></div>
+              <select onChange="{{ onClientFilter }}" style="appearance:none;font-family:'Archivo',sans-serif;font-size:11.5px;font-weight:500;color:#17150F;background:#fff;border:1px solid #E5E1DA;border-radius:8px;padding:7px 26px 7px 10px;cursor:pointer;background-image:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2210%22 height=%2210%22><path d=%22M1 3l4 4 4-4%22 fill=%22none%22 stroke=%22%23996F3D%22 stroke-width=%221.4%22/></svg>');background-repeat:no-repeat;background-position:right 9px center">
+                <sc-for list="{{ clientOptions }}" as="o" hint-placeholder-count="5">
+                  <option value="{{ o.id }}" selected="{{ o.selected }}">{{ o.label }}</option>
+                </sc-for>
+              </select>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+              <span style="font-size:11.5px;color:#A8A29A">{{ feedCountLabel }}</span>
+              <sc-if value="{{ focusActive }}" hint-placeholder-val="{{ false }}">
+                <button onClick="{{ onClearFocus }}" style="appearance:none;cursor:pointer;display:flex;align-items:center;gap:6px;background:#1E1B16;border:none;border-radius:16px;padding:4px 11px;font-family:'Archivo',sans-serif;font-size:11px;font-weight:600;color:#EBC98D">&#10005;&nbsp; focused on your top pick — show all</button>
+              </sc-if>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:24px">
+              <sc-for list="{{ feedIdeas }}" as="idea" hint-placeholder-count="4">
+                <div id="post-{{ idea.id }}" style="scroll-margin-top:150px">
+                  <dc-import name="IdeaPost" idea="{{ idea }}" hint-size="100%,640px"></dc-import>
+                </div>
+              </sc-for>
+            </div>
+            <sc-if value="{{ feedEmpty }}" hint-placeholder-val="{{ false }}">
+              <div style="text-align:center;padding:70px 0;color:#A8A29A;font-size:14px">No ideas match — try a different search or filter.</div>
+            </sc-if>
+            </div>
+          </div>
+
+          <!-- RIGHT RAIL: ask your book -->
+          <aside style="position:sticky;top:158px">
+            <div style="height:min(620px, calc(100vh - 210px));display:flex;flex-direction:column;background:#fff;border:1px solid #E5E1DA;border-radius:13px;overflow:hidden;box-shadow:0 10px 34px -22px rgba(30,27,22,.4)">
+          <div style="flex:none;background:#1E1B16;padding:13px 16px;display:flex;align-items:center;gap:10px">
+            <span style="width:28px;height:28px;border-radius:8px;background:#54301A;color:#EBC98D;font-size:14px;display:flex;align-items:center;justify-content:center">&#10022;</span>
+            <div>
+              <div style="font-size:13px;font-weight:600;color:#F4F1EA;line-height:1.1">Ask your book</div>
+              <div style="font-size:10px;color:#8E8A80">Morgan AI · answered live</div>
+            </div>
+          </div>
+          <div style="flex:1;overflow-y:auto;padding:18px" class="bp-scroll">
+            <sc-if value="{{ askEmpty }}" hint-placeholder-val="{{ true }}">
+              <div>
+                <div style="font-family:'Source Serif 4',serif;font-size:18px;line-height:1.38;color:#26221B;margin-bottom:6px">Ask anything about your book.</div>
+                <div style="font-size:12.5px;color:#8E8A80;line-height:1.5;margin-bottom:18px">Morgan AI reads across concentration, idle cash, liabilities, income needs and daily priorities — grounded in your live coverage.</div>
+                <div style="font-size:9.5px;font-weight:600;letter-spacing:.16em;color:#A8A29A;margin-bottom:9px">TRY ASKING</div>
+                <div style="display:flex;flex-direction:column;gap:8px">
+                  <sc-for list="{{ askChips }}" as="c" hint-placeholder-count="4">
+                    <button onClick="{{ c.onClick }}" style="appearance:none;cursor:pointer;text-align:left;background:#FBFAF7;border:1px solid #EDE7DC;border-radius:9px;padding:11px 13px;font-family:'Archivo',sans-serif;font-size:12.5px;color:#54301A;line-height:1.35" style-hover="border-color:#C7A97A;background:#FBF7F0">{{ c.label }}</button>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ askHasMsgs }}" hint-placeholder-val="{{ false }}">
+              <div>
+                    <sc-for list="{{ askMsgs }}" as="m" hint-placeholder-count="0">
+                      <div style="margin-bottom:16px;display:flex;justify-content:{{ m.justify }}">
+                        <sc-if value="{{ m.isUser }}" hint-placeholder-val="{{ false }}">
+                          <div style="max-width:88%;background:#54301A;color:#F4EFE8;font-family:'Archivo',sans-serif;font-size:13px;line-height:1.45;padding:9px 13px;border-radius:13px 13px 4px 13px">{{ m.text }}</div>
+                        </sc-if>
+                        <sc-if value="{{ m.isAi }}" hint-placeholder-val="{{ true }}">
+                          <div style="max-width:100%">
+                            <div style="display:flex;align-items:center;gap:7px;margin-bottom:7px">
+                              <span style="width:19px;height:19px;border-radius:50%;background:#1E1B16;color:#EBC98D;font-size:9.5px;display:flex;align-items:center;justify-content:center">&#10022;</span>
+                              <span style="font-size:9px;font-weight:600;letter-spacing:.14em;color:#A8A29A">MORGAN AI</span>
+                            </div>
+                            <div style="font-family:'Source Serif 4',serif;font-size:14px;line-height:1.55;color:#26221B;white-space:pre-wrap">{{ m.text }}</div>
+                            <sc-if value="{{ m.hasRefs }}" hint-placeholder-val="{{ false }}">
+                              <div style="display:flex;flex-wrap:wrap;gap:7px;margin-top:11px">
+                                <sc-for list="{{ m.refs }}" as="r" hint-placeholder-count="2">
+                                  <button onClick="{{ r.onClick }}" style="appearance:none;cursor:pointer;display:flex;align-items:center;gap:7px;background:#fff;border:1px solid #DDD6C9;border-radius:9px;padding:5px 10px 5px 5px;font-family:'Archivo',sans-serif" style-hover="border-color:#996F3D;background:#FBF7F0">
+                                    <span style="width:19px;height:19px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10px;background:{{ r.iconBg }};color:{{ r.iconFg }}">{{ r.icon }}</span>
+                                    <span style="font-size:11.5px;font-weight:600;color:#17150F">{{ r.label }}</span>
+                                  </button>
+                                </sc-for>
+                              </div>
+                            </sc-if>
+                          </div>
+                        </sc-if>
+                      </div>
+                    </sc-for>
+                  </div>
+                </sc-if>
+            </div>
+            <div style="flex:none;border-top:1px solid #E5E1DA;background:#fff;padding:12px 14px">
+              <div style="display:flex;gap:9px;align-items:flex-end">
+                <input value="{{ askQuery }}" onChange="{{ onAskInput }}" onKeyDown="{{ onAskKey }}" placeholder="Ask about a client, idea or risk…" style="flex:1;min-width:0;border:1px solid #E5E1DA;background:#FBFAF7;border-radius:11px;padding:12px 14px;font-family:'Archivo',sans-serif;font-size:13.5px;color:#17150F;outline:none" style-focus="border-color:#996F3D;background:#fff" />
+                <button onClick="{{ onAskSubmit }}" style="appearance:none;background:#54301A;border:none;cursor:pointer;color:#fff;width:44px;height:44px;border-radius:11px;font-size:17px;flex:none" style-hover="background:#6B3C21">&#8593;</button>
+              </div>
+            </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ===== ADVISOR BOOK ===== -->
+    <sc-if value="{{ isBook }}" hint-placeholder-val="{{ true }}">
+      <div style="animation:fadeIn .4s ease">
+
+        <sc-if value="{{ bookListView }}" hint-placeholder-val="{{ true }}">
+          <div>
+            <div style="font-size:11px;font-weight:600;letter-spacing:.22em;color:#996F3D;border-bottom:1px dotted #C7A97A;display:inline-block;padding-bottom:3px;margin-bottom:12px">COVERAGE</div>
+            <h1 style="font-family:'Source Serif 4',serif;font-weight:600;font-size:40px;line-height:1.05;letter-spacing:-.02em;margin:0 0 6px;color:#17150F">Advisor Book</h1>
+            <p style="max-width:640px;color:#6B675F;font-size:14.5px;line-height:1.55;margin:0 0 26px">Your full book at a glance. Open a client to see a plain-language read on their portfolio and the ideas mapped to each holding — assets and liabilities.</p>
+
+            <div style="display:flex;gap:14px;margin-bottom:22px">
+              <div style="border:1px solid #E5E1DA;background:#fff;border-radius:10px;padding:13px 20px">
+                <div style="font-size:10px;font-weight:600;letter-spacing:.14em;color:#A8A29A">CLIENTS</div>
+                <div style="font-family:'Source Serif 4',serif;font-size:26px;font-weight:600;color:#17150F">4</div>
+              </div>
+              <div style="border:1px solid #E5E1DA;background:#fff;border-radius:10px;padding:13px 20px">
+                <div style="font-size:10px;font-weight:600;letter-spacing:.14em;color:#A8A29A">BOOK AUM</div>
+                <div style="font-family:'Source Serif 4',serif;font-size:26px;font-weight:600;color:#17150F">$77.0M</div>
+              </div>
+              <div style="border:1px solid #E5E1DA;background:#fff;border-radius:10px;padding:13px 20px">
+                <div style="font-size:10px;font-weight:600;letter-spacing:.14em;color:#A8A29A">LIVE IDEAS</div>
+                <div style="font-family:'Source Serif 4',serif;font-size:26px;font-weight:600;color:#17150F">7</div>
+              </div>
+            </div>
+
+            <div style="background:#fff;border:1px solid #E5E1DA;border-radius:12px;overflow:hidden">
+              <div style="display:grid;grid-template-columns:2.2fr 1fr 1fr 2fr auto;gap:16px;padding:13px 22px;background:#F6F3EE;border-bottom:1px solid #E5E1DA;font-size:10px;font-weight:600;letter-spacing:.14em;color:#8E8A80">
+                <div>CLIENT</div><div>AUM</div><div>YTD</div><div>FLAGS</div><div style="text-align:right">IDEAS</div>
+              </div>
+              <sc-for list="{{ bookClients }}" as="c" hint-placeholder-count="4">
+                <div onClick="{{ c.onOpen }}" style="display:grid;grid-template-columns:2.2fr 1fr 1fr 2fr auto;gap:16px;padding:18px 22px;border-bottom:1px solid #F0ECE4;cursor:pointer;align-items:center" style-hover="background:#FBF9F5">
+                  <div style="display:flex;align-items:center;gap:12px">
+                    <span style="width:34px;height:34px;border-radius:50%;background:#1E1B16;color:#EBC98D;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center">{{ c.init }}</span>
+                    <div>
+                      <div style="font-family:'Source Serif 4',serif;font-size:16px;font-weight:600;color:#17150F">{{ c.name }}</div>
+                      <div style="font-size:11.5px;color:#A8A29A">{{ c.prof }}</div>
+                    </div>
+                  </div>
+                  <div style="font-family:'Source Serif 4',serif;font-size:16px;color:#17150F">{{ c.aum }}</div>
+                  <div style="font-size:14px;font-weight:600;color:{{ c.ytdColor }}">{{ c.ytd }}</div>
+                  <div style="display:flex;flex-wrap:wrap;gap:5px">
+                    <sc-for list="{{ c.flags }}" as="f" hint-placeholder-count="2">
+                      <span style="font-size:10.5px;font-weight:500;padding:3px 8px;border-radius:5px;background:#F3EAD9;color:#8A5A2B">{{ f }}</span>
+                    </sc-for>
+                  </div>
+                  <div style="text-align:right;font-size:13px;color:#996F3D;font-weight:600;white-space:nowrap">{{ c.ideaCount }} recs&nbsp;›</div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ bookDetailView }}" hint-placeholder-val="{{ false }}">
+          <div style="animation:fadeIn .3s ease">
+            <button onClick="{{ onBackToList }}" style="appearance:none;background:none;border:none;cursor:pointer;font-family:'Archivo',sans-serif;font-size:12.5px;font-weight:600;color:#996F3D;padding:0;margin-bottom:18px">&larr; Advisor Book</button>
+
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:22px">
+              <div style="display:flex;align-items:center;gap:16px">
+                <span style="width:52px;height:52px;border-radius:50%;background:#1E1B16;color:#EBC98D;font-size:18px;font-weight:700;display:flex;align-items:center;justify-content:center">{{ detail.init }}</span>
+                <div>
+                  <h1 style="font-family:'Source Serif 4',serif;font-weight:600;font-size:32px;line-height:1;margin:0;color:#17150F">{{ detail.name }}</h1>
+                  <div style="font-size:13px;color:#A8A29A;margin-top:5px">{{ detail.prof }}</div>
+                </div>
+              </div>
+              <div style="text-align:right">
+                <div style="font-size:10px;font-weight:600;letter-spacing:.14em;color:#A8A29A">BOOK AUM</div>
+                <div style="font-family:'Source Serif 4',serif;font-size:28px;font-weight:600;color:#17150F">{{ detail.aum }}</div>
+                <div style="font-size:13px;font-weight:600;color:{{ detail.ytdColor }}">{{ detail.ytd }} YTD</div>
+              </div>
+            </div>
+
+            <div style="border-radius:11px;overflow:hidden;box-shadow:0 12px 34px -20px rgba(30,27,22,.55);margin-bottom:30px">
+              <div style="height:5px;background:#2FBF71"></div>
+              <div style="background:#1E1B16;padding:22px 26px">
+                <div style="font-size:10.5px;font-weight:600;letter-spacing:.22em;color:#8E8A80;margin-bottom:11px">THE READ ON THIS BOOK</div>
+                <div style="font-family:'Source Serif 4',serif;font-size:18.5px;line-height:1.55;color:#F4F1EA;font-weight:400">{{ detail.summary }}</div>
+              </div>
+            </div>
+
+            <sc-if value="{{ hasSelection }}" hint-placeholder-val="{{ false }}">
+              <div style="position:sticky;top:104px;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:16px;background:#54301A;color:#fff;border-radius:10px;padding:13px 20px;margin-bottom:20px;box-shadow:0 10px 26px -14px rgba(84,48,26,.7)">
+                <div style="font-size:13px"><span style="font-weight:700">{{ selectedCount }}</span> {{ selectedNoun }} selected across this book</div>
+                <div style="display:flex;gap:10px">
+                  <button onClick="{{ onClearSelection }}" style="appearance:none;background:none;border:1px solid rgba(255,255,255,.35);color:#fff;cursor:pointer;font-family:'Archivo',sans-serif;font-size:12.5px;font-weight:600;padding:8px 14px;border-radius:8px">Clear</button>
+                  <button onClick="{{ onCombineEmail }}" style="appearance:none;background:#EBC98D;border:none;color:#3A2410;cursor:pointer;font-family:'Archivo',sans-serif;font-size:12.5px;font-weight:700;padding:8px 16px;border-radius:8px">&#9993;&nbsp; Export to one email</button>
+                </div>
+              </div>
+            </sc-if>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:26px">
+              <div>
+                <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:14px">
+                  <span style="width:9px;height:9px;border-radius:2px;background:#1E1B16"></span>
+                  <h2 style="font-family:'Source Serif 4',serif;font-weight:600;font-size:20px;margin:0;color:#17150F">Assets</h2>
+                </div>
+                <sc-for list="{{ detail.assets }}" as="b" hint-placeholder-count="3">
+                  <div style="background:#fff;border:1px solid #E5E1DA;border-radius:11px;padding:16px 17px;margin-bottom:14px">
+                    <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:3px">
+                      <div style="font-size:14.5px;font-weight:600;color:#17150F">{{ b.name }}</div>
+                      <div style="font-family:'Source Serif 4',serif;font-size:16px;color:#17150F">{{ b.val }}</div>
+                    </div>
+                    <div style="font-size:11.5px;color:#A8A29A;margin-bottom:12px">{{ b.note }}</div>
+                    <sc-for list="{{ b.ideas }}" as="idea" hint-placeholder-count="1">
+                      <div style="border:1px solid {{ idea.rowBorder }};background:{{ idea.rowBg }};border-radius:9px;margin-top:8px;overflow:hidden">
+                        <div style="display:flex;align-items:center;gap:10px;padding:10px 12px">
+                          <button onClick="{{ idea.onToggleSelect }}" style="appearance:none;cursor:pointer;flex:none;width:19px;height:19px;border-radius:5px;border:1.5px solid {{ idea.checkBorder }};background:{{ idea.checkBg }};color:#fff;font-size:12px;line-height:1;display:flex;align-items:center;justify-content:center;padding:0">{{ idea.checkMark }}</button>
+                          <div onClick="{{ idea.onExpand }}" style="flex:1;cursor:pointer;min-width:0">
+                            <div style="font-size:13px;font-weight:600;color:#17150F;line-height:1.25">{{ idea.title }}</div>
+                            <div style="font-size:10.5px;color:#996F3D;margin-top:2px">{{ idea.tk }} · {{ idea.authorName }}</div>
+                          </div>
+                          <button onClick="{{ idea.onExpand }}" style="appearance:none;background:none;border:none;cursor:pointer;color:#A8A29A;font-size:12px;transform:{{ idea.caret }}">&#9662;</button>
+                        </div>
+                        <sc-if value="{{ idea.expanded }}" hint-placeholder-val="{{ false }}">
+                          <div style="padding:0 13px 13px;border-top:1px solid #F0ECE4;margin-top:2px;padding-top:11px">
+                            <div style="font-family:'Source Serif 4',serif;font-size:13.5px;line-height:1.5;color:#3A362F;margin-bottom:11px">{{ idea.plain }}</div>
+                            <button onClick="{{ idea.onEmail }}" style="appearance:none;background:#1E1B16;border:none;cursor:pointer;color:#fff;font-family:'Archivo',sans-serif;font-size:11.5px;font-weight:600;padding:7px 13px;border-radius:7px">&#9993;&nbsp; Draft this email</button>
+                          </div>
+                        </sc-if>
+                      </div>
+                    </sc-for>
+                  </div>
+                </sc-for>
+              </div>
+
+              <div>
+                <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:14px">
+                  <span style="width:9px;height:9px;border-radius:2px;background:#9C4A3A"></span>
+                  <h2 style="font-family:'Source Serif 4',serif;font-weight:600;font-size:20px;margin:0;color:#17150F">Liabilities</h2>
+                  <span style="font-size:10px;font-weight:600;letter-spacing:.1em;color:#9C4A3A;background:#F6E7E2;padding:2px 7px;border-radius:4px">IDEAS TOO</span>
+                </div>
+                <sc-for list="{{ detail.liabilities }}" as="b" hint-placeholder-count="2">
+                  <div style="background:#fff;border:1px solid #E5E1DA;border-radius:11px;padding:16px 17px;margin-bottom:14px">
+                    <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:3px">
+                      <div style="font-size:14.5px;font-weight:600;color:#17150F">{{ b.name }}</div>
+                      <div style="font-family:'Source Serif 4',serif;font-size:16px;color:#9C4A3A">{{ b.val }}</div>
+                    </div>
+                    <div style="font-size:11.5px;color:#A8A29A;margin-bottom:12px">{{ b.note }}</div>
+                    <sc-for list="{{ b.ideas }}" as="idea" hint-placeholder-count="1">
+                      <div style="border:1px solid {{ idea.rowBorder }};background:{{ idea.rowBg }};border-radius:9px;margin-top:8px;overflow:hidden">
+                        <div style="display:flex;align-items:center;gap:10px;padding:10px 12px">
+                          <button onClick="{{ idea.onToggleSelect }}" style="appearance:none;cursor:pointer;flex:none;width:19px;height:19px;border-radius:5px;border:1.5px solid {{ idea.checkBorder }};background:{{ idea.checkBg }};color:#fff;font-size:12px;line-height:1;display:flex;align-items:center;justify-content:center;padding:0">{{ idea.checkMark }}</button>
+                          <div onClick="{{ idea.onExpand }}" style="flex:1;cursor:pointer;min-width:0">
+                            <div style="font-size:13px;font-weight:600;color:#17150F;line-height:1.25">{{ idea.title }}</div>
+                            <div style="font-size:10.5px;color:#996F3D;margin-top:2px">{{ idea.tk }} · {{ idea.authorName }}</div>
+                          </div>
+                          <button onClick="{{ idea.onExpand }}" style="appearance:none;background:none;border:none;cursor:pointer;color:#A8A29A;font-size:12px;transform:{{ idea.caret }}">&#9662;</button>
+                        </div>
+                        <sc-if value="{{ idea.expanded }}" hint-placeholder-val="{{ false }}">
+                          <div style="padding:0 13px 13px;border-top:1px solid #F0ECE4;margin-top:2px;padding-top:11px">
+                            <div style="font-family:'Source Serif 4',serif;font-size:13.5px;line-height:1.5;color:#3A362F;margin-bottom:11px">{{ idea.plain }}</div>
+                            <button onClick="{{ idea.onEmail }}" style="appearance:none;background:#1E1B16;border:none;cursor:pointer;color:#fff;font-family:'Archivo',sans-serif;font-size:11.5px;font-weight:600;padding:7px 13px;border-radius:7px">&#9993;&nbsp; Draft this email</button>
+                          </div>
+                        </sc-if>
+                      </div>
+                    </sc-for>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+      </div>
+    </sc-if>
+
+  </main>
+
+  <!-- ===== SUITABILITY POPUP ===== -->
+  <sc-if value="{{ suitOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ onCloseSuit }}" style="position:fixed;inset:0;z-index:60;background:rgba(23,21,15,.5);backdrop-filter:blur(3px);display:flex;align-items:flex-start;justify-content:center;padding:34px 20px;overflow-y:auto" class="bp-scroll">
+      <div onClick="{{ stop }}" style="width:100%;max-width:1180px;background:#FBFAF7;border-radius:14px;overflow:hidden;box-shadow:0 30px 80px -20px rgba(23,21,15,.6);animation:popIn .32s cubic-bezier(.2,.8,.2,1)">
+        <div style="background:#1E1B16;padding:20px 26px;display:flex;align-items:flex-start;justify-content:space-between;gap:16px">
+          <div>
+            <div style="font-size:10px;font-weight:600;letter-spacing:.22em;color:#8E8A80;margin-bottom:7px">IDEA SUITABILITY &#183; {{ suit.tk }}</div>
+            <div style="font-family:'Source Serif 4',serif;font-size:22px;font-weight:600;color:#F4F1EA;line-height:1.15">{{ suit.title }}</div>
+          </div>
+          <button onClick="{{ onCloseSuit }}" style="appearance:none;background:rgba(255,255,255,.1);border:none;cursor:pointer;color:#F4F1EA;width:32px;height:32px;border-radius:50%;font-size:16px;flex:none">&#10005;</button>
+        </div>
+
+        <!-- ONE BIG TREE -->
+        <sc-if value="{{ suitShowFlow }}" hint-placeholder-val="{{ true }}">
+          <div style="padding:22px 26px 34px;overflow-x:auto" class="bp-scroll">
+            <div style="display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:20px">
+              <div style="text-align:center;color:#8E8A80;font-size:10.5px;font-weight:600;letter-spacing:.18em">IDEA &rarr; OBJECTIVE &rarr; IMPLEMENTATION &rarr; CLIENT&nbsp;&nbsp;·&nbsp;&nbsp;TAP A CLIENT TO DRAFT THEIR EMAIL</div>
+              <button onClick="{{ onSuitScore }}" style="appearance:none;cursor:pointer;display:flex;align-items:center;gap:7px;background:#fff;border:1px solid #E5E1DA;border-radius:20px;padding:5px 12px 5px 6px;font-family:'Archivo',sans-serif" style-hover="border-color:#C7A97A">
+                <span style="width:22px;height:22px;border-radius:50%;background:{{ suitScoreColor }};color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">{{ suitScore }}</span>
+                <span style="font-size:11px;font-weight:600;color:#54301A">Why this score</span>
+              </button>
+            </div>
+            <div style="width:{{ tree.outW }}px;height:{{ tree.outH }}px;margin:0 auto;position:relative">
+              <div style="position:absolute;top:0;left:0;width:{{ tree.w }}px;height:{{ tree.h }}px;transform:scale({{ tree.scale }});transform-origin:top left">
+                <svg width="{{ tree.w }}" height="{{ tree.h }}" style="position:absolute;top:0;left:0;overflow:visible">
+                  <sc-for list="{{ tree.lines }}" as="ln" hint-placeholder-count="6">
+                    <path d="{{ ln.d }}" style="fill:none;stroke:{{ ln.color }};stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:{{ ln.len }};stroke-dashoffset:{{ ln.len }};animation:drawLine .5s ease {{ ln.delay }} forwards"></path>
+                  </sc-for>
+                </svg>
+                <sc-for list="{{ tree.whys }}" as="w" hint-placeholder-count="4">
+                  <div style="position:absolute;left:{{ w.left }}px;top:{{ w.top }}px;width:{{ w.w }}px;text-align:center;opacity:0;animation:treePop .45s ease {{ w.delay }} forwards">
+                    <span style="display:inline-block;background:#FBFAF7;padding:2px 8px;border-radius:6px;font-family:'Source Serif 4',serif;font-style:italic;font-size:13px;line-height:1.3;color:#9C7A45">{{ w.text }}</span>
+                  </div>
+                </sc-for>
+                <sc-for list="{{ tree.nodes }}" as="n" hint-placeholder-count="6">
+                  <div onClick="{{ n.onClick }}" style="position:absolute;left:{{ n.left }}px;top:{{ n.top }}px;width:{{ n.w }}px;opacity:0;animation:treePop .45s ease {{ n.delay }} forwards;cursor:{{ n.cursor }}">
+                    <sc-if value="{{ n.isClient }}" hint-placeholder-val="{{ false }}">
+                      <div style="display:flex;align-items:center;gap:10px;background:#fff;border:1px solid #DDD6C9;border-radius:12px;padding:10px 12px;box-shadow:0 6px 16px -8px rgba(30,27,22,.35)" style-hover="border-color:#996F3D;background:#FBF7F0">
+                        <span style="flex:none;width:30px;height:30px;border-radius:50%;background:#1E1B16;color:#EBC98D;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center">{{ n.init }}</span>
+                        <span style="min-width:0">
+                          <span style="display:block;font-size:13.5px;font-weight:600;color:#17150F;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ n.label }}</span>
+                          <span style="display:block;font-size:10.5px;color:#996F3D">draft email &rarr;</span>
+                        </span>
+                      </div>
+                    </sc-if>
+                    <sc-if value="{{ n.notClient }}" hint-placeholder-val="{{ true }}">
+                      <div style="text-align:center;background:{{ n.boxBg }};border:{{ n.boxBorder }};border-radius:{{ n.radius }}px;padding:{{ n.pad }};color:{{ n.boxColor }};font-family:{{ n.ff }};font-weight:600;font-size:{{ n.fs }}px;line-height:1.22">
+                        <sc-if value="{{ n.isObj }}" hint-placeholder-val="{{ false }}"><div style="font-size:8.5px;font-weight:600;letter-spacing:.16em;color:{{ n.boxColor }};opacity:.6;margin-bottom:3px">OBJECTIVE</div></sc-if>
+                        {{ n.label }}
+                      </div>
+                    </sc-if>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- CLIENT EMAIL -->
+        <sc-if value="{{ suitShowEmail }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:22px 26px;max-width:680px;margin:0 auto">
+            <button onClick="{{ onSuitBack }}" style="appearance:none;background:none;border:none;cursor:pointer;font-family:'Archivo',sans-serif;font-size:12.5px;font-weight:600;color:#996F3D;padding:0;margin-bottom:16px">&larr; back to flowchart</button>
+            <div style="display:flex;align-items:center;gap:11px;margin-bottom:16px">
+              <span style="width:36px;height:36px;border-radius:50%;background:#1E1B16;color:#EBC98D;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center">{{ suitEmailInit }}</span>
+              <div>
+                <div style="font-size:10px;font-weight:600;letter-spacing:.16em;color:#A8A29A">DRAFT · TAILORED TO</div>
+                <div style="font-family:'Source Serif 4',serif;font-size:17px;font-weight:600;color:#17150F">{{ suitEmailClient }}</div>
+              </div>
+            </div>
+            <div style="background:#fff;border:1px solid #E5E1DA;border-radius:11px;padding:22px 24px;font-family:'Source Serif 4',serif;font-size:15px;line-height:1.62;color:#26221B;white-space:pre-wrap;min-height:220px">{{ suitEmailText }}</div>
+            <div style="display:flex;gap:11px;margin-top:16px;opacity:{{ suitEmailBtnOpacity }}">
+              <button style="appearance:none;background:#1E1B16;border:none;cursor:pointer;color:#fff;font-family:'Archivo',sans-serif;font-size:13px;font-weight:600;padding:11px 18px;border-radius:9px">Open in Outlook</button>
+              <button onClick="{{ onCopySuitEmail }}" style="appearance:none;background:#fff;border:1px solid #DDD6C9;cursor:pointer;color:#54301A;font-family:'Archivo',sans-serif;font-size:13px;font-weight:600;padding:11px 18px;border-radius:9px">{{ suitCopyLabel }}</button>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ===== GENERIC EMAIL POPUP ===== -->
+  <sc-if value="{{ emailOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ onCloseEmail }}" style="position:fixed;inset:0;z-index:60;background:rgba(23,21,15,.5);backdrop-filter:blur(3px);display:flex;align-items:flex-start;justify-content:center;padding:44px 20px;overflow-y:auto" class="bp-scroll">
+      <div onClick="{{ stop }}" style="width:100%;max-width:620px;background:#FBFAF7;border-radius:14px;overflow:hidden;box-shadow:0 30px 80px -20px rgba(23,21,15,.6);animation:popIn .32s cubic-bezier(.2,.8,.2,1)">
+        <div style="background:#1E1B16;padding:20px 26px;display:flex;align-items:flex-start;justify-content:space-between;gap:16px">
+          <div>
+            <div style="font-size:10px;font-weight:600;letter-spacing:.22em;color:#8E8A80;margin-bottom:7px">CLIENT-READY DRAFT &#183; GENERIC</div>
+            <div style="font-family:'Source Serif 4',serif;font-size:20px;font-weight:600;color:#F4F1EA;line-height:1.15">{{ emailIdeaTitle }}</div>
+          </div>
+          <button onClick="{{ onCloseEmail }}" style="appearance:none;background:rgba(255,255,255,.1);border:none;cursor:pointer;color:#F4F1EA;width:32px;height:32px;border-radius:50%;font-size:16px;flex:none">&#10005;</button>
+        </div>
+        <div style="padding:22px 26px">
+          <div style="font-size:12px;color:#8E8A80;margin-bottom:14px">A non-client-specific draft — personalise it per client from the Suitability flowchart.</div>
+          <div style="background:#fff;border:1px solid #E5E1DA;border-radius:11px;padding:22px 24px;font-family:'Source Serif 4',serif;font-size:15px;line-height:1.62;color:#26221B;white-space:pre-wrap;min-height:200px">{{ emailText }}</div>
+          <div style="display:flex;gap:11px;margin-top:16px;opacity:{{ emailBtnOpacity }}">
+            <button style="appearance:none;background:#1E1B16;border:none;cursor:pointer;color:#fff;font-family:'Archivo',sans-serif;font-size:13px;font-weight:600;padding:11px 18px;border-radius:9px">Open in Outlook</button>
+            <button onClick="{{ onCopyEmail }}" style="appearance:none;background:#fff;border:1px solid #DDD6C9;cursor:pointer;color:#54301A;font-family:'Archivo',sans-serif;font-size:13px;font-weight:600;padding:11px 18px;border-radius:9px">{{ emailCopyLabel }}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ===== COMBINED EMAIL POPUP ===== -->
+  <sc-if value="{{ combineOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ onCloseCombine }}" style="position:fixed;inset:0;z-index:60;background:rgba(23,21,15,.5);backdrop-filter:blur(3px);display:flex;align-items:flex-start;justify-content:center;padding:44px 20px;overflow-y:auto" class="bp-scroll">
+      <div onClick="{{ stop }}" style="width:100%;max-width:640px;background:#FBFAF7;border-radius:14px;overflow:hidden;box-shadow:0 30px 80px -20px rgba(23,21,15,.6);animation:popIn .32s cubic-bezier(.2,.8,.2,1)">
+        <div style="height:5px;background:#2FBF71"></div>
+        <div style="background:#1E1B16;padding:20px 26px;display:flex;align-items:flex-start;justify-content:space-between;gap:16px">
+          <div>
+            <div style="font-size:10px;font-weight:600;letter-spacing:.22em;color:#8E8A80;margin-bottom:7px">ONE EMAIL &#183; {{ combineCount }} ACTIONS</div>
+            <div style="font-family:'Source Serif 4',serif;font-size:20px;font-weight:600;color:#F4F1EA;line-height:1.15">A coordinated note to {{ combineClient }}</div>
+          </div>
+          <button onClick="{{ onCloseCombine }}" style="appearance:none;background:rgba(255,255,255,.1);border:none;cursor:pointer;color:#F4F1EA;width:32px;height:32px;border-radius:50%;font-size:16px;flex:none">&#10005;</button>
+        </div>
+        <div style="padding:22px 26px">
+          <div style="background:#fff;border:1px solid #E5E1DA;border-radius:11px;padding:22px 24px;font-family:'Source Serif 4',serif;font-size:15px;line-height:1.62;color:#26221B;white-space:pre-wrap;min-height:260px">{{ combineText }}</div>
+          <div style="display:flex;gap:11px;margin-top:16px;opacity:{{ combineBtnOpacity }}">
+            <button style="appearance:none;background:#1E1B16;border:none;cursor:pointer;color:#fff;font-family:'Archivo',sans-serif;font-size:13px;font-weight:600;padding:11px 18px;border-radius:9px">Open in Outlook</button>
+            <button onClick="{{ onCopyCombine }}" style="appearance:none;background:#fff;border:1px solid #DDD6C9;cursor:pointer;color:#54301A;font-family:'Archivo',sans-serif;font-size:13px;font-weight:600;padding:11px 18px;border-radius:9px">{{ combineCopyLabel }}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ===== SCORE BREAKDOWN POPUP ===== -->
+  <sc-if value="{{ scoreOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ onCloseScore }}" style="position:fixed;inset:0;z-index:70;background:rgba(23,21,15,.5);backdrop-filter:blur(3px);display:flex;align-items:flex-start;justify-content:center;padding:8vh 20px 20px;overflow-y:auto" class="bp-scroll">
+      <div onClick="{{ stop }}" style="width:100%;max-width:560px;background:#FBFAF7;border-radius:14px;overflow:hidden;box-shadow:0 30px 80px -20px rgba(23,21,15,.6);animation:popIn .3s cubic-bezier(.2,.8,.2,1)">
+        <div style="background:#1E1B16;padding:20px 24px;display:flex;align-items:center;gap:18px">
+          <div style="flex:none;position:relative;width:66px;height:66px">
+            <svg width="66" height="66">
+              <circle cx="33" cy="33" r="26" fill="none" stroke="#3A362E" stroke-width="5.5"></circle>
+              <circle cx="33" cy="33" r="26" fill="none" stroke="{{ scoreColor }}" stroke-width="5.5" stroke-linecap="round" transform="rotate(-90 33 33)" style="stroke-dasharray:163.4;stroke-dashoffset:{{ scoreRingOffset }};animation:ringMd 1s cubic-bezier(.3,.9,.3,1) .1s both"></circle>
+            </svg>
+            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+              <span style="font-family:'Source Serif 4',serif;font-size:21px;font-weight:600;color:#F4F1EA;line-height:1">{{ scoreScore }}</span>
+              <span style="font-size:7.5px;font-weight:600;letter-spacing:.16em;color:#8E8A80">FIT</span>
+            </div>
+          </div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:9.5px;font-weight:600;letter-spacing:.2em;color:#8E8A80;margin-bottom:5px">HOW CLAUDE SCORED THIS &#183; {{ scoreTk }}</div>
+            <div style="font-family:'Source Serif 4',serif;font-size:18px;font-weight:600;color:#F4F1EA;line-height:1.18">{{ scoreTitle }}</div>
+          </div>
+          <button onClick="{{ onCloseScore }}" style="appearance:none;background:rgba(255,255,255,.1);border:none;cursor:pointer;color:#F4F1EA;width:30px;height:30px;border-radius:50%;font-size:15px;flex:none">&#10005;</button>
+        </div>
+        <div style="padding:20px 24px 8px">
+          <div style="font-size:10px;font-weight:600;letter-spacing:.16em;color:#996F3D;margin-bottom:14px">ALIGNMENT WITH THE SOLUTIONS DESK IS ONE INPUT</div>
+          <sc-for list="{{ scoreFactors }}" as="f" hint-placeholder-count="4">
+            <div style="margin-bottom:15px">
+              <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:5px">
+                <span style="font-size:13px;font-weight:600;color:#26221B">{{ f.label }}</span>
+                <span style="font-size:12px;font-weight:600;color:{{ f.color }};font-variant-numeric:tabular-nums">{{ f.pctTxt }}</span>
+              </div>
+              <div style="height:7px;background:#EFEAE1;border-radius:4px;overflow:hidden">
+                <div style="height:100%;width:{{ f.pct }}%;background:{{ f.color }};border-radius:4px;animation:growBar .9s cubic-bezier(.3,.9,.3,1) {{ f.delay }} both"></div>
+              </div>
+              <div style="font-size:11px;color:#A8A29A;margin-top:4px">{{ f.note }}</div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="padding:6px 24px 22px">
+          <button onClick="{{ onScoreToSuit }}" style="appearance:none;cursor:pointer;width:100%;background:#1E1B16;border:none;color:#fff;font-family:'Archivo',sans-serif;font-size:13px;font-weight:600;padding:12px;border-radius:9px">&#9095;&nbsp; See the suitability flowchart</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ===== COMMAND PALETTE (⌘K) ===== -->
+  <sc-if value="{{ cmdOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ onCloseCmd }}" style="position:fixed;inset:0;z-index:80;background:rgba(23,21,15,.42);backdrop-filter:blur(5px);display:flex;justify-content:center;align-items:flex-start;padding:11vh 20px 20px">
+      <div onClick="{{ stop }}" style="width:100%;max-width:600px;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 30px 80px -18px rgba(23,21,15,.6);animation:popIn .26s cubic-bezier(.2,.8,.2,1)">
+        <div style="display:flex;align-items:center;gap:12px;padding:15px 18px;border-bottom:1px solid #EFEAE1">
+          <span style="font-size:16px;color:#996F3D">&#9906;</span>
+          <input value="{{ cmdQuery }}" onChange="{{ onCmdInput }}" autofocus="{{ true }}" placeholder="Jump to a client, idea, or view…" style="flex:1;border:none;outline:none;background:none;font-family:'Archivo',sans-serif;font-size:16px;color:#17150F" />
+          <span style="font-size:10px;font-weight:600;color:#A8A29A;background:#F4F1EA;border:1px solid #E5E1DA;border-radius:5px;padding:2px 7px">ESC</span>
+        </div>
+        <div style="max-height:56vh;overflow-y:auto" class="bp-scroll">
+          <sc-for list="{{ cmdItems }}" as="it" hint-placeholder-count="6">
+            <div onClick="{{ it.onRun }}" style="display:flex;align-items:center;gap:12px;padding:11px 18px;cursor:pointer;background:{{ it.bg }};border-left:2px solid {{ it.accent }}">
+              <span style="flex:none;width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;background:{{ it.iconBg }};color:{{ it.iconFg }}">{{ it.icon }}</span>
+              <span style="flex:1;min-width:0">
+                <span style="display:block;font-size:13.5px;font-weight:600;color:#17150F;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ it.label }}</span>
+                <span style="display:block;font-size:11px;color:#A8A29A">{{ it.hint }}</span>
+              </span>
+              <span style="flex:none;font-size:9px;font-weight:600;letter-spacing:.12em;color:#B8B2A8">{{ it.kindLabel }}</span>
+            </div>
+          </sc-for>
+          <sc-if value="{{ cmdEmpty }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:34px;text-align:center;color:#A8A29A;font-size:13px">No matches for &ldquo;{{ cmdQuery }}&rdquo;</div>
+          </sc-if>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px;padding:10px 18px;border-top:1px solid #EFEAE1;background:#FBFAF7;font-size:10.5px;color:#A8A29A">
+          <span><span style="font-weight:700;color:#6B675F">&uarr;&darr;</span> navigate</span>
+          <span><span style="font-weight:700;color:#6B675F">&crarr;</span> open</span>
+          <span><span style="font-weight:700;color:#6B675F">esc</span> close</span>
+          <span style="margin-left:auto;color:#C4BEB4">Brokerage Playground</span>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1200,&quot;height&quot;:900},&quot;startTab&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;feed&quot;,&quot;book&quot;],&quot;default&quot;:&quot;feed&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Behavior&quot;},&quot;streamSpeed&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:2,&quot;min&quot;:1,&quot;max&quot;:3,&quot;step&quot;:1,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Behavior&quot;},&quot;showLikeCounts&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Behavior&quot;}}">
+class Component extends DCLogic {
+  state = {
+    tab: this.props.startTab || 'feed',
+    emailBump: {}, checkBump: {}, focusId: null,
+    search: '', assetFilter: 'All', clientFilter: 'all',
+    liked: {}, bump: {},
+    suitId: null, suitClientId: null, suitEmail: '', suitStreaming: false, suitCopied: false,
+    emailId: null, emailText: '', emailStreaming: false, emailCopied: false,
+    bookClientId: null, expanded: {}, selected: {},
+    combineOpen: false, combineText: '', combineStreaming: false, combineCopied: false,
+    cmdOpen: false, cmdQuery: '', cmdIndex: 0, tickers: null,
+    scoreId: null,
+    askQuery: '', askMsgs: [], askStreaming: false, askOpen: false,
+  };
+
+  askChipsList = [
+    "Who's most exposed to a CEG drawdown?",
+    "Where's the idle cash to deploy?",
+    "Which clients have unhedged liabilities?",
+    "Who needs income ideas?",
+  ];
+  askIntents = [
+    { keys:['ceg','constellation','drawdown','concentration','exposed','single-name'],
+      text:"Two clients carry the Constellation risk. Aurora Vance is the acute one — CEG is ~18% of her book after a +142% run, so a sharp drawdown would hit book-level performance hard; a zero-cost collar is the cleanest fix without a taxable sale. R. Hoffmann holds CEG at a loss, so his exposure is smaller in size but sits on a duration-gapped, income-led book where a protection note or loss-harvest fits better. No one else in the book carries a material single-name CEG position.",
+      refs:[{kind:'client',id:'aurora',label:'Aurora Vance'},{kind:'client',id:'hoffmann',label:'R. Hoffmann'},{kind:'idea',id:'ceg',label:'CEG collar'}] },
+    { keys:['idle','cash','deploy','sidelined','uninvested','under-invested','put to work'],
+      text:"The Oliveira family is the standout — about 34% of a $32.8M book is sitting in cash, well above policy. The two best homes for it today are the 4YNC1Y range accrual (8.10% conditional coupon while the 10Y holds its range) and the gold twin-win on the pullback. Aurora also has a smaller ~10% idle sleeve that could take the range accrual.",
+      refs:[{kind:'client',id:'oliveira',label:'Fam. Oliveira'},{kind:'idea',id:'range',label:'Range accrual'},{kind:'idea',id:'gold',label:'Gold twin-win'}] },
+    { keys:['liab','hedge','loan','lombard','facility','floating','sofr','eur','borrow'],
+      text:"Three unhedged liabilities stand out. Aurora's Lombard loan floats on SOFR — a 2Y cap at 5.00% fixes the ceiling for ~45bps. The Oliveira and Rossi books both carry floating EUR facilities exposed to a stronger euro, where a near-zero-cost EURUSD seagull covers the band that matters. This is the liability side we usually under-manage.",
+      refs:[{kind:'idea',id:'sofr',label:'SOFR cap'},{kind:'idea',id:'eurusd',label:'EURUSD seagull'},{kind:'client',id:'aurora',label:'Aurora Vance'},{kind:'client',id:'rossi',label:'A. Rossi'}] },
+    { keys:['income','coupon','yield','carry','get paid','dividend'],
+      text:"Two books are income-led. R. Hoffmann needs reliable coupon to offset a down year — the range accrual and a biotech reverse convertible both fit his defined-risk mandate. A. Rossi wants carry on his European tilt — the SX7E 9.25% Phoenix autocall and the same reverse convertible monetise that exposure without buying the outright downside.",
+      refs:[{kind:'client',id:'hoffmann',label:'R. Hoffmann'},{kind:'client',id:'rossi',label:'A. Rossi'},{kind:'idea',id:'sx7e',label:'SX7E autocall'},{kind:'idea',id:'xbi',label:'Reverse convertible'}] },
+    { keys:['summary','summarize','overview','how is','doing','shape','book look'],
+      text:"Across four clients and $77.0M, the book is net positive on the year. Aurora (+4.1%) and Oliveira (+2.2%) are healthy but carry the two biggest to-dos — CEG concentration and 34% idle cash respectively. Rossi (+1.1%) is fine but concentrated in EU financials. Hoffmann (−3.4%) is the one needing attention, on a CEG loss and a duration gap. Seven live ideas map onto these across both assets and liabilities.",
+      refs:[{kind:'client',id:'aurora',label:'Aurora'},{kind:'client',id:'oliveira',label:'Oliveira'},{kind:'client',id:'hoffmann',label:'Hoffmann'},{kind:'client',id:'rossi',label:'Rossi'}] },
+    { keys:['first','priorit','urgent','today','next best','start','one thing'],
+      text:"If you do one thing per client today: collar Aurora's CEG concentration (the largest single risk in the book), deploy Oliveira's idle cash into the range accrual, address Hoffmann's CEG loss and duration gap, and monetise Rossi's EU-financials tilt with the SX7E autocall. Aurora's collar is the most time-sensitive given the post-FOMC round-trip.",
+      refs:[{kind:'client',id:'aurora',label:'Aurora Vance'},{kind:'idea',id:'ceg',label:'CEG collar'},{kind:'idea',id:'range',label:'Range accrual'}] },
+  ];
+  answerFor(q){
+    q=(q||'').toLowerCase();
+    let best=null, bestN=0;
+    this.askIntents.forEach(it=>{ const n=it.keys.filter(k=>q.includes(k)).length; if(n>bestN){ bestN=n; best=it; } });
+    if(best) return best;
+    return { text:"I read the book across concentration, idle cash, liabilities, income needs, and daily priorities. Try one of the suggested questions below — or ask about a specific client or idea by name.", refs:[] };
+  }
+
+  tickersInit = [
+    { sym:'CEG', px:412.30, dayChg:1.2, fmt:'p2' },
+    { sym:'US 10Y', px:4.386, dayChg:-0.4, fmt:'pct3' },
+    { sym:'XAU', px:4031, dayChg:-0.8, fmt:'comma' },
+    { sym:'EURUSD', px:1.0885, dayChg:0.2, fmt:'p4' },
+    { sym:'SX7E', px:142.6, dayChg:0.6, fmt:'p2' },
+    { sym:'SOFR', px:4.83, dayChg:0.0, fmt:'pct2' },
+    { sym:'XBI', px:92.4, dayChg:-1.1, fmt:'p2' },
+  ];
+  _tk = this.tickersInit.map(t=>({ ...t, base:t.px, hist:Array.from({length:20},(_,i)=> t.px*(1+Math.sin(i*0.6)*0.0012)) }));
+
+  scores = { ceg:88, range:82, sx7e:74, gold:67, eurusd:63, sofr:79, xbi:71 };
+  emailsBase = { ceg:12, range:18, sx7e:9, gold:7, eurusd:5, sofr:8, xbi:11 };
+  whyMap = {
+    ceg:'CEG is 18% of Aurora\u2019s book and a held loss for Hoffmann — your two biggest single-name flags',
+    range:'34% idle cash at Oliveira and a duration gap at Hoffmann — both resolved by this coupon',
+    sx7e:'matches A. Rossi\u2019s EU-financials tilt and his income mandate',
+    gold:'deploys Oliveira\u2019s idle cash into a haven sleeve on the pullback',
+    eurusd:'two of your books carry floating EUR facilities — direct hedge match',
+    sofr:'Aurora\u2019s Lombard loan floats on SOFR — a liability-side match most desks miss',
+    xbi:'income mandates at Hoffmann and Rossi — defined-risk carry both can hold',
+  };
+  checksBase = { ceg:48, range:39, sx7e:22, gold:17, eurusd:12, sofr:21, xbi:19 };
+  factorMap = {
+    ceg:[
+      {label:'Aligns with Solutions Desk', val:70, note:'Off-theme single-name — scored on merit, partial house alignment'},
+      {label:'Book trigger match', val:96, note:'CEG flagged in 2 books · 18% concentration + a held loss'},
+      {label:'Objective fit across book', val:92, note:'Maps cleanly to Preservation, Income and Growth'},
+      {label:'Within comfort caps', val:84, note:'Stays under single-sector limits after the trade'},
+    ],
+    range:[
+      {label:'Aligns with Solutions Desk', val:95, note:'Core Fixed Income house view — high alignment'},
+      {label:'Book trigger match', val:80, note:'Idle cash and a duration gap across 2 books'},
+      {label:'Objective fit across book', val:78, note:'Income-led; fits preservation mandates'},
+      {label:'Within comfort caps', val:88, note:'Principal at risk only below the band'},
+    ],
+    sx7e:[
+      {label:'Aligns with Solutions Desk', val:82, note:'Broadening Equity / Structured Outcomes theme'},
+      {label:'Book trigger match', val:72, note:'European financials tilt in 1 book'},
+      {label:'Objective fit across book', val:74, note:'Income with a defined downside'},
+      {label:'Within comfort caps', val:70, note:'Barrier risk inside tolerance'},
+    ],
+    gold:[
+      {label:'Aligns with Solutions Desk', val:88, note:'Gold & Currency standing view'},
+      {label:'Book trigger match', val:60, note:'Deploys idle cash in 1 book'},
+      {label:'Objective fit across book', val:66, note:'Haven sleeve — growth + preservation'},
+      {label:'Within comfort caps', val:78, note:'Capital protected down to the barrier'},
+    ],
+    eurusd:[
+      {label:'Aligns with Solutions Desk', val:64, note:'Tactical hedge — light house weight'},
+      {label:'Book trigger match', val:70, note:'Floating EUR facility in 2 books'},
+      {label:'Objective fit across book', val:60, note:'Liability hedge — preservation'},
+      {label:'Within comfort caps', val:80, note:'Near-zero premium, defined band'},
+    ],
+    sofr:[
+      {label:'Aligns with Solutions Desk', val:66, note:'Liability-side view — less-covered angle'},
+      {label:'Book trigger match', val:92, note:'Floating Lombard on SOFR flagged'},
+      {label:'Objective fit across book', val:82, note:'Preservation on the liability side'},
+      {label:'Within comfort caps', val:86, note:'Known, modest upfront premium'},
+    ],
+    xbi:[
+      {label:'Aligns with Solutions Desk', val:76, note:'Healthcare Innovation theme'},
+      {label:'Book trigger match', val:66, note:'Income need + risk appetite in 2 books'},
+      {label:'Objective fit across book', val:72, note:'Income with a defined entry'},
+      {label:'Within comfort caps', val:70, note:'Deep knock-in observed at maturity only'},
+    ],
+  };
+  scoreColor(v){ return v>=80?'#2C7A4B':v>=68?'#996F3D':'#A97D48'; }
+
+  // ---------- TICKER ----------
+  _fmtPx(t){
+    if(t.fmt==='pct3') return t.px.toFixed(3)+'%';
+    if(t.fmt==='pct2') return t.px.toFixed(2)+'%';
+    if(t.fmt==='p4') return t.px.toFixed(4);
+    if(t.fmt==='comma') return Math.round(t.px).toLocaleString('en-US');
+    return t.px.toFixed(2);
+  }
+  _spark(hist){
+    const w=46,h=16,p=2; const min=Math.min(...hist),max=Math.max(...hist),r=(max-min)||1;
+    return hist.map((v,i)=>{ const x=p+i*(w-2*p)/(hist.length-1); const y=h-p-(v-min)/r*(h-2*p); return x.toFixed(1)+','+y.toFixed(1); }).join(' ');
+  }
+  _buildTickers(){
+    return this._tk.map(t=>{
+      const chg = t.dayChg + (t.px/t.base-1)*100;
+      const col = chg>=0.03?'#3FD986':(chg<=-0.03?'#E79484':'#9A948A');
+      return { sym:t.sym, pxTxt:this._fmtPx(t), chgTxt:(chg>=0?'+':'')+chg.toFixed(chg>=1||chg<=-1?1:2)+'%', chgColor:col, spark:this._spark(t.hist) };
+    });
+  }
+
+  // ---------- COMMAND PALETTE ----------
+  buildCmd(q){
+    q=(q||'').trim().toLowerCase();
+    const items=[];
+    [['feed','Idea Feed'],['book','Advisor Book']].forEach(([id,label])=> items.push({ kind:'tab', tid:id, label:'Go to '+label, hint:'View' }));
+    this.clients.forEach(c=> items.push({ kind:'client', cid:c.id, label:c.name, hint:c.aum+' · '+c.ytd+' · open book' }));
+    this.ideas.forEach(i=> items.push({ kind:'idea', iid:i.id, label:i.title, hint:i.tk+' · '+i.ac+' · Idea Suitability' }));
+    if(!q) return items;
+    const match=(s)=>{ s=(s||'').toLowerCase(); if(s.includes(q)) return true; let j=0; for(const ch of s){ if(ch===q[j]) j++; if(j===q.length) return true; } return false; };
+    return items.filter(it=> match(it.label) || match(it.hint));
+  }
+  runCmd(it){
+    this.setState({ cmdOpen:false, cmdQuery:'', cmdIndex:0 });
+    if(it.kind==='tab') this.go(it.tid);
+    else if(it.kind==='client'){ this.setState({ tab:'book' }); this.openClient(it.cid); }
+    else if(it.kind==='idea') this.openSuit(it.iid);
+  }
+  _onKey = (e)=>{
+    if((e.metaKey||e.ctrlKey) && (e.key==='k'||e.key==='K')){ e.preventDefault(); this.setState(s=>({ cmdOpen:!s.cmdOpen, cmdQuery:'', cmdIndex:0 })); return; }
+    if(!this.state.cmdOpen) return;
+    if(e.key==='Escape'){ this.setState({ cmdOpen:false }); return; }
+    const items=this.buildCmd(this.state.cmdQuery);
+    if(e.key==='ArrowDown'){ e.preventDefault(); this.setState(s=>({ cmdIndex:Math.min(s.cmdIndex+1, Math.max(0,items.length-1)) })); }
+    else if(e.key==='ArrowUp'){ e.preventDefault(); this.setState(s=>({ cmdIndex:Math.max(s.cmdIndex-1,0) })); }
+    else if(e.key==='Enter'){ e.preventDefault(); const it=items[this.state.cmdIndex]; if(it) this.runCmd(it); }
+  };
+
+  clients = [
+    { id:'aurora', name:'Aurora Vance', salut:'Aurora', init:'AV', aum:'$21.4M', ytd:'+4.1%', pos:true,
+      prof:'5-yr relationship · MiFID Retail · Growth + income',
+      hook:'your Constellation position is now roughly 18% of the book — genuinely your best call, but also your single largest concentration — and the Lombard facility still floats on SOFR',
+      summary:"Aurora's book is in good shape — up 4.1% on the year, led by a Constellation position that has more than doubled. The flip side is concentration: CEG is now ~18% of assets, and the Lombard facility still floats on SOFR. Three things to focus on today: collar the CEG gain without a taxable sale, put the idle cash to work in the range accrual, and cap the loan rate.",
+      assets:[
+        { name:'US Equities', val:'$12.1M', note:'CEG ~18% of book · +142% held', ideas:['ceg'] },
+        { name:'Fixed Income', val:'$4.8M', note:'short duration, low coupon', ideas:['range'] },
+        { name:'Cash', val:'$2.1M', note:'~10% idle — deployable', ideas:['gold'] },
+      ],
+      liabilities:[ { name:'Lombard loan (floating)', val:'−$3.4M', note:'SOFR + 130bps · resets quarterly', ideas:['sofr'] } ] },
+    { id:'oliveira', name:'Fam. Oliveira', salut:'Ana', init:'FO', aum:'$32.8M', ytd:'+2.2%', pos:true,
+      prof:'Family office · Balanced · preservation-led',
+      hook:'roughly a third of the book — about 34% — is sitting in cash, earning meaningfully less than it could in this rate environment',
+      summary:"The Oliveira family book is steady and up 2.2%, but it's badly under-invested — roughly 34% sits in cash. The opportunity today is simply deployment: a range accrual note and a gold twin-win to earn on the sidelined capital, plus a light hedge on the euro facility. Three things to focus on today: deploy the idle cash into coupon, add a haven sleeve on gold's pullback, and hedge the EUR facility.",
+      assets:[
+        { name:'US Equities', val:'$9.4M', note:'diversified, no single-name risk', ideas:['sx7e'] },
+        { name:'Fixed Income', val:'$6.2M', note:'laddered, room to extend', ideas:['range'] },
+        { name:'Cash', val:'$11.1M', note:'34% idle — the headline issue', ideas:['range','gold'] },
+      ],
+      liabilities:[ { name:'EUR facility (floating)', val:'−$2.0M', note:'EURIBOR-linked', ideas:['eurusd'] } ] },
+    { id:'hoffmann', name:'R. Hoffmann', salut:'Herr Hoffmann', init:'RH', aum:'$14.2M', ytd:'−3.4%', pos:false,
+      prof:'11-yr relationship · Retiree · income & preservation',
+      hook:"the book is down about 3.4% this year, largely on a Constellation loss, and there's a duration gap in the bond sleeve to close",
+      summary:"Herr Hoffmann's book is down 3.4% this year, weighed by a Constellation loss and a duration gap in the bond sleeve. The focus is repair, not reach: harvest and protect the CEG loss, close the duration gap with the range accrual, and add defined-risk income. Three things to focus on today: address the CEG loss, close the duration gap, and layer in reliable coupon income.",
+      assets:[
+        { name:'US Equities', val:'$5.1M', note:'CEG held at a loss', ideas:['ceg'] },
+        { name:'Fixed Income', val:'$6.8M', note:'duration gap vs liabilities', ideas:['range'] },
+        { name:'Cash', val:'$2.3M', note:'buffer intact', ideas:['xbi'] },
+      ],
+      liabilities:[] },
+    { id:'rossi', name:'A. Rossi', salut:'Signor Rossi', init:'AR', aum:'$8.6M', ytd:'+1.1%', pos:true,
+      prof:'Business owner · Growth · European bias',
+      hook:'the book leans heavily into European financials — a good year so far, but the tilt is concentrated enough to be worth monetising',
+      summary:"Signor Rossi's book is modestly ahead at 1.1% but leans hard into European financials. Today is about monetising and diversifying that tilt rather than fighting it: an SX7E autocall and a biotech reverse convertible turn the exposure into income, while an FX seagull hedges the euro facility. Three things to focus on today: monetise the financials tilt, diversify with defined-risk income, and hedge the EUR facility.",
+      assets:[
+        { name:'EU Equities', val:'$5.9M', note:'financials concentration', ideas:['sx7e','xbi'] },
+        { name:'Cash', val:'$0.9M', note:'', ideas:[] },
+      ],
+      liabilities:[ { name:'EUR facility (floating)', val:'−$1.1M', note:'floating, unhedged', ideas:['eurusd'] } ] },
+  ];
+
+  ideas = [
+    { id:'ceg', title:'Constellation — collar the concentration', tk:'CEG', ac:'Equities', t:'1h ago', author:'claude', likes:31,
+      thesis:'Constellation is +142% and now an outsized single-name across two books. Lock the level without a taxable sale.',
+      thesisFull:"Constellation has compounded +142% and is now an outsized single-name across two of your books — the position has quietly become the dominant driver of book-level risk. Post-FOMC the tape round-tripped, and a name this size can erase a quarter of performance in a single session. The signal here isn't directional; it's that the concentration itself now needs managing — and it can be managed without a taxable sale.",
+      rec:'Collar the position, don\u2019t sell it. Preferred: zero-cost 12M collar (buy the 90% put, sell the 112% call). Keeps ~12% of further upside, floors the downside at −10%, no cash out and no realised gain.',
+      plain:"Constellation has been an exceptional holding — it's more than doubled — but that success has quietly made it your single largest risk. Rather than sell and trigger a tax bill, we can put a costless collar around the position: a floor that protects the gain and a ceiling that funds it, keeping you invested with the downside defined.",
+      terms:'Zero-cost collar, 12M: buy the 90% put, sell the 112% call, net premium ≈ 0. Keeps ~12% of further upside, floors the downside at −10%, no cash outlay and no realised gain.',
+      suited:['aurora','hoffmann','rossi'],
+      flow:[
+        { obj:'Preservation', impls:[
+          { name:'Market protection note', clients:[{id:'hoffmann', why:'— sitting on a loss →'}] },
+          { name:'Zero-cost collar', clients:[{id:'aurora', why:'— 18% concentration →'},{id:'hoffmann', why:'— define the downside →'}] },
+        ]},
+        { obj:'Income', impls:[
+          { name:'Sell cash-secured puts', clients:[{id:'rossi', why:'— wants carry →'}] },
+          { name:'Reverse convertible', clients:[{id:'rossi', why:'— happy to own lower →'}] },
+        ]},
+        { obj:'Growth', impls:[
+          { name:'Long equity (hold)', clients:[{id:'aurora', why:'— keep the upside →'}] },
+          { name:'BREN 1.5x participation', clients:[{id:'aurora', why:'— geared re-entry →'}] },
+        ]},
+      ] },
+    { id:'range', title:'Get paid to hold the range', tk:'US 10Y', ac:'Rates', t:'2h ago', author:'desk', likes:38,
+      thesis:'Post-FOMC the 10Y is boxed 4.38–4.39%. Earn an 8.10% conditional coupon to hold the range.',
+      thesisFull:'The 17-Jun hold and in-line PCE have boxed the 10Y between roughly 4.38–4.39%, and the desk reads rates as rangebound into the autumn. Cash and short paper are under-earning that backdrop. A range accrual monetises the very thing the market is pricing — low realised volatility in rates — by paying an enhanced coupon for every day the 10Y stays inside a wide band, without asking you to take a directional call.',
+      rec:'Put idle cash to work without a rate call. Preferred: 4YNC1Y callable range accrual on 10Y CMT, 8.10% conditional coupon, accrues inside a 3.50–5.25% band, issuer call after 1Y.',
+      plain:'With the Fed on hold and the 10-year Treasury stuck in a tight range, cash is earning less than it needs to. This note pays an enhanced coupon for as long as rates stay inside a wide band — a way to put idle capital to work without taking a directional call on rates.',
+      terms:'4YNC1Y Callable Range Accrual on 10Y CMT: 8.10% conditional coupon accruing each day the 10Y sits in 3.50–5.25%; issuer call after 1Y; principal at risk only below the range at maturity.',
+      suited:['oliveira','hoffmann'],
+      flow:[ { obj:'Income', impls:[ { name:'Range accrual note', clients:[{id:'oliveira', why:'— 34% idle cash →'},{id:'hoffmann', why:'— duration gap →'}] } ]} ] },
+    { id:'sx7e', title:'Euro banks — income without the tail', tk:'SX7E', ac:'Equities', t:'3h ago', author:'claude', likes:24,
+      thesis:'A Phoenix autocall on SX7E pays a 9.25% memory coupon with a 60% barrier — income without owning the downside.',
+      thesisFull:'European banks (SX7E) have re-rated hard but still screen cheap on capital return, and implied vol remains rich enough to pay for structure. Rather than own the index outright into a stretched move, a Phoenix autocall converts that richness into a high memory coupon and returns capital early if the index simply holds — income that doesn\u2019t require the rally to continue.',
+      rec:'Own the yield, not the tail. Preferred: 3Y Phoenix autocall on SX7E, 9.25% p.a. memory coupon, autocall at 100% from month 6, 60% European barrier observed only at maturity.',
+      plain:'European banks have re-rated but still pay you well to own the risk in a structured form. This autocall pays a high memory coupon and returns your capital early if the index simply holds — income, without buying the outright downside.',
+      terms:'3Y Phoenix autocall on SX7E: 9.25% p.a. memory coupon, autocall at 100% from month 6, 60% European barrier observed only at maturity.',
+      suited:['rossi'],
+      flow:[
+        { obj:'Income', impls:[ { name:'Phoenix autocall', clients:[{id:'rossi', why:'— EU financials tilt →'}] } ]},
+        { obj:'Growth', impls:[ { name:'Participation note', clients:[{id:'rossi', why:'— stays constructive →'}] } ]},
+      ] },
+    { id:'gold', title:'Gold — pay on either side of the pullback', tk:'XAU', ac:'Commodities', t:'4h ago', author:'desk', likes:15,
+      thesis:'Gold slipped to an ~8-month low near $4,030. A twin-win pays on moves either way around a stabilising spot.',
+      thesisFull:'Gold has slipped to an ~8-month low near $4,030 as the dollar reclaimed the haven bid, but the structural case — central-bank buying and real-rate normalisation — is intact. Calling the exact low is a low-probability game; a twin-win sidesteps it, paying on a recovery and on moderate further weakness alike, with principal protected down to a barrier.',
+      rec:'Add the haven sleeve on the pullback. Preferred: 18M gold twin-win, 1:1 upside participation plus a positive return on moderate downside, capital protected down to an 80% knock-in floor.',
+      plain:'Gold has pulled back to an eight-month low as the dollar firmed. Rather than call the exact bottom, this structure pays whether spot drifts up or moderately down, with your capital protected down to a barrier — a patient way to add a haven allocation.',
+      terms:'18M twin-win on gold: 1:1 upside participation and a positive return on moderate downside via a knock-in floor at 80%; capital protected down to the barrier.',
+      suited:['oliveira'],
+      flow:[
+        { obj:'Growth', impls:[ { name:'Twin-win note', clients:[{id:'oliveira', why:'— deploy idle cash →'}] } ]},
+        { obj:'Preservation', impls:[ { name:'Physical gold / ETC', clients:[{id:'oliveira', why:'— haven sleeve →'}] } ]},
+      ] },
+    { id:'eurusd', title:'Hedge the euro cheaply', tk:'EURUSD', ac:'FX', t:'5h ago', author:'claude', likes:9,
+      thesis:'A seagull caps hedging cost by giving up a slice of favourable moves — the lower-carry way to hedge a euro liability.',
+      thesisFull:'A floating euro liability leaves the book exposed to a stronger euro at exactly the wrong time. Outright forwards are clean but expensive to carry; a seagull cuts that cost to near zero by financing the protective put with a put and a call sold around it — you give up only the extreme favourable move in exchange for covering the band that actually matters.',
+      rec:'Hedge the euro at near-zero cost. Preferred: 12M EURUSD seagull — long the ATM EUR put, short a 3% OTM EUR put and a 3% OTM EUR call.',
+      plain:'A euro facility leaves the book exposed to a stronger euro. A seagull hedges that risk at close to zero cost by giving up a sliver of the most favourable move — the cheapest practical way to cap the exposure across a defined band.',
+      terms:'12M EURUSD seagull: buy the ATM EUR put, sell a 3% OTM EUR put and a 3% OTM EUR call — near-zero net cost, protection over a defined band.',
+      suited:['rossi','oliveira'],
+      flow:[ { obj:'Preservation', impls:[ { name:'FX seagull', clients:[{id:'rossi', why:'— EUR facility →'},{id:'oliveira', why:'— euro exposure →'}] } ]} ] },
+    { id:'sofr', title:'Cap the loan, not just the assets', tk:'SOFR', ac:'Rates', t:'6h ago', author:'claude', likes:12,
+      thesis:'A Lombard loan that floats on SOFR is unmanaged liability risk. A cap fixes the ceiling on borrowing cost.',
+      thesisFull:'Lombard facilities that float on SOFR are a live, unmanaged risk on the liability side of the book — a further leg up in front-end rates raises the cost of carry with no offset. We spend far more time hedging assets than liabilities; a rate cap fixes the ceiling on borrowing cost for a known, modest premium, and it\u2019s the kind of defensive move clients thank you for later.',
+      rec:'Cap the loan, not just the assets. Preferred: 2Y SOFR cap struck at 5.00%, ~45bps premium upfront, pays the difference whenever 3M SOFR fixes above the strike.',
+      plain:'A Lombard facility that floats on SOFR means a further move up in short rates raises the cost of carry. A rate cap fixes the ceiling for a modest one-off premium — insurance on the liability side of the book, which we rarely address as deliberately as the asset side.',
+      terms:'2Y SOFR cap struck at 5.00%, premium ≈ 45bps upfront; pays the difference whenever 3M SOFR fixes above the strike.',
+      suited:['aurora'],
+      flow:[ { obj:'Preservation (liability)', impls:[ { name:'SOFR interest-rate cap', clients:[{id:'aurora', why:'— floating Lombard →'}] } ]} ] },
+    { id:'xbi', title:'Biotech — rich coupon, defined entry', tk:'XBI', ac:'Equities', t:'7h ago', author:'desk', likes:19,
+      thesis:"Elevated biotech vol makes a reverse convertible pay a rich coupon on names you'd be happy to own lower.",
+      thesisFull:'Biotech implied vol sits well above the broad market, which means the options market is paying handsomely for downside you may be happy to take on anyway. A reverse convertible on a quality basket turns that premium into a rich coupon now, with conversion into shares only if the basket breaches a deep barrier at maturity — income today, a defined entry if the market comes to you.',
+      rec:'Get paid to wait for a lower entry. Preferred: 6M reverse convertible on a biotech basket, 11.5% p.a. coupon, 70% knock-in observed only at maturity.',
+      plain:"Volatility in biotech is elevated, which means you get paid a rich coupon to stand ready to buy a basket you'd be comfortable owning at lower levels — income now, with a defined entry if the market comes to you.",
+      terms:'6M reverse convertible on a biotech basket: 11.5% p.a. coupon, 70% knock-in; converts to shares only below the barrier at maturity.',
+      suited:['rossi','hoffmann'],
+      flow:[ { obj:'Income', impls:[ { name:'Reverse convertible', clients:[{id:'rossi', why:'— wants carry →'},{id:'hoffmann', why:'— income need →'}] } ]} ] },
+  ];
+
+  todayTop = ['ceg','range','sx7e'];
+
+  idea(id){ return this.ideas.find(i=>i.id===id); }
+  client(id){ return this.clients.find(c=>c.id===id); }
+  authorName(a){ return a==='desk' ? 'Solutions Desk' : "Claude's Views"; }
+  authorTag(a){ return a==='desk' ? 'SOLUTIONS DESK' : "CLAUDE'S VIEWS"; }
+  authorInit(a){ return a==='desk' ? 'SD' : 'C'; }
+  authorBg(a){ return a==='desk' ? '#1E1B16' : '#54301A'; }
+  authorFg(){ return '#EBC98D'; }
+
+  objColor(obj){
+    return ({ 'Preservation':{dot:'#2FBF71',headBg:'#F2FAF5'},
+      'Preservation (liability)':{dot:'#9C4A3A',headBg:'#F9F0ED'},
+      'Income':{dot:'#996F3D',headBg:'#FBF6EE'},
+      'Growth':{dot:'#1E1B16',headBg:'#F5F3EF'} })[obj] || {dot:'#1E1B16',headBg:'#F5F3EF'};
+  }
+
+  // ---------- TREE LAYOUT ----------
+  elbow(x1,y1,x2,y2,color,delay){
+    const mid=(y1+y2)/2;
+    const len=(y2-y1)+Math.abs(x2-x1)+4;
+    return { d:`M ${x1} ${y1} V ${mid} H ${x2} V ${y2}`, color, len, delay };
+  }
+  buildTree(idea){
+    const gap=196, cW=162, oW=172, iW=200, rW=336;
+    const rH=58, oH=58, iH=58;
+    const rTop=10, oTop=152, iTop=304, cTop=458, cH=64;
+    const shift=cW/2;
+    let leaf=0;
+    const objN=[];
+    idea.flow.forEach(o=>{
+      const col=this.objColor(o.obj);
+      const implN=[];
+      o.impls.forEach(im=>{
+        const cliN=[];
+        im.clients.forEach(cc=>{ cliN.push({ c:leaf*gap, cc }); leaf++; });
+        const ic=cliN.reduce((a,b)=>a+b.c,0)/cliN.length;
+        implN.push({ c:ic, im, cliN });
+      });
+      const oc=implN.reduce((a,b)=>a+b.c,0)/implN.length;
+      objN.push({ c:oc, o, col, implN });
+    });
+    const rc=objN.reduce((a,b)=>a+b.c,0)/objN.length;
+    const leafCount=leaf;
+    const w=(leafCount-1)*gap + cW;
+    const h=cTop + cH + 8;
+    const sc=e=>e+shift;
+    const nodes=[], lines=[], whys=[];
+    nodes.push({ key:'root', isClient:false, notClient:true, isObj:false, label:idea.title, w:rW, left:sc(rc)-rW/2, top:rTop, delay:'0.05s',
+      boxBg:'#1E1B16', boxBorder:'1px solid #1E1B16', boxColor:'#F4F1EA', radius:12, pad:'15px 20px', ff:"'Source Serif 4',serif", fs:17, cursor:'default', onClick:()=>{} });
+    objN.forEach((on,oi)=>{
+      lines.push(this.elbow(sc(rc), rTop+rH, sc(on.c), oTop, on.col.dot, '0.14s'));
+      nodes.push({ key:'o'+oi, isClient:false, notClient:true, isObj:true, label:on.o.obj, w:oW, left:sc(on.c)-oW/2, top:oTop, delay:'0.26s',
+        boxBg:on.col.headBg, boxBorder:'1.5px solid '+on.col.dot, boxColor:'#17150F', radius:10, pad:'11px 12px', ff:"'Source Serif 4',serif", fs:15.5, cursor:'default', onClick:()=>{} });
+      on.implN.forEach((imn,ii)=>{
+        lines.push(this.elbow(sc(on.c), oTop+oH, sc(imn.c), iTop, '#C7A97A', '0.44s'));
+        nodes.push({ key:'i'+oi+'_'+ii, isClient:false, notClient:true, isObj:false, label:imn.im.name, w:iW, left:sc(imn.c)-iW/2, top:iTop, delay:'0.56s',
+          boxBg:'#F9F4EC', boxBorder:'1.5px dashed #C7A97A', boxColor:'#54301A', radius:9, pad:'11px 12px', ff:"'Archivo',sans-serif", fs:13.5, cursor:'default', onClick:()=>{} });
+        imn.cliN.forEach((cn,ci)=>{
+          const cl=this.client(cn.cc.id);
+          lines.push(this.elbow(sc(imn.c), iTop+iH, sc(cn.c), cTop, '#996F3D', '0.74s'));
+          whys.push({ text:cn.cc.why, left:sc(cn.c)-90, top:cTop-32, w:180, delay:'0.84s' });
+          nodes.push({ key:'c'+oi+'_'+ii+'_'+ci, isClient:true, notClient:false, isObj:false, label:cl.name, init:cl.init, w:cW, left:sc(cn.c)-cW/2, top:cTop, delay:'0.9s',
+            cursor:'pointer', onClick:()=>this.suitPickClient(idea.id, cn.cc.id) });
+        });
+      });
+    });
+    const avail=1120; const scale=Math.min(1, avail/w);
+    return { nodes, lines, whys, w, h, scale, outW:Math.round(w*scale), outH:Math.round(h*scale) };
+  }
+
+  // ---------- STREAMING ----------
+  stream(full, field){
+    clearInterval(this._t);
+    const speed=this.props.streamSpeed||2;
+    const step=Math.max(2, Math.round(full.length/(speed===1?220:speed===3?70:120)));
+    let i=0;
+    const flag=field==='suitEmail'?'suitStreaming':field==='emailText'?'emailStreaming':field==='askAnswer'?'askStreaming':'combineStreaming';
+    this.setState({ [field]:'', [flag]:true });
+    this._t=setInterval(()=>{
+      i+=step;
+      if(i>=full.length){ clearInterval(this._t); this.setState({ [field]:full, [flag]:false }); return; }
+      this.setState({ [field]: full.slice(0,i) });
+    }, 20);
+  }
+
+  draftEmail(idea, client){
+    return `Dear ${client.salut},
+
+I was reviewing your portfolio this morning and wanted to flag one thing directly: ${client.hook}.
+
+${idea.plain}
+
+Here's how I'd implement it in practice: ${idea.terms} It fits where your book is today, and it's fully reversible if your view changes.
+
+If you have ten minutes this week, I'd welcome the chance to walk you through the payoff on a quick call — no obligation, just so you can see the shape of it before we do anything.
+
+Warm regards,
+Your J.P. Morgan Private Bank team`;
+  }
+  draftGeneric(idea){
+    return `Dear [Client],
+
+I wanted to share an idea the desk is focused on this week.
+
+${idea.plain}
+
+In practice: ${idea.terms}
+
+If this is relevant to your objectives, I'd be glad to tailor it to your specific holdings and walk you through it on a short call.
+
+Warm regards,
+Your J.P. Morgan Private Bank team`;
+  }
+  draftCombined(client, ideaList){
+    const nums=['First','Second','Third','Fourth','Fifth'];
+    const body=ideaList.map((idea,i)=>`${nums[i]||'Also'}, ${idea.plain} We would implement this as ${idea.terms}`).join('\n\n');
+    return `Dear ${client.salut},
+
+I've been through your portfolio in full and pulled together the handful of moves I think are worth making now — as one coordinated plan rather than piecemeal. The thread running through them: ${client.hook}.
+
+${body}
+
+Taken together these tidy up the concentration, put idle capital to work, and keep everything defined-risk. None of it is urgent to the day, but each is time-sensitive to current pricing.
+
+Could we find twenty minutes this week to go through them? I'll bring term sheets for each.
+
+Warm regards,
+Your J.P. Morgan Private Bank team`;
+  }
+
+  go(tab){ this.setState({ tab, bookClientId:null }); if(typeof window!=='undefined') window.scrollTo(0,0); }
+  toggleLike(id){ this.setState(s=>({ liked:{...s.liked,[id]:!s.liked[id]}, bump:{...s.bump,[id]:!s.liked[id]} })); }
+  setSearch(e){ this.setState({ search:e.target.value }); }
+  setAsset(a){ this.setState({ assetFilter:a }); }
+  setClientFilter(e){ this.setState({ clientFilter:e.target.value }); }
+
+  ask(q){
+    q=(q||'').trim(); if(!q) return;
+    const a=this.answerFor(q);
+    this.setState(s=>({ askOpen:true, askQuery:'', askMsgs:[...(s.askMsgs||[]), {role:'user',text:q}, {role:'ai',text:'',refs:a.refs,streaming:true}] }),
+      ()=>this._streamMsg(a.text, this.state.askMsgs.length-1));
+  }
+  _streamMsg(full, idx){
+    clearInterval(this._t);
+    const speed=this.props.streamSpeed||2;
+    const step=Math.max(2, Math.round(full.length/(speed===1?220:speed===3?70:120)));
+    let i=0;
+    this._t=setInterval(()=>{
+      i+=step; const done=i>=full.length;
+      this.setState(s=>{ const m=(s.askMsgs||[]).slice(); if(m[idx]) m[idx]={...m[idx], text:done?full:full.slice(0,i), streaming:!done}; return {askMsgs:m}; });
+      if(done) clearInterval(this._t);
+    },20);
+  }
+  openAsk(){ this.setState({ askOpen:true }); }
+  closeAsk(){ this.setState({ askOpen:false }); }
+  askChip(q){ this.ask(q); }
+  refClick(r){ this.setState({ askOpen:false }); if(r.kind==='client'){ this.setState({ tab:'book' }); this.openClient(r.id); } else this.openSuit(r.id); }
+  openScore(id){ this.setState({ scoreId:id }); }
+  closeScore(){ this.setState({ scoreId:null }); }
+  openSuit(id){ this.setState(s=>({ suitId:id, suitClientId:null, suitEmail:'', suitCopied:false, scoreId:null, checkBump:{...s.checkBump,[id]:(s.checkBump[id]||0)+1} })); }
+  toggleFocus(id){ this.setState(s=>({ focusId: s.focusId===id ? null : id })); }
+  closeSuit(){ clearInterval(this._t); this.setState({ suitId:null, suitClientId:null, suitStreaming:false }); }
+  suitPickClient(ideaId, clientId){
+    const idea=this.idea(ideaId), cl=this.client(clientId);
+    this.setState({ suitId:ideaId, suitClientId:clientId, suitCopied:false });
+    this.stream(this.draftEmail(idea,cl),'suitEmail');
+  }
+  suitBack(){ clearInterval(this._t); this.setState({ suitClientId:null, suitStreaming:false }); }
+
+  openEmail(id){ this.setState(s=>({ emailId:id, emailCopied:false, emailBump:{...s.emailBump,[id]:(s.emailBump[id]||0)+1} })); this.stream(this.draftGeneric(this.idea(id)),'emailText'); }
+  closeEmail(){ clearInterval(this._t); this.setState({ emailId:null, emailStreaming:false }); }
+
+  openClient(id){ this.setState({ bookClientId:id, expanded:{}, selected:{} }); if(typeof window!=='undefined') window.scrollTo(0,0); }
+  backToList(){ this.setState({ bookClientId:null }); }
+  toggleExpand(k){ this.setState(s=>({ expanded:{...s.expanded,[k]:!s.expanded[k]} })); }
+  toggleSelect(k){ this.setState(s=>({ selected:{...s.selected,[k]:!s.selected[k]} })); }
+  clearSelection(){ this.setState({ selected:{} }); }
+  openCombine(){
+    const cl=this.client(this.state.bookClientId);
+    const ids=Object.keys(this.state.selected).filter(k=>this.state.selected[k]).map(k=>k.split('::')[1]);
+    const list=[...new Set(ids)].map(id=>this.idea(id)).filter(Boolean);
+    this.setState({ combineOpen:true, combineCopied:false });
+    this.stream(this.draftCombined(cl,list),'combineText');
+  }
+  closeCombine(){ clearInterval(this._t); this.setState({ combineOpen:false, combineStreaming:false }); }
+  copy(text, flag){ try{ navigator.clipboard.writeText(text); }catch(e){} this.setState({ [flag]:true }); setTimeout(()=>this.setState({ [flag]:false }),1600); }
+  componentDidMount(){
+    if(typeof window!=='undefined') window.addEventListener('keydown', this._onKey);
+    this.setState({ tickers:this._buildTickers() });
+    this._tkInt=setInterval(()=>{
+      this._tk.forEach(t=>{ const np=t.px*(1+(Math.random()-0.5)*0.0035); t.px=np; t.hist.push(np); if(t.hist.length>22) t.hist.shift(); });
+      this.setState({ tickers:this._buildTickers() });
+    }, 1800);
+  }
+  componentWillUnmount(){ clearInterval(this._t); clearInterval(this._tkInt); if(typeof window!=='undefined') window.removeEventListener('keydown', this._onKey); }
+
+  cardIdea(idea){
+    const liked=!!this.state.liked[idea.id];
+    const count=idea.likes+(liked?1:0);
+    const score=this.scores[idea.id]||0;
+    return {
+      ...idea, liked,
+      score, scoreColor:this.scoreColor(score), ringOffset:(97.39*(1-score/100)).toFixed(2),
+      acUpper: idea.ac.toUpperCase(),
+      why: this.whyMap[idea.id]||'scored against your coverage',
+      emailCount: (this.emailsBase[idea.id]||0)+(this.state.emailBump[idea.id]||0)+' advisors',
+      checkCount: (this.checksBase[idea.id]||0)+(this.state.checkBump[idea.id]||0)+' advisors',
+      heartColor: liked?'#C0392B':'#C9C3B8',
+      heartAnim: this.state.bump[idea.id]?'heartPop .4s ease':'none',
+      likeCount: count,
+      likedBy: (this.props.showLikeCounts!==false)?('Liked by '+count+' advisors'):'',
+      authorName:this.authorName(idea.author), authorTag:this.authorTag(idea.author),
+      authorInit:this.authorInit(idea.author), authorBg:this.authorBg(idea.author), authorFg:this.authorFg(idea.author),
+      onLike:()=>this.toggleLike(idea.id), onSuit:()=>this.openSuit(idea.id), onEmail:()=>this.openEmail(idea.id), onScore:()=>this.openScore(idea.id),
+    };
+  }
+
+  renderVals(){
+    const s=this.state, tab=s.tab;
+    const nav=[['feed','Idea Feed'],['book','Advisor Book']].map(([id,label])=>({
+      label, onClick:()=>this.go(id),
+      color: tab===id?'#17150F':'#8E8A80', underline: tab===id?'#996F3D':'transparent', weight: tab===id?600:400 }));
+
+    const todayIdeas=this.todayTop.map(id=>this.cardIdea(this.idea(id)));
+    const top3Rail=this.todayTop.map((id,i)=>{
+      const idea=this.idea(id);
+      const active=s.focusId===id;
+      return { rank:i+1, title:idea.title, tk:idea.tk, score:this.scores[id]||0,
+        border: active?'#C7A97A':'#1E1B16',
+        strip: active?'#2FBF71':'rgba(47,191,113,.25)',
+        focusLabel: active?' · SHOWING':'',
+        onFocus:()=>this.toggleFocus(id) };
+    });
+    const askChips=this.askChipsList.map(c=>({ label:c, onClick:()=>this.askChip(c) }));
+    const askMsgs=(s.askMsgs||[]).map(m=>({
+      isUser:m.role==='user', isAi:m.role==='ai',
+      justify:m.role==='user'?'flex-end':'flex-start',
+      text:m.text + (m.streaming?'▍':''),
+      hasRefs: m.role==='ai' && !m.streaming && !!(m.refs&&m.refs.length),
+      refs:(m.refs||[]).map(r=>({ label:r.label, icon:r.kind==='client'?'◷':'⑃', iconBg:r.kind==='client'?'#1E1B16':'#F3EAD9', iconFg:r.kind==='client'?'#EBC98D':'#8A5A2B', onClick:()=>this.refClick(r) })),
+    }));
+    const briefing='Post-FOMC the front end held and the 10Y settled into a 4.38–4.39% box, while Constellation round-tripped its earnings pop — a reminder of how much single-name risk now sits across the book. Gold slipped to an ~8-month low near $4,030 on a firmer dollar, and euro-bank vol stayed rich enough to pay for structure. Net for your book today: three ideas clear an 80% fit — collar the CEG concentration, put the idle cash to work in the range accrual, and hedge the euro facility.';
+
+    const assetChips=['All','Equities','Rates','Commodities','FX'].map(a=>({
+      label:a, onClick:()=>this.setAsset(a), active:s.assetFilter===a,
+      bg: s.assetFilter===a?'#1E1B16':'#fff', color: s.assetFilter===a?'#fff':'#54301A', border: s.assetFilter===a?'#1E1B16':'#E5E1DA' }));
+    const clientOptions=[{id:'all',label:'All clients'},...this.clients.map(c=>({id:c.id,label:c.name}))].map(o=>({...o, selected:s.clientFilter===o.id}));
+    const stories=[{id:'all', init:'✦', label:'All ideas', face:'dark'},...this.clients.map(c=>({id:c.id, init:c.init, label:c.name.split(' ').pop(), face:'light'}))].map(st=>{
+      const active=s.clientFilter===st.id;
+      return { ...st,
+        ring: active ? 'linear-gradient(45deg,#2FBF71,#996F3D,#EBC98D)' : (st.id==='all' ? '#D8D2C7' : 'linear-gradient(45deg,#C7A97A,#996F3D)'),
+        faceBg: st.face==='dark' ? '#1E1B16' : '#1E1B16', faceFg:'#EBC98D',
+        weight: active?700:500, color: active?'#17150F':'#8E8A80',
+        onClick:()=>this.setState({ clientFilter:st.id }) };
+    });
+
+    const q=s.search.trim().toLowerCase();
+    let feed=this.ideas.slice();
+    if(s.focusId) feed=feed.filter(i=>i.id===s.focusId);
+    if(s.assetFilter!=='All') feed=feed.filter(i=>i.ac===s.assetFilter);
+    if(s.clientFilter!=='all') feed=feed.filter(i=>i.suited.includes(s.clientFilter));
+    if(q) feed=feed.filter(i=>{
+      const names=i.suited.map(cid=>this.client(cid).name.toLowerCase()).join(' ');
+      return (i.title+' '+i.thesisFull+' '+i.tk+' '+i.ac+' '+i.plain+' '+names).toLowerCase().includes(q);
+    });
+    const feedIdeas=feed.map(i=>this.cardIdea(i));
+    const cfName=s.clientFilter!=='all'?this.client(s.clientFilter).name:null;
+    const feedCountLabel=feed.length+(feed.length===1?' idea':' ideas')+(cfName?(' suited to '+cfName):'')+(q?(' matching “'+s.search.trim()+'”'):'');
+
+    const flagMap={ aurora:['CEG 18% concentration','Floating Lombard'], oliveira:['34% idle cash'], hoffmann:['CEG loss','Duration gap'], rossi:['EU financials concentration'] };
+    const bookClients=this.clients.map(c=>({ id:c.id, name:c.name, prof:c.prof, init:c.init, aum:c.aum, ytd:c.ytd,
+      ytdColor:c.pos?'#2C7A4B':'#9C4A3A', flags:flagMap[c.id]||[], ideaCount:this.ideas.filter(i=>i.suited.includes(c.id)).length, onOpen:()=>this.openClient(c.id) }));
+
+    let detail=null;
+    if(s.bookClientId){
+      const c=this.client(s.bookClientId);
+      const row=(blockName,ideaId)=>{
+        const idea=this.idea(ideaId); const key=blockName+'::'+ideaId;
+        const sel=!!s.selected[key], exp=!!s.expanded[key];
+        return { key, title:idea.title, tk:idea.tk, plain:idea.plain, authorName:this.authorName(idea.author),
+          expanded:exp, caret:exp?'rotate(180deg)':'none', selected:sel,
+          checkBg:sel?'#54301A':'#fff', checkBorder:sel?'#54301A':'#CFC8BB', checkMark:sel?'✓':'',
+          rowBorder:sel?'#C7A97A':'#EDE7DC', rowBg:sel?'#FBF6EE':'#FCFBF8',
+          onToggleSelect:()=>this.toggleSelect(key), onExpand:()=>this.toggleExpand(key),
+          onEmail:()=>this.suitPickClient(ideaId, c.id) };
+      };
+      detail={ name:c.name, prof:c.prof, init:c.init, aum:c.aum, ytd:c.ytd, ytdColor:c.pos?'#2C7A4B':'#9C4A3A', summary:c.summary,
+        assets:c.assets.map(b=>({ name:b.name, val:b.val, note:b.note, ideas:b.ideas.map(id=>row(b.name,id)) })),
+        liabilities:c.liabilities.map(b=>({ name:b.name, val:b.val, note:b.note, ideas:b.ideas.map(id=>row(b.name,id)) })) };
+    }
+    const selKeys=Object.keys(s.selected).filter(k=>s.selected[k]);
+    const selectedCount=selKeys.length;
+
+    let suit=null, tree=null, suitScore=0, suitScoreColor='#996F3D', suitRingOffset=188.5, suitFactors=[];
+    if(s.suitId){
+      const idea=this.idea(s.suitId); suit={ title:idea.title, tk:idea.tk };
+      suitScore=this.scores[idea.id]||0; suitScoreColor=this.scoreColor(suitScore);
+      suitRingOffset=(188.5*(1-suitScore/100)).toFixed(1);
+      suitFactors=(this.factorMap[idea.id]||[]).map((f,i)=>({ label:f.label, note:f.note, pct:f.val, pctTxt:f.val, color:this.scoreColor(f.val), delay:(0.2+i*0.12).toFixed(2)+'s' }));
+      if(!s.suitClientId) tree=this.buildTree(idea);
+    }
+
+    // score breakdown popup
+    let sv=null;
+    if(s.scoreId){
+      const idea=this.idea(s.scoreId); const sc=this.scores[s.scoreId]||0;
+      sv={ title:idea.title, tk:idea.tk, score:sc, color:this.scoreColor(sc),
+        ringOffset:(163.4*(1-sc/100)).toFixed(1),
+        factors:(this.factorMap[s.scoreId]||[]).map((f,i)=>({ label:f.label, note:f.note, pct:f.val, pctTxt:f.val, color:this.scoreColor(f.val), delay:(0.15+i*0.1).toFixed(2)+'s' })) };
+    }
+
+    // command palette items
+    const cmdItems=this.buildCmd(s.cmdQuery).map((it,i)=>{
+      const active=i===s.cmdIndex;
+      const style = it.kind==='client' ? {icon:'◷',iconBg:'#1E1B16',iconFg:'#EBC98D',kindLabel:'CLIENT'}
+        : it.kind==='idea' ? {icon:'⑃',iconBg:'#F3EAD9',iconFg:'#8A5A2B',kindLabel:'IDEA'}
+        : {icon:'→',iconBg:'#F0ECE4',iconFg:'#6B675F',kindLabel:'VIEW'};
+      return { ...it, ...style, active, bg:active?'#FBF6EE':'#fff', accent:active?'#996F3D':'transparent', onRun:()=>this.runCmd(it) };
+    });
+    const suitClientObj=s.suitClientId?this.client(s.suitClientId):null;
+    const emailIdeaObj=s.emailId?this.idea(s.emailId):null;
+    const combineClientObj=(s.combineOpen&&s.bookClientId)?this.client(s.bookClientId):null;
+
+    return {
+      nav,
+      isToday:tab==='today', isFeed:tab==='feed', isBook:tab==='book',
+      briefing, todayIdeas, top3Rail,
+      askChips, askQuery:s.askQuery, askMsgs, askOpen:s.askOpen, askClosed:!s.askOpen, askEmpty:(s.askMsgs||[]).length===0, askHasMsgs:(s.askMsgs||[]).length>0,
+      onOpenAsk:()=>this.openAsk(), onCloseAsk:()=>this.closeAsk(),
+      onAskInput:(e)=>this.setState({askQuery:e.target.value}),
+      onAskKey:(e)=>{ if(e.key==='Enter') this.ask(this.state.askQuery); },
+      onAskSubmit:()=>this.ask(this.state.askQuery),
+      assetChips, clientOptions, stories, search:s.search,
+      onSearch:(e)=>this.setSearch(e), onClientFilter:(e)=>this.setClientFilter(e),
+      feedIdeas, feedCountLabel, feedEmpty:feedIdeas.length===0,
+      focusActive:!!s.focusId, onClearFocus:()=>this.setState({focusId:null}),
+      bookListView:!s.bookClientId, bookDetailView:!!s.bookClientId, bookClients, detail,
+      onBackToList:()=>this.backToList(),
+      hasSelection:selectedCount>0, selectedCount, selectedNoun:selectedCount===1?'action':'actions',
+      onClearSelection:()=>this.clearSelection(), onCombineEmail:()=>this.openCombine(),
+      tickers:s.tickers||this._buildTickers(),
+      cmdOpen:s.cmdOpen, cmdQuery:s.cmdQuery, cmdItems, cmdEmpty:cmdItems.length===0,
+      onOpenCmd:()=>this.setState({cmdOpen:true,cmdQuery:'',cmdIndex:0}),
+      onCloseCmd:()=>this.setState({cmdOpen:false}),
+      onCmdInput:(e)=>this.setState({cmdQuery:e.target.value,cmdIndex:0}),
+      suitOpen:!!s.suitId, suit, tree, suitShowFlow:!s.suitClientId, suitShowEmail:!!s.suitClientId,
+      suitScore, suitScoreColor, suitRingOffset, suitFactors,
+      onSuitScore:()=>this.openScore(s.suitId),
+      scoreOpen:!!s.scoreId, scoreTitle:sv?sv.title:'', scoreTk:sv?sv.tk:'', scoreScore:sv?sv.score:0,
+      scoreColor:sv?sv.color:'#996F3D', scoreRingOffset:sv?sv.ringOffset:163.4, scoreFactors:sv?sv.factors:[],
+      onCloseScore:()=>this.closeScore(), onScoreToSuit:()=>this.openSuit(s.scoreId),
+      suitEmailText:s.suitEmail+(s.suitStreaming?'▍':''),
+      suitEmailClient:suitClientObj?suitClientObj.name:'', suitEmailInit:suitClientObj?suitClientObj.init:'',
+      suitEmailBtnOpacity:s.suitStreaming?0.4:1, suitCopyLabel:s.suitCopied?'Copied ✓':'Copy',
+      onCloseSuit:()=>this.closeSuit(), onSuitBack:()=>this.suitBack(), onCopySuitEmail:()=>this.copy(s.suitEmail,'suitCopied'),
+      emailOpen:!!s.emailId, emailIdeaTitle:emailIdeaObj?emailIdeaObj.title:'',
+      emailText:s.emailText+(s.emailStreaming?'▍':''), emailBtnOpacity:s.emailStreaming?0.4:1, emailCopyLabel:s.emailCopied?'Copied ✓':'Copy',
+      onCloseEmail:()=>this.closeEmail(), onCopyEmail:()=>this.copy(s.emailText,'emailCopied'),
+      combineOpen:s.combineOpen, combineClient:combineClientObj?combineClientObj.name:'', combineCount:selectedCount,
+      combineText:s.combineText+(s.combineStreaming?'▍':''), combineBtnOpacity:s.combineStreaming?0.4:1, combineCopyLabel:s.combineCopied?'Copied ✓':'Copy',
+      onCloseCombine:()=>this.closeCombine(), onCopyCombine:()=>this.copy(s.combineText,'combineCopied'),
+      stop:(e)=>{ e.stopPropagation(); },
+    };
+  }
+}
+</script>
+</body>
+</html>

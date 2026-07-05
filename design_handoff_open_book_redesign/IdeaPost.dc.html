@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<div style="background:#fff;border:1px solid #E5E1DA;border-radius:14px;overflow:hidden;box-shadow:0 2px 5px rgba(30,27,22,.04)">
+
+  <!-- IG header: author on top -->
+  <div style="display:flex;align-items:center;gap:11px;padding:12px 16px">
+    <span style="width:36px;height:36px;border-radius:50%;background:{{ idea.authorBg }};color:{{ idea.authorFg }};font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none">{{ idea.authorInit }}</span>
+    <div style="flex:1;min-width:0">
+      <div style="font-size:13.5px;font-weight:700;color:#17150F;line-height:1.2">{{ idea.authorName }}</div>
+      <div style="font-size:11px;color:#A8A29A;margin-top:1px">{{ idea.ac }} · {{ idea.t }}</div>
+    </div>
+    <button onClick="{{ idea.onScore }}" title="How Claude scored this" style="appearance:none;background:none;border:none;cursor:pointer;padding:0;display:flex;align-items:center;gap:6px;flex:none">
+      <span style="font-size:9px;font-weight:600;letter-spacing:.14em;color:#A8A29A">FIT</span>
+      <span style="position:relative;width:36px;height:36px;display:block">
+        <svg width="36" height="36" style="display:block">
+          <circle cx="18" cy="18" r="15.5" fill="none" stroke="#EDE7DC" stroke-width="3"></circle>
+          <circle cx="18" cy="18" r="15.5" fill="none" stroke="{{ idea.scoreColor }}" stroke-width="3" stroke-linecap="round" transform="rotate(-90 18 18)" style="stroke-dasharray:97.39;stroke-dashoffset:{{ idea.ringOffset }};animation:ringSm 1.1s cubic-bezier(.3,.9,.3,1) .2s both"></circle>
+        </svg>
+        <span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Archivo',sans-serif;font-size:11.5px;font-weight:700;color:#17150F">{{ idea.score }}</span>
+      </span>
+    </button>
+  </div>
+
+  <!-- THE WINDOW: all idea text inside -->
+  <div style="margin:0 10px;border-radius:11px;overflow:hidden;box-shadow:0 10px 26px -18px rgba(30,27,22,.75)">
+    <div style="height:4px;background:#2FBF71"></div>
+    <div style="background:#1E1B16;padding:20px 22px 22px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <span style="font-size:10px;font-weight:700;letter-spacing:.14em;color:#EBC98D">{{ idea.tk }}</span>
+        <span style="width:3px;height:3px;border-radius:50%;background:#4A463E"></span>
+        <span style="font-size:10px;font-weight:600;letter-spacing:.14em;color:#8E8A80">{{ idea.acUpper }}</span>
+      </div>
+      <h3 style="font-family:'Source Serif 4',serif;font-weight:600;font-size:22px;line-height:1.16;letter-spacing:-.01em;margin:0;color:#F4F1EA">{{ idea.title }}</h3>
+      <p style="margin:11px 0 0;font-size:13.5px;line-height:1.6;color:#B9B4A8;text-wrap:pretty;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">{{ idea.thesisFull }}</p>
+      <div style="margin-top:13px;border-top:1px solid rgba(244,241,234,.12);padding-top:11px">
+        <div style="font-size:9.5px;font-weight:600;letter-spacing:.22em;color:#2FBF71;margin-bottom:7px">RECOMMENDATION</div>
+        <div style="font-family:'Source Serif 4',serif;font-size:14.5px;line-height:1.48;color:#EEEAE2;font-weight:500;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">{{ idea.rec }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- actions OUTSIDE the window -->
+  <div style="display:flex;align-items:center;gap:6px;padding:11px 12px 3px">
+    <button onClick="{{ idea.onLike }}" style="appearance:none;background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:6px;padding:6px 7px;font-family:'Archivo',sans-serif;font-size:13px;color:#6B675F">
+      <span style="font-size:21px;line-height:1;color:{{ idea.heartColor }};animation:{{ idea.heartAnim }}">&#9829;</span>
+    </button>
+    <button onClick="{{ idea.onSuit }}" style="appearance:none;background:none;border:1px solid #E5E1DA;cursor:pointer;display:flex;align-items:center;gap:6px;padding:7px 12px;border-radius:8px;font-family:'Archivo',sans-serif;font-size:12px;font-weight:600;color:#54301A" style-hover="background:#F6F1E9;border-color:#C7A97A"><span style="font-size:13px">&#9095;</span> Idea Suitability</button>
+    <button onClick="{{ idea.onEmail }}" style="appearance:none;background:none;border:1px solid #E5E1DA;cursor:pointer;display:flex;align-items:center;gap:6px;padding:7px 12px;border-radius:8px;font-family:'Archivo',sans-serif;font-size:12px;font-weight:600;color:#54301A" style-hover="background:#F6F1E9;border-color:#C7A97A"><span style="font-size:13px">&#9993;</span> Email</button>
+  </div>
+
+  <!-- engagement analytics (like IG reactions line) -->
+  <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;padding:2px 16px 13px;font-size:11.5px;color:#8E8A80">
+    <span style="font-weight:600;color:#54301A">{{ idea.likedBy }}</span>
+    <span style="width:3px;height:3px;border-radius:50%;background:#D8D2C7"></span>
+    <span>&#9993; drafted by <span style="font-weight:600;color:#54301A">{{ idea.emailCount }}</span></span>
+    <span style="width:3px;height:3px;border-radius:50%;background:#D8D2C7"></span>
+    <span>&#9095; checked by <span style="font-weight:600;color:#54301A">{{ idea.checkCount }}</span></span>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:560,&quot;height&quot;:620},&quot;idea&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;object&quot;}}"></script>
+</body>
+</html>
