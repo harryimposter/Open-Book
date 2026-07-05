@@ -31,6 +31,7 @@
   <script src="scanner.js"></script>
   <script src="mapping.js"></script>
   <script src="expressions.js"></script>
+  <script src="today_focus.js"></script>
   <script src="morgan.js"></script>
   <script>
   (function () {
@@ -82,10 +83,30 @@
         <td class="r h-wt">${p.weightPct}%</td>
       </tr>`).join("");
 
-    // advisor view — scanner findings + matched ideas, as tiles
+    // advisor view — book-derived findings + today's flagged focus ideas +
+    // standing views, all gated by the SAME MAPPING flag threshold the Idea
+    // Feed uses, so every surface agrees on what fits this client.
     const rec = window.Scanner.recommendations(c);
-    const recos = rec.all.length ? `<div class="reco-tiles">` + rec.all.slice(0, 9).map(it => `
-      <article class="reco-card" data-href="${it.source === "View" ? `index.html?tab=ideas&idea=${esc(it.ideaId)}` : `index.html?tab=book&client=${esc(c.id)}`}">
+    const flagMin = window.MAPPING.PARAMS.flagMin;
+    const fitGate = (idea) => {
+      try {
+        const r = window.MAPPING.scoreIdeaForClient(idea, c);
+        return (!r.suppressed && r.fit >= flagMin) ? r : null;
+      } catch (e) { return null; }
+    };
+    const gatedViews = rec.viewItems.filter(it => {
+      const idea = SEED.ideas.find(i => i.id === it.ideaId);
+      return idea ? !!fitGate(idea) : true;
+    });
+    const TFOC = window.TODAY_FOCUS ? [].concat(window.TODAY_FOCUS.earnings || [], window.TODAY_FOCUS.exEarnings || []) : [];
+    const focusItems = TFOC.map(idea => {
+      const r = fitGate(idea);
+      return r ? { source: "Focus", title: idea.name, rationale: `${idea.headline} (fit ${r.fit} for ${c.name})`,
+        structures: idea.structures, sector: idea.sector, assetClass: idea.assetClass, conviction: null, ideaId: idea.id } : null;
+    }).filter(Boolean);
+    const allRecs = rec.findings.concat(focusItems, gatedViews);
+    const recos = allRecs.length ? `<div class="reco-tiles">` + allRecs.map(it => `
+      <article class="reco-card" data-href="${it.source === "View" ? `index.html?tab=ideas&idea=${esc(it.ideaId)}` : it.source === "Focus" ? `index.html` : `index.html?tab=book&client=${esc(c.id)}`}">
         <div class="rc-top">
           <span class="src-tag ${it.source === "Portfolio" ? "portfolio" : "view"}">${esc(it.source)}</span>
           ${it.conviction ? `<span class="tag ${convClass(it.conviction)}">${esc(it.conviction)}</span>` : ""}
@@ -93,7 +114,7 @@
         <h4>${esc(it.title)}</h4>
         <p class="rc-why">${esc(it.rationale)}</p>
         <div class="rc-structs">${window.EXPRESSIONS.accordionHTML((it.structures || []).slice(0, 3), { sector: it.sector, assetClass: it.assetClass, title: it.title }, { sm: true })}</div>
-        <div class="rc-foot"><span class="rc-bucket">${esc(it.assetClass)}</span><span class="rc-cta">${it.source === "View" ? "View idea ›" : "Open client ›"}</span></div>
+        <div class="rc-foot"><span class="rc-bucket">${esc(it.assetClass)}</span><span class="rc-cta">${it.source === "View" ? "View idea ›" : it.source === "Focus" ? "View in the feed ›" : "Open client ›"}</span></div>
       </article>`).join("") + `</div>` : `<p class="rec-why">No recommendations — book is on plan.</p>`;
 
     document.getElementById("report").innerHTML = `
@@ -160,7 +181,7 @@
           <p>${esc(c.summary)}</p>
         </div>
         <div class="panel">
-          <div class="panel-head"><h3>Recommended actions</h3><span class="rec-theme" style="margin-left:auto">${rec.findings.length} from the book · ${rec.viewItems.length} from Views</span></div>
+          <div class="panel-head"><h3>Recommended actions</h3><span class="rec-theme" style="margin-left:auto">${rec.findings.length} from the book · ${focusItems.length} from today's focus · ${gatedViews.length} from Views — same fit bar as the Idea Feed</span></div>
           <div class="panel-body">${recos}</div>
         </div>
       </div>`;

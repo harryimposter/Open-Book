@@ -952,6 +952,18 @@
   function renderClientDetail(c) {
     if (!c) return;
     const rec = window.Scanner.recommendations(c);
+    /* standing views are display-gated by the SAME flag threshold the Idea
+       Feed uses (MAPPING fit >= flagMin), so every surface agrees on what
+       "fits" this client. Portfolio-derived findings are a separate category
+       (book actions) and always show. */
+    const gatedViews = rec.viewItems.filter(it => {
+      const idea = ideaById(it.ideaId);
+      if (!idea) return true;
+      try {
+        const r = window.MAPPING.scoreIdeaForClient(idea, c);
+        return !r.suppressed && r.fit >= window.MAPPING.PARAMS.flagMin;
+      } catch (e) { return true; }
+    });
     const nba = rec.nba;
     const nbaKey = nba ? (nba.source === "View" ? nba.ideaId : nba.title) : null;
 
@@ -970,7 +982,7 @@
 
     // the rest of the matched catalog, grouped by asset class (behind "see more")
     const viewByAC = {};
-    rec.viewItems.forEach(it => { (viewByAC[it.assetClass] = viewByAC[it.assetClass] || []).push(it); });
+    gatedViews.forEach(it => { (viewByAC[it.assetClass] = viewByAC[it.assetClass] || []).push(it); });
     const viewGroupsHTML = Object.keys(viewByAC).length
       ? Object.entries(viewByAC).map(([ac, items]) => `
         <div class="reco-group">
@@ -1040,9 +1052,9 @@
         ${houseViewsHTML}
 
         <section class="bb-sec bb-more">
-          <button class="see-more-btn" id="seeMoreIdeas" type="button" aria-expanded="false">See all house-view ideas that fit — ${rec.viewItems.length} by asset class ›</button>
+          <button class="see-more-btn" id="seeMoreIdeas" type="button" aria-expanded="false">See all house-view ideas that fit — ${gatedViews.length} by asset class ›</button>
           <div class="panel" id="moreIdeasPanel" hidden style="margin-top:14px">
-            <div class="panel-head"><h3>House views that fit, by asset class</h3><span class="rec-theme" style="margin-left:auto">${rec.viewItems.length} standing ideas matched to this book · scroll for more</span></div>
+            <div class="panel-head"><h3>House views that fit, by asset class</h3><span class="rec-theme" style="margin-left:auto">${gatedViews.length} standing ideas clear the fit bar for this book · scroll for more</span></div>
             <div class="panel-body frame-host"><iframe class="cd-frame views-frame" id="viewsFrame" title="House views that fit, by asset class"></iframe></div>
           </div>
         </section>
@@ -1115,7 +1127,7 @@
       seeMore.setAttribute("aria-expanded", String(!open));
       seeMore.classList.toggle("open", !open);
       seeMore.textContent = open
-        ? `See more ideas — all ${rec.all.length} recommendations by asset class ›`
+        ? `See all house-view ideas that fit — ${gatedViews.length} by asset class ›`
         : `Hide the full recommendation list ▲`;
     });
     $$("#clientDetail .reco-card[data-idea]").forEach(el =>

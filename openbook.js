@@ -1216,7 +1216,8 @@
     const host = $("#toolkitList");
     host.innerHTML = (window.SEED.clients || []).map(c => {
       const n = FOCUS.filter(i => { try { return bookFit(i).flags.some(f => f.client.id === c.id); } catch (e) { return false; } }).length;
-      return `<button type="button" class="tk-row" data-tk="${esc(c.id)}">
+      let m = 0; try { m = window.Scanner.recommendations(c).findings.length; } catch (e) {}
+      return `<button type="button" class="tk-row" data-tk="${esc(c.id)}" title="${n} of today's ideas clear the fit bar · ${m} actions derived from the book itself">
         <span class="tk-av">${esc(initials(c.name))}</span>
         <span class="tk-mid">
           <span class="tk-nm">${esc(c.name)}</span>
@@ -1224,7 +1225,7 @@
         </span>
         <span class="tk-right">
           <span class="tk-aum">${esc(fmtAum(c))}</span><br>
-          <span class="tk-n">${n} idea${n === 1 ? "" : "s"} fit</span>
+          <span class="tk-n">${n} idea${n === 1 ? "" : "s"} · ${m} action${m === 1 ? "" : "s"}</span>
         </span>
       </button>`;
     }).join("");
