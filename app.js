@@ -1681,7 +1681,10 @@
     root.setAttribute("aria-hidden", "false");
   }
 
-  /* rank the daily focus ideas for one client by a conviction × client-fit blend */
+  /* rank the daily focus ideas for one client by a conviction × client-fit blend.
+     Only ideas that CLEAR the engine's flag threshold (fit >= flagMin) qualify —
+     the same bar the Idea Feed uses, so both surfaces always agree on who an
+     idea is flagged to. */
   function topFocusIdeasForClient(client, n) {
     const TF = window.TODAY_FOCUS;
     if (!TF) return [];
@@ -1689,7 +1692,8 @@
       const fit = window.MAPPING.scoreIdeaForClient(idea, client).fit;
       const conv = (idea.conviction && idea.conviction.score) || 0;
       return { idea, fit, conv, blend: Math.round(0.45 * conv + 0.55 * fit) };
-    }).sort((a, b) => b.blend - a.blend).slice(0, n);
+    }).filter(x => x.fit >= window.MAPPING.PARAMS.flagMin)
+      .sort((a, b) => b.blend - a.blend).slice(0, n);
   }
 
   function focusIdeaMatches(idea, q) {
