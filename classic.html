@@ -8,10 +8,39 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css?v=20260626a" />
-  <!-- embed mode: hosted inside the redesigned shell's Advisor Book tab; hide
-       the duplicate masthead only, everything else stays exactly as before -->
-  <style>html.embed .masthead { display: none; }</style>
-  <script>if (new URLSearchParams(location.search).get("embed") === "1") document.documentElement.classList.add("embed");</script>
+  <!-- embed mode: hosted inside the redesigned shell's Advisor Book tab.
+       Presentation only: hide the duplicate masthead and the old tab bar so
+       just the Advisor Book shows; if an in-page action jumps to another old
+       view (e.g. "Stage in Pre-Trade"), a small return pill appears. -->
+  <style>
+    html.embed .masthead, html.embed .tabs { display: none; }
+    #embedBack { display: none; position: fixed; top: 12px; left: 16px; z-index: 300;
+      background: #0b1f3a; color: #fff; border: 0; border-radius: 20px; padding: 8px 16px;
+      font: 600 12.5px Inter, system-ui, sans-serif; cursor: pointer;
+      box-shadow: 0 8px 22px -8px rgba(11,31,58,.55); }
+  </style>
+  <script>
+    (function () {
+      if (new URLSearchParams(location.search).get("embed") !== "1") return;
+      document.documentElement.classList.add("embed");
+      document.addEventListener("DOMContentLoaded", function () {
+        var pill = document.createElement("button");
+        pill.id = "embedBack"; pill.type = "button"; pill.textContent = "← Back to Advisor Book";
+        pill.addEventListener("click", function () {
+          var tab = document.querySelector('.tab[data-tab="book"]');
+          if (tab) tab.click();
+        });
+        document.body.appendChild(pill);
+        // show the pill whenever the visible old view isn't the book
+        var check = function () {
+          var book = document.getElementById("view-book");
+          pill.style.display = (book && book.hidden) ? "block" : "none";
+        };
+        setInterval(check, 400);
+        document.addEventListener("click", function () { setTimeout(check, 60); }, true);
+      });
+    })();
+  </script>
 </head>
 <body>
 

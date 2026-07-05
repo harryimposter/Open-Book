@@ -1162,17 +1162,22 @@
     $$(".tk-row", host).forEach(el => el.addEventListener("click", () => openToolkit(el.dataset.tk)));
   }
 
-  /* group the client's positions by asset class into "blocks", and attach the
-     LIVE flagged ideas: an idea goes to the block of its engine-chosen relevant
-     holding (MAPPING.relevantHolding), else its own asset class, else Cash.
-     FX / liability-hedge ideas attach to a matching liability instead. */
+  /* map the day's board onto the client's BALANCE SHEET: every tradable idea
+     attaches to the line it is actually about —
+       1) a liability, for FX / rate hedges (matched on currency / floating)
+       2) the sleeve of the engine's relevant holding (MAPPING.relevantHolding)
+       3) the sleeve of the idea's own asset class
+       4) the Cash sleeve, for deployment ideas when idle cash exists
+     Ideas with no balance-sheet link (and MiFID-suppressed ones) go to the
+     "more ideas" picker instead. Max 3 per line, best engine fit first. */
   function clientBlocks(c) {
-    const flags = FOCUS.map(i => {
-      try {
-        const r = window.MAPPING.scoreIdeaForClient(i, c);
-        return (!r.suppressed && r.fit >= window.MAPPING.PARAMS.flagMin) ? { idea: i, res: r } : null;
-      } catch (e) { return null; }
-    }).filter(Boolean);
+    const entries = FOCUS.map(idea => {
+      let res = null; try { res = window.MAPPING.scoreIdeaForClient(idea, c); } catch (e) {}
+      return { idea, res };
+    });
+    const usable = entries.filter(e => e.res && !e.res.suppressed)
+      .sort((a, b) => b.res.fit - a.res.fit);
+    const suppressed = entries.filter(e => e.res && e.res.suppressed);
 
     const byAC = {};
     (c.positions || []).forEach(p => { (byAC[p.assetClass] = byAC[p.assetClass] || []).push(p); });
@@ -1180,7 +1185,7 @@
       const wt = rows.reduce((s, p) => s + p.weightPct, 0);
       const val = (wt / 100) * c.aum;
       const names = rows.slice().sort((a, b) => b.weightPct - a.weightPct).slice(0, 3).map(p => p.name).join(" · ");
-      return { key: ac, name: ac, val, note: names + (rows.length > 3 ? ` +${rows.length - 3} more` : ""), ideas: [] };
+      return { key: ac, name: ac, val, wt, note: names + (rows.length > 3 ? ` +${rows.length - 3} more` : ""), ideas: [] };
     }).sort((a, b) => b.val - a.val);
 
     const liabs = (c.liabilities || []).map((l, i) => ({
@@ -1189,26 +1194,43 @@
       note: l.note || "", ideas: [],
     }));
 
-    flags.forEach(({ idea, res }) => {
-      const isHedge = /hedge/i.test(ideaAction(idea));
+    const extras = [];
+    usable.forEach(e => {
+      const idea = e.idea;
+      const action = ideaAction(idea);
+      const isHedge = /hedge|cap|protect/i.test(action) || idea.intent === "protect";
+      // 1) liability side: FX hedges → currency liabilities, rate hedges → floating debt
       if (liabs.length && (idea.sector === "FX" || (isHedge && idea.sector === "Rates"))) {
-        liabs[0].ideas.push({ idea, res });
-        return;
+        const target = liabs.find(l => idea.sector === "FX"
+          ? /(EUR|GBP|CHF|JPY|currency|FX)/i.test(l.name + " " + l.note)
+          : /float|reset|SOFR|LIBOR|EURIBOR|rate|curve/i.test(l.name + " " + l.note));
+        if (target) { target.ideas.push(e); return; }
       }
-      let ac = null;
+      // 2) the sleeve holding the engine's relevant position for this idea
+      let ac = null, tier = 9;
       try {
         const rh = window.MAPPING.relevantHolding(idea, c);
         if (rh && rh.name) {
           const pos = (c.positions || []).find(p => p.name === rh.name);
-          if (pos) ac = pos.assetClass;
+          if (pos) { ac = pos.assetClass; tier = 2; }
         }
-      } catch (e) {}
-      if (!ac && byAC[idea.assetClass]) ac = idea.assetClass;
-      let block = blocks.find(b => b.key === ac);
-      if (!block) block = blocks.find(b => b.key === "Cash") || blocks[0];
-      if (block) block.ideas.push({ idea, res });
+      } catch (err) {}
+      // 3) the sleeve of the idea's own asset class
+      if (!ac && byAC[idea.assetClass]) { ac = idea.assetClass; tier = 3; }
+      // 4) deployment ideas land on idle cash
+      if (!ac && byAC["Cash"] && (idea.intent === "add" || idea.intent === "income" || /buy|income|accumulate/i.test(action))) { ac = "Cash"; tier = 4; }
+      const block = blocks.find(b => b.key === ac);
+      if (block) { e.tier = tier; block.ideas.push(e); } else extras.push(e);
     });
-    return { blocks, liabs };
+
+    // keep each line readable: held-name links outrank sleeve matches, then fit;
+    // top 3 stay on the line, overflow stays selectable below
+    blocks.concat(liabs).forEach(b => {
+      b.ideas.sort((a, x) => (a.tier || 9) - (x.tier || 9) || x.res.fit - a.res.fit);
+      if (b.ideas.length > 3) { extras.push(...b.ideas.slice(3)); b.ideas = b.ideas.slice(0, 3); }
+    });
+    extras.sort((a, b) => b.res.fit - a.res.fit);
+    return { blocks, liabs, extras: extras.concat(suppressed) };
   }
 
   const ccySym = (ccy) => ({ USD: "$", EUR: "€", GBP: "£" }[ccy] || "$");
@@ -1291,14 +1313,7 @@
 
   function renderTkBody(root) {
     const c = tk.client;
-    const { blocks, liabs } = clientBlocks(c);
-    const attached = new Set();
-    blocks.forEach(b => b.ideas.forEach(e => attached.add(e.idea.id)));
-    liabs.forEach(b => b.ideas.forEach(e => attached.add(e.idea.id)));
-    const extras = FOCUS.filter(i => !attached.has(i.id)).map(i => {
-      let res = null; try { res = window.MAPPING.scoreIdeaForClient(i, c); } catch (e) {}
-      return { idea: i, res };
-    }).sort((a, b) => ((b.res && !b.res.suppressed) ? b.res.fit : -1) - ((a.res && !a.res.suppressed) ? a.res.fit : -1));
+    const { blocks, liabs, extras } = clientBlocks(c);
     const nSel = Object.keys(tk.selected).filter(k => tk.selected[k]).length;
 
     const blockHTML = (b, neg) => `<div class="cd-block">
