@@ -369,6 +369,7 @@
   }
   function renderTicker() {
     const row = $("#tickerRow");
+    if (!row) return;                 // ticker strip removed from the header — no-op
     const items = _tk.map(t => {
       const chg = (t.px / t.base - 1) * 100;
       const col = chg >= 0.03 ? "#3FD986" : chg <= -0.03 ? "#E79484" : "#9A948A";
@@ -382,6 +383,7 @@
     row.innerHTML = `<span class="obt-live"><span class="obt-dot"></span>LIVE</span>` + items;
   }
   function startTicker() {
+    if (!$("#tickerRow")) return;     // ticker removed — skip the interval entirely
     renderTicker();
     setInterval(() => {
       _tk.forEach(t => {
@@ -1064,10 +1066,22 @@
      (real holdings / weights / goal gaps via relevanceLine), the idea's own
      authored headline + thesis, and the engine-chosen implementation. No
      invented market commentary or synthesis. */
+  /* normalise a standing house-view (SEED idea: .title, no .headline/.ticker)
+     into the focus-idea shape buildEmail expects, so the SAME grounded email
+     engine writes coherent copy for views too — no invented commentary. */
+  function asEmailIdea(idea) {
+    if (idea.name && idea.headline) return idea;
+    return Object.assign({}, idea, {
+      name: idea.name || idea.title,
+      headline: idea.headline || idea.title,
+      ticker: idea.ticker || "",
+    });
+  }
   function combinedEmailText(client, ideas) {
     const obj = client.goals && client.goals.objective;
     const intro = `I've been through your portfolio in full${obj ? ` — with your objective of “${obj}” in mind —` : ""} and pulled together the ${ideas.length === 1 ? "idea" : ideas.length + " ideas"} below as one coordinated plan rather than piecemeal. Each one ties directly to something you hold or to how the book is positioned today.`;
-    const parts = ideas.map((idea, i) => {
+    const parts = ideas.map((raw, i) => {
+      const idea = asEmailIdea(raw);
       const em = buildEmail(idea, client, defaultImplFor(idea, client));
       const tick = idea.ticker && idea.ticker !== "—" ? ` (${idea.ticker})` : "";
       return `${i + 1}) ${idea.name}${tick}\n${em.relevance}\n${em.ideaLine}\n${em.thesis}\n${em.impLine}`;
@@ -1306,8 +1320,25 @@
 
   const ccySym = (ccy) => ({ USD: "$", EUR: "€", GBP: "£" }[ccy] || "$");
 
+  /* standing house-view ideas that fit this client, gated by the SAME flag
+     threshold everything else uses — these are the "house views" shown on the
+     portfolio page, now made selectable so a coordinated email can include
+     them alongside today's focus ideas. */
+  function standingViewsFor(c) {
+    let items = [];
+    try { items = (window.Scanner.recommendations(c).viewItems) || []; } catch (e) {}
+    const seen = new Set(), out = [];
+    items.forEach(it => {
+      const idea = (window.SEED.ideas || []).find(i => i.id === it.ideaId);
+      if (!idea || seen.has(idea.id)) return;
+      let res = null; try { res = window.MAPPING.scoreIdeaForClient(idea, c); } catch (e) {}
+      if (res && !res.suppressed && res.fit >= window.MAPPING.PARAMS.flagMin) { seen.add(idea.id); out.push({ idea, res, standing: true }); }
+    });
+    return out.sort((a, b) => b.res.fit - a.res.fit);
+  }
+
   /* toolkit popup state — reset each time a client is opened */
-  let tk = null; // { client, selected:{}, expanded:{} }
+  let tk = null; // { client, selected:{}, expanded:{}, pool:{id->idea} }
 
   function tkWhy(entry, client) {
     /* engine flag reasoning for THIS client; unflagged ideas fall back to the
@@ -1325,12 +1356,14 @@
   function tkIdeaRow(entry, key, client) {
     const { idea, res } = entry;
     const a = authorOf(idea);
+    const title = idea.name || idea.title || "";
+    const tag = idea.ticker || (entry.standing ? (idea.sector || "House view") : "—");
     if (res && res.suppressed) {
       return `<div class="cd-irow blocked">
         <div class="cd-irow-top">
           <button type="button" class="cd-check" disabled aria-disabled="true"></button>
           <div class="cd-imid">
-            <div class="cd-ititle">${esc(idea.name)}</div>
+            <div class="cd-ititle">${esc(title)}</div>
             <div class="cd-isupp">⚠ ${esc(res.tradabilityReason || "Not tradable for this client (MiFID gate)")}</div>
           </div>
         </div>
@@ -1341,8 +1374,8 @@
       <div class="cd-irow-top">
         <button type="button" class="cd-check" data-tksel="${esc(key)}">${sel ? "✓" : ""}</button>
         <div class="cd-imid" data-tkexp="${esc(key)}">
-          <div class="cd-ititle">${esc(idea.name)}</div>
-          <div class="cd-isub">${esc(idea.ticker || "—")} · ${esc(a.name)}${res ? ` · fit ${res.fit}` : ""}</div>
+          <div class="cd-ititle">${esc(title)}</div>
+          <div class="cd-isub">${esc(tag)} · ${entry.standing ? "House view" : esc(a.name)}${res ? ` · fit ${res.fit}` : ""}</div>
         </div>
         <button type="button" class="cd-caret" data-tkexp="${esc(key)}">▾</button>
       </div>
@@ -1358,7 +1391,9 @@
   function openToolkit(clientId) {
     const c = clientById(clientId);
     if (!c) return;
-    tk = { client: c, selected: {}, expanded: {} };
+    tk = { client: c, selected: {}, expanded: {}, pool: Object.assign({}, FOCUS_BY_ID) };
+    tk.standing = standingViewsFor(c);
+    tk.standing.forEach(e => { tk.pool[e.idea.id] = e.idea; });
     const pnl = clientPnl(c);
     openModal(`<div class="ob-overlay ob-scroll">
       <div class="ob-pop tkp-pop">
@@ -1379,7 +1414,7 @@
 
   function tkSelectedIdeas() {
     const ids = [...new Set(Object.keys(tk.selected).filter(k => tk.selected[k]).map(k => k.split("::")[1]))];
-    return ids.map(id => FOCUS_BY_ID[id]).filter(Boolean);
+    return ids.map(id => tk.pool[id]).filter(Boolean);
   }
 
   function renderTkBody(root) {
@@ -1430,6 +1465,11 @@
         </div>
       </div>
       ${colsHTML}
+      ${(tk.standing && tk.standing.length) ? `<div class="tkp-more">
+        <div class="tkp-more-head"><span class="sq" style="background:#996F3D"></span><h2 style="font-family:var(--serif);font-weight:600;font-size:16px;margin:0;color:var(--ink)">Standing house views that fit</h2></div>
+        <div class="tkp-more-note">The desk's permanent themes matched to ${esc(c.name)}'s book — the same house views shown on the portfolio, selectable here too.</div>
+        <div class="tkp-more-grid">${tk.standing.map(e => tkIdeaRow(e, "view::" + e.idea.id, c)).join("")}</div>
+      </div>` : ""}
       <div class="tkp-more">
         <div class="tkp-more-head"><span class="sq"></span><h2 style="font-family:var(--serif);font-weight:600;font-size:16px;margin:0;color:var(--ink)">More ideas from today's sweep</h2></div>
         <div class="tkp-more-note">Everything else on today's board, scored live for ${esc(c.name)} — tick any to fold them into the same email.</div>
@@ -1459,7 +1499,7 @@
     ideas.forEach(i => bumpCounter("drafted", i.id));
     const text = combinedEmailText(c, ideas);
     const subject = ideas.length === 1
-      ? `An idea worth a look — ${ideas[0].name}`
+      ? `An idea worth a look — ${ideas[0].name || ideas[0].title}`
       : `${ideas.length} coordinated ideas for your portfolio`;
     $("#tkpBody", root).innerHTML = `
       <button type="button" class="suit-back" id="tkBack">← back to ${esc(c.name)}'s toolkit</button>
@@ -1498,7 +1538,6 @@
     $("#cmdBtn").addEventListener("click", openCmd);
     document.addEventListener("keydown", onGlobalKey);
 
-    startTicker();
     renderBrief();
     renderTop3();
     renderToolkit();
