@@ -81,6 +81,18 @@ button { font-family: inherit; cursor: pointer; }
   letter-spacing: 0.04em;
 }
 .masthead-meta strong { color: var(--ink); font-weight: 600; }
+.mh-theme {
+  flex: none; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center;
+  background: var(--cream); border: 1px solid var(--line); border-radius: var(--radius);
+  cursor: pointer; color: var(--bronze-deep); font-size: 15px; line-height: 1;
+  transition: border-color .15s ease, background .15s ease;
+}
+.mh-theme:hover { border-color: var(--bronze); }
+.mh-theme .mh-theme-sun { display: none; }
+.mh-theme .mh-theme-moon { display: inline; }
+[data-theme="dark"] .mh-theme { background: var(--paper); }
+[data-theme="dark"] .mh-theme .mh-theme-moon { display: none; }
+[data-theme="dark"] .mh-theme .mh-theme-sun { display: inline; }
 
 /* ===== Tabs =============================================================== */
 .tabs {
@@ -1373,3 +1385,58 @@ button.struct-chip.struct-toggle:focus-visible { outline: 2px solid var(--gold);
   opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; z-index: 9999;
 }
 .bp-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ============================================================================
+   DARK THEME  —  activated by <html data-theme="dark">.  Shares the ob-theme
+   localStorage key with the redesigned shell, so the embedded book follows the
+   shell toggle and standalone pages remember the choice.  Light mode untouched.
+   ========================================================================== */
+[data-theme="dark"] {
+  --cream:        #141109;   /* page background */
+  --cream-2:      #201C15;   /* subtle fills / rails */
+  --paper:        #1D1A14;   /* cards / drawers (was #FFFFFF) */
+  --ink:          #EDE8DE;
+  --ink-soft:     #B2AB9F;
+  --ink-faint:    #8C8579;
+  --espresso:     #26211A;   /* dark accent panels -> elevated */
+  --espresso-2:   #2F281F;
+  --bronze:       #BE9760;
+  --bronze-deep:  #C7A06A;   /* label text, lifted for contrast */
+  --gold:         #D4B876;
+  --line:         #332C24;
+  --line-strong:  #3E362C;
+  --pos:          #5EA97C;
+  --neg:          #CB7160;
+  --warn:         #C79A54;
+  --shadow-card:   0 1px 2px rgba(0,0,0,.4), 0 8px 28px rgba(0,0,0,.5);
+  --shadow-drawer: -16px 0 48px rgba(0,0,0,.6);
+  color-scheme: dark;
+}
+
+/* hardcoded white surfaces -> dark */
+[data-theme="dark"] .masthead { background: #17130C; }
+[data-theme="dark"] .tabs { background: #17130C; }
+[data-theme="dark"] .jpm-wordmark { color: var(--ink); }
+[data-theme="dark"] .morgan-msg.bot,
+[data-theme="dark"] .morgan-sug,
+[data-theme="dark"] .morgan-input { background: var(--paper); }
+
+/* tinted conviction / flag chips: light pastel -> translucent, hue kept */
+[data-theme="dark"] .tag.conv-high,
+[data-theme="dark"] .fund-pill.ok,
+[data-theme="dark"] .src-tag.view,
+[data-theme="dark"] .class-pill.professional,
+[data-theme="dark"] .src-flag.sourced,
+[data-theme="dark"] .pt-verdict.toward { background: rgba(94,169,124,.16); color: var(--pos); border-color: rgba(94,169,124,.3); }
+[data-theme="dark"] .struct-chip.blocked,
+[data-theme="dark"] .xd-note.otc { background: rgba(203,113,96,.15); color: var(--neg); }
+[data-theme="dark"] .ft-conv.conv-medium,
+[data-theme="dark"] .fc-conv.conv-medium,
+[data-theme="dark"] .fc-tag.theme,
+[data-theme="dark"] .fcl-fit.fit-good,
+[data-theme="dark"] .rub-pegs { background: rgba(199,154,84,.14); }
+[data-theme="dark"] .rec-whynow,
+[data-theme="dark"] .ft-whynow,
+[data-theme="dark"] .gap-comfort.gc-amber { background: rgba(199,154,84,.14); color: var(--warn); }
+[data-theme="dark"] .pl-head:hover,
+[data-theme="dark"] .ri-head:hover { background: var(--cream-2); }

@@ -511,3 +511,133 @@ button { font-family: var(--sans); }
   .ob-rail-l, .ob-rail-r { position: static; }
   .cd-cols { grid-template-columns: 1fr; }
 }
+
+/* ============================================================================
+   THEME TOGGLE (header button)  — visible in both light & dark
+   ========================================================================== */
+.obh-theme {
+  appearance: none; display: flex; align-items: center; justify-content: center;
+  width: 34px; height: 34px; background: var(--cream); border: 1px solid var(--hairline);
+  border-radius: 9px; cursor: pointer; color: var(--bronze); font-size: 15px; line-height: 1;
+  transition: border-color .15s ease, background .15s ease, color .15s ease;
+}
+.obh-theme:hover { border-color: var(--bronze-l); background: #EFEAE0; }
+.obh-theme .obh-theme-sun { display: none; }
+.obh-theme .obh-theme-moon { display: inline; }
+[data-theme="dark"] .obh-theme .obh-theme-moon { display: none; }
+[data-theme="dark"] .obh-theme .obh-theme-sun { display: inline; }
+
+/* ============================================================================
+   DARK THEME  —  activated by <html data-theme="dark">.  Light mode (:root)
+   is left untouched.  Strategy: (1) remap the design tokens so every var(--x)
+   flips automatically, then (2) override the hardcoded light surfaces / hovers
+   / small accent text that don't go through a token.
+   ========================================================================== */
+[data-theme="dark"] {
+  --ground: #14110B;          /* page background (deepest) */
+  --surface: #1E1A13;         /* cards / inputs / tiles (was #fff) */
+  --surface-2: #262019;       /* hovers, selected, elevated */
+  --ink: #EDE8DE;             /* primary text */
+  --charcoal: #221E17;        /* dark accent panels — now read as "elevated" */
+  --charcoal2: #1C1810;
+  --hairline: #342C24;        /* borders */
+  --hairline-soft: #2A241D;
+  --grey: #A9A296;
+  --grey-soft: #B7B0A5;
+  --grey-faint: #8A8377;
+  --bronze: #C69C60;          /* small accent labels — lifted for contrast */
+  --brown: #8A5228;           /* button fills (white/cream text still reads) */
+  --green-pos: #52B37E;
+  --brick: #CB7160;
+  --card-shadow: 0 2px 6px rgba(0,0,0,.45);
+  --window-shadow: 0 12px 30px -18px rgba(0,0,0,.85);
+  --pop-shadow: 0 30px 80px -20px rgba(0,0,0,.85);
+  color-scheme: dark;
+}
+
+/* shell */
+[data-theme="dark"] .ob-header { background: #17130C; border-bottom-color: var(--hairline); }
+[data-theme="dark"] .obh-cmd { background: var(--surface); color: var(--grey-soft); }
+[data-theme="dark"] .obh-cmd:hover { background: var(--surface-2); }
+[data-theme="dark"] .obh-cmd-key { background: var(--surface-2); border-color: var(--hairline); }
+[data-theme="dark"] .obh-theme { background: var(--surface); }
+[data-theme="dark"] .obh-theme:hover { background: var(--surface-2); }
+[data-theme="dark"] .ob-scroll::-webkit-scrollbar-thumb { background: #3A342A; }
+
+/* light surfaces (were #fff) -> dark card surface */
+[data-theme="dark"] .tk-row,
+[data-theme="dark"] .ob-search input,
+[data-theme="dark"] .ob-chip,
+[data-theme="dark"] .ob-clientsel,
+[data-theme="dark"] .ob-card,
+[data-theme="dark"] .ob-letter,
+[data-theme="dark"] .ob-btn-line,
+[data-theme="dark"] .suit-whypill,
+[data-theme="dark"] .tree-client,
+[data-theme="dark"] .cmd-card,
+[data-theme="dark"] .cmd-item,
+[data-theme="dark"] .ask-panel,
+[data-theme="dark"] .ask-ref,
+[data-theme="dark"] .ask-composer,
+[data-theme="dark"] .bkg-tile,
+[data-theme="dark"] .bk-stat,
+[data-theme="dark"] .bk-tablecard,
+[data-theme="dark"] .cd-block,
+[data-theme="dark"] .cd-check,
+[data-theme="dark"] .tep-sel { background: var(--surface); }
+
+/* light cream hovers / selected -> elevated dark */
+[data-theme="dark"] .tk-row:hover,
+[data-theme="dark"] .tree-client:hover,
+[data-theme="dark"] .ask-sug:hover,
+[data-theme="dark"] .ask-ref:hover,
+[data-theme="dark"] .ip-btn:hover,
+[data-theme="dark"] .cmd-item.active,
+[data-theme="dark"] .bk-row:hover,
+[data-theme="dark"] .bk-hrow,
+[data-theme="dark"] .cd-irow,
+[data-theme="dark"] .cd-irow.sel,
+[data-theme="dark"] .tkp-selbar.idle,
+[data-theme="dark"] .tkp-count,
+[data-theme="dark"] .cd-irow.blocked .cd-check,
+[data-theme="dark"] .ask-composer input:focus { background: var(--surface-2); }
+
+/* borders that were hardcoded light */
+[data-theme="dark"] .ob-btn-line,
+[data-theme="dark"] .ask-ref,
+[data-theme="dark"] .tree-client,
+[data-theme="dark"] .cd-irow { border-color: var(--hairline); }
+[data-theme="dark"] .cd-check { border-color: var(--hairline); }
+[data-theme="dark"] .ask-sug { border-color: var(--hairline); background: var(--surface); }
+[data-theme="dark"] .cmd-inrow,
+[data-theme="dark"] .cmd-foot { border-color: var(--hairline); }
+[data-theme="dark"] .score-track { background: #342C24; }
+
+/* dark ink text that was hardcoded #26221B / #3A362F -> light */
+[data-theme="dark"] .ob-letter,
+[data-theme="dark"] .ask-empty-h,
+[data-theme="dark"] .ask-ai-body,
+[data-theme="dark"] .score-flbl,
+[data-theme="dark"] .cd-iplain { color: var(--ink); }
+
+/* small brown/label accents -> lifted warm so they read on dark */
+[data-theme="dark"] .ob-chip,
+[data-theme="dark"] .ip-btn,
+[data-theme="dark"] .ask-sug,
+[data-theme="dark"] .ob-btn-line,
+[data-theme="dark"] .suit-whypill .lbl,
+[data-theme="dark"] .tree-impl,
+[data-theme="dark"] .ip-engage b { color: var(--bronze-l); }
+
+/* tinted chips (light pastel -> translucent dark, hue preserved) */
+[data-theme="dark"] .bk-flag,
+[data-theme="dark"] .ask-ref .ic.idea { background: rgba(235,201,141,.14); color: var(--gold); }
+[data-theme="dark"] .tk-selcount { background: rgba(82,179,126,.16); color: var(--green-pos); border-color: rgba(82,179,126,.3); }
+[data-theme="dark"] .cd-liabtag { background: rgba(203,113,96,.16); color: var(--brick); }
+
+/* misc surfaces */
+[data-theme="dark"] .tree-impl { background: var(--surface-2); }
+[data-theme="dark"] .obh-cmd-ico,
+[data-theme="dark"] .cmd-kind,
+[data-theme="dark"] .top3-note { color: var(--grey-faint); }
+[data-theme="dark"] .cmd-foot .brand { color: var(--grey-faint); }

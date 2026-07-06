@@ -4,10 +4,20 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Portfolio — Brokerage Playground</title>
+  <!-- Theme: apply persisted dark/light before first paint (shared 'ob-theme' key). -->
+  <script>
+  (function () {
+    var K = 'ob-theme', d = document.documentElement;
+    function apply(t) { if (t === 'dark') { d.setAttribute('data-theme', 'dark'); } else { d.removeAttribute('data-theme'); } }
+    var s; try { s = localStorage.getItem(K); } catch (e) {}
+    apply(s === 'dark' ? 'dark' : 'light');
+    window.addEventListener('storage', function (e) { if (e.key === K) apply(e.newValue === 'dark' ? 'dark' : 'light'); });
+  })();
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css?v=20260706a-dark" />
   <!-- embed mode: shown inside the Open Book shell's Advisor Book tab. Hide the
        duplicate masthead; the shell provides the "← All clients" bar. -->
   <style>

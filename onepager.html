@@ -4,10 +4,20 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Client one-pager — J.P.Morgan Private Bank</title>
+  <!-- Theme: apply persisted dark/light before first paint (shared 'ob-theme' key). -->
+  <script>
+  (function () {
+    var K = 'ob-theme', d = document.documentElement;
+    function apply(t) { if (t === 'dark') { d.setAttribute('data-theme', 'dark'); } else { d.removeAttribute('data-theme'); } }
+    var s; try { s = localStorage.getItem(K); } catch (e) {}
+    apply(s === 'dark' ? 'dark' : 'light');
+    window.addEventListener('storage', function (e) { if (e.key === K) apply(e.newValue === 'dark' ? 'dark' : 'light'); });
+  })();
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css?v=20260706a-dark" />
   <style>
     .op-bar { background:#fff; border-bottom:1px solid var(--line); }
     .op-bar-inner { max-width:840px; margin:0 auto; padding:16px 28px; display:flex; align-items:center; gap:16px; }
@@ -29,6 +39,8 @@
     .op-rec .op-rec-how b { color:var(--ink); }
     .op-disc { font-size:11px; color:var(--ink-faint); line-height:1.5; border-top:1px solid var(--line); padding-top:14px; margin-top:8px; }
     .op-num { display:inline-grid; place-items:center; width:22px; height:22px; border-radius:50%; background:var(--espresso); color:var(--gold); font-size:12px; font-weight:600; margin-right:9px; }
+    [data-theme="dark"] .op-bar { background:#17130C; }
+    [data-theme="dark"] .op-sheet { background:var(--paper); }
     @media print {
       .op-bar, .no-print { display:none !important; }
       body { background:#fff; }

@@ -4,10 +4,41 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Open Book — Private Bank Investment Desk</title>
+  <!-- Theme: apply the persisted choice before first paint (no flash). Default
+       light unless the user chose dark. Shares one localStorage key across all
+       pages + the embedded book iframe, and stays in sync via storage events. -->
+  <script>
+  (function () {
+    var K = 'ob-theme', d = document.documentElement;
+    function apply(t) {
+      if (t === 'dark') { d.setAttribute('data-theme', 'dark'); }
+      else { d.removeAttribute('data-theme'); }
+      var f = document.getElementById('classicFrame');
+      if (f && f.contentDocument) {
+        var fd = f.contentDocument.documentElement;
+        if (t === 'dark') { fd.setAttribute('data-theme', 'dark'); }
+        else { fd.removeAttribute('data-theme'); }
+      }
+    }
+    var s; try { s = localStorage.getItem(K); } catch (e) {}
+    apply(s === 'dark' ? 'dark' : 'light');
+    window.__obTheme = {
+      current: function () { return d.getAttribute('data-theme') === 'dark' ? 'dark' : 'light'; },
+      toggle: function () {
+        var n = this.current() === 'dark' ? 'light' : 'dark';
+        try { localStorage.setItem(K, n); } catch (e) {}
+        apply(n); return n;
+      }
+    };
+    window.addEventListener('storage', function (e) {
+      if (e.key === K) apply(e.newValue === 'dark' ? 'dark' : 'light');
+    });
+  })();
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="openbook.css?v=20260706e" />
+  <link rel="stylesheet" href="openbook.css?v=20260706g-dark" />
 </head>
 <body>
 
@@ -20,6 +51,9 @@
         <span class="obh-sub">PRIVATE&nbsp;BANK</span>
       </div>
       <div class="obh-right">
+        <button class="obh-theme" id="themeBtn" type="button" onclick="window.__obTheme.toggle()" aria-label="Toggle dark mode" title="Toggle light / dark">
+          <span class="obh-theme-moon" aria-hidden="true">☾</span><span class="obh-theme-sun" aria-hidden="true">☀</span>
+        </button>
         <button class="obh-cmd" id="cmdBtn" type="button">
           <span class="obh-cmd-ico">⌕</span><span>Search everything</span>
           <span class="obh-cmd-key">⌘K</span>

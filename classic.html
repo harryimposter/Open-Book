@@ -4,10 +4,26 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Brokerage Playground — Private Bank Investment Desk</title>
+  <!-- Theme: apply persisted dark/light before first paint. Shares the
+       'ob-theme' key with the Open Book shell, so this follows the shell toggle
+       when embedded and remembers the choice when opened standalone. -->
+  <script>
+  (function () {
+    var K = 'ob-theme', d = document.documentElement;
+    function apply(t) { if (t === 'dark') { d.setAttribute('data-theme', 'dark'); } else { d.removeAttribute('data-theme'); } }
+    var s; try { s = localStorage.getItem(K); } catch (e) {}
+    apply(s === 'dark' ? 'dark' : 'light');
+    window.__obTheme = {
+      current: function () { return d.getAttribute('data-theme') === 'dark' ? 'dark' : 'light'; },
+      toggle: function () { var n = this.current() === 'dark' ? 'light' : 'dark'; try { localStorage.setItem(K, n); } catch (e) {} apply(n); return n; }
+    };
+    window.addEventListener('storage', function (e) { if (e.key === K) apply(e.newValue === 'dark' ? 'dark' : 'light'); });
+  })();
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=20260626a" />
+  <link rel="stylesheet" href="styles.css?v=20260706a-dark" />
   <!-- embed mode: hosted inside the redesigned shell's Advisor Book tab.
        Presentation only: hide the duplicate masthead and the old tab bar so
        just the Advisor Book shows; if an in-page action jumps to another old
@@ -55,6 +71,9 @@
         <div><strong>Advisor view</strong> · Coverage book</div>
         <div id="asOf">As of —</div>
       </div>
+      <button class="mh-theme" type="button" onclick="window.__obTheme.toggle()" aria-label="Toggle dark mode" title="Toggle light / dark">
+        <span class="mh-theme-moon" aria-hidden="true">☾</span><span class="mh-theme-sun" aria-hidden="true">☀</span>
+      </button>
     </div>
   </header>
 
