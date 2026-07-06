@@ -52,6 +52,40 @@ A daily scheduled run would: (1) sweep the market and overwrite `today_focus.jso
 (2) run `python build_today_focus.py`, (3) commit. No app edits needed. The client
 mapping is computed in the browser, so it always reflects the current book.
 
+**Sweep inputs.** Each sweep must (a) scan large-cap **drawdowns/dislocations** (a
+>~15% pullback in a widely-held name is a candidate, not noise) and (b) read the
+desk's **core voices** — every sweep, alongside the broad tape — citing them in an
+idea's `sources` (`kind: "view"`, shown as a "Via …" line). Their read informs
+conviction; it never bypasses the rubric or the client-fit mapping.
+
+- **Core (read every sweep):** Citrini Research (thematic), Serenity, TSCS,
+  Brent Donnelly (FX), **Cem Karsan** (vol/dealer positioning), **Joseph Wang /
+  Fed Guy** (rates & Fed plumbing), **SemiAnalysis** (AI capex/semis).
+- **Conditional (read when an idea touches their domain — they are the natural
+  second independent source under the ≥2-source rule):**
+  earnings/single names → The Transcript; options expression & vol pricing →
+  Benn Eifert, Kris Abdelmessih (Moontower), Tier1 Alpha; semis second source →
+  Fabricated Knowledge; commodities → Rory Johnston (Commodity Context), Doomberg;
+  credit stress in levered names → HighYield Harry; flows/positioning →
+  The Market Ear, Brad Setser; rates/macro data → Andy Constan (Damped Spring),
+  Joseph Politano (Apricitas).
+
+Several of these publish daily; fresh commentary that merely *restates* a thesis is
+not a reason to cite or re-date an idea (the ledger below guards the dates — "Via"
+citations belong only where a read actually informed or changed the argument).
+
+**Honest dates.** `build_today_focus.py` keeps a committed ledger
+(`today_focus.ledger.json`) fingerprinting each idea's *argument*. An idea's
+`postedAt` only moves when its thesis actually changes — a no-op re-commit never
+re-dates the board, and `updatedAt` marks a re-grounded idea (a "· updated Nd ago"
+chip). The build **warns** when an idea's thesis has gone >10 days unchanged, so
+stale commentary is surfaced rather than silently aging.
+
+**Charts.** An idea may carry an optional `chart` block (`kind: "spark"|"band"`,
+`series`, `band`, `refs`, `caption`) rendered inline by `charts.js` — used only
+where a picture adds signal (a rates accrual band, an equity pullback, FX vs a key
+level).
+
 ## Files
 
 | File | Purpose |

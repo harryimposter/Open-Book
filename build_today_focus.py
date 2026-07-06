@@ -33,6 +33,41 @@ COVERAGE SPEC (what every sweep MUST span — not just US equity/earnings):
   unwind) / stop — carried in a `levels` block — primarily across FX (and where relevant
   rates/equity). The coverage check WARNS if no tactical idea (or no tactical FX idea) is present.
 
+  SWEEP INPUTS (what the sweep MUST read before writing ideas — so the board doesn't miss
+  the obvious):
+    - DISLOCATIONS: scan for large-cap DRAWDOWNS in widely-held names (a >~15% pullback,
+      e.g. a hyperscaler off its highs on AI-capex fear) as candidate ideas — a sharp move
+      in a name clients own is a flag, not noise.
+    - NAMED AUTHORS (two tiers — wide funnel, same gate; NOTHING bypasses the conviction
+      rubric or the client-fit mapping):
+        CORE (read EVERY sweep, alongside the broad tape Reuters/WSJ/Bloomberg/CNBC):
+          Citrini Research (thematic), Serenity, TSCS, Brent Donnelly (FX),
+          Cem Karsan (vol/dealer positioning), Joseph Wang / Fed Guy (rates & Fed
+          plumbing), SemiAnalysis (AI capex/semis).
+        CONDITIONAL (read when an idea touches their domain — they are the natural
+        SECOND independent source under the >=2-source rule):
+          earnings/single names -> The Transcript;
+          options expression & vol pricing -> Benn Eifert, Kris Abdelmessih (Moontower),
+            Tier1 Alpha;
+          semis second source -> Fabricated Knowledge;
+          commodities -> Rory Johnston (Commodity Context), Doomberg;
+          credit stress in levered names -> HighYield Harry;
+          flows/positioning -> The Market Ear, Brad Setser;
+          rates/macro data -> Andy Constan (Damped Spring), Joseph Politano (Apricitas).
+      Where a view is informed by any of them, CITE it in that idea's `sources`
+      (kind "view"). Several publish DAILY: commentary that merely RESTATES an unchanged
+      thesis is not a reason to cite it or re-date the idea (the ledger keeps dates
+      honest) — cite only a read that actually informed or changed the argument.
+
+  CITATION INTEGRITY (HARD RULE — no exceptions):
+    DO NOT HALLUCINATE OR MAKE UP CITATIONS. Never attribute a view to a named author
+    (kind "view") unless that author's actual content was READ during the sweep. Every
+    kind-"view" source MUST carry a `basis` field stating what was read, when, and what
+    was taken from it — the validator REJECTS view-citations without one. If the view is
+    entirely our own, OWN IT: set `ownView: true` on the idea (surfaced on the card as
+    the desk's own call) — an owned original view is always preferable to a borrowed
+    authority that was never read.
+
   TACTICAL TRIGGER GATE (event/move-driven ideas don't sit on the board permanently):
   a tactical idea (one carrying a `levels` block) MUST also carry:
     - `trigger`   — the stated condition that justifies it NOW (e.g. "USD/JPY pushed into
@@ -64,12 +99,15 @@ This script also VALIDATES the payload (prints warnings, never silently passes):
 """
 import json
 import sys
+import hashlib
 import datetime
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 SRC = HERE / "today_focus.json"
 OUT = HERE / "today_focus.js"
+LEDGER = HERE / "today_focus.ledger.json"
+STALE_DAYS = 10  # warn when an idea's thesis hasn't been re-grounded in this many days
 
 # ---- Conviction rubrics (TWO models, selected by idea kind) -------------------
 # EARNINGS ideas are scored by the print rubric: four pillars, each 0-2 -> /8,
@@ -261,6 +299,12 @@ def gate_tactical(data, warns):
 def validate(idea, as_of, warns):
     if len(idea.get("sources", [])) < 2:
         warns.append(f"{idea['id']}: fewer than 2 sources cited")
+    # CITATION INTEGRITY: a named-author view citation must state what was actually read.
+    for s in idea.get("sources", []):
+        if s.get("kind") == "view" and not str(s.get("basis", "")).strip():
+            warns.append(f"{idea['id']}: view-citation '{s.get('name','?')}' has NO `basis` — "
+                         "never cite an author whose content wasn't read; state what was read "
+                         "and when, or drop the citation and set ownView:true instead")
     ts = idea.get("tradeStatement")
     if not (ts and str(ts).strip()):
         warns.append(f"{idea['id']}: no tradeStatement — REQUIRED (one precise sentence: instrument + direction + the actual view; for FX, name which currency is long vs short and whether it's a spot or differential/carry bet)")
@@ -330,6 +374,77 @@ def check_coverage(data, warns):
     return has_fx and has_rates
 
 
+# ---- Date integrity: postedAt only moves when the idea's ARGUMENT changes --------
+# Every card reads its "posted / Nd ago" off the idea's own postedAt, not the global
+# asOf — so a no-op re-commit must NOT make an idea look freshly posted. We fingerprint
+# each idea's substantive argument (NOT volatile/derived fields) and keep a committed
+# ledger (today_focus.ledger.json) of {id: {fp, postedAt, updatedAt}}:
+#   - id unseen           -> postedAt = updatedAt = asOf
+#   - seen, fp unchanged  -> carry BOTH dates (nothing moves)
+#   - seen, fp changed    -> keep postedAt, bump updatedAt = asOf
+# The author never hand-manages dates; refreshing an idea's copy bumps its updatedAt,
+# leaving a stale (unrefreshed) idea visibly old instead of silently reset.
+_FP_FIELDS = ("tradeStatement", "headline", "thesis", "changeMyMind", "direction", "intent")
+
+
+def _fingerprint(idea):
+    """Stable hash over the idea's ARGUMENT only. Excludes chart series, indicators
+    timestamps, computed conviction totals/labels and sources (all volatile/derived),
+    so a pure price/timestamp refresh does not count as a content change."""
+    parts = {k: idea.get(k) for k in _FP_FIELDS if idea.get(k) is not None}
+    parts["structures"] = list(idea.get("structures", []) or [])
+    parts["facts"] = [f.get("text", "") for f in (idea.get("facts") or [])]
+    parts["pillars"] = [
+        [p.get("key"), p.get("score"), p.get("authoredNote") or p.get("note") or ""]
+        for p in (idea.get("conviction", {}).get("pillars") or [])
+    ]
+    if idea.get("levels") is not None:
+        parts["levels"] = idea.get("levels")
+    result = (idea.get("earnings") or {}).get("result")
+    if result:
+        parts["earningsResult"] = result
+    blob = json.dumps(parts, ensure_ascii=False, sort_keys=True)
+    return hashlib.sha1(blob.encode("utf-8")).hexdigest()
+
+
+def apply_ledger(data, as_of_str, warns):
+    """Stamp postedAt/updatedAt on every idea from the fingerprint ledger; return the
+    rewritten ledger. Warns on ideas whose argument hasn't changed in > STALE_DAYS."""
+    try:
+        ledger = json.loads(LEDGER.read_text(encoding="utf-8")) if LEDGER.exists() else {}
+    except (json.JSONDecodeError, OSError):
+        ledger = {}
+    try:
+        as_of_date = datetime.date.fromisoformat(as_of_str)
+    except ValueError:
+        as_of_date = None
+    new_ledger = {}
+    for section in ("earnings", "exEarnings"):
+        for idea in data.get(section, []):
+            iid = idea.get("id")
+            fp = _fingerprint(idea)
+            prev = ledger.get(iid)
+            if not prev:
+                posted = updated = as_of_str
+            elif prev.get("fp") == fp:
+                posted = prev.get("postedAt", as_of_str)
+                updated = prev.get("updatedAt", posted)
+            else:
+                posted = prev.get("postedAt", as_of_str)
+                updated = as_of_str
+            idea["postedAt"] = posted
+            idea["updatedAt"] = updated
+            new_ledger[iid] = {"fp": fp, "postedAt": posted, "updatedAt": updated}
+            if as_of_date:
+                try:
+                    stale = (as_of_date - datetime.date.fromisoformat(updated)).days
+                    if stale > STALE_DAYS:
+                        warns.append(f"{iid}: thesis unchanged for {stale} days (since {updated}) — re-ground the commentary or retire the idea")
+                except ValueError:
+                    pass
+    return new_ledger
+
+
 def main():
     if not SRC.exists():
         print(f"ERROR: {SRC.name} not found", file=sys.stderr)
@@ -351,6 +466,11 @@ def main():
     dropped_tactical = gate_tactical(data, warns)
 
     check_coverage(data, warns)
+
+    # date integrity: stamp postedAt/updatedAt from the fingerprint ledger AFTER the
+    # tactical gate (only shipped ideas get dated) and rewrite the ledger.
+    new_ledger = apply_ledger(data, data.get("asOf", "1970-01-01"), warns)
+    LEDGER.write_text(json.dumps(new_ledger, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
     data["convictionRubric"] = {"earnings": EARNINGS_RUBRIC, "exEarnings": EXEARN_RUBRIC}
 
