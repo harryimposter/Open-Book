@@ -17,111 +17,6 @@
   },
   "earnings": [
     {
-      "id": "nke-fq4-react",
-      "direction": "neutral",
-      "stance": "post-print",
-      "tradeStatement": "Don't chase Nike's (NKE) headline EPS beat — FQ4 diluted EPS printed $0.72 vs a ~$0.11 bar, but ~$0.52 of that is a one-off IEEPA tariff-recovery benefit (ex-item EPS ~$0.20), revenue was $11.0B (-4% currency-neutral) and FY26 landed flat at $46.4B, so the stock whipsawed and fell ~2.66% after the close; play the reaction with defined risk (cash-secured puts / reverse convertible) or wait, not a naked chase of a tariff-flattered print.",
-      "intent": "add",
-      "action": "Fade the headline / defined-risk entry",
-      "preferredExpression": "Cash-secured puts",
-      "name": "Nike",
-      "ticker": "NKE",
-      "sector": "Consumer",
-      "assetClass": "Equity",
-      "bucket": "Growth",
-      "goalType": "appreciation",
-      "riskProfile": {
-        "vol": "high",
-        "beta": "high",
-        "structured": false
-      },
-      "naturalExpression": "Direct equity",
-      "headline": "Nike beat on a tariff-flattered EPS but fell ~2.66% after the print — the quality of the beat is the signal",
-      "thesis": "Nike reported fiscal Q4 after the close on 30 June: diluted EPS $0.72 on revenue $11.0B (down 1% reported, down 4% currency-neutral), ahead of ~$10.86B expected — but the headline is flattered by a ~$0.52 benefit tied to expected recovery of IEEPA tariffs, so the underlying number is closer to ~$0.20 and the turnaround is still slow. Full-year FY26 revenue was flat at $46.4B (down 2% currency-neutral); gross profit was $5.4B and operating profit $1.3B. The market saw through it: shares whipsawed between gain and loss and settled down ~2.66% after the print. CEO Elliott Hill's 'Win Now' reset is stabilising wholesale but has not yet delivered the revenue or margin inflection that would justify multiple expansion, and the self-imposed China clear-down continues. This is a 'don't chase the headline' reaction: for books with consumer-discretionary exposure, express any constructive view with a defined-risk structure (cash-secured puts to get paid to wait, or a reverse convertible) rather than buying a tariff-flattered beat outright.",
-      "themeId": null,
-      "offThemeWhy": "No standing desk theme on consumer discretionary — this is a single-name turnaround reaction judged on its own merit, not a strategic house view.",
-      "structures": [
-        "Cash-secured puts",
-        "Reverse convertible",
-        "Direct equity",
-        "Buffered note"
-      ],
-      "variant": {
-        "street": "Bulls seize on the big headline EPS beat and the revenue upside as proof the turnaround is landing",
-        "us": "Strip out the ~$0.52 tariff-recovery one-off and it's a ~$0.20 quarter on flat, currency-negative sales — better than feared, not inflecting; the ~2.66% drop confirms the market saw through it",
-        "gap": "The crowd anchors on the headline EPS; the edge is in the quality-of-earnings caveat and the muted price reaction"
-      },
-      "changeMyMind": "Gross margins inflecting higher ex the tariff-refund and China revenue stabilising in the FY27 guide — evidence the turnaround is real, not a one-off refund, would turn the fade into an add.",
-      "conviction": {
-        "pillars": [
-          {
-            "key": "asymmetry",
-            "score": 1,
-            "dq": "estimated",
-            "note": "A whipsaw that settled ~2.66% lower on a headline beat offers a modest reaction to fade, but the low bar and one-off caps the clean edge."
-          },
-          {
-            "key": "consensus",
-            "score": 1,
-            "dq": "estimated",
-            "note": "Street split — a big headline EPS beat against flat, currency-negative revenue and a slow turnaround; no clean alignment."
-          },
-          {
-            "key": "catalyst",
-            "score": 2,
-            "dq": "sourced",
-            "note": "Dated, landed print (30 Jun after close) — a headline beat flattered by a tariff-recovery one-off, sold off on the day."
-          },
-          {
-            "key": "positioning",
-            "score": 1,
-            "dq": "estimated",
-            "note": "Beaten-down name with an eight-quarter beat streak, but no positioning extreme after the muted reaction. RSI 53 (neutral).",
-            "authoredNote": "Beaten-down name with an eight-quarter beat streak, but no positioning extreme after the muted reaction.",
-            "indicators": {
-              "rsi": 52.9,
-              "asOf": "2026-07-06 06:05 UTC",
-              "symbol": "NYSE:NKE",
-              "direction": "neutral"
-            }
-          }
-        ]
-      },
-      "earnings": {
-        "reportDate": "2026-06-30",
-        "reportWhen": "after close",
-        "result": "Headline beat, soft underneath — FQ4 diluted EPS $0.72 (vs ~$0.11 est) but ~$0.52 was a one-off IEEPA tariff-recovery benefit; revenue $11.0B (down 1% reported / 4% currency-neutral) vs ~$10.86B est; gross profit $5.4B, operating profit $1.3B; FY26 revenue flat at $46.4B (down 2% currency-neutral)",
-        "resultSource": "sourced",
-        "reaction": "Shares whipsawed between gain and loss and fell ~2.66% after the close as the market discounted the tariff-flattered headline EPS",
-        "reactionSource": "sourced",
-        "watch": "Gross-margin recovery ex the tariff-refund one-off, the China revenue trajectory, wholesale re-stocking and the FY27 guide."
-      },
-      "facts": [
-        {
-          "text": "Nike reported FQ4 FY26 after the close on 30 Jun: diluted EPS $0.72 (vs ~$0.11 est) on revenue $11.0B (down 1% reported, 4% currency-neutral), beating ~$10.86B; ~$0.52 of the EPS was a one-off IEEPA tariff-recovery benefit",
-          "tag": "sourced"
-        },
-        {
-          "text": "Full-year FY26 revenue was flat at $46.4B (down 2% currency-neutral); gross profit $5.4B, operating profit $1.3B; shares fell ~2.66% after the close, whipsawing between gain and loss",
-          "tag": "sourced"
-        }
-      ],
-      "sources": [
-        {
-          "name": "NIKE 8-K / StockTitan (press release)",
-          "kind": "data"
-        },
-        {
-          "name": "TheStreet",
-          "kind": "news"
-        },
-        {
-          "name": "247WallSt / Quiver Quantitative",
-          "kind": "news"
-        }
-      ]
-    },
-    {
       "id": "mu-fq3-react",
       "direction": "long",
       "stance": "post-print",
@@ -797,7 +692,8 @@
           "name": "Trading Economics (10Y)",
           "kind": "data"
         }
-      ]
+      ],
+      "pinned": true
     },
     {
       "id": "fx-usd-hedge",

@@ -452,6 +452,11 @@
 
   function rankedIdeas() {
     return FOCUS.slice().sort((a, b) => {
+      // Desk pin: an idea flagged `pinned` in the sweep leads the board, ahead of the
+      // algorithmic order. A deliberate desk override (the fit/conviction engines are
+      // untouched — the tile still shows the real FIT and is labelled a DESK PICK).
+      const pa = a.pinned ? 1 : 0, pb = b.pinned ? 1 : 0;
+      if (pb !== pa) return pb - pa;
       const fa = bookFit(a).fit, fb = bookFit(b).fit;
       if (fb !== fa) return fb - fa;
       return ((b.conviction && b.conviction.score) || 0) - ((a.conviction && a.conviction.score) || 0);
@@ -480,7 +485,7 @@
           <span class="top3-rank">${i + 1}</span>
           <span class="top3-body">
             <span class="top3-title">${esc(idea.name)}</span>
-            <span class="top3-sub2">${esc((idea.ticker && idea.ticker !== "—" ? idea.ticker : idea.sector || "").toUpperCase())} · FIT <b>${bf.fit}</b>${active ? " · SHOWING" : ""}</span>
+            <span class="top3-sub2">${idea.pinned ? `<b style="color:#9A7B4F">DESK PICK</b> · ` : ""}${esc((idea.ticker && idea.ticker !== "—" ? idea.ticker : idea.sector || "").toUpperCase())} · FIT <b>${bf.fit}</b>${active ? " · SHOWING" : ""}</span>
           </span>
         </span>
       </button>`;
