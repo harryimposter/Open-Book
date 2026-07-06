@@ -1,0 +1,62 @@
+{
+  "mu-fq3-react": {
+    "fp": "d266e7f5aa311331a5490556dff1de009e2c88bb",
+    "postedAt": "2026-07-07",
+    "updatedAt": "2026-07-07"
+  },
+  "dal-q2": {
+    "fp": "30a940f44d2005f327474d9a3f9b88a8df9a09d1",
+    "postedAt": "2026-07-07",
+    "updatedAt": "2026-07-07"
+  },
+  "msft-capex-pullback": {
+    "fp": "d06da3f66bc0aee3e197d44b2dc18f9ef3acf943",
+    "postedAt": "2026-07-07",
+    "updatedAt": "2026-07-07"
+  },
+  "avgo-capex-readthrough": {
+    "fp": "591ed220686a9d856862789faad0a36b0c63428b",
+    "postedAt": "2026-07-07",
+    "updatedAt": "2026-07-07"
+  },
+  "spx-cheap-convexity": {
+    "fp": "b4a2a2de60becf64103e543452946c3f979d2d4b",
+    "postedAt": "2026-07-07",
+    "updatedAt": "2026-07-07"
+  },
+  "gold-pullback": {
+    "fp": "0674d816739774a3e22ccdaff991100c4dfc3403",
+    "postedAt": "2026-07-07",
+    "updatedAt": "2026-07-07"
+  },
+  "ai-power": {
+    "fp": "e9a1604fe321b1659a76f190ac71d665e3d76430",
+    "postedAt": "2026-07-07",
+    "updatedAt": "2026-07-07"
+  },
+  "lock-yields": {
+    "fp": "41efc50242c801d6c10bb1a161b7dca16bb7af02",
+    "postedAt": "2026-07-07",
+    "updatedAt": "2026-07-07"
+  },
+  "rate-range-accrual": {
+    "fp": "801e8cfe00272098488907f8d6e11b7a717eb116",
+    "postedAt": "2026-07-07",
+    "updatedAt": "2026-07-07"
+  },
+  "fx-usd-hedge": {
+    "fp": "aaee6af0804d857b0c01d40e0fa80967add39a3d",
+    "postedAt": "2026-07-07",
+    "updatedAt": "2026-07-07"
+  },
+  "fx-carry-income": {
+    "fp": "594284f950ffb70d136b11763933c427dd66d1e6",
+    "postedAt": "2026-07-07",
+    "updatedAt": "2026-07-07"
+  },
+  "tac-usdjpy-strangle": {
+    "fp": "81378c50a8f45f0539c466cfc8629ab028b5104c",
+    "postedAt": "2026-07-07",
+    "updatedAt": "2026-07-07"
+  }
+}
