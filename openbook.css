@@ -635,6 +635,18 @@ button { font-family: var(--sans); }
 [data-theme="dark"] .tk-selcount { background: rgba(82,179,126,.16); color: var(--green-pos); border-color: rgba(82,179,126,.3); }
 [data-theme="dark"] .cd-liabtag { background: rgba(203,113,96,.16); color: var(--brick); }
 
+/* objective nodes carry an inline pastel bg from JS (#F2FAF5 / #FBF6EE /
+   #F5F3EF) — force a dark fill so the light label reads; the inline colored
+   border stays for objective identity */
+[data-theme="dark"] .tree-obj { background: var(--surface-2) !important; color: var(--ink); }
+
+/* selected asset chip: my token remap flattened .ob-chip.active onto the same
+   surface as the idle chips — restore a filled, obviously-"selected" pill */
+[data-theme="dark"] .ob-chip.active { background: var(--gold); border-color: var(--gold); color: #17130C; }
+
+/* command-palette icon squares also get an inline light bg -> unify to dark */
+[data-theme="dark"] .cmd-kicon { background: var(--surface-2) !important; color: var(--gold) !important; }
+
 /* misc surfaces */
 [data-theme="dark"] .tree-impl { background: var(--surface-2); }
 [data-theme="dark"] .obh-cmd-ico,
