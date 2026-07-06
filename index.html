@@ -38,7 +38,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="openbook.css?v=20260706h-dark" />
+  <link rel="stylesheet" href="openbook.css?v=20260707b" />
 </head>
 <body>
 
@@ -51,6 +51,10 @@
         <span class="obh-sub">PRIVATE&nbsp;BANK</span>
       </div>
       <div class="obh-right">
+        <div class="obh-viewsw" role="group" aria-label="Switch view">
+          <button type="button" class="obh-vbtn active" data-view="advisor">Advisor</button>
+          <button type="button" class="obh-vbtn" data-view="solutions">Solutions</button>
+        </div>
         <button class="obh-theme" id="themeBtn" type="button" onclick="window.__obTheme.toggle()" aria-label="Toggle dark mode" title="Toggle light / dark">
           <span class="obh-theme-moon" aria-hidden="true">☾</span><span class="obh-theme-sun" aria-hidden="true">☀</span>
         </button>
@@ -95,7 +99,7 @@
           <span class="top3-sub">RANKED FOR YOUR BOOK · TAP TO FOCUS THE FEED</span>
         </div>
         <div class="top3-tiles" id="top3Rail"></div>
-        <div class="top3-note">Scored live against your coverage. Tap a tile to show only that idea in the feed; tap again for all ideas.</div>
+        <div class="top3-note">Ranked by breadth first — how many of your clients the live engine flags it to — then desk conviction; shown in conviction order. Tap a tile to show only that idea; tap again for all.</div>
 
         <div class="tk-head">
           <span class="top3-chip">CLIENT TOOLKIT</span>
@@ -116,6 +120,7 @@
             <div class="ob-filter-spacer"></div>
             <select class="ob-clientsel" id="clientFilter" aria-label="Filter by client"></select>
           </div>
+          <div class="ob-solbar" id="solBar" hidden></div>
           <div class="ob-countline" id="countLine"></div>
           <div class="ob-feedlist" id="feedList"></div>
           <div class="ob-feedempty" id="feedEmpty" hidden>No ideas match — try a different search or filter.</div>
@@ -174,10 +179,11 @@
   <script src="expressions.js?v=20260705a"></script>
   <script src="mapping.js?v=20260705a"></script>
   <script src="goals.js?v=20260705a"></script>
-  <script src="today_focus.js?v=20260705a"></script>
+  <script src="today_focus.js?v=20260707b"></script>
   <script src="methodology.js?v=20260705a"></script>
   <script src="morgan.js?v=20260705a"></script>
+  <script src="charts.js?v=20260707a"></script>
   <script src="email.js?v=20260706f"></script>
-  <script src="openbook.js?v=20260706f"></script>
+  <script src="openbook.js?v=20260707b"></script>
 </body>
 </html>

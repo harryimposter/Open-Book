@@ -29,6 +29,7 @@
     u.hiddenIdeas = u.hiddenIdeas || [];
     u.dismissedFocus = u.dismissedFocus || [];
     u.reactions = u.reactions || {};
+    u.customIdeas = u.customIdeas || [];   // advisor-authored ideas (Solutions view)
     return u;
   }
   function saveUser(u) { localStorage.setItem(LS_KEY, JSON.stringify(u)); }
@@ -162,8 +163,18 @@
      ======================================================================== */
 
   const TF = window.TODAY_FOCUS || {};
-  const FOCUS = [].concat(TF.earnings || [], TF.exEarnings || []).filter(i => !isDismissed(i.id));
-  const FOCUS_BY_ID = {}; FOCUS.forEach(i => { FOCUS_BY_ID[i.id] = i; });
+  /* the idea universe is REBUILDABLE: sweep ideas minus removed ones, plus the
+     advisor's own drafts (Solutions view). bookFit's cache clears on rebuild. */
+  const _fitCache = {};
+  let FOCUS = [], FOCUS_BY_ID = {};
+  function rebuildFocus() {
+    const sweep = [].concat(TF.earnings || [], TF.exEarnings || []).filter(i => !isDismissed(i.id));
+    const custom = (userData.customIdeas || []).filter(i => !isDismissed(i.id));
+    FOCUS = sweep.concat(custom);
+    FOCUS_BY_ID = {}; FOCUS.forEach(i => { FOCUS_BY_ID[i.id] = i; });
+    Object.keys(_fitCache).forEach(k => delete _fitCache[k]);
+  }
+  rebuildFocus();
 
   /* UI-only state (presentation): engagement bumps persisted separately from
      the engine's own store so nothing existing is disturbed. */
@@ -177,6 +188,8 @@
   const state = {
     tab: "feed",
     search: "", assetFilter: "All", clientFilter: "all", focusId: null,
+    savedOnly: !!uiData.savedOnly,
+    viewMode: uiData.viewMode === "solutions" ? "solutions" : "advisor",
     bookClientId: null, expanded: {}, selected: {},
     cmdIndex: 0,
   };
@@ -184,8 +197,7 @@
   const scoreColor = (v) => v >= 80 ? "#2C7A4B" : v >= 68 ? "#996F3D" : "#A97D48";
 
   /* book-level fit: the idea's best per-client fit from the LIVE engine.
-     Cached per idea id — pure read of MAPPING.scoreIdeaForClient. */
-  const _fitCache = {};
+     Cached per idea id (declared above, cleared by rebuildFocus). */
   function bookFit(idea) {
     if (_fitCache[idea.id]) return _fitCache[idea.id];
     let flags = [];
@@ -206,14 +218,31 @@
     return out;
   }
 
-  const authorOf = (idea) => idea.themeId
-    ? { name: "Solutions Desk", init: "SD", cls: "desk" }
-    : { name: "Claude's Views", init: "C", cls: "claude" };
+  const authorOf = (idea) => idea.custom
+    ? { name: "You — Solutions view", init: "A", cls: "desk" }
+    : idea.themeId
+      ? { name: "Solutions Desk", init: "SD", cls: "desk" }
+      : { name: "Claude's Views", init: "C", cls: "claude" };
 
-  function timeAgo() {
-    const asOf = new Date(TF.asOf + "T08:00:00");
-    const days = Math.max(0, Math.round((Date.now() - asOf.getTime()) / 86400000));
+  /* per-idea "posted Nd ago" — reads the idea's OWN postedAt (stamped by the build
+     ledger, only moved when the idea's argument changed), not the global sweep date. */
+  function daysSince(stamp) {
+    if (!stamp) return null;
+    const d = new Date(stamp + "T08:00:00");
+    if (isNaN(d)) return null;
+    return Math.max(0, Math.round((Date.now() - d.getTime()) / 86400000));
+  }
+  function timeAgo(idea) {
+    const days = daysSince((idea && idea.postedAt) || TF.asOf);
+    if (days == null) return "—";
     return days === 0 ? "today" : days + "d ago";
+  }
+  /* "updated Nd ago" chip — only when the idea was re-grounded after it was first posted */
+  function updatedAgo(idea) {
+    if (!idea || !idea.updatedAt || idea.updatedAt === idea.postedAt) return "";
+    const days = daysSince(idea.updatedAt);
+    if (days == null) return "";
+    return days === 0 ? "updated today" : "updated " + days + "d ago";
   }
 
   const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -462,22 +491,56 @@
       return ((b.conviction && b.conviction.score) || 0) - ((a.conviction && a.conviction.score) || 0);
     });
   }
-  const top3 = () => rankedIdeas().slice(0, 3);
+  /* TOP 3 — explicit, inspectable ranking: (1) breadth — how many of YOUR clients
+     the live engine flags it to; (2) the desk's conviction score as tiebreak; a
+     desk pin only breaks remaining ties. The 3 picks then display in conviction
+     order. This is deliberately different from the feed order (which leads with
+     best single-client fit): the rail answers "what matters to the most of my
+     book", the feed answers "what's strongest for someone". */
+  function top3() {
+    const scored = FOCUS.map(idea => ({
+      idea,
+      breadth: bookFit(idea).flags.length,
+      conv: (idea.conviction && idea.conviction.score) || 0,
+    }));
+    scored.sort((a, b) =>
+      (b.breadth - a.breadth) ||
+      (b.conv - a.conv) ||
+      ((b.idea.pinned ? 1 : 0) - (a.idea.pinned ? 1 : 0)));
+    return scored.slice(0, 3).sort((a, b) => b.conv - a.conv).map(s => s.idea);
+  }
 
   function renderBrief() {
     const d = new Date(TF.asOf + "T08:10:00");
     $("#feedEyebrow").textContent = `ORIGINATION FEED · AS OF ${fmtDateLong(d).toUpperCase()}`;
     $("#briefStamp").textContent = `${fmtDateLong(d).toUpperCase()} · 08:10 ET`;
-    const note = clampSentences((TF.sweep || {}).note || "", 3, 560);
-    const t3 = top3();
-    const actions = t3.map(i => i.name).join(" · ");
-    $("#briefText").textContent = note + (t3.length ? ` Net for your book today: ${t3.length} ideas lead the ranking — ${actions}.` : "");
+    const host = $("#briefText");
+    const brief = (TF.sweep || {}).brief;
+    if (Array.isArray(brief) && brief.length) {
+      /* authored desk brief: a few short, opinionated lines — the full sweep
+         note stays one tap away rather than filling the tile */
+      const lines = () => brief.map(l => `<p class="obb-line">${esc(l)}</p>`).join("");
+      const render = (full) => {
+        host.innerHTML = full
+          ? `<p class="obb-line obb-full">${esc((TF.sweep || {}).note || "")}</p><button type="button" class="obb-more" id="briefMore">◂ Back to the brief</button>`
+          : lines() + `<button type="button" class="obb-more" id="briefMore">Full sweep note ▸</button>`;
+        $("#briefMore").addEventListener("click", () => render(!full));
+      };
+      render(false);
+    } else {
+      const note = clampSentences((TF.sweep || {}).note || "", 3, 560);
+      const t3 = top3();
+      const actions = t3.map(i => i.name).join(" · ");
+      host.textContent = note + (t3.length ? ` Net for your book today: ${t3.length} ideas lead the ranking — ${actions}.` : "");
+    }
   }
 
   function renderTop3() {
     const host = $("#top3Rail");
     host.innerHTML = top3().map((idea, i) => {
       const bf = bookFit(idea);
+      const conv = (idea.conviction && idea.conviction.score) || 0;
+      const n = bf.flags.length;
       const active = state.focusId === idea.id;
       return `<button type="button" class="top3-tile${active ? " active" : ""}" data-focus="${esc(idea.id)}">
         <span class="top3-strip"></span>
@@ -485,7 +548,7 @@
           <span class="top3-rank">${i + 1}</span>
           <span class="top3-body">
             <span class="top3-title">${esc(idea.name)}</span>
-            <span class="top3-sub2">${idea.pinned ? `<b style="color:#9A7B4F">DESK PICK</b> · ` : ""}${esc((idea.ticker && idea.ticker !== "—" ? idea.ticker : idea.sector || "").toUpperCase())} · FIT <b>${bf.fit}</b>${active ? " · SHOWING" : ""}</span>
+            <span class="top3-sub2">${idea.pinned ? `<b style="color:#9A7B4F">DESK PICK</b> · ` : ""}${esc((idea.ticker && idea.ticker !== "—" ? idea.ticker : idea.sector || "").toUpperCase())} · <b>${n}</b> CLIENT${n === 1 ? "" : "S"} · CONV <b>${conv}</b>${active ? " · SHOWING" : ""}</span>
           </span>
         </span>
       </button>`;
@@ -503,11 +566,19 @@
   }
   function renderFilters() {
     const chips = ["All"].concat(assetClasses());
+    const savedN = FOCUS.filter(i => getReaction(i.id) === "like").length;
     $("#assetChips").innerHTML = chips.map(a =>
-      `<button type="button" class="ob-chip${state.assetFilter === a ? " active" : ""}" data-ac="${esc(a)}">${esc(a)}</button>`).join("");
-    $$("#assetChips .ob-chip").forEach(el => el.addEventListener("click", () => {
+      `<button type="button" class="ob-chip${state.assetFilter === a ? " active" : ""}" data-ac="${esc(a)}">${esc(a)}</button>`).join("")
+      + `<button type="button" class="ob-chip ob-chip-saved${state.savedOnly ? " active" : ""}" id="savedToggle" title="Show only ideas you’ve saved (tap ♥ on a card to save it)">♥ Saved${savedN ? ` <b>${savedN}</b>` : ""}</button>`;
+    $$("#assetChips .ob-chip[data-ac]").forEach(el => el.addEventListener("click", () => {
       state.assetFilter = el.dataset.ac; renderFilters(); renderFeed();
     }));
+    const st = $("#savedToggle");
+    if (st) st.addEventListener("click", () => {
+      state.savedOnly = !state.savedOnly;
+      uiData.savedOnly = state.savedOnly; saveUi();
+      renderFilters(); renderFeed();
+    });
     const sel = $("#clientFilter");
     sel.innerHTML = `<option value="all">All clients</option>` +
       (window.SEED.clients || []).map(c => `<option value="${esc(c.id)}"${state.clientFilter === c.id ? " selected" : ""}>${esc(c.name)}</option>`).join("");
@@ -528,6 +599,7 @@
 
   function feedIdeas() {
     let list = rankedIdeas();
+    if (state.savedOnly) list = list.filter(i => getReaction(i.id) === "like");
     if (state.focusId) list = list.filter(i => i.id === state.focusId);
     if (state.assetFilter !== "All") list = list.filter(i => i.assetClass === state.assetFilter);
     if (state.clientFilter !== "all") list = list.filter(i => {
@@ -552,15 +624,28 @@
     const liked = getReaction(idea.id) === "like";
     const rec = ideaTradeStatement(idea);
     const open = !!state.expanded[idea.id];
+    const upd = updatedAgo(idea);
+    const chartHTML = (idea.chart && window.BPCharts && window.BPCharts.ideaChart)
+      ? window.BPCharts.ideaChart(idea.chart) : "";
+    /* attribution: cite ONLY view-sources actually read (kind "view"); if the call
+       is entirely the desk's own, say so plainly — never a borrowed authority */
+    const vias = (idea.sources || []).filter(s => s && s.kind === "view").map(s => s.name);
+    const viaHTML = vias.length
+      ? `<div class="ip-via">Via ${esc(vias.join(" · "))}</div>`
+      : (idea.ownView ? `<div class="ip-via own">Own view — no outside research leaned on</div>` : "");
+    const sol = state.viewMode === "solutions";
+    const removeHTML = sol ? `<button type="button" class="ip-remove" data-remove="${esc(idea.id)}" title="${idea.custom ? "Delete this draft idea" : "Remove this idea from the feed"}">✕</button>` : "";
     return `<div class="ob-post" id="post-${esc(idea.id)}">
       <article class="ob-card">
         <div class="ip-head">
           <span class="ip-avatar ${a.cls}">${a.init}</span>
           <div class="ip-who">
             <div class="ip-author">${esc(a.name)}</div>
-            <div class="ip-meta">${esc(idea.assetClass)} · ${timeAgo()}</div>
+            <div class="ip-meta">${esc(idea.assetClass)} · ${timeAgo(idea)}${upd ? ` · <span class="ip-upd">${esc(upd)}</span>` : ""}</div>
           </div>
-          <button type="button" class="ip-fit" data-score="${esc(idea.id)}" title="How the desk scored this idea">
+          ${idea.custom
+            ? `<span class="ip-draftpill" title="Your own idea — not desk-scored; the conviction rubric only scores the sweep">DRAFT</span>`
+            : `<button type="button" class="ip-fit" data-score="${esc(idea.id)}" title="How the desk scored this idea">
             <span class="ip-fit-lbl">CONV</span>
             <span class="ip-ring">
               <svg width="36" height="36">
@@ -569,7 +654,8 @@
               </svg>
               <span class="ip-ring-n">${conv}</span>
             </span>
-          </button>
+          </button>`}
+          ${removeHTML}
         </div>
         <div class="ip-window">
           <div class="ob-strip4"></div>
@@ -585,11 +671,12 @@
               <div class="ip-wrec-k">RECOMMENDATION</div>
               <div class="ip-wrec-v">${esc(rec)}</div>
             </div>
+            ${chartHTML}${viaHTML}
             <button type="button" class="ip-more" data-more="${esc(idea.id)}" hidden>${open ? "– Show less" : "＋ Full thesis &amp; recommendation"}</button>
           </div>
         </div>
         <div class="ip-actions">
-          <button type="button" class="ip-like${liked ? " on" : ""}" data-like="${esc(idea.id)}">
+          <button type="button" class="ip-like${liked ? " on" : ""}" data-like="${esc(idea.id)}" title="${liked ? "Saved — tap to remove from Saved" : "Save / like — filter to these with ♥ Saved"}">
             <span class="ip-heart">♥</span><span class="ip-likecount">${likeCount(idea.id)}</span>
           </button>
           <button type="button" class="ip-btn" data-suit="${esc(idea.id)}"><span class="g">⑃</span> Idea Suitability</button>
@@ -627,8 +714,125 @@
     if (cfBtn) cfBtn.addEventListener("click", () => { state.focusId = null; renderTop3(); renderFeed(); });
 
     $("#feedList").innerHTML = list.map(ideaPostHTML).join("");
-    $("#feedEmpty").hidden = list.length > 0;
+    const empty = $("#feedEmpty");
+    empty.hidden = list.length > 0;
+    if (!list.length) {
+      empty.textContent = state.savedOnly
+        ? "No saved ideas yet — tap ♥ on any idea to save it here."
+        : "No ideas match — try a different search or filter.";
+    }
     wireFeed($("#feedList"));
+    renderSolBar();
+  }
+
+  /* ---- Solutions view: manage the feed (add drafts, remove/restore ideas) ---- */
+  function renderSolBar() {
+    const bar = $("#solBar");
+    if (!bar) return;
+    const sol = state.viewMode === "solutions";
+    bar.hidden = !sol;
+    if (!sol) return;
+    const removed = (userData.dismissedFocus || []).length;
+    bar.innerHTML = `
+      <span class="sol-k">SOLUTIONS VIEW</span>
+      <span class="sol-hint">You curate this feed — add your own ideas, remove the desk's.</span>
+      <span class="sol-spacer"></span>
+      ${removed ? `<button type="button" class="sol-restore" id="solRestore">↺ Restore ${removed} removed</button>` : ""}
+      <button type="button" class="sol-add" id="solAdd">＋ Add idea</button>`;
+    const add = $("#solAdd");
+    if (add) add.addEventListener("click", openIdeaComposer);
+    const rs = $("#solRestore");
+    if (rs) rs.addEventListener("click", () => {
+      userData.dismissedFocus = [];
+      saveUser(userData);
+      renderAll();
+      toast("All removed ideas restored.");
+    });
+  }
+
+  function setViewMode(mode) {
+    state.viewMode = mode === "solutions" ? "solutions" : "advisor";
+    uiData.viewMode = state.viewMode; saveUi();
+    document.body.classList.toggle("sol-mode", state.viewMode === "solutions");
+    $$(".obh-vbtn").forEach(b => b.classList.toggle("active", b.dataset.view === state.viewMode));
+    const meta = $(".obh-meta-1");
+    if (meta) meta.innerHTML = state.viewMode === "solutions"
+      ? `Solutions view <span>· Manage the feed</span>`
+      : `Advisor view <span>· Coverage book</span>`;
+    renderAll();
+  }
+
+  /* everything that reads FOCUS re-renders after the universe changes */
+  function renderAll() {
+    rebuildFocus();
+    renderBrief();
+    renderTop3();
+    renderToolkit();
+    renderFilters();
+    renderFeed();
+  }
+
+  function openIdeaComposer() {
+    const AC = ["Equity", "Fixed Income", "Commodity", "Multi-Asset"];
+    const BK = ["Growth", "Income", "Preservation", "Structured"];
+    openModal(`<div class="ob-overlay"><div class="ob-pop" style="max-width:640px">
+      <div class="ob-pop-head">
+        <div><div class="ob-pop-kicker">SOLUTIONS VIEW</div>
+        <div class="ob-pop-title">Add your own idea to the feed</div></div>
+        <button type="button" class="ob-pop-x" data-close>✕</button>
+      </div>
+      <div class="ic-form">
+        <div class="ic-row2">
+          <label class="ic-f"><span>Idea name *</span><input id="icName" placeholder="e.g. Trim EU luxury into the tariff review" /></label>
+          <label class="ic-f ic-sm"><span>Ticker</span><input id="icTicker" placeholder="e.g. MC.PA" /></label>
+        </div>
+        <div class="ic-row2">
+          <label class="ic-f"><span>Asset class</span><select id="icAsset">${AC.map(a => `<option>${a}</option>`).join("")}</select></label>
+          <label class="ic-f"><span>Goal bucket</span><select id="icBucket">${BK.map(b => `<option>${b}</option>`).join("")}</select></label>
+          <label class="ic-f"><span>Direction</span><select id="icDir"><option>long</option><option>short</option><option>neutral</option></select></label>
+        </div>
+        <label class="ic-f"><span>Thesis *</span><textarea id="icThesis" rows="3" placeholder="The argument — why this, why now."></textarea></label>
+        <label class="ic-f"><span>Recommendation *</span><textarea id="icRec" rows="2" placeholder="One precise sentence: instrument + direction + the view."></textarea></label>
+        <label class="ic-f"><span>Expressions (comma-separated)</span><input id="icStr" placeholder="e.g. Direct equity, Call spread, Buffered note" /></label>
+        <div class="ic-note">Drafts carry your name, are not desk-scored (no conviction ring), and map to clients through the same live fit engine as every other idea.</div>
+        <div class="ob-mailbtns"><button type="button" class="ob-btn-dark" id="icSave">Add to feed</button>
+        <button type="button" class="ob-btn-line" data-close>Cancel</button></div>
+      </div>
+    </div></div>`, (root) => {
+      $("#icSave", root).addEventListener("click", () => {
+        const name = $("#icName", root).value.trim();
+        const thesis = $("#icThesis", root).value.trim();
+        const rec = $("#icRec", root).value.trim();
+        if (!name || !thesis || !rec) { toast("Name, thesis and recommendation are required."); return; }
+        const bucket = $("#icBucket", root).value;
+        const idea = {
+          id: "custom-" + Date.now().toString(36),
+          custom: true,
+          name,
+          ticker: $("#icTicker", root).value.trim() || "—",
+          assetClass: $("#icAsset", root).value,
+          sector: $("#icAsset", root).value === "Equity" ? "Advisor idea" : $("#icAsset", root).value,
+          bucket,
+          goalType: bucket === "Income" ? "yield" : bucket === "Preservation" ? "protection" : "appreciation",
+          intent: bucket === "Income" ? "income" : bucket === "Preservation" ? "protect" : "add",
+          direction: $("#icDir", root).value,
+          riskProfile: { vol: "moderate", beta: "moderate", structured: bucket === "Structured" },
+          headline: name,
+          thesis,
+          tradeStatement: rec,
+          structures: $("#icStr", root).value.split(",").map(s => s.trim()).filter(Boolean),
+          themeId: null,
+          offThemeWhy: "Advisor-authored idea (Solutions view) — not part of the desk sweep.",
+          postedAt: new Date().toISOString().slice(0, 10),
+          sources: [],
+        };
+        userData.customIdeas.push(idea);
+        saveUser(userData);
+        closeModal();
+        renderAll();
+        toast("Idea added to the feed.");
+      });
+    });
   }
 
   function wireFeed(root) {
@@ -644,10 +848,30 @@
       const h = el.querySelector(".ip-heart");
       if (on) { h.classList.remove("pop"); void h.offsetWidth; h.classList.add("pop"); }
       refreshEngage(id);
+      renderFilters();                          // keep the ♥ Saved (n) count live
+      if (state.savedOnly && !on) renderFeed();  // drop a just-unsaved card from the saved view
     }));
     $$("[data-suit]", root).forEach(el => el.addEventListener("click", () => openSuit(el.dataset.suit)));
-    $$("[data-email]", root).forEach(el => el.addEventListener("click", () => openTailoredEmail(el.dataset.email)));
+    $$("[data-email]", root).forEach(el => el.addEventListener("click", () => {
+      const idea = FOCUS_BY_ID[el.dataset.email];
+      if (idea && idea.custom) { toast("Draft ideas don't have desk-authored email copy yet."); return; }
+      openTailoredEmail(el.dataset.email);
+    }));
     $$("[data-score]", root).forEach(el => el.addEventListener("click", () => openConvScore(el.dataset.score)));
+    /* Solutions view: remove a sweep idea from the feed (dismiss) or delete a draft */
+    $$("[data-remove]", root).forEach(el => el.addEventListener("click", () => {
+      const id = el.dataset.remove;
+      const idea = FOCUS_BY_ID[id];
+      if (idea && idea.custom) {
+        userData.customIdeas = (userData.customIdeas || []).filter(i => i.id !== id);
+        toast("Draft idea deleted.");
+      } else {
+        if (!userData.dismissedFocus.includes(id)) userData.dismissedFocus.push(id);
+        toast("Removed from the feed — restore any time from the Solutions bar.");
+      }
+      saveUser(userData);
+      renderAll();
+    }));
     $$("[data-more]", root).forEach(el => el.addEventListener("click", () => {
       const id = el.dataset.more;
       const open = !state.expanded[id];
@@ -1670,11 +1894,9 @@
     $("#cmdBtn").addEventListener("click", openCmd);
     document.addEventListener("keydown", onGlobalKey);
 
-    renderBrief();
-    renderTop3();
-    renderToolkit();
-    renderFilters();
-    renderFeed();
+    /* Advisor ↔ Solutions switch (Solutions = curate the feed: add/remove ideas) */
+    $$(".obh-vbtn").forEach(b => b.addEventListener("click", () => setViewMode(b.dataset.view)));
+    setViewMode(state.viewMode);   // applies persisted mode + does the initial render pass
     initAsk();
 
     const inp = $("#feedSearch");

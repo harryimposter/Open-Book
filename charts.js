@@ -142,9 +142,78 @@
     ).join("") + `</div>`;
   }
 
+  /* ---- Idea sparkline / band chart ---------------------------------------
+     Small, self-contained inline SVG for an idea card. Themed via CSS custom
+     properties (currentColor / var(--gold) etc.) so it flows with light/dark.
+     Data is a short, hand-embedded, SOURCED series — never a live feed. Shapes:
+       kind:"spark" — a price line with an optional shaded entry/add band + last dot
+       kind:"band"  — a series over a shaded reference band (e.g. an accrual range)
+     Both accept: { unit, series:[…], band:{lo,hi,label}, refs:[{y,label}], caption } */
+  function _fmt(v, unit) {
+    const n = (Math.round(v * 100) / 100);
+    const s = Number.isInteger(n) ? String(n) : n.toFixed(unit === "%" ? 2 : 2);
+    if (unit === "%") return s + "%";
+    if (unit === "$") return "$" + s;
+    return unit ? s + " " + unit : s;
+  }
+
+  function _lineChart(series, opts) {
+    opts = opts || {};
+    series = (series || []).filter(v => typeof v === "number");
+    if (series.length < 2) return "";
+    const unit = opts.unit || "";
+    const band = opts.band || null;
+    const refs = opts.refs || [];
+    const W = 340, H = 108, padL = 8, padR = 52, padT = 12, padB = 10;
+    const iw = W - padL - padR, ih = H - padT - padB;
+
+    // domain spans the series, the band and any reference lines, with a little headroom
+    const pool = series.slice();
+    if (band) { pool.push(band.lo, band.hi); }
+    refs.forEach(r => pool.push(r.y));
+    let lo = Math.min.apply(null, pool), hi = Math.max.apply(null, pool);
+    if (hi === lo) { hi += 1; lo -= 1; }
+    const padv = (hi - lo) * 0.08; lo -= padv; hi += padv;
+
+    const x = i => padL + (iw * i) / (series.length - 1);
+    const y = v => padT + ih * (1 - (v - lo) / (hi - lo));
+
+    const bandRect = band
+      ? `<rect x="${padL}" y="${y(band.hi).toFixed(1)}" width="${iw}" height="${(y(band.lo) - y(band.hi)).toFixed(1)}" fill="var(--gold)" opacity="0.14"/>
+         <line x1="${padL}" x2="${padL + iw}" y1="${y(band.hi).toFixed(1)}" y2="${y(band.hi).toFixed(1)}" stroke="var(--gold)" stroke-width="1" opacity="0.5" stroke-dasharray="2 3"/>
+         <line x1="${padL}" x2="${padL + iw}" y1="${y(band.lo).toFixed(1)}" y2="${y(band.lo).toFixed(1)}" stroke="var(--gold)" stroke-width="1" opacity="0.5" stroke-dasharray="2 3"/>`
+      : "";
+    const refLines = refs.map(r =>
+      `<line x1="${padL}" x2="${padL + iw}" y1="${y(r.y).toFixed(1)}" y2="${y(r.y).toFixed(1)}" stroke="var(--bronze-l)" stroke-width="1" stroke-dasharray="4 3" opacity="0.8"/>
+       <text x="${padL + iw}" y="${(y(r.y) - 3).toFixed(1)}" text-anchor="end" font-family="var(--sans)" font-size="9" fill="var(--bronze-l)">${r.label || _fmt(r.y, unit)}</text>`
+    ).join("");
+
+    const pts = series.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(" ");
+    const lastX = x(series.length - 1), lastY = y(series[series.length - 1]);
+    const line = `<polyline points="${pts}" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
+    const dot = `<circle cx="${lastX.toFixed(1)}" cy="${lastY.toFixed(1)}" r="3.2" fill="var(--gold)"/>
+      <text x="${(lastX + 6).toFixed(1)}" y="${(lastY + 3.5).toFixed(1)}" font-family="var(--sans)" font-size="10.5" font-weight="700" fill="var(--cream)">${_fmt(series[series.length - 1], unit)}</text>`;
+
+    return `<svg viewBox="0 0 ${W} ${H}" width="100%" height="${H}" role="img" preserveAspectRatio="xMidYMid meet">${bandRect}${refLines}${line}${dot}</svg>`;
+  }
+
+  /* dispatcher used by the idea card. Returns a full <figure> or "" if no/blank data. */
+  function ideaChart(chart) {
+    if (!chart || !Array.isArray(chart.series) || chart.series.length < 2) return "";
+    const svg = _lineChart(chart.series, chart);
+    if (!svg) return "";
+    const bandLbl = chart.band && chart.band.label
+      ? `<span class="ipc-band"><i></i>${chart.band.label}</span>` : "";
+    const cap = chart.caption ? `<figcaption class="ipc-cap">${chart.caption}</figcaption>` : "";
+    return `<figure class="ip-chart">${bandLbl ? `<div class="ipc-key">${bandLbl}</div>` : ""}${svg}${cap}</figure>`;
+  }
+  const sparkline = (series, opts) => _lineChart(series, opts || {});
+  const bandChart = (series, opts) => _lineChart(series, opts || {});
+
   window.BPCharts = {
     PALETTE, donut, legend, splitSegments, bucketAlloc, bucketSegments,
     applyTrade, targetDistance, fundingBar,
-    goalTargetBar3, goalGlossary3
+    goalTargetBar3, goalGlossary3,
+    sparkline, bandChart, ideaChart
   };
 })();

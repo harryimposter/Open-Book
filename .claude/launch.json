@@ -12,6 +12,18 @@
       "runtimeExecutable": "python",
       "runtimeArgs": ["-m", "http.server", "5546", "--directory", "C:/Users/harin/OneDrive/Desktop/Claude Code/Open Book"],
       "port": 5546
+    },
+    {
+      "name": "openbook-verify",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "5547", "--directory", "C:/Users/harin/OneDrive/Desktop/Claude Code/Open Book"],
+      "port": 5547
+    },
+    {
+      "name": "derivs-static",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "5548", "--directory", "C:/Users/harin/OneDrive/Desktop/Claude Code/Derivs-Safe-Space/out"],
+      "port": 5548
     }
   ]
 }
