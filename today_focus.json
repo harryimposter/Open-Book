@@ -7,25 +7,28 @@
       "CNBC",
       "WSJ",
       "Bloomberg",
-      "BLS",
+      "Financial Times",
+      "Trading Economics",
       "Yahoo Finance",
       "World Gold Council",
-      "Barron's"
+      "SemiAnalysis",
+      "am/FX (Brent Donnelly)",
+      "MUFG Research"
     ],
     "rule": "A fact is stated only if >=2 independent sources agree. Pending/forward events are kept in the future tense. Every datapoint is tagged sourced or estimated.",
     "brief": [
-      "The tape is buying its own contradiction: Dow through 53,000 and semis ripping while the market takes an axe to the people writing the cheques — Microsoft at ~$370 and ~22x is pricing the AI build-out as a cost centre, not a moat. One of those two views is wrong.",
-      "Rates won't referee it this week — the 10Y is back on 4.5%'s doorstep into Warsh's first minutes and a 3s/10s/30s supply run; the 4–5% box holds until the minutes or the auctions say otherwise, and you're paid to assume it holds.",
-      "The yen at 162 is the cleanest binary on the board: Tokyo's silence is itself a position, the carry crowd is calling the bluff, and short-dated optionality is the only honest way to have an opinion."
+      "The overnight tape flipped the script: an Iranian missile hit a Qatari LNG tanker in the Strait of Hormuz, putting a war premium back into a crude market that had just written it off — and Asia sold the AI complex hard (KOSPI -3.6%, Nikkei -2.2%). Yet the S&P closed Monday at a record with the VIX at 15.6. A live geopolitical tail and cheap insurance rarely sit together this long — own the convexity in oil and the index.",
+      "The 'capex is a cost centre' trade is quietly reversing: Microsoft has bounced ~$14 off its late-June low to ~$387 and Broadcom is +3.7% to ~$374 — both still down ~20-24%, so the fade-the-derate structures are working, not broken. SemiAnalysis (6-Jul) says the build-out is now being debt-financed; Citrini says the trade is crowded. Both are right, which is why you own it with defined risk.",
+      "The yen slipped back under 162 to ~161.8 as the intervention ambush never came; with the Fed at 3.50-3.75% and the BoJ only at 1.00%, the two-sided binary — a surprise MoF op versus a carry that the differential keeps feeding — is still the cleanest event-vol trade on the board (Brent Donnelly maps a unilateral op to a 157-158 buy zone)."
     ],
-    "note": "Tuesday-morning desk sweep as of 7-Jul-2026, reading off Monday's reopened tape after the long Independence-Day weekend, into a data- and earnings-heavy week. The reopen was risk-on: the Dow closed above 53,000 for the first time (~53,056, +0.3%), the S&P 500 ran to ~7,537 (+0.7%) and the Nasdaq to ~26,121 (+1.1%) as semiconductors and Tesla led a tech rebound — a reversal of last week's cyclicals-over-tech split. That week set the backdrop: the June jobs report (2-Jul) landed soft — nonfarm payrolls +57K vs a ~115K consensus, April/May revised down a combined 74K, unemployment 4.2% only because participation fell 0.3pp to 61.5% (lowest since Mar-2021). Markets read it dovish for the hike cycle — September-HIKE odds faded to ~50% (from ~64%), a July hike is largely priced out (~22%), and the dollar softened. Rates: the 10Y edged up ~1bp to ~4.49%, back testing the 4.5% area; the Fed's band is 3.50-3.75% and Chair Kevin Warsh (Sintra, 1-Jul) said inflation expectations had eased and gave no forward guidance. FX: DXY ~101; EUR/USD ~1.142 (ECB 2.25%); GBP/USD ~1.334 (BoE 3.75%, next 30-Jul). USD/JPY is the standout — ~162, back through the 162.00 'line in the sand' at ~40-year lows for the yen; MoF's Katayama repeats authorities will act 'at any time,' Reuters flags Japan may intervene WITHOUT pre-signalling, and Goldman lifted its USD/JPY forecast while warning intervention would slow, not reverse, the trend — no operation has yet materialised. Commodities: gold firmed to ~$4,176 (highest since the late-Jan run; still well below the 29-Jan record $5,595); Brent ~$72 and WTI ~$69 with the war premium bled out and OPEC+ having agreed a modest +188K b/d hike. VIX ~16. The standout dislocation is the hyperscaler complex, which has kept derating even as the tape rebounds: Microsoft trades ~$370 — roughly -23% YTD and ~-17% in June — as the market frets the ~$190B 2026 AI-capex bill and its payback window, with Oppenheimer cutting its MSFT target to $515; a >10% cut to any hyperscaler's forward capex guide would ripple straight to NVDA/AVGO. Week ahead (7-10 Jul): Wednesday's June FOMC minutes — the first under Chair Warsh — headline the hike-bias read, alongside 3/10/30-year Treasury supply (Tue-Thu) and Thursday jobless claims; Q2 earnings open with Levi Strauss (Wed 8-Jul, after close), PepsiCo (Thu 9-Jul, pre-open) and Delta (Fri 10-Jul, pre-open, the travel bellwether). No CPI this week; a tariff overhang — the US declined to renew its trade pact with Mexico and Canada — is a background risk. Implied moves are options-desk estimates (labelled estimated); consensus figures are flagged where not dual-confirmed."
+    "note": "Tuesday 6am-London desk sweep, 7-Jul-2026. The read splits cleanly into a record-setting Monday US close and a risk-off Tuesday Asia session on a fresh geopolitical shock. MONDAY (US, sourced): the Dow closed above 53,000 for the first time (53,056, +0.29%), the S&P 500 at a record 7,537 (+0.72%) and the Nasdaq at 26,121 (+1.12%) as chips rebounded; VIX 15.57. OVERNIGHT (Asia, sourced): an Iranian missile struck the Qatari LNG carrier Al Rekayyat (owner Nakilat) in the Strait of Hormuz early Tuesday — the first vessel strike since the interim truce — triggering pan-Asia risk-off: KOSPI -3.6% (Samsung -4% despite a record-profit beat; SK Hynix -1.8%, its Nasdaq ADR debuts 10-Jul), Nikkei ~-2.2%, Hang Seng modestly lower, Shanghai ~-1.5%; the PBoC set a weaker-than-expected USD/CNY fix (6.8054 vs 6.7838 est). The attack re-injects a war premium into oil after Brent had fallen ~10% the prior week on Hormuz-reopening hopes (Brent ~$72, WTI ~$69 pre-reaction; OPEC+ agreed a third +188K b/d step for August on 5-Jul). BACKDROP: the June jobs report (2-Jul) was soft — payrolls +57K vs ~115K consensus, April/May revised down a combined 74K, unemployment 4.2% on a falling participation rate — fading September-hike odds to ~50% (from ~64%; July hike ~20%). RATES: 10Y ~4.48%, back testing 4.5%; the 30Y sits right on the 5.00% handle; Fed band 3.50-3.75%; 3/10/30-year auctions run Tue-Thu and the June FOMC minutes (first under Chair Warsh) land Wednesday 9-Jul. FX: DXY eased to ~100.85; EUR/USD ~1.142 (ECB deposit rate 2.25%, hiked 11-Jun); GBP/USD recovered to ~1.339 (BoE 3.75%, next 30-Jul); USD/JPY ~161.8, back under the 162.00 'line' with no intervention yet and the BoJ now at 1.00% (hiked 16-Jun). COMMODITIES: gold ~$4,130, softening intraday but with a fresh Hormuz bid (Goldman trimmed its target to ~$4,900 in June; JPMorgan still ~$6,000). DISLOCATION: the hyperscaler complex has BOUNCED off last week's lows — MSFT ~$387 (~-20% YTD, up ~$14 off the 30-Jun low), AVGO ~$374 (+3.7% Monday, ~-24% off its 2-Jun ATH), NVDA ~$196 (roughly flat YTD); Oppenheimer's MSFT target is $515 (cut from $630) while the Street mean stays ~$565. WEEK AHEAD: Levi Strauss (Wed 8-Jul), PepsiCo (Thu 9-Jul, pre-open), Delta (Fri 10-Jul, pre-open) open Q2 earnings; a USMCA overhang persists after the US declined to renew the pact (now a 10-year annual-review process). Implied moves are options-desk estimates (labelled estimated); consensus figures are flagged where not dual-confirmed."
   },
   "earnings": [
     {
       "id": "mu-fq3-react",
       "direction": "long",
       "stance": "post-print",
-      "tradeStatement": "Stay long Micron (MU) but express it with discipline — a week-plus after the record FQ3 (rev $41.46B, EPS $25.11, ~$50B Q4 guide, GM ~86%) the stock has kept fading, down to ~$976 (roughly a fifth off the 25-Jun ATH near $1,213) as the post-print momentum rolled over into a rate-wary, tech-heavy pullback; the HBM/AI-memory thesis is confirmed AND priced, so for concentrated holders monetise the level with a zero-cost collar or call-overwrite, and add on the pullbacks the fade is now handing you rather than chasing.",
+      "tradeStatement": "Stay long Micron (MU) but express it with discipline — two weeks after the record FQ3 (rev $41.46B, EPS $25.11, ~$50B Q4 guide, GM ~86%) the stock has round-tripped part of its spike to ~$985 (roughly a fifth off the 25-Jun ATH near $1,213), and the pricing thesis keeps getting louder (The Transcript, 30-Jun: DRAM revenue +343% YoY driven by price, shortages seen through 2028); the HBM/AI-memory thesis is confirmed AND largely priced, so for concentrated holders monetise the level with a zero-cost collar or call-overwrite, and add on the pullbacks the fade is now handing you rather than chasing.",
       "intent": "add",
       "action": "Ride / monetise the gap",
       "preferredExpression": "Zero-cost collar",
@@ -42,7 +45,7 @@
       },
       "naturalExpression": "Direct equity",
       "headline": "Micron's record blow-out is confirmed and priced — and the fade has extended to ~$976, roughly a fifth off its late-June ATH.",
-      "thesis": "Micron reported FQ3 (ended 28-May) after the close on 24 June and it was the print of the quarter: record revenue $41.46B (beating ~$35.25B consensus), non-GAAP EPS $25.11 (vs ~$20.28), and a Q4 guide of ~$50B ±$1B (~86% gross margin), with 16 strategic customer agreements (~$22B of deposits/commitments) underpinning it. HBM3E/HBM4 are sold out through calendar 2027 with demand into 2028; HBM4 12-high is ramping ~2x faster than HBM3E. The stock gapped to an all-time high near $1,213 on 25 June (Goldman lifted its target to $1,100, though kept a Neutral rating), then FADED — trading ~$976 by early July, roughly a fifth off the peak, as the post-print momentum rolled over and the chip complex extended its pullback around the soft June jobs print, with the 10Y off its 4.5% test. The 2027 pricing thesis is confirmed but largely in the price — this is a 'how do I hold a name that just made and gave back a new high' problem, not a 'buy the event'. For concentrated holders, monetise the move with a collar or overwrite; for others, the post-ATH fade is now handing you the dip to add into, not the strength.",
+      "thesis": "Micron reported FQ3 (ended 28-May) after the close on 24 June and it was the print of the quarter: record revenue $41.46B (beating ~$35.25B consensus), non-GAAP EPS $25.11 (vs ~$20.28), and a Q4 guide of ~$50B ±$1B (~86% gross margin), with 16 strategic customer agreements (~$22B of deposits/commitments) underpinning it. HBM3E/HBM4 are sold out through calendar 2027 with demand into 2028; HBM4 12-high is ramping ~2x faster than HBM3E. The stock gapped to an all-time high near $1,213 on 25 June (Goldman lifted its target to $1,100, though kept a Neutral rating), then FADED — trading ~$985 by 7 July, roughly a fifth off the peak, as the post-print momentum rolled over and the chip complex whipsawed (Monday's US chip rebound, then a Tuesday Asia selloff that took Samsung -4% and SK Hynix -1.8% despite a record Samsung profit beat). The 2027 pricing thesis is confirmed and reinforced — The Transcript's 30-Jun earnings-call read flags DRAM revenue +343% YoY on PRICE (not volume) and memory shortages 'everlasting' through 2028 — but it is largely in the price — this is a 'how do I hold a name that just made and gave back a new high' problem, not a 'buy the event'. For concentrated holders, monetise the move with a collar or overwrite; for others, the post-ATH fade is now handing you the dip to add into, not the strength.",
       "themeId": "ai",
       "offThemeWhy": null,
       "structures": [
@@ -82,11 +85,11 @@
             "key": "positioning",
             "score": 1,
             "dq": "estimated",
-            "note": "Crowded long that gapped to ATHs then gave ~15% back — momentum has clearly rolled over, not a washed-out or short-squeeze setup. RSI 48 — no sentiment extreme. [sourced: TradingView].",
+            "note": "Crowded long that gapped to ATHs then gave ~15% back — momentum has clearly rolled over, not a washed-out or short-squeeze setup. RSI 49 — no sentiment extreme. [sourced: TradingView].",
             "authoredNote": "Crowded long that gapped to ATHs then gave ~15% back — momentum has clearly rolled over, not a washed-out or short-squeeze setup.",
             "indicators": {
-              "rsi": 48.5,
-              "asOf": "2026-07-06 06:05 UTC",
+              "rsi": 49.0,
+              "asOf": "2026-07-07 05:31 UTC",
               "symbol": "NASDAQ:MU",
               "direction": "long"
             }
@@ -98,9 +101,9 @@
         "reportWhen": "after close",
         "result": "Blow-out beat — record revenue $41.46B (vs ~$35.25B est), non-GAAP EPS $25.11 (vs ~$20.28); Q4 guided to ~$50B ±$1B with gross margin ~86%; HBM sold out through CY2027 into 2028",
         "resultSource": "sourced",
-        "reaction": "Shares gapped to an all-time high near $1,213 on 25 Jun (Goldman raised its target to $1,100 from $900, keeping Neutral), then faded to ~$976 by early July — roughly a fifth off the peak — as momentum rolled over into a softer, rate-wary, tech-heavy tape",
+        "reaction": "Shares gapped to an all-time high near $1,213 on 25 Jun (Goldman raised its target to $1,100 from $900, keeping Neutral), then faded to ~$985 by 7 July — roughly a fifth off the peak — as momentum rolled over into a whippy, rate-wary tape (a Monday US chip rebound, a Tuesday Asia memory selloff)",
         "reactionSource": "sourced",
-        "watch": "2027 HBM pricing durability, the HBM4 ramp, and whether the post-ATH fade finds support or extends with the AI/semis complex off its highs."
+        "watch": "2027 HBM pricing durability, the HBM4 ramp, SK Hynix's Nasdaq ADR debut (10-Jul) as a memory-complex sentiment tell, and whether the post-ATH fade finds support or extends with the AI/semis complex off its highs."
       },
       "facts": [
         {
@@ -112,7 +115,11 @@
           "tag": "sourced"
         },
         {
-          "text": "MU gapped to an ATH near $1,213 on 25 Jun (Goldman to $1,100, Neutral), then faded to ~$976 by early July — roughly a fifth off the peak — as the chip complex extended its pullback around the soft jobs print",
+          "text": "MU gapped to an ATH near $1,213 on 25 Jun (Goldman to $1,100, Neutral), then faded to ~$985 by 7 July — roughly a fifth off the peak — as the chip complex whipsawed (Monday US rebound, Tuesday Asia memory selloff, Samsung -4% / SK Hynix -1.8% on a record Samsung beat)",
+          "tag": "sourced"
+        },
+        {
+          "text": "The Transcript (30-Jun earnings-call read): Micron DRAM revenue +343% YoY on PRICE not volume, with memory shortages seen as 'everlasting for a couple of quarters' through 2028",
           "tag": "sourced"
         }
       ],
@@ -122,12 +129,17 @@
           "kind": "data"
         },
         {
-          "name": "MacroTrends / Yahoo Finance (MU price)",
+          "name": "MacroTrends / Yahoo Finance (MU price ~$985)",
           "kind": "data"
         },
         {
-          "name": "CNBC / 247WallSt",
+          "name": "CNBC / 247WallSt (chip tape, Samsung/SK Hynix)",
           "kind": "news"
+        },
+        {
+          "name": "The Transcript — Catalyst Watch, 30-Jun-2026 (memory pricing & shortages)",
+          "kind": "view",
+          "basis": "Read via web sweep 7-Jul-2026 (thetranscript.substack.com, 30-Jun 'Catalyst Watch'): synthesises earnings-call commentary that DRAM revenue rose +343% YoY on price and memory shortages run through 2028 — used to corroborate the durability of the HBM/DRAM pricing leg of the thesis."
         }
       ]
     },
@@ -152,7 +164,7 @@
       },
       "naturalExpression": "Direct equity",
       "headline": "Delta kicks off travel earnings pre-market 10 July — a fuel-aided bar into peak summer, but the stock runs in overbought",
-      "thesis": "Delta reports fiscal Q2 2026 before the opening bell on Friday 10 July — the first read on how peak-summer travel demand and premium-cabin/loyalty resilience are holding up. Consensus clusters around ~$1.44 diluted EPS (the Street spread is wide, $1.43-1.54) on revenue ~$17.5B, roughly flat-to-modestly higher YoY. The setup has two supports: sharply softer jet fuel — the IATA jet-fuel benchmark eased from ~$141.6/bbl in June toward ~$116.6 in early July as crude retreated (WTI ~$68.8, Brent ~$71.9, the lowest since late-February after the US-Iran war premium bled out) — is a direct margin tailwind, and Delta's mix keeps tilting toward higher-margin premium and loyalty revenue that is less sensitive to a slowing main cabin. The offset: the stock has rallied into the print and screens overbought (RSI ~72), so a lot of the good news may be in. This is off the desk's strategic themes but a genuine dated catalyst for any book with consumer-cyclical or travel exposure, and a bellwether for the broader industrials/consumer read into Q3. Best expressed pre-print with a defined-risk structure — cash-secured puts to get paid to wait for a better entry, or a reverse convertible — rather than chasing an overbought name into an event.",
+      "thesis": "Delta reports fiscal Q2 2026 before the opening bell on Friday 10 July — the first read on how peak-summer travel demand and premium-cabin/loyalty resilience are holding up. Consensus clusters around ~$1.44 diluted EPS (the Street spread is wide, $1.43-1.54) on revenue ~$17.5B, roughly flat-to-modestly higher YoY. The setup has two supports: sharply softer jet fuel — the IATA jet-fuel benchmark eased from ~$141.6/bbl in June toward ~$116.6 in early July as crude retreated (WTI ~$68.8, Brent ~$71.9, the lowest since late-February after the US-Iran war premium bled out) — is a direct margin tailwind, and Delta's mix keeps tilting toward higher-margin premium and loyalty revenue that is less sensitive to a slowing main cabin. The offset is now two-sided: the stock has rallied into the print and screens overbought (RSI ~72), AND the overnight Strait-of-Hormuz tanker strike (7-Jul) has re-armed the oil-price tail — the single biggest swing factor in the fuel-tailwind leg, so a sustained crude spike into the print would erode the very support this trade leans on. This is off the desk's strategic themes but a genuine dated catalyst for any book with consumer-cyclical or travel exposure, and a bellwether for the broader industrials/consumer read into Q3. Best expressed pre-print with a defined-risk structure — cash-secured puts to get paid to wait for a better entry, or a reverse convertible — rather than chasing an overbought name into an event.",
       "themeId": null,
       "offThemeWhy": "No standing desk theme on airlines/travel — this is a single-name, dated earnings catalyst judged on its own merit, not a strategic house view.",
       "structures": [
@@ -161,7 +173,7 @@
         "Direct equity",
         "Buffered note"
       ],
-      "changeMyMind": "A guide-down on softening main-cabin demand or a corporate-travel air-pocket outweighing the fuel tailwind — evidence the consumer is rolling over turns the pre-position into a pass.",
+      "changeMyMind": "A guide-down on softening main-cabin demand or a corporate-travel air-pocket outweighing the fuel tailwind — or a sustained Hormuz-driven crude spike that reverses the cheaper-jet-fuel support before the print — turns the pre-position into a pass.",
       "conviction": {
         "pillars": [
           {
@@ -186,11 +198,11 @@
             "key": "positioning",
             "score": 1,
             "dq": "estimated",
-            "note": "Cyclical, sentiment-sensitive name; some caution priced but no clean positioning extreme into the print. RSI 72 — crowd already long — unwind risk. [sourced: TradingView].",
+            "note": "Cyclical, sentiment-sensitive name; some caution priced but no clean positioning extreme into the print. RSI 68 — no sentiment extreme. [sourced: TradingView].",
             "authoredNote": "Cyclical, sentiment-sensitive name; some caution priced but no clean positioning extreme into the print.",
             "indicators": {
-              "rsi": 72.0,
-              "asOf": "2026-07-06 06:05 UTC",
+              "rsi": 67.9,
+              "asOf": "2026-07-07 05:31 UTC",
               "symbol": "NYSE:DAL",
               "direction": "long"
             }
@@ -205,7 +217,7 @@
         "historicalAvgMovePct": 6.0,
         "historicalSource": "estimated",
         "impliedVsHist": "rich",
-        "watch": "Summer-travel demand and load factors, premium-cabin/loyalty revenue, unit costs (CASM) against the cheaper jet-fuel tailwind, and the full-year guide."
+        "watch": "Summer-travel demand and load factors, premium-cabin/loyalty revenue, unit costs (CASM) against the cheaper jet-fuel tailwind, the Hormuz/oil path as a live threat to that tailwind, and the full-year guide."
       },
       "facts": [
         {
@@ -237,7 +249,7 @@
     {
       "id": "msft-capex-pullback",
       "direction": "long",
-      "tradeStatement": "Buy the Microsoft (MSFT) AI-capex drawdown with a defined-risk structure — a 3-6 month call spread (or a buffered note for conservative books) struck off ~$370, ~23% below the year's high, to fade an overdone derate into the late-July print where the ~$190B 2026 capex guide is the swing factor; defined risk because the same print is the two-sided catalyst.",
+      "tradeStatement": "Own the Microsoft (MSFT) AI-capex-derate reversal with a defined-risk structure — a 3-6 month call spread (or a buffered note for conservative books) struck off ~$385, still ~20% below the year's high after a ~$14 bounce from the 30-Jun low, into the late-July print where the ~$190B 2026 capex guide is the swing factor; defined risk because the same print is the two-sided catalyst.",
       "intent": "add",
       "action": "Buy the pullback (defined-risk)",
       "preferredExpression": "Call spread",
@@ -255,23 +267,42 @@
       "naturalExpression": "Call spread",
       "tactical": true,
       "triggered": true,
-      "trigger": "Live dislocation: MSFT has derated to ~$370 — roughly -23% YTD and ~-17% in June — as the market prices the ~$190B 2026 AI-capex bill as pure cost, a >15% drawdown in a widely-held quality compounder into a dated late-July FQ4 print where the capex guide is the swing factor. A sharp, sourced move in a name most books own is a flag now, not noise.",
+      "trigger": "Live dislocation, now reversing: MSFT derated to a ~$373 low on 30-Jun on AI-capex-payback fear and has bounced ~$14 to ~$387 (still ~-20% YTD) — a widely-held quality compounder ~20% off its high, into a dated late-July FQ4 print where the ~$190B capex guide is the swing factor. The bounce is the fade-the-derate thesis starting to work, not a reason to stand down; Citrini (24-Jun) explicitly frames these as positioning-driven 10-15% drawdowns in names still worth owning. A sharp, sourced move in a name most books hold is a flag, not noise.",
       "levels": {
         "tenor": "3-6 months (through the late-July print)",
-        "entry": "MSFT ~$365-375 (spot ~$370, ~23% off the high)",
-        "target": "$470-500 partial; Street consensus PT ~$561",
-        "stop": "close below ~$330 (capex-guide breakdown) / structure premium at risk"
+        "entry": "MSFT ~$375-390 (spot ~$387, ~20% off the high; add on dips toward $375)",
+        "target": "$470-500 partial; Street mean PT ~$565",
+        "stop": "close below ~$345 (near the 52-wk low $349) / structure premium at risk"
       },
       "chart": {
         "kind": "spark",
         "unit": "$",
-        "series": [481, 470, 458, 444, 430, 414, 398, 384, 371],
-        "band": { "lo": 365, "hi": 380, "label": "Add zone $365-380" },
-        "refs": [ { "y": 561, "label": "Cons. PT ~$561" } ],
-        "caption": "MSFT indicative 2026 path into ~$370 (~-23% YTD). Shaded = add zone; Street mean PT ~$561 (52 buy / 0 sell). Levels sourced; line indicative."
+        "series": [
+          481,
+          470,
+          455,
+          438,
+          420,
+          401,
+          384,
+          373,
+          387
+        ],
+        "band": {
+          "lo": 375,
+          "hi": 390,
+          "label": "Add zone $375-390"
+        },
+        "refs": [
+          {
+            "y": 565,
+            "label": "Cons. PT ~$565"
+          }
+        ],
+        "caption": "MSFT indicative 2026 path — derate to the 30-Jun ~$373 low, then a bounce to ~$387 (~-20% YTD). Shaded = add zone; Street mean PT ~$565 (52 buy / 0 sell). Levels sourced; line indicative."
       },
-      "headline": "Microsoft is down ~23% YTD on AI-capex-payback fear — fade an overdone derate in a quality compounder with a defined-risk call spread into the July print",
-      "thesis": "Microsoft has been re-rated harder than the franchise warrants: ~$370, roughly -23% YTD and ~-17% in June, as the market treats the ~$190B of planned 2026 AI infrastructure spend (Q3 capex ~$30.9B, +84% YoY) as a margin drag with an unproven payback rather than the build-out behind Azure/Copilot monetization. The tell is that sell-side conviction has NOT broken with the price — roughly 52 buy / 0 sell ratings and a mean target near $561 (~50%+ upside), even after Oppenheimer trimmed its target to $515 on the capex line — while the multiple has compressed to a ~22 P/E near the low end of its multi-year range. The variant view: the derate prices capex as cost and gives the monetization ramp (what Citrini frames as the shift from free-AI to tokenomics) little credit; if the payback window holds, this is a dip in a compounder, not a broken thesis. Because the late-July FQ4 print is genuinely two-sided (a raised capex guide into any Azure deceleration would confirm the fear), express it with DEFINED risk — a 3-6 month call spread, or a buffered note for conservative books — not naked length.",
+      "headline": "Microsoft is ~20% off its high but bouncing off the late-June low — own the AI-capex-derate reversal in a quality compounder with a defined-risk call spread into the July print",
+      "thesis": "Microsoft was re-rated harder than the franchise warrants — to a ~$373 low on 30-Jun, roughly -23% YTD at the trough — as the market treated the ~$190B of planned 2026 AI infrastructure spend (Q3 capex ~$30.9B, +84% YoY) as a margin drag with an unproven payback rather than the build-out behind Azure/Copilot monetization. It has since bounced ~$14 to ~$387 (~-20% YTD), the derate starting to reverse. The tell throughout is that sell-side conviction never broke with the price — roughly 52 buy / 0 sell ratings and a mean target near $565 (~45%+ upside), even after Oppenheimer cut its target to $515 (from $630) on the capex line — while the multiple compressed to a ~22 P/E near the low end of its multi-year range. Two independent voices frame the setup: SemiAnalysis (6-Jul) argues the build-out is now debt-financed (cumulative AI capex ~$11.1T through 2029; financing, not chips or power, the binding constraint) — i.e. the spend is real and funded, not discretionary cost; and Citrini (24-Jun), while flagging the AI trade as crowded and trimming exposure, expects exactly these positioning-driven 10-15% drawdowns in names still worth owning. The variant view: the market priced capex as pure cost; if the payback window holds, this was a dip in a compounder, not a broken thesis. Because the late-July FQ4 print is genuinely two-sided (a raised capex guide into any Azure deceleration would confirm the fear), express it with DEFINED risk — a 3-6 month call spread, or a buffered note — not naked length.",
       "themeId": "ai",
       "offThemeWhy": null,
       "structures": [
@@ -281,18 +312,18 @@
         "Direct equity"
       ],
       "variant": {
-        "street": "Overwhelmingly bullish on fundamentals (52 buy / 0 sell, mean PT ~$561) but the price has ignored them through the capex scare",
-        "us": "The derate is overdone for a compounder whose sell-side thesis is intact; own the recovery with defined risk into a two-sided print",
-        "gap": "Market prices ~$190B capex as cost with no payback credit; if monetization/tokenomics holds, the multiple re-rates back up"
+        "street": "Overwhelmingly bullish on fundamentals (52 buy / 0 sell, mean PT ~$565) and the price is now beginning to catch up after ignoring them through the capex scare",
+        "us": "The derate was overdone for a compounder whose sell-side thesis is intact; the bounce off ~$373 is the recovery starting — own it with defined risk into a two-sided print",
+        "gap": "Market priced ~$190B capex as cost with no payback credit; SemiAnalysis says the spend is debt-financed and real; if monetization holds, the multiple re-rates back up"
       },
-      "changeMyMind": "A late-July print that pairs a RAISED capex guide with a decelerating Azure — spend rising as monetization stalls — or management conceding the AI payback window is lengthening; that turns an overdone dip into a justified re-rating lower.",
+      "changeMyMind": "A late-July print that pairs a RAISED capex guide with a decelerating Azure — spend rising as monetization stalls — or management conceding the AI payback window is lengthening; that turns the bounce back into a justified re-rating lower.",
       "conviction": {
         "pillars": [
           {
             "key": "asymmetry",
             "score": 2,
             "dq": "estimated",
-            "note": "Entry ~$370 with a defined-risk call spread against a Street mean PT ~$561 and near-term recovery to ~$470-500 — a large, capped-risk upside versus a well-defined ~$330 invalidation. Target is a soft input."
+            "note": "Entry ~$387 with a defined-risk call spread against a Street mean PT ~$565 and near-term recovery to ~$470-500 — a large, capped-risk upside versus a well-defined ~$345 invalidation. Target is a soft input."
           },
           {
             "key": "catalyst",
@@ -304,7 +335,7 @@
             "key": "consensus",
             "score": 2,
             "dq": "sourced",
-            "note": "Sell-side aligned and intact (~52 buy / 0 sell, mean PT ~$561, ~50%+ upside) AND an independent signal — a >20% oversold drawdown that has diverged from unchanged estimates."
+            "note": "Sell-side aligned and intact (~52 buy / 0 sell, mean PT ~$565, ~45%+ upside) AND an independent signal — a ~20% drawdown that diverged from unchanged estimates and is now beginning to mean-revert."
           },
           {
             "key": "thesis",
@@ -322,25 +353,47 @@
             "key": "positioning",
             "score": 1,
             "dq": "estimated",
-            "note": "Sentiment is washed-out bearish after ~-23% YTD — offside our long is fuel — but without a hard SI/CoT read this is a mixed, not extreme, signal."
+            "note": "Sentiment was washed-out bearish at the ~-23% trough — offside our long is fuel — and the ~$14 bounce off the low suggests it is starting to unwind; without a hard SI/CoT read this is a mixed, not extreme, signal. RSI 48 — no sentiment extreme. [sourced: TradingView].",
+            "authoredNote": "Sentiment was washed-out bearish at the ~-23% trough — offside our long is fuel — and the ~$14 bounce off the low suggests it is starting to unwind; without a hard SI/CoT read this is a mixed, not extreme, signal.",
+            "indicators": {
+              "rsi": 48.1,
+              "asOf": "2026-07-07 05:31 UTC",
+              "symbol": "NASDAQ:MSFT",
+              "direction": "long"
+            }
           },
           {
             "key": "technical",
-            "score": 1,
-            "dq": "estimated",
-            "note": "Deeply oversold (a bounce setup) but price is below its major moving averages after the drawdown — a falling knife the defined-risk structure is designed to catch, so trend is mixed for a long."
+            "score": 0,
+            "dq": "sourced",
+            "note": "Price 386.7 vs SMA50/100/200 406.7/400.1/444.8 (0/3 above), RSI 48, mid-band. Trend contradicts the long. [sourced: TradingView]",
+            "authoredNote": "Deeply oversold (a bounce setup) but price is below its major moving averages after the drawdown — a falling knife the defined-risk structure is designed to catch, so trend is mixed for a long.",
+            "indicators": {
+              "symbol": "NASDAQ:MSFT",
+              "asOf": "2026-07-07 05:31 UTC",
+              "close": 386.74,
+              "sma50": 406.6718,
+              "sma100": 400.1371,
+              "sma200": 444.8246,
+              "rsi": 48.1,
+              "bbUpper": 416.7585,
+              "bbLower": 353.0215,
+              "recommendMA": -0.267,
+              "direction": "long",
+              "directionSource": "explicit"
+            }
           }
         ]
       },
       "macro": {
-        "metric": "MSFT ~$370 · ~-23% YTD · ~22 P/E · cons. PT ~$561",
-        "detail": "Buy a 3-6 month call spread struck off ~$365-375 (or a buffered note for conservative books) into the late-July print. Partial target $470-500, consensus ~$561; invalidation on a close below ~$330. Driven by an overdone AI-capex derate in a compounder with intact sell-side conviction.",
+        "metric": "MSFT ~$387 · ~-20% YTD (off a ~$373 low) · ~22 P/E · cons. PT ~$565",
+        "detail": "Buy a 3-6 month call spread struck off ~$375-390 (or a buffered note for conservative books) into the late-July print. Partial target $470-500, consensus ~$565; invalidation on a close below ~$345 (near the 52-wk low $349). Driven by an overdone AI-capex derate now reversing in a compounder with intact sell-side conviction.",
         "source": "sourced",
-        "watch": "The late-July FQ4 capex guide vs Azure growth, any hyperscaler trimming forward capex >10% (a read-through to NVDA/AVGO), and whether $365-380 holds as support."
+        "watch": "The late-July FQ4 capex guide vs Azure growth, any hyperscaler trimming forward capex >10% (a read-through to NVDA/AVGO), and whether $375-390 holds as the bounce base."
       },
       "facts": [
         {
-          "text": "Microsoft trades ~$370, roughly -23% YTD and ~-17% in June, as the market re-rates hyperscaler AI capex",
+          "text": "Microsoft trades ~$387 (7-Jul), roughly -20% YTD, having bounced ~$14 off a ~$373 low on 30-Jun (52-wk low $349.20) as the AI-capex derate began to reverse",
           "tag": "sourced"
         },
         {
@@ -348,7 +401,7 @@
           "tag": "sourced"
         },
         {
-          "text": "Sell-side stays overwhelmingly constructive — ~52 buy / 0 sell, mean target ~$561 (~50%+ upside) — though Oppenheimer trimmed its target to $515 on the capex line",
+          "text": "Sell-side stays overwhelmingly constructive — ~52 buy / 0 sell, mean target ~$565 (~45%+ upside) — though Oppenheimer cut its target to $515 (from $630) on the capex line",
           "tag": "sourced"
         },
         {
@@ -358,28 +411,29 @@
       ],
       "sources": [
         {
-          "name": "Reuters / CNBC (MSFT price, capex)",
-          "kind": "news"
+          "name": "stockanalysis.com / CNBC (MSFT price, YTD, capex)",
+          "kind": "data"
         },
         {
-          "name": "Oppenheimer (MSFT PT to $515)",
+          "name": "Oppenheimer (MSFT PT to $515 from $630)",
           "kind": "analysis"
         },
         {
-          "name": "Citrini Research — State of the Themes, Jun-2026 (free-AI → tokenomics; AI-capex monetization)",
+          "name": "SemiAnalysis — 'Nvidia GPU Debt Backstop Unleashes the AI Project Trinity', 6-Jul-2026",
           "kind": "view",
-          "basis": "Read via web sweep 7-Jul-2026: Citrini frames free-AI ending and tokenomics beginning — monetization turning up just as enterprise AI opex explodes; used to support the payback-window side of the variant view."
+          "basis": "Read via web sweep 7-Jul-2026 (newsletter.semianalysis.com, 6-Jul): argues financing — not chips or power — is now the binding constraint on the AI build-out, with cumulative AI capex ~$11.1T through 2029 increasingly debt-financed; used to support that the ~$190B MSFT capex is real, funded spend rather than discretionary cost."
         },
         {
-          "name": "Yahoo Finance / MacroTrends (MSFT levels)",
-          "kind": "data"
+          "name": "Citrini Research — 'Small Themes: June 2026', 24-Jun-2026",
+          "kind": "view",
+          "basis": "Read via web sweep 7-Jul-2026 (citriniresearch.com, free preview of the 24-Jun 'Small Themes'): Citrini has trimmed AI as the trade is crowded ('attention tax') and expects significantly increased 10-15% drawdowns 'driven more by positioning than fundamentals' in names still worth owning — used to frame the MSFT derate as a positioning-driven dip to buy with defined risk, and as the honest caution counterweight."
         }
       ]
     },
     {
       "id": "avgo-capex-readthrough",
       "direction": "long",
-      "tradeStatement": "Buy the Broadcom (AVGO) derate with a defined-risk call spread — a 3-6 month structure struck off ~$362, roughly 27% below the 52-week high near $495, to fade the market pricing hyperscaler capex cuts as a certainty into a name whose AI silicon revenue is still accelerating (+143% YoY, Q3 AI guide ~$16B); defined risk because a real >10% capex-guide cut at any hyperscaler would hit AVGO first and hardest.",
+      "tradeStatement": "Own the Broadcom (AVGO) derate reversal with a defined-risk call spread — a 3-6 month structure struck off ~$374 (having bounced +3.7% Monday, still ~24% below the 2-Jun ATH close of $480.77 / $495 intraday high), to fade the market pricing hyperscaler capex cuts as a certainty into a name whose AI silicon revenue is still accelerating (+143% YoY, Q3 AI guide ~$16B); defined risk because a real >10% capex-guide cut at any hyperscaler would hit AVGO first and hardest.",
       "intent": "add",
       "action": "Buy the pullback (defined-risk)",
       "preferredExpression": "Call spread",
@@ -398,23 +452,41 @@
       "ownView": true,
       "tactical": true,
       "triggered": true,
-      "trigger": "Live dislocation, same fault line as MSFT: AVGO trades ~$362, roughly 27% below its 52-week high near $495, as the market prices hyperscaler capex cuts as a certainty — while the printed numbers run the other way (AI semi revenue +143% YoY, Q3 AI guide ~$16B, +200% YoY). A >25% drawdown against accelerating delivered revenue is exactly the dislocation the sweep exists to flag.",
+      "trigger": "Live dislocation, same fault line as MSFT and now turning: AVGO trades ~$374 after a +3.7% Monday, roughly 24% below its 2-Jun ATH close ($480.77 / $495 intraday), as the market prices hyperscaler capex cuts as a certainty — while the printed numbers run the other way (AI semi revenue +143% YoY, Q3 AI guide ~$16B, +200% YoY). A >20% drawdown against accelerating delivered revenue, now bouncing, is exactly the dislocation-into-reversal the sweep exists to flag.",
       "levels": {
         "tenor": "3-6 months (through the hyperscaler capex guides)",
-        "entry": "AVGO ~$355-370 (spot ~$362, ~27% off the 52-week high ~$495)",
+        "entry": "AVGO ~$365-378 (spot ~$374, ~24% off the ~$495 high; add on dips toward $365)",
         "target": "$430-450 partial (recovers half the derate)",
-        "stop": "close below ~$320 or a confirmed >10% capex-guide cut at a major hyperscaler / structure premium at risk"
+        "stop": "close below ~$335 or a confirmed >10% capex-guide cut at a major hyperscaler / structure premium at risk"
       },
       "chart": {
         "kind": "spark",
         "unit": "$",
-        "series": [495, 472, 455, 431, 408, 396, 374, 362],
-        "band": { "lo": 355, "hi": 372, "label": "Add zone $355-372" },
-        "refs": [ { "y": 495, "label": "52wk high ~$495" } ],
-        "caption": "AVGO indicative path from the ~$495 high to ~$362 (~-27%). Shaded = add zone. Levels sourced from quote data; line indicative."
+        "series": [
+          495,
+          472,
+          452,
+          428,
+          405,
+          388,
+          361,
+          374
+        ],
+        "band": {
+          "lo": 365,
+          "hi": 378,
+          "label": "Add zone $365-378"
+        },
+        "refs": [
+          {
+            "y": 495,
+            "label": "52wk high ~$495"
+          }
+        ],
+        "caption": "AVGO indicative path from the ~$495 high to a ~$361 trough, then a bounce to ~$374 (~-24%). Shaded = add zone. Levels sourced from quote data; line indicative."
       },
-      "headline": "Broadcom is ~27% off its high on capex fear while its AI revenue accelerates +143% — the read-through trade is discounted before the read-through happened",
-      "thesis": "Our own read of the same fault line the MSFT idea trades: the market has pre-priced the downstream damage of a hyperscaler capex cut into Broadcom — ~$362 against a 52-week high near $495 — while the delivered numbers are still accelerating: revenue ~$22.2B last quarter (+48% YoY), AI semiconductor revenue ~$10.8B (+143% YoY), and a Q3 AI guide of ~$16B (over +200% YoY) on custom-accelerator design wins across Google, Meta and OpenAI. The derate is a probability statement — that hyperscalers will cut the very spend that feeds this backlog — and it is being marked as near-certain while MSFT alone still guides ~$190B for 2026. If the capex guides hold through the late-July/August prints, AVGO's drawdown reverses off delivered growth; if a major hyperscaler actually cuts >10%, the thesis is wrong and the defined-risk structure caps the damage. That two-sidedness is why this is a call spread and not naked stock. Own view: no outside author's work read for this one — the numbers and the drawdown are the argument.",
+      "headline": "Broadcom is ~24% off its high but bouncing (+3.7% Monday) while its AI revenue accelerates +143% — the read-through trade is discounted before the read-through happened",
+      "thesis": "Our own read of the same fault line the MSFT idea trades: the market pre-priced the downstream damage of a hyperscaler capex cut into Broadcom — down to a ~$361 trough against a 52-week high near $495 — while the delivered numbers keep accelerating: revenue ~$22.2B last quarter (+48% YoY), AI semiconductor revenue ~$10.8B (+143% YoY), and a Q3 AI guide of ~$16B (over +200% YoY) on custom-accelerator design wins across Google, Meta and OpenAI. It has since bounced +3.7% to ~$374, the derate starting to unwind. The derate is a probability statement — that hyperscalers will cut the very spend that feeds this backlog — marked as near-certain while MSFT alone still guides ~$190B for 2026 and SemiAnalysis (6-Jul) argues that spend is now debt-financed and structural. If the capex guides hold through the late-July/August prints, AVGO's drawdown keeps reversing off delivered growth; if a major hyperscaler actually cuts >10%, the thesis is wrong and the defined-risk structure caps the damage. That two-sidedness is why this is a call spread and not naked stock. Own view: the numbers and the drawdown are the argument — no outside author's work is load-bearing here.",
       "themeId": "ai",
       "offThemeWhy": null,
       "structures": [
@@ -435,7 +507,7 @@
             "key": "asymmetry",
             "score": 2,
             "dq": "estimated",
-            "note": "Entry ~$362 with a capped-risk spread against a partial target of $430-450 and a 52-week high near $495 — roughly 2:1 on the structure if the derate half-retraces; the target is a soft input."
+            "note": "Entry ~$374 with a capped-risk spread against a partial target of $430-450 and a 52-week high near $495 — roughly 2:1 on the structure if the derate half-retraces; the target is a soft input."
           },
           {
             "key": "catalyst",
@@ -465,25 +537,47 @@
             "key": "positioning",
             "score": 1,
             "dq": "estimated",
-            "note": "A ~27% drawdown suggests the hot money has left, but we lack a hard short-interest/flow read — mixed, not extreme."
+            "note": "A ~27% drawdown suggests the hot money has left, but we lack a hard short-interest/flow read — mixed, not extreme. RSI 45 — no sentiment extreme. [sourced: TradingView].",
+            "authoredNote": "A ~27% drawdown suggests the hot money has left, but we lack a hard short-interest/flow read — mixed, not extreme.",
+            "indicators": {
+              "rsi": 44.7,
+              "asOf": "2026-07-07 05:31 UTC",
+              "symbol": "NASDAQ:AVGO",
+              "direction": "long"
+            }
           },
           {
             "key": "technical",
             "score": 1,
-            "dq": "estimated",
-            "note": "Price well below its highs and likely below major moving averages after the slide — oversold entry, against-trend long; the defined-risk structure is the concession to that."
+            "dq": "sourced",
+            "note": "Price 373.9 vs SMA50/100/200 408.5/373.3/361.5 (2/3 above), RSI 45, mid-band. Trend is mixed for the long. [sourced: TradingView]",
+            "authoredNote": "Price well below its highs and likely below major moving averages after the slide — oversold entry, against-trend long; the defined-risk structure is the concession to that.",
+            "indicators": {
+              "symbol": "NASDAQ:AVGO",
+              "asOf": "2026-07-07 05:31 UTC",
+              "close": 373.9,
+              "sma50": 408.454,
+              "sma100": 373.3117,
+              "sma200": 361.52,
+              "rsi": 44.7,
+              "bbUpper": 405.7091,
+              "bbLower": 358.4209,
+              "recommendMA": -0.4,
+              "direction": "long",
+              "directionSource": "explicit"
+            }
           }
         ]
       },
       "macro": {
-        "metric": "AVGO ~$362 · ~-27% from the ~$495 high · AI rev +143% YoY · Q3 AI guide ~$16B",
-        "detail": "Buy a 3-6 month call spread struck off ~$355-370 into the hyperscaler capex-guide season. Partial target $430-450; invalidation on a close below ~$320 or a confirmed >10% capex-guide cut at a major hyperscaler.",
+        "metric": "AVGO ~$374 · ~-24% from the ~$495 high (bounced +3.7% Mon) · AI rev +143% YoY · Q3 AI guide ~$16B",
+        "detail": "Buy a 3-6 month call spread struck off ~$365-378 into the hyperscaler capex-guide season. Partial target $430-450; invalidation on a close below ~$335 or a confirmed >10% capex-guide cut at a major hyperscaler.",
         "source": "sourced",
-        "watch": "Late-July/August hyperscaler capex guides (the direct order-book driver), the Google/Meta/OpenAI custom-silicon programs, and whether $355-372 holds as the add zone."
+        "watch": "Late-July/August hyperscaler capex guides (the direct order-book driver), the Google/Meta/OpenAI custom-silicon programs, and whether $365-378 holds as the bounce base."
       },
       "facts": [
         {
-          "text": "AVGO trades ~$362 (6-Jul), roughly 27% below its 52-week high near $495 (52-week range ~$269.58-$495.00 per quote data)",
+          "text": "AVGO trades ~$374 (6-Jul close, +3.7% on the day), roughly 24% below its 2-Jun ATH close of $480.77 / $495 intraday high (52-week range ~$269.58-$495.00 per quote data)",
           "tag": "sourced"
         },
         {
@@ -517,7 +611,7 @@
     {
       "id": "spx-cheap-convexity",
       "direction": "short",
-      "tradeStatement": "Buy 2-3 month S&P 500 put-spread protection while volatility is asleep — with the VIX ~16 (16.59 close on 1-Jul), rate vol near one-year lows and the index at a record ~7,537, a ~5%-out put spread costs a fraction of what the event calendar (FOMC minutes, Q2 earnings, the unresolved hyperscaler-capex fault line, a live tariff overhang) argues it should; size it as book insurance on concentrated equity gains, premium fully at risk if the melt-up simply continues.",
+      "tradeStatement": "Buy 2-3 month S&P 500 put-spread protection while volatility is asleep — with the VIX ~15.6 (15.57 on 6-Jul), rate vol near one-year lows and the index at a record ~7,537 even as an overnight Strait-of-Hormuz tanker strike sends Asia risk-off, a ~5%-out put spread costs a fraction of what the event calendar (FOMC minutes, Q2 earnings, the hyperscaler-capex fault line, a fresh geopolitical tail) argues it should; size it as book insurance on concentrated equity gains, premium fully at risk if the melt-up simply continues.",
       "intent": "protect",
       "action": "Hedge — buy cheap convexity",
       "preferredExpression": "Put spread",
@@ -536,15 +630,15 @@
       "ownView": true,
       "tactical": true,
       "triggered": true,
-      "trigger": "Live now because the mispricing is now: VIX ~16 and rate vol near one-year lows INTO a dated event cluster — Wednesday's June FOMC minutes (the first under Chair Warsh), the Q2 earnings open (Levi/Pepsi/Delta this week), late-July hyperscaler capex guides, and a fresh tariff overhang — while the S&P sits at a record ~7,537 with the market's own AI-capex fault line unresolved (MSFT -23% YTD inside a record index). Cheap insurance and a full calendar rarely coexist for long.",
+      "trigger": "Live now because the mispricing is now: VIX ~15.6 (15.57 on 6-Jul) and rate vol near one-year lows INTO a dated event cluster — Wednesday's June FOMC minutes (the first under Chair Warsh), the Q2 earnings open (Levi/Pepsi/Delta this week), late-July hyperscaler capex guides, a USMCA overhang — AND a fresh, unscheduled geopolitical tail: an Iranian missile struck a Qatari LNG tanker in the Strait of Hormuz overnight, sending Asia risk-off (KOSPI -3.6%, Nikkei -2.2%) while the S&P still sits at a record ~7,537. Cheap insurance the same morning a live tail materialises rarely coexist for long.",
       "levels": {
         "tenor": "2-3 months (through the FOMC minutes, Q2 earnings and the capex guides)",
-        "entry": "SPX ~7,537 / VIX ~16 — buy a ~5% out-of-the-money put spread (e.g. 7,150/6,750)",
+        "entry": "SPX ~7,537 / VIX ~15.6 — buy a ~5% out-of-the-money put spread (e.g. 7,150/6,750)",
         "target": "monetise on a 5-7% index drawdown or a VIX spike into the mid-20s",
         "stop": "premium at risk by construction — let it expire if the tape grinds higher; roll only if the catalyst cluster is still live"
       },
-      "headline": "VIX ~16 against a record index, a full event calendar and an unresolved AI-capex fault line — insurance is mispriced, so own some",
-      "thesis": "Our own call, and a simple one: the price of protection has disconnected from the calendar. The VIX closed 16.59 on 1-Jul and sits near 16; rate vol is near one-year lows; the S&P closed Monday at a record ~7,537 with the Dow through 53,000. Against that calm stands a dated cluster of two-sided events — Wednesday's June FOMC minutes (the first under Chair Warsh, the market's best read on the hike bias), 3/10/30-year Treasury supply, the Q2 earnings season opening this week, late-July hyperscaler capex guides that the MSFT/AVGO drawdowns show the market genuinely fears, and an unresolved tariff overhang after the US declined to renew its pact with Mexico and Canada. The index is making records while one of its largest components is down ~23% YTD — that internal contradiction resolves one way or another, and at VIX 16 you are not paying much to be there when it does. This is insurance sizing, not a market call: a ~5%-out, 2-3 month put spread on concentrated equity books, premium fully at risk, monetised into a drawdown or a vol spike. If the melt-up continues, the premium was the cost of holding the gains with a clear head. Own view — no outside author's work read for this one.",
+      "headline": "VIX ~15.6 against a record index, a full event calendar and a fresh Hormuz shock — insurance is mispriced, so own some",
+      "thesis": "Our own call, and a simple one: the price of protection has disconnected from the calendar. The VIX closed 15.57 on 6-Jul; rate vol is near one-year lows; the S&P closed Monday at a record ~7,537 with the Dow through 53,000. Against that calm stands a dated cluster of two-sided events — Wednesday's June FOMC minutes (the first under Chair Warsh, the market's best read on the hike bias), 3/10/30-year Treasury supply, the Q2 earnings season opening this week, late-July hyperscaler capex guides that the MSFT/AVGO drawdowns show the market genuinely fears, and a USMCA overhang — now joined by an unscheduled geopolitical shock: an Iranian missile hit a Qatari LNG tanker in the Strait of Hormuz overnight, the first vessel strike since the truce, sending Asia sharply risk-off even as US index vol sits near its floor. The index is making records while its own AI-capex fault line is unresolved and a live war-risk tail has just re-opened — those resolve one way or another, and at VIX ~15.6 you are not paying much to be there when they do. Insurance sizing, not a market call: a ~5%-out, 2-3 month put spread on concentrated equity books, premium fully at risk, monetised into a drawdown or a vol spike. Own view — no outside author's work is load-bearing here (Moontower's 5-Jul note that buying vol AFTER a spike underperforms only sharpens the case for owning it cheap, ahead).",
       "themeId": null,
       "offThemeWhy": "A tactical long-volatility hedge on the index, not a standing desk theme — it exists because the price of convexity has detached from the event calendar, and it expires with the calendar.",
       "structures": [
@@ -564,7 +658,7 @@
             "key": "asymmetry",
             "score": 2,
             "dq": "estimated",
-            "note": "A ~5%-out put spread at VIX ~16 pays a multiple of premium on a 5-7% drawdown — convexity bought near the bottom of the vol range; payoff estimates are options-desk numbers."
+            "note": "A ~5%-out put spread at VIX ~15.6 pays a multiple of premium on a 5-7% drawdown — convexity bought near the bottom of the vol range, the morning a fresh geopolitical tail opens; payoff estimates are options-desk numbers."
           },
           {
             "key": "catalyst",
@@ -582,7 +676,7 @@
             "key": "thesis",
             "score": 1,
             "dq": "sourced",
-            "note": "The core inputs are sourced (VIX 16.59, record index, the calendar) and the internal-contradiction argument is specific, but this is insurance logic, not a differentiated directional number."
+            "note": "The core inputs are sourced (VIX 15.57, record index, the calendar, the overnight Hormuz strike) and the cheap-vol-into-a-live-tail argument is specific, but this is insurance logic, not a differentiated directional number."
           },
           {
             "key": "houseview",
@@ -605,18 +699,18 @@
         ]
       },
       "macro": {
-        "metric": "VIX ~16 (16.59 on 1-Jul) · SPX record ~7,537 · rate vol near 1-yr lows",
-        "detail": "Buy a 2-3 month, ~5% out-of-the-money SPX put spread (e.g. 7,150/6,750) as book insurance while the VIX sits ~16 into the FOMC minutes, Q2 earnings and the hyperscaler capex guides. Monetise on a 5-7% drawdown or a VIX spike to the mid-20s; premium fully at risk if the tape grinds on.",
+        "metric": "VIX ~15.6 (15.57 on 6-Jul) · SPX record ~7,537 · rate vol near 1-yr lows · fresh Hormuz tail",
+        "detail": "Buy a 2-3 month, ~5% out-of-the-money SPX put spread (e.g. 7,150/6,750) as book insurance while the VIX sits ~15.6 into the FOMC minutes, Q2 earnings and the hyperscaler capex guides — and the morning a Strait-of-Hormuz tanker strike re-opens a war-risk tail. Monetise on a 5-7% drawdown or a VIX spike to the mid-20s; premium fully at risk if the tape grinds on.",
         "source": "sourced",
-        "watch": "Wednesday's June FOMC minutes, the Q2 earnings tape (Levi/Pepsi/Delta this week), late-July hyperscaler capex guides, tariff headlines — and whether the VIX's floor near 16 holds."
+        "watch": "Wednesday's June FOMC minutes, the Q2 earnings tape (Levi/Pepsi/Delta this week), late-July hyperscaler capex guides, Hormuz/oil headlines — and whether the VIX's floor near 15-16 holds."
       },
       "facts": [
         {
-          "text": "The VIX closed at 16.59 on 1-Jul-2026 and trades near 16 — a low-volatility regime with options correspondingly cheap",
+          "text": "The VIX closed at 15.57 on 6-Jul-2026 (down ~1.5% on the day) — a low-volatility regime with options correspondingly cheap",
           "tag": "sourced"
         },
         {
-          "text": "The S&P 500 closed Monday 6-Jul at a record ~7,537 (+0.72%) and the Dow above 53,000 for the first time; rate vols sit near one-year lows",
+          "text": "The S&P 500 closed Monday 6-Jul at a record ~7,537 (+0.72%) and the Dow above 53,000 for the first time (53,056); rate vols sit near one-year lows",
           "tag": "sourced"
         },
         {
@@ -624,29 +718,34 @@
           "tag": "sourced"
         },
         {
-          "text": "The index is making records while Microsoft — one of its largest weights — is down ~23% YTD on the AI-capex derate, an unresolved internal contradiction",
+          "text": "An Iranian missile struck the Qatari LNG carrier Al Rekayyat in the Strait of Hormuz early 7-Jul — the first vessel strike since the truce — sending Asia risk-off (KOSPI -3.6%, Nikkei -2.2%) while US index vol sat near its floor: a live tail against cheap protection",
           "tag": "sourced"
         }
       ],
       "sources": [
         {
-          "name": "Cboe / Yahoo Finance / FRED (VIX level)",
+          "name": "Cboe / Yahoo Finance (VIX 15.57)",
           "kind": "data"
         },
         {
-          "name": "Motley Fool / TheStreet (6-Jul index closes)",
+          "name": "TheStreet / CNBC (6-Jul record index closes)",
           "kind": "data"
         },
         {
-          "name": "CNBC / streetstats.finance (hedge-cost and rate-vol context)",
-          "kind": "analysis"
+          "name": "Bloomberg / Times of Israel (Strait of Hormuz LNG tanker strike, 7-Jul)",
+          "kind": "news"
+        },
+        {
+          "name": "Moontower / Kris Abdelmessih — 'every silver lining has a cloud', 5-Jul-2026",
+          "kind": "view",
+          "basis": "Read via web sweep 7-Jul-2026 (moontower.substack.com, 5-Jul): shows buying equities/vol AFTER a VIX spike >30 delivers worse risk-adjusted returns than following the vol trend — used to support the case for owning convexity cheaply AHEAD of the move rather than chasing it after a spike."
         }
       ]
     },
     {
       "id": "gold-pullback",
       "direction": "long",
-      "tradeStatement": "Long gold (XAU) — accumulate ~$4,150 as strategic ballast; a bet on continued official-sector demand and currency debasement, with bullion having firmed to its highest since 23-Jun after the soft June payrolls faded Fed hike odds — sized to the protection gap, not a tactical momentum chase.",
+      "tradeStatement": "Long gold (XAU) — accumulate ~$4,130 as strategic ballast; a bet on continued official-sector demand and currency debasement, with a fresh safe-haven bid from the overnight Strait-of-Hormuz strike layered on top of an already-firm base — sized to the protection gap, not a tactical momentum chase.",
       "intent": "protect",
       "tickers": [
         "XAU",
@@ -668,8 +767,8 @@
         "structured": false
       },
       "naturalExpression": "Physical / ETC",
-      "headline": "Gold firms to ~$4,150 after the soft jobs print — the accumulation window is still open",
-      "thesis": "Gold slipped to an ~8-month low near $4,000 in late June — roughly a quarter below its January record — as strong data and a firm dollar drained safe-haven flows, then rebounded to ~$4,150 (Friday's highest since 23-Jun, a ~2% week) after the soft June jobs print (+57K vs ~115K) faded Fed rate-hike odds and Chair Warsh flagged that inflation expectations had eased. The strategic case is unchanged: central banks remain structural buyers (net +41t in May per the WGC) and every major bank's year-end target still sits above spot, even as Q1 official demand momentum cooled (net +16t, with Türkiye a 60t seller). For under-protected books this dip-and-rebound is still the accumulation window in the cleanest debasement-and-geopolitics hedge — sized to the protection gap, bought into weakness rather than chased, with a still-firm dollar the near-term headwind and official buyers the underpin.",
+      "headline": "Gold ~$4,130 with a fresh Hormuz safe-haven bid — the accumulation window is still open",
+      "thesis": "Gold slipped to an ~8-month low near $4,000 in late June — roughly a quarter below its January record — as strong data and a firm dollar drained safe-haven flows, then rebounded to ~$4,150 (a ~2% week) after the soft June jobs print (+57K vs ~115K) faded Fed rate-hike odds; it has since eased to ~$4,130 intraday, but the overnight Strait-of-Hormuz tanker strike has just re-armed the geopolitical bid. The strategic case is unchanged: central banks remain structural buyers (net +41t in May per the WGC) and the major banks' year-end targets still bracket well above spot (JPMorgan ~$6,000, UBS ~$5,500-5,900), even after Goldman trimmed its target to ~$4,900 in June on a Fed unlikely to cut. Two independent voices back the contrarian long — TSCS ('Gold Is Hated. Buy It.', 26-Jun) flags intact buyer demand into depressed sentiment, and Doomberg frames gold as the emerging neutral reserve asset for trade settlement. For under-protected books this dip is still the accumulation window in the cleanest debasement-and-geopolitics hedge — sized to the protection gap, bought into weakness rather than chased, with a still-firm dollar the near-term headwind and official buyers plus a live war-risk tail the underpin.",
       "themeId": "gold",
       "offThemeWhy": null,
       "structures": [
@@ -719,11 +818,11 @@
             "key": "positioning",
             "score": 1,
             "dq": "estimated",
-            "note": "~26% off the highs with positioning reset, now rebounding hard off an 8-month low on the soft jobs print — neither washed-out nor crowded; mild fuel. RSI 45 — no sentiment extreme. [sourced: TradingView].",
+            "note": "~26% off the highs with positioning reset, now rebounding hard off an 8-month low on the soft jobs print — neither washed-out nor crowded; mild fuel. RSI 44 — no sentiment extreme. [sourced: TradingView].",
             "authoredNote": "~26% off the highs with positioning reset, now rebounding hard off an 8-month low on the soft jobs print — neither washed-out nor crowded; mild fuel.",
             "indicators": {
-              "rsi": 45.1,
-              "asOf": "2026-07-06 06:05 UTC",
+              "rsi": 43.8,
+              "asOf": "2026-07-07 05:31 UTC",
               "symbol": "OANDA:XAUUSD",
               "direction": "long"
             }
@@ -732,19 +831,19 @@
             "key": "technical",
             "score": 0,
             "dq": "sourced",
-            "note": "Price 4147 vs SMA50/100/200 4392/4627/4485 (0/3 above), RSI 45, mid-band. Trend contradicts the long. [sourced: TradingView]",
+            "note": "Price 4126 vs SMA50/100/200 4383/4618/4487 (0/3 above), RSI 44, mid-band. Trend contradicts the long. [sourced: TradingView]",
             "authoredNote": "Rebounded to ~$4,130 after an ~8-month low; the long-term uptrend (above the rising 200-day) is intact but the near-term trend is only stabilising — mixed.",
             "indicators": {
               "symbol": "OANDA:XAUUSD",
-              "asOf": "2026-07-06 06:05 UTC",
-              "close": 4147.185,
-              "sma50": 4391.6958,
-              "sma100": 4626.7279,
-              "sma200": 4485.006,
-              "rsi": 45.1,
-              "bbUpper": 4346.1326,
-              "bbLower": 3948.2499,
-              "recommendMA": -0.533,
+              "asOf": "2026-07-07 05:31 UTC",
+              "close": 4126.195,
+              "sma50": 4382.6423,
+              "sma100": 4618.2491,
+              "sma200": 4486.9794,
+              "rsi": 43.8,
+              "bbUpper": 4333.8891,
+              "bbLower": 3948.9094,
+              "recommendMA": -0.667,
               "direction": "long",
               "directionSource": "explicit"
             }
@@ -752,28 +851,28 @@
         ]
       },
       "macro": {
-        "metric": "Spot ~$4,150 (Mon 6 Jul)",
-        "detail": "~26% below the 29-Jan record of $5,595; firmed to ~$4,150 — Friday's highest since 23-Jun, a ~2% week — off late-June's ~8-month low near $4,000 after the soft June payrolls faded Fed hike odds and Warsh flagged easing inflation expectations. Central banks net +41t in May and a softer +16t in Q1 (Türkiye a 60t Q1 seller) per the WGC.",
+        "metric": "Spot ~$4,130 (Tue 7 Jul), fresh Hormuz bid",
+        "detail": "~26% below the 29-Jan record of $5,595; firmed to ~$4,150 last week off late-June's ~8-month low near $4,000, then eased to ~$4,130 intraday before the overnight Strait-of-Hormuz strike re-armed the safe-haven bid. Central banks net +41t in May per the WGC; bank targets bracket above spot (JPMorgan ~$6,000, UBS ~$5,500-5,900) even after Goldman trimmed to ~$4,900 in June.",
         "source": "sourced",
-        "watch": "The still-firm dollar / Fed path as the near-term headwind; official-sector demand as the marginal buyer underpinning the dip; Wednesday's June FOMC minutes and the PepsiCo/Delta prints as the next macro tests."
+        "watch": "The still-firm dollar / Fed path as the near-term headwind; the Hormuz/geopolitics path as the fresh bid; official-sector demand as the marginal buyer; Wednesday's June FOMC minutes as the next macro test."
       },
       "facts": [
         {
-          "text": "Gold firmed to ~$4,150 — Friday's highest since 23-Jun (a ~2% week) — rebounding off late-June's ~8-month low near $4,000 (about 26% below the 29-Jan record of $5,595), after a soft June jobs print (+57K) faded Fed hike odds and Warsh flagged easing inflation expectations",
+          "text": "Gold trades ~$4,130 (7-Jul), off last week's ~$4,150 rebound high but with a fresh safe-haven bid from the overnight Strait-of-Hormuz tanker strike; it remains about 26% below the 29-Jan record of $5,595 after basing near an ~8-month low of $4,000 in late June",
           "tag": "sourced"
         },
         {
-          "text": "Gold had been on track for a fourth straight monthly loss as markets firmed odds of a 2026 Fed hike, before the jobs-day rebound",
+          "text": "Gold had been on track for a fourth straight monthly loss as markets firmed odds of a 2026 Fed hike, before the jobs-day rebound and the Hormuz bid",
           "tag": "sourced"
         },
         {
-          "text": "Central banks stayed net buyers: +41t in May and a softer +16t net in Q1 2026 (Türkiye sold 60t in March) per the World Gold Council; bank year-end targets remain above spot (Goldman ~$5,400, JPMorgan ~$6,000, Morgan Stanley $5,200, UBS $5,500)",
+          "text": "Central banks stayed net buyers (+41t in May per the World Gold Council); year-end bank targets bracket above spot — JPMorgan ~$6,000, UBS ~$5,500-5,900, with Goldman having trimmed to ~$4,900 in June on a Fed unlikely to cut",
           "tag": "sourced"
         }
       ],
       "sources": [
         {
-          "name": "TradingEconomics / LiteFinance (gold spot)",
+          "name": "Trading Economics / Investing.com (gold spot ~$4,130)",
           "kind": "data"
         },
         {
@@ -781,8 +880,18 @@
           "kind": "data"
         },
         {
-          "name": "JPMorgan Research",
+          "name": "JPMorgan Research / Goldman Sachs / UBS (year-end targets)",
           "kind": "analysis"
+        },
+        {
+          "name": "TSCS / The Short Case Scenario — 'Gold Is Hated. Buy It.', 26-Jun-2026",
+          "kind": "view",
+          "basis": "Read via web sweep 7-Jul-2026 (tscsw.substack.com, 26-Jun): contrarian long-gold call — intact buyer demand and depressed miner valuations into hated sentiment, citing the historical bull-market drawdown-then-rally pattern; used as an independent second source for accumulating the dip."
+        },
+        {
+          "name": "Doomberg — 'Why Energy Abundance May Be Ahead' podcast, 23-Jun-2026",
+          "kind": "view",
+          "basis": "Read via web sweep 7-Jul-2026 (monetary-metals/ZeroHedge transcript, 23-Jun): frames gold as the emerging 'neutral reserve asset' for trade settlement as USD hegemony weakens, with current softness a temporary liquidity-driven sale; used to support the structural debasement leg of the thesis."
         }
       ]
     },
@@ -803,7 +912,7 @@
       },
       "naturalExpression": "Utility basket",
       "headline": "Electricity is the binding constraint on AI — and the lower-beta way to own it",
-      "thesis": "Datacenter electricity demand is on track for roughly 1,050 TWh in 2026 — doubling in a few years — with gas and nuclear the dispatchable supply. Owning the power and grid build-out is the lower-beta way to stay long the AI theme, and it pays contracted income while it compounds. The AI chip complex round-tripped a full drawdown into a record H1 close and has since eased off its highs (the chip complex kept pulling back through the soft-jobs-day tape, with Tesla sinking and MU fading roughly a fifth off its late-June ATH) as the market turned rate-wary around the soft June jobs print — and that volatility is the point: the power bottleneck behind the build-out (with Micron's record HBM print a reminder the demand keeps scaling) is a steadier expression of the same secular story.",
+      "thesis": "Datacenter electricity demand is on track for roughly 1,050 TWh in 2026 — doubling in a few years — with gas and nuclear the dispatchable supply. Owning the power and grid build-out is the lower-beta way to stay long the AI theme, and it pays contracted income while it compounds. Two fresh reads reinforce the bottleneck: SemiAnalysis (25-Jun) now points to 40GW+ of behind-the-meter datacenter capacity by 2028 as US grid constraints bind, and Serenity reads the latest Chinese power-chip price hikes (Yangjie +10-15% from 1-Jul, plus peers) as demand-driven — AI datacenters, grid and EVs — not cost-push. Meanwhile the AI chip complex keeps whipsawing (a Monday US rebound, a Tuesday Asia memory selloff, MU still ~a fifth off its late-June ATH) — and that volatility is the point: the power bottleneck behind the build-out is a steadier expression of the same secular story.",
       "themeId": "power",
       "offThemeWhy": null,
       "structures": [
@@ -887,6 +996,16 @@
         {
           "name": "Morgan Stanley",
           "kind": "analysis"
+        },
+        {
+          "name": "SemiAnalysis — 'US Grid Constraints: Towards 40GW+ of Behind-The-Meter Datacenter by 2028?', 25-Jun-2026",
+          "kind": "view",
+          "basis": "Read via web sweep 7-Jul-2026 (newsletter.semianalysis.com, 25-Jun, headline/thesis level): argues US grid constraints push 40GW+ of datacenter capacity behind-the-meter by 2028 — used as an independent second source that the grid/power supply is the binding constraint on AI compute."
+        },
+        {
+          "name": "Serenity (@aleabitoreddit) — AI power/grid note, late-Jun-2026",
+          "kind": "view",
+          "basis": "Read via tracker mirror during web sweep 7-Jul-2026 (semiconstocks.com; primary X feed un-fetchable): reads recent Chinese power-chip price hikes (Yangjie +10-15% eff. 1-Jul, plus China Resources Micro/Silan/NCE) as demand-driven (AI data centers, grid, EVs) rather than cost-push — used to corroborate the power-demand leg. Dates are tracker-reported, not read from the primary feed."
         }
       ]
     },
@@ -907,7 +1026,7 @@
       },
       "naturalExpression": "Govt / IG bonds",
       "headline": "The 10Y is back testing 4.5% (~4.49%) — own the carry at a locked ~4.5% level",
-      "thesis": "The 10Y is back at ~4.49%, retesting the 4.5% area into Wednesday's June FOMC minutes and this week's 3/10/30-year auctions. The backdrop that boxes it: the last PCE (25 June) printed broadly in line at 4.1% headline / core 3.4% — still the hottest core in over two years — and the Fed held 3.50-3.75% on 17 June with a hawkish dot plot, before the soft June jobs print (+57K vs ~115K, 2-Jul) faded September-hike odds to ~50%. The 'extend before the cuts' convexity trade is on ice, but the case left is simpler and now well priced — you are paid ~4.5% in high-quality intermediate bonds to wait, ballast that cash can't give a book that carried equities to a record H1. Wednesday's June FOMC minutes — the first under Chair Warsh — and this week's 3/10/30-year auctions are the near-term tests of the hike bias. The soft payrolls read is exactly the kind of cooling-labour signal that rewards the extra yield you're locking. Add for income and diversification, not for a quick gain.",
+      "thesis": "The 10Y is at ~4.48%, still testing the 4.5% area into Wednesday's June FOMC minutes and this week's 3/10/30-year auctions, with the 30Y sitting right on the 5.00% handle. The backdrop that boxes it: the last PCE (25 June) printed broadly in line at 4.1% headline / core 3.4% — still the hottest core in over two years — and the Fed held 3.50-3.75% on 17 June with a hawkish dot plot, before the soft June jobs print (+57K vs ~115K, 2-Jul) faded September-hike odds to ~50%. The hawkish anchor is still being reinforced: NY Fed's Williams, per The Transcript's 30-Jun read, called inflation 'unquestionably elevated and well above the 2% goal' (tariffs, Middle East, AI demand). The 'extend before the cuts' convexity trade is on ice, but the case left is simpler and now well priced — you are paid ~4.5% in high-quality intermediate bonds to wait, ballast that cash can't give a book that carried equities to a record H1. Wednesday's June FOMC minutes — the first under Chair Warsh — and this week's auctions are the near-term tests of the hike bias. The soft payrolls read is exactly the kind of cooling-labour signal that rewards the extra yield you're locking. Add for income and diversification, not for a quick gain.",
       "themeId": "duration",
       "offThemeWhy": null,
       "structures": [
@@ -969,18 +1088,22 @@
         ]
       },
       "macro": {
-        "metric": "PCE 4.1% / core 3.4%; hold; 10Y ~4.49%",
-        "detail": "May PCE (25 Jun) printed in line at 4.1% headline, core 3.4%. The Fed held 3.50-3.75% on 17 Jun with a hawkish dot plot and the 10Y ran up to test 4.5% on September-hike odds — until the soft June payrolls (+57K vs ~115K; u/e 4.2% on a falling participation rate) faded those odds to ~50% and eased the 10Y back to ~4.49%.",
+        "metric": "PCE 4.1% / core 3.4%; hold; 10Y ~4.48%, 30Y ~5.00%",
+        "detail": "May PCE (25 Jun) printed in line at 4.1% headline, core 3.4%. The Fed held 3.50-3.75% on 17 Jun with a hawkish dot plot and the 10Y ran up to test 4.5% on September-hike odds — the soft June payrolls (+57K vs ~115K; u/e 4.2% on a falling participation rate) faded those odds to ~50% but the 10Y sits ~4.48% with the 30Y right on the 5.00% handle.",
         "source": "sourced",
         "watch": "Wednesday's June FOMC minutes and this week's 3/10/30-year auctions, then the late-July FOMC — whether the data hardens or softens the path; and whether duration holds its diversification value as equities sit near records."
       },
       "facts": [
         {
-          "text": "The 10Y Treasury yield eased to ~4.49% after testing 4.5%, as a soft June jobs print faded September Fed-hike odds to ~50%; Warsh (Sintra, 1-Jul) said inflation expectations had eased and there was no urgency to hike",
+          "text": "The 10Y Treasury yield sits ~4.48% (still testing 4.5%) with the 30Y right on the 5.00% handle, as a soft June jobs print faded September Fed-hike odds to ~50% but sticky inflation caps the rally",
           "tag": "sourced"
         },
         {
           "text": "The June jobs report, released Thu 2-Jul, came in soft at +57K (vs ~115K est), with April and May revised down a combined 74K; the unemployment rate dipped to 4.2% on a falling participation rate",
+          "tag": "sourced"
+        },
+        {
+          "text": "NY Fed's Williams (via The Transcript, 30-Jun) called inflation 'unquestionably elevated and well above the 2% goal,' citing tariffs, the Middle East and AI demand — reinforcing the higher-for-longer anchor",
           "tag": "sourced"
         }
       ],
@@ -990,8 +1113,13 @@
           "kind": "news"
         },
         {
-          "name": "Trading Economics (10Y)",
+          "name": "Trading Economics (10Y ~4.48%, 30Y ~5.00%)",
           "kind": "data"
+        },
+        {
+          "name": "The Transcript — Catalyst Watch, 30-Jun-2026 (Williams on inflation)",
+          "kind": "view",
+          "basis": "Read via web sweep 7-Jul-2026 (thetranscript.substack.com, 30-Jun): quotes NY Fed's Williams that inflation is 'unquestionably elevated and well above the 2% goal' (tariffs, Middle East, AI demand) — used to reinforce the higher-for-longer / get-paid-to-wait carry thesis."
         }
       ]
     },
@@ -1016,10 +1144,28 @@
       "chart": {
         "kind": "band",
         "unit": "%",
-        "series": [4.28, 4.36, 4.5, 4.43, 4.46, 4.44, 4.47, 4.49],
-        "band": { "lo": 4.0, "hi": 4.9, "label": "Accrual band 4.00-4.90%" },
-        "refs": [ { "y": 5.0, "label": "5% ceiling" } ],
-        "caption": "10Y yield vs the 4.00-4.90% accrual band — ~4.49% now, back testing 4.5%. 5% has capped every test since Oct-2023. Levels sourced; line indicative."
+        "series": [
+          4.36,
+          4.5,
+          4.43,
+          4.46,
+          4.44,
+          4.47,
+          4.49,
+          4.48
+        ],
+        "band": {
+          "lo": 4.0,
+          "hi": 4.9,
+          "label": "Accrual band 4.00-4.90%"
+        },
+        "refs": [
+          {
+            "y": 5.0,
+            "label": "5% ceiling"
+          }
+        ],
+        "caption": "10Y yield vs the 4.00-4.90% accrual band — ~4.48% now, still testing 4.5% (30Y on the 5.00% handle into this week's supply). 5% has capped every 10Y test since Oct-2023. Levels sourced; line indicative."
       },
       "trigger": "The 10Y is back at ~4.49%, retesting the 4.5% area, into Wednesday's June FOMC minutes, this week's 3/10/30-year auctions and the late-July FOMC — sitting in the upper half of the band but still comfortably below the proven 5% ceiling. The regime that boxes it holds from both sides: a hawkish Fed on hold (band 3.50-3.75%, no cuts priced until 2027) anchors against a runaway break through 5%, while sticky inflation (the last PCE at 4.1% / core 3.4%) keeps it from rallying under 4% — exactly the boxed-in tape a range accrual is paid to harvest.",
       "headline": "With the 10Y back testing 4.5%, a proven 5% ceiling and a sticky-inflation floor box it — get paid an enhanced coupon to hold the range",
@@ -1141,8 +1287,8 @@
       "naturalExpression": "Currency-hedged sleeve",
       "action": "Hedge",
       "preferredExpression": "Currency-hedged sleeve",
-      "headline": "Dollar slips below 101 after a soft jobs print — a prime window to hedge USD-heavy non-dollar books",
-      "thesis": "The dollar pushed to a 15-month high (DXY ~101.6) on the hawkish Fed and firmer September-hike odds before slipping below 101 to ~101.0 — soft after a weak June payrolls print faded those hike bets; EUR/USD holds ~1.142 and cable has recovered to ~1.334 — even as every 2026 bank outlook still calls a post-peak dollar and an eventually-narrowing Fed-ECB spread. For EUR- and GBP-base books carrying outsized USD sleeves, this stretched-but-rolling-over level is the window to hedge the currency mismatch: currency-hedged share classes for Retail, FX forwards or zero-cost collars for Professionals — sized to the mismatch, not run as a directional bet.",
+      "headline": "Dollar eases to ~100.85, near a 3-week low — a prime window to hedge USD-heavy non-dollar books",
+      "thesis": "The dollar pushed to a 15-month high (DXY ~101.6) on the hawkish Fed and firmer September-hike odds before rolling over to ~100.85 — near a 3-week low after the largest weekly drop since April, as a weak June payrolls print faded those hike bets; EUR/USD holds ~1.142 and cable has recovered to ~1.339 — even as every 2026 bank outlook still calls a post-peak dollar and an eventually-narrowing Fed-ECB spread. For EUR- and GBP-base books carrying outsized USD sleeves, this rolling-over level is the window to hedge the currency mismatch: currency-hedged share classes for Retail, FX forwards or zero-cost collars for Professionals — sized to the mismatch, not run as a directional bet.",
       "themeId": "gold",
       "offThemeWhy": null,
       "structures": [
@@ -1191,11 +1337,11 @@
             "key": "positioning",
             "score": 1,
             "dq": "estimated",
-            "note": "Dollar longs are crowded after the hawkish repricing — hedging when the crowd is max-long USD is reasonable timing, not an extreme. RSI 59 (neutral).",
+            "note": "Dollar longs are crowded after the hawkish repricing — hedging when the crowd is max-long USD is reasonable timing, not an extreme. RSI 58 (neutral).",
             "authoredNote": "Dollar longs are crowded after the hawkish repricing — hedging when the crowd is max-long USD is reasonable timing, not an extreme.",
             "indicators": {
-              "rsi": 59.0,
-              "asOf": "2026-07-06 06:05 UTC",
+              "rsi": 58.0,
+              "asOf": "2026-07-07 05:31 UTC",
               "symbol": "TVC:DXY",
               "direction": "neutral"
             }
@@ -1204,19 +1350,19 @@
             "key": "technical",
             "score": 0,
             "dq": "sourced",
-            "note": "Price 101 vs SMA50/100/200 99.61/99.25/98.93 (3/3 above), RSI 59, mid-band. Tape is up, stretched to a band edge — range at risk. [sourced: TradingView]",
+            "note": "Price 100.9 vs SMA50/100/200 99.65/99.29/98.94 (3/3 above), RSI 58, mid-band. Tape is up, stretched to a band edge — range at risk. [sourced: TradingView]",
             "authoredNote": "DXY off a 15-month high to ~101.4, soft after the jobs miss — mixed; a level to fade rather than chase.",
             "indicators": {
               "symbol": "TVC:DXY",
-              "asOf": "2026-07-06 06:05 UTC",
-              "close": 101.009,
-              "sma50": 99.6064,
-              "sma100": 99.2502,
-              "sma200": 98.9256,
-              "rsi": 59.0,
-              "bbUpper": 102.0123,
-              "bbLower": 99.3805,
-              "recommendMA": 0.786,
+              "asOf": "2026-07-07 05:31 UTC",
+              "close": 100.934,
+              "sma50": 99.6502,
+              "sma100": 99.287,
+              "sma200": 98.9386,
+              "rsi": 58.0,
+              "bbUpper": 102.0099,
+              "bbLower": 99.4615,
+              "recommendMA": 0.643,
               "direction": "neutral",
               "directionSource": "explicit"
             }
@@ -1224,8 +1370,8 @@
         ]
       },
       "macro": {
-        "metric": "DXY ~101.0, off a 15-month high",
-        "detail": "The dollar pushed to a 15-month high (~101.6) on the hawkish Fed and firmer September-hike odds before slipping below 101 to ~101.0 after a soft June payrolls print faded those bets (EUR/USD ~1.142, GBP/USD recovered to ~1.334); 2026 bank outlooks still describe a post-peak dollar with the Fed-ECB spread set to narrow. USD/JPY has held a fresh ~40-year high ~162 on the wide differential.",
+        "metric": "DXY ~100.85, off a 15-month high",
+        "detail": "The dollar pushed to a 15-month high (~101.6) on the hawkish Fed and firmer September-hike odds before rolling over to ~100.85 — near a 3-week low after the largest weekly drop since April, as a soft June payrolls print faded those bets (EUR/USD ~1.142, GBP/USD recovered to ~1.339); 2026 bank outlooks still describe a post-peak dollar with the Fed-ECB spread set to narrow. USD/JPY has eased back under 162 to ~161.8 on the wide differential.",
         "source": "sourced",
         "watch": "Soft-payrolls follow-through, Wednesday's FOMC minutes, the Fed-ECB / BOJ rate spreads; any intervention-driven or risk-off turn that tops the dollar."
       },
@@ -1235,7 +1381,7 @@
           "tag": "sourced"
         },
         {
-          "text": "DXY hit a ~15-month high (~101.6) before slipping below 101 to ~101.0 after a soft June payrolls print faded Fed-hike odds; EUR/USD holds ~1.142, GBP/USD recovered to ~1.334",
+          "text": "DXY hit a ~15-month high (~101.6) before easing to ~100.85, near a 3-week low, after a soft June payrolls print faded Fed-hike odds; EUR/USD holds ~1.142, GBP/USD recovered to ~1.339",
           "tag": "sourced"
         },
         {
@@ -1282,7 +1428,7 @@
       "action": "Generate income",
       "preferredExpression": "Dual-currency deposit (DCD)",
       "headline": "Monetise the wide rate differential — FX carry and dual-currency income, but mind the intervention line at ~40-year highs",
-      "thesis": "With the front end held high by the hawkish Fed and rate differentials wide, income books can be paid to express a range view on pairs they are happy to hold either side of. Dual-currency deposits and currency-hedged carry turn the differential into an enhanced coupon — you accept conversion at a set rate in return for yield. A Professional, range-bound income tool, not a directional dollar bet — and with USD/JPY at a fresh ~40-year high (~162), back through the 162.00 level several banks call the intervention 'line in the sand', with intervention risk live and the BoJ next meeting 31-Jul, size the conversion strikes with real care.",
+      "thesis": "With the front end held high by the hawkish Fed (3.50-3.75%) against a BoJ still only at 1.00% (hiked 16-Jun), the US-Japan differential is wide and income books can be paid to express a range view on pairs they are happy to hold either side of. Dual-currency deposits and currency-hedged carry turn the differential into an enhanced coupon — you accept conversion at a set rate in return for yield. MUFG (2-Jul) frames USD/JPY as 'at core a rate-differential trade' that intervention 'cannot dissolve' — the carry keeps winning. A Professional, range-bound income tool, not a directional dollar bet — and with USD/JPY having eased back under the 162.00 'line in the sand' to ~161.8 near ~40-year lows, intervention risk live and the BoJ next meeting 31-Jul, size the conversion strikes with real care.",
       "themeId": "gold",
       "offThemeWhy": null,
       "structures": [
@@ -1332,11 +1478,11 @@
             "key": "positioning",
             "score": 1,
             "dq": "estimated",
-            "note": "Carry trades are well-populated and crowded at the highs — not at a clear unwind extreme, but acute intervention risk at the intervention line argues for care. RSI 63 (neutral).",
+            "note": "Carry trades are well-populated and crowded at the highs — not at a clear unwind extreme, but acute intervention risk at the intervention line argues for care. RSI 59 (neutral).",
             "authoredNote": "Carry trades are well-populated and crowded at the highs — not at a clear unwind extreme, but acute intervention risk at the intervention line argues for care.",
             "indicators": {
-              "rsi": 62.9,
-              "asOf": "2026-07-06 06:05 UTC",
+              "rsi": 59.4,
+              "asOf": "2026-07-07 05:31 UTC",
               "symbol": "FX_IDC:USDJPY",
               "direction": "neutral"
             }
@@ -1345,19 +1491,19 @@
             "key": "technical",
             "score": 0,
             "dq": "sourced",
-            "note": "Price 162.1 vs SMA50/100/200 159.7/158.9/156.8 (3/3 above), RSI 63, mid-band. Tape is up, stretched to a band edge — range at risk. [sourced: TradingView]",
+            "note": "Price 161.8 vs SMA50/100/200 159.7/159/156.9 (3/3 above), RSI 59, mid-band. Tape is up, stretched to a band edge — range at risk. [sourced: TradingView]",
             "authoredNote": "USD/JPY trends with the differential at ~40-year highs, through the 162 intervention line — constructive for carry but stretched into intervention territory; mixed.",
             "indicators": {
               "symbol": "FX_IDC:USDJPY",
-              "asOf": "2026-07-06 06:05 UTC",
-              "close": 162.148,
-              "sma50": 159.6614,
-              "sma100": 158.9475,
-              "sma200": 156.8248,
-              "rsi": 62.9,
-              "bbUpper": 162.7791,
-              "bbLower": 159.6926,
-              "recommendMA": 0.929,
+              "asOf": "2026-07-07 05:31 UTC",
+              "close": 161.845,
+              "sma50": 159.7058,
+              "sma100": 159.0321,
+              "sma200": 156.8944,
+              "rsi": 59.4,
+              "bbUpper": 162.8041,
+              "bbLower": 159.8092,
+              "recommendMA": 0.786,
               "direction": "neutral",
               "directionSource": "explicit"
             }
@@ -1365,14 +1511,14 @@
         ]
       },
       "macro": {
-        "metric": "US front end ~3.50-3.75%; differential wide, USD/JPY ~162 (fresh ~40-year highs)",
-        "detail": "Hawkish-Fed policy has held US rate differentials wide and driven USD/JPY to a fresh ~40-year high ~162 — the weakest yen since 1986, back through the 162.00 intervention 'line in the sand' — with live MoF-intervention risk (~¥11.7tn spent Apr-May) and the BoJ next meeting 31-Jul; an eventual yen recovery that narrows the gap remains a 2026 story.",
+        "metric": "US front end 3.50-3.75% vs BoJ 1.00%; differential wide, USD/JPY ~161.8",
+        "detail": "Hawkish-Fed policy (3.50-3.75%) against a BoJ at 1.00% keeps the US-Japan differential wide; USD/JPY sits ~161.8, having eased back under the 162.00 'line' near ~40-year lows, with live MoF-intervention risk (~¥11.7tn spent Apr-May) and the BoJ next meeting 31-Jul. MUFG notes intervention 'cannot dissolve the carry dynamics'; an eventual yen recovery that narrows the gap remains a 2026 story.",
         "source": "sourced",
         "watch": "BOJ/MoF intervention and the ECB path versus the Fed; any sharp differential compression or disorderly intervention that erodes the carry."
       },
       "facts": [
         {
-          "text": "Hawkish-Fed policy keeps US rate differentials wide, with USD/JPY at a fresh ~40-year high ~162 — the weakest yen since 1986, back through the 162.00 level banks call the intervention line",
+          "text": "Hawkish-Fed policy (3.50-3.75%) against a BoJ at 1.00% (hiked 16-Jun) keeps the differential wide; USD/JPY ~161.8, the weakest yen since 1986, having eased back under the 162.00 level banks call the intervention line",
           "tag": "sourced"
         },
         {
@@ -1392,6 +1538,16 @@
         {
           "name": "Mitrade / OCBC",
           "kind": "analysis"
+        },
+        {
+          "name": "MUFG Research — 'Asia FX Talk: JPY intervention risks ahead', 2-Jul-2026",
+          "kind": "view",
+          "basis": "Read via web sweep 7-Jul-2026 (mufgresearch.com, 2-Jul): argues USD/JPY is 'at core a rate-differential trade' and that ¥11.7trn of MoF selling has done 'very little' — intervention 'cannot dissolve the carry dynamics'; used to support that the wide differential keeps the carry dominant."
+        },
+        {
+          "name": "am/FX (Brent Donnelly) — 'NFP MOF', 1-Jul-2026",
+          "kind": "view",
+          "basis": "Read in full via FXStreet free republication during web sweep 7-Jul-2026 (fxstreet.com/analysis/nfp-mof-202607011352, dated 1-Jul 13:52 GMT): frames USD/JPY as fundamentally a differential trade where a unilateral MoF op targets a 157.10/157.90 buy zone and typically fades — informing the conversion-strike placement for a carry position."
         }
       ]
     },
@@ -1416,15 +1572,15 @@
       "naturalExpression": "FX puts (USD/JPY)",
       "tactical": true,
       "triggered": false,
-      "trigger": "Still invalid on the reopened Monday tape: a one-way yen-strength bet has no live justification while the carry is winning and spot is making highs. USD/JPY holds ~162 — back through the 162.00 intervention 'line in the sand' — with NO confirmed intervention-driven reversal yet. Elevated surprise-intervention risk (Tokyo may act without warning, per Reuters) raises the odds of a snap, but until MoF actually stalls and reverses spot (a confirmed lower high) this is a knife-catch. The two-sided strangle is the right way to own the intervention binary here, not directional puts. Held back.",
+      "trigger": "Still invalid: a one-way yen-strength bet has no live justification while the carry is winning and no intervention has come. USD/JPY has eased back under the 162.00 'line in the sand' to ~161.8 — near ~40-year lows — with NO confirmed intervention-driven reversal. Brent Donnelly (am/FX, 1-Jul) notes a UNILATERAL MoF op typically only drops spot 3-3.5% into a 157-158 zone and then fades ('buy dips') — so even a surprise op wouldn't validate holding directional puts; only a coordinated op (targeting ~155, 'sell rallies') or a confirmed lower high would. The two-sided strangle is the right way to own the intervention binary here, not directional puts. Held back.",
       "levels": {
         "tenor": "4-6 weeks",
-        "entry": "n/a — held back (spot ~162 near fresh highs; no confirmed lower high yet)",
+        "entry": "n/a — held back (spot ~161.8, no confirmed lower high; a unilateral op would fade)",
         "target": "158-159 (unwind)",
         "stop": "break above ~164 / premium at risk"
       },
       "headline": "USD/JPY through 162 at ~40-year highs — directional yen-strength puts have no live trigger; own the two-sided strangle instead",
-      "thesis": "USD/JPY sits at ~40-year highs — ~162, back through the 162.00 level several banks call the intervention 'line in the sand', deep in MoF/BoJ territory, held up by a wide US-Japan differential after the in-line PCE and hawkish Fed. A one-way short-dated put trade is a fast yen-strength snapback bet — but with spot still making highs and the carry dominant, there is no live justification to own directional downside here. This trade only re-arms if intervention actually stalls and reverses spot (a confirmed lower high). Until then it is held back in favour of the two-sided strangle — even with surprise-intervention risk elevated.",
+      "thesis": "USD/JPY sits near ~40-year lows for the yen — ~161.8, just back under the 162.00 level several banks call the intervention 'line in the sand', held up by a wide US-Japan differential (Fed 3.50-3.75% vs BoJ 1.00%). A one-way short-dated put trade is a fast yen-strength snapback bet — but with the carry dominant and no intervention having come, there is no live justification to own directional downside here. Brent Donnelly's read that a unilateral op fades ('buy dips') means even a surprise op wouldn't validate directional puts; this only re-arms on a coordinated op or a confirmed lower high. Until then it is held back in favour of the two-sided strangle.",
       "themeId": null,
       "offThemeWhy": "Tactical, event-driven FX trade around intervention risk — a short-dated directional position, not the desk's strategic currency-diversification house view.",
       "structures": [
@@ -1474,11 +1630,11 @@
             "key": "positioning",
             "score": 1,
             "dq": "estimated",
-            "note": "Yen shorts are crowded at the highs — offside is fuel, but not a confirmed wash-out signal. RSI 63 — no sentiment extreme. [sourced: TradingView].",
+            "note": "Yen shorts are crowded at the highs — offside is fuel, but not a confirmed wash-out signal. RSI 59 — no sentiment extreme. [sourced: TradingView].",
             "authoredNote": "Yen shorts are crowded at the highs — offside is fuel, but not a confirmed wash-out signal.",
             "indicators": {
-              "rsi": 62.9,
-              "asOf": "2026-07-06 06:05 UTC",
+              "rsi": 59.4,
+              "asOf": "2026-07-07 05:31 UTC",
               "symbol": "FX_IDC:USDJPY",
               "direction": "short"
             }
@@ -1487,19 +1643,19 @@
             "key": "technical",
             "score": 0,
             "dq": "sourced",
-            "note": "Price 162.1 vs SMA50/100/200 159.7/158.9/156.8 (3/3 above), RSI 63, mid-band. Trend contradicts the short. [sourced: TradingView]",
+            "note": "Price 161.8 vs SMA50/100/200 159.7/159/156.9 (3/3 above), RSI 59, mid-band. Trend contradicts the short. [sourced: TradingView]",
             "authoredNote": "Spot at fresh ~40-year highs through 162 — a one-way directional fade is premature; constructive only on a confirmed reversal.",
             "indicators": {
               "symbol": "FX_IDC:USDJPY",
-              "asOf": "2026-07-06 06:05 UTC",
-              "close": 162.148,
-              "sma50": 159.6614,
-              "sma100": 158.9475,
-              "sma200": 156.8248,
-              "rsi": 62.9,
-              "bbUpper": 162.7791,
-              "bbLower": 159.6926,
-              "recommendMA": 0.929,
+              "asOf": "2026-07-07 05:31 UTC",
+              "close": 161.845,
+              "sma50": 159.7058,
+              "sma100": 159.0321,
+              "sma200": 156.8944,
+              "rsi": 59.4,
+              "bbUpper": 162.8041,
+              "bbLower": 159.8092,
+              "recommendMA": 0.786,
               "direction": "short",
               "directionSource": "explicit"
             }
@@ -1514,15 +1670,15 @@
       },
       "facts": [
         {
-          "text": "USD/JPY holds ~162, the weakest yen since 1986, back through the 162.00 level banks call the intervention line",
+          "text": "USD/JPY ~161.8, the weakest yen since 1986, having eased back under the 162.00 level banks call the intervention line — no confirmed intervention-driven reversal has occurred",
           "tag": "sourced"
         },
         {
-          "text": "The BoJ stays hike-biased (next meeting 31-Jul) and MoF surprise-intervention risk is elevated (Tokyo may act without pre-warning), but no confirmed intervention-driven reversal has occurred",
+          "text": "The BoJ is at 1.00% (hiked 16-Jun, next meeting 31-Jul) and MoF surprise-intervention risk is elevated (Tokyo may act without pre-warning), but the wide differential keeps the carry dominant",
           "tag": "sourced"
         },
         {
-          "text": "The in-line 25-Jun PCE and hawkish Fed keep the US-Japan rate differential wide and the carry dominant",
+          "text": "Brent Donnelly (am/FX, 1-Jul) maps a unilateral MoF op to a 157.10/157.90 buy zone with a typical 3-3.5% drop that fades; a coordinated op could reach ~155 — only the latter marks a durable turn",
           "tag": "sourced"
         }
       ],
@@ -1536,8 +1692,9 @@
           "kind": "analysis"
         },
         {
-          "name": "ING THINK",
-          "kind": "analysis"
+          "name": "am/FX (Brent Donnelly) — 'NFP MOF', 1-Jul-2026",
+          "kind": "view",
+          "basis": "Read in full via FXStreet free republication during web sweep 7-Jul-2026 (fxstreet.com/analysis/nfp-mof-202607011352): unilateral MoF intervention targets a 157.10/157.90 buy zone and 'almost always' yields a 3-3.5% drop that fades ('buy dips'), whereas a coordinated op could push toward 155.00 ('sell rallies') — used to justify holding directional puts back until a coordinated op or confirmed lower high."
         }
       ]
     },
@@ -1623,8 +1780,8 @@
             "note": "Euro longs building but not extreme — neutral fuel. RSI 42 — no sentiment extreme. [sourced: TradingView].",
             "authoredNote": "Euro longs building but not extreme — neutral fuel.",
             "indicators": {
-              "rsi": 41.7,
-              "asOf": "2026-07-06 06:05 UTC",
+              "rsi": 42.3,
+              "asOf": "2026-07-07 05:31 UTC",
               "symbol": "FX_IDC:EURUSD",
               "direction": "long"
             }
@@ -1633,18 +1790,18 @@
             "key": "technical",
             "score": 0,
             "dq": "sourced",
-            "note": "Price 1.143 vs SMA50/100/200 1.158/1.162/1.165 (0/3 above), RSI 42, mid-band. Trend contradicts the long. [sourced: TradingView]",
+            "note": "Price 1.143 vs SMA50/100/200 1.158/1.161/1.165 (0/3 above), RSI 42, mid-band. Trend contradicts the long. [sourced: TradingView]",
             "authoredNote": "EUR/USD firmed to ~1.145 but still below the 1.17 trigger — not a constructive entry yet.",
             "indicators": {
               "symbol": "FX_IDC:EURUSD",
-              "asOf": "2026-07-06 06:05 UTC",
-              "close": 1.1428,
-              "sma50": 1.1582,
-              "sma100": 1.1618,
-              "sma200": 1.1652,
-              "rsi": 41.7,
-              "bbUpper": 1.1619,
-              "bbLower": 1.1309,
+              "asOf": "2026-07-07 05:31 UTC",
+              "close": 1.1431,
+              "sma50": 1.1577,
+              "sma100": 1.1614,
+              "sma200": 1.165,
+              "rsi": 42.3,
+              "bbUpper": 1.1611,
+              "bbLower": 1.1308,
               "recommendMA": -0.643,
               "direction": "long",
               "directionSource": "explicit"
@@ -1762,11 +1919,11 @@
             "key": "positioning",
             "score": 1,
             "dq": "estimated",
-            "note": "GBP recovering on the softer dollar but not yet at a clean offside extreme that favours the long. RSI 52 — no sentiment extreme. [sourced: TradingView].",
+            "note": "GBP recovering on the softer dollar but not yet at a clean offside extreme that favours the long. RSI 56 — no sentiment extreme. [sourced: TradingView].",
             "authoredNote": "GBP recovering on the softer dollar but not yet at a clean offside extreme that favours the long.",
             "indicators": {
-              "rsi": 52.2,
-              "asOf": "2026-07-06 06:05 UTC",
+              "rsi": 56.2,
+              "asOf": "2026-07-07 05:31 UTC",
               "symbol": "FX_IDC:GBPUSD",
               "direction": "long"
             }
@@ -1775,19 +1932,19 @@
             "key": "technical",
             "score": 0,
             "dq": "sourced",
-            "note": "Price 1.334 vs SMA50/100/200 1.34/1.34/1.34 (0/3 above), RSI 52, mid-band. Trend contradicts the long. [sourced: TradingView]",
+            "note": "Price 1.338 vs SMA50/100/200 1.34/1.34/1.34 (0/3 above), RSI 56, mid-band. Trend contradicts the long. [sourced: TradingView]",
             "authoredNote": "Cable ~1.32, near a 7-month low, well below the 1.355 trigger and close to the short strike — clearly not a constructive entry.",
             "indicators": {
               "symbol": "FX_IDC:GBPUSD",
-              "asOf": "2026-07-06 06:05 UTC",
-              "close": 1.334,
-              "sma50": 1.3402,
-              "sma100": 1.3404,
+              "asOf": "2026-07-07 05:31 UTC",
+              "close": 1.3382,
+              "sma50": 1.34,
+              "sma100": 1.3403,
               "sma200": 1.3397,
-              "rsi": 52.2,
-              "bbUpper": 1.3463,
-              "bbLower": 1.313,
-              "recommendMA": -0.071,
+              "rsi": 56.2,
+              "bbUpper": 1.3472,
+              "bbLower": 1.3127,
+              "recommendMA": 0.071,
               "direction": "long",
               "directionSource": "explicit"
             }
@@ -1832,7 +1989,7 @@
     {
       "id": "tac-usdjpy-strangle",
       "direction": "neutral",
-      "tradeStatement": "Long USD/JPY volatility at the intervention line — buy a 2-4wk strangle (~160 put / ~166 call, ~1.3% total premium) to own the next move either way: a surprise MoF intervention (Tokyo may now act without pre-signalling, per Reuters) could snap it sharply lower, while a dominant carry trade could squeeze it higher through 164. Entry ~162.5, take profit on a break beyond 160 or 166, let it decay / cut if pinned 161-164 (theta).",
+      "tradeStatement": "Long USD/JPY volatility at the intervention line — buy a 2-4wk strangle (~159 put / ~165 call, ~1.3% total premium) to own the next move either way: a surprise MoF intervention (Tokyo may now act without pre-signalling, per Reuters; Brent Donnelly maps a unilateral op to a 157-158 buy zone) could snap it sharply lower, while a dominant carry trade could squeeze it back up through 164. Entry ~161.8, take profit on a break beyond 159 or 165, let it decay / cut if pinned 160-164 (theta).",
       "intent": "add",
       "action": "Buy strangle (long volatility, defined-risk)",
       "preferredExpression": "FX strangle (USD/JPY)",
@@ -1851,22 +2008,40 @@
       "chart": {
         "kind": "spark",
         "unit": "",
-        "series": [158.9, 159.8, 160.6, 161.2, 160.9, 161.7, 162.1, 162.0],
-        "band": { "lo": 160, "hi": 166, "label": "Strangle strikes 160 / 166" },
-        "refs": [ { "y": 162.0, "label": "162 intervention line" } ],
-        "caption": "USD/JPY ~162, back through the 162.00 intervention line; the strangle owns a break beyond 160/166. Levels sourced; line indicative."
+        "series": [
+          159.8,
+          160.6,
+          161.2,
+          160.9,
+          161.7,
+          162.1,
+          162.0,
+          161.8
+        ],
+        "band": {
+          "lo": 159,
+          "hi": 165,
+          "label": "Strangle strikes 159 / 165"
+        },
+        "refs": [
+          {
+            "y": 162.0,
+            "label": "162 intervention line"
+          }
+        ],
+        "caption": "USD/JPY ~161.8, having eased back under the 162.00 intervention line; the strangle owns a break beyond 159/165. Levels sourced; line indicative."
       },
       "tactical": true,
       "triggered": true,
-      "trigger": "Live on the reopened Monday tape: spot back at ~40-year highs (~162, through the 162.00 intervention line), with Tokyo signalling via Reuters it may intervene WITHOUT pre-warning and the BoJ 31-Jul meeting ahead — a two-sided binary with a live justification, and no operation having yet materialised.",
+      "trigger": "Live: spot sits ~161.8 near ~40-year lows for the yen, just under the 162.00 intervention line, with Tokyo signalling via Reuters it may intervene WITHOUT pre-warning and the BoJ 31-Jul meeting ahead — a genuinely two-sided binary (a surprise MoF snapback vs a carry squeeze) with a live justification, and no operation having yet materialised. The yen gave back ~half its 2-Jul intervention-scare spike as no action came, leaving the binary unresolved and event vol still the honest expression.",
       "levels": {
         "tenor": "2-4 weeks",
-        "entry": "~162",
-        "target": "break beyond 160 or 166",
-        "stop": "theta decay if pinned 161-164"
+        "entry": "~161.8",
+        "target": "break beyond 159 or 165",
+        "stop": "theta decay if pinned 160-164"
       },
-      "headline": "USD/JPY ~162 through the intervention line with acute surprise-MoF risk — own the two-sided move with a short-dated strangle",
-      "thesis": "Live and sharp on the reopened Monday tape: USD/JPY holds a fresh ~40-year high (~162) — the weakest yen since 1986 — back through the 162.00 level several banks call the intervention 'line in the sand'. No intervention has yet materialised, but the risk stays ACUTE: FinMin Katayama repeated authorities would 'respond appropriately at any time', and Reuters reports Japan may now intervene WITHOUT pre-signalling (unlike the 30-Apr op; ~¥11.7tn spent Apr-May), the surprise itself the weapon. With the BoJ hike-biased into its 31-Jul meeting and the carry still dominant, the next move is a genuinely two-sided binary — a carry-driven melt-up vs a surprise-intervention snapback. Owning the move either way has a live justification.",
+      "headline": "USD/JPY ~161.8 at the intervention line with acute surprise-MoF risk — own the two-sided move with a short-dated strangle",
+      "thesis": "Live and two-sided: USD/JPY sits ~161.8 — near the weakest yen since 1986 — just back under the 162.00 level several banks call the intervention 'line in the sand', having given back ~half its 2-Jul intervention-scare spike as no operation came. The risk stays ACUTE: FinMin Katayama repeated authorities would 'respond appropriately at any time', and Reuters reports Japan may now intervene WITHOUT pre-signalling (unlike the 30-Apr op; ~¥11.7tn spent Apr-May), the surprise itself the weapon. Brent Donnelly (am/FX, 1-Jul) sizes the downside: a unilateral op typically drops spot 3-3.5% into a 157-158 zone, a coordinated op toward 155. With the BoJ at 1.00% into its 31-Jul meeting and the carry still dominant, the next move is a genuinely two-sided binary — a carry-driven melt-up vs a surprise-intervention snapback. Owning the move either way has a live justification.",
       "themeId": null,
       "offThemeWhy": "Tactical long-volatility trade around acute intervention risk at the highs — non-directional, not the strategic currency house view.",
       "structures": [
@@ -1916,11 +2091,11 @@
             "key": "positioning",
             "score": 1,
             "dq": "estimated",
-            "note": "Crowded directional positioning raises the odds of an outsized unwind — supportive of long vol. RSI 63 (neutral).",
+            "note": "Crowded directional positioning raises the odds of an outsized unwind — supportive of long vol. RSI 59 (neutral).",
             "authoredNote": "Crowded directional positioning raises the odds of an outsized unwind — supportive of long vol.",
             "indicators": {
-              "rsi": 62.9,
-              "asOf": "2026-07-06 06:05 UTC",
+              "rsi": 59.4,
+              "asOf": "2026-07-07 05:31 UTC",
               "symbol": "FX_IDC:USDJPY",
               "direction": "neutral"
             }
@@ -1929,19 +2104,19 @@
             "key": "technical",
             "score": 0,
             "dq": "sourced",
-            "note": "Price 162.1 vs SMA50/100/200 159.7/158.9/156.8 (3/3 above), RSI 63, mid-band. Tape is up, stretched to a band edge — range at risk. [sourced: TradingView]",
+            "note": "Price 161.8 vs SMA50/100/200 159.7/159/156.9 (3/3 above), RSI 59, mid-band. Tape is up, stretched to a band edge — range at risk. [sourced: TradingView]",
             "authoredNote": "Spot holding a fresh high 162.78 through the intervention line — stretched and two-sided, consistent with a pending break either way.",
             "indicators": {
               "symbol": "FX_IDC:USDJPY",
-              "asOf": "2026-07-06 06:05 UTC",
-              "close": 162.148,
-              "sma50": 159.6614,
-              "sma100": 158.9475,
-              "sma200": 156.8248,
-              "rsi": 62.9,
-              "bbUpper": 162.7791,
-              "bbLower": 159.6926,
-              "recommendMA": 0.929,
+              "asOf": "2026-07-07 05:31 UTC",
+              "close": 161.845,
+              "sma50": 159.7058,
+              "sma100": 159.0321,
+              "sma200": 156.8944,
+              "rsi": 59.4,
+              "bbUpper": 162.8041,
+              "bbLower": 159.8092,
+              "recommendMA": 0.786,
               "direction": "neutral",
               "directionSource": "explicit"
             }
@@ -1949,18 +2124,22 @@
         ]
       },
       "macro": {
-        "metric": "USD/JPY ~162 · ~40-year highs, through the intervention line, two-sided",
-        "detail": "Buy a 2-4wk ~160 put / ~166 call strangle (~1.3% total). Take profit beyond 160 or 166; max loss = both premiums if pinned 161-164. Driver: a two-sided binary — a surprise-intervention snapback vs a carry-driven squeeze higher, with the BoJ 31-Jul meeting in play.",
+        "metric": "USD/JPY ~161.8 · near ~40-year lows for the yen, at the intervention line, two-sided",
+        "detail": "Buy a 2-4wk ~159 put / ~165 call strangle (~1.3% total). Take profit beyond 159 or 165; max loss = both premiums if pinned 160-164. Driver: a two-sided binary — a surprise-intervention snapback (Brent Donnelly: unilateral to 157-158, coordinated to ~155) vs a carry-driven squeeze higher, with the BoJ 31-Jul meeting in play.",
         "source": "estimated",
         "watch": "Surprise MoF intervention and jawboning, the US-Japan differential, the BoJ 31-Jul meeting, and realised vs implied vol."
       },
       "facts": [
         {
-          "text": "USD/JPY holds a fresh ~40-year high ~162 — the weakest yen since 1986, back through the 162.00 level several banks call the intervention 'line in the sand' — with ~¥11.7tn spent Apr-May, 'when, not if' the watchword, and Tokyo signalling it may now act without warning",
+          "text": "USD/JPY ~161.8 — near the weakest yen since 1986, having eased back under the 162.00 level several banks call the intervention 'line in the sand' — with ~¥11.7tn spent Apr-May and Tokyo signalling it may now act without warning",
           "tag": "sourced"
         },
         {
-          "text": "With no intervention yet triggered, the BoJ 31-Jul meeting is the next clustered catalyst on top of the standing intervention binary",
+          "text": "The yen gave back ~half its 2-Jul intervention-scare spike as no operation came; with no intervention yet triggered, the BoJ 31-Jul meeting is the next clustered catalyst on top of the standing intervention binary",
+          "tag": "sourced"
+        },
+        {
+          "text": "Brent Donnelly (am/FX, 1-Jul): a unilateral MoF op typically drops spot 3-3.5% into a 157.10/157.90 zone (fades, 'buy dips'), a coordinated US-Japan op could reach ~155 ('sell rallies') — bounding the downside leg of the strangle",
           "tag": "sourced"
         }
       ],
@@ -1974,14 +2153,186 @@
           "kind": "analysis"
         },
         {
-          "name": "Investing.com / ING THINK",
-          "kind": "analysis"
+          "name": "am/FX (Brent Donnelly) — 'NFP MOF', 1-Jul-2026",
+          "kind": "view",
+          "basis": "Read in full via FXStreet free republication during web sweep 7-Jul-2026 (fxstreet.com/analysis/nfp-mof-202607011352): quantifies the intervention downside — unilateral op → 157.10/157.90 buy zone, ~3-3.5% drop that fades; coordinated op → ~155 — used to size the put strike and frame the two-sided binary the strangle owns."
+        }
+      ]
+    },
+    {
+      "id": "tac-brent-hormuz",
+      "direction": "long",
+      "tradeStatement": "Own upside oil convexity into the re-opened Hormuz tail — buy a 2-3 month Brent call spread (e.g. ~$80/$92, ~1% premium) rather than flat-price length, because the structural tape is soft (supply recovering, prompt contango, weak China demand) while the geopolitical tail just re-fattened after an Iranian missile hit a Qatari LNG tanker in the Strait of Hormuz overnight; defined premium at risk — a bet on the tail and on cheap oil vol, not a directional glut call.",
+      "intent": "add",
+      "action": "Buy call spread (tactical, defined-risk)",
+      "preferredExpression": "Brent call spread",
+      "name": "Brent — own the Hormuz tail",
+      "ticker": "BRENT",
+      "sector": "Energy",
+      "assetClass": "Commodity",
+      "bucket": "Growth",
+      "goalType": "appreciation",
+      "riskProfile": {
+        "vol": "high",
+        "beta": "moderate",
+        "structured": false
+      },
+      "naturalExpression": "Brent call spread",
+      "tactical": true,
+      "triggered": true,
+      "trigger": "Live overnight catalyst: an Iranian missile struck the Qatari LNG carrier Al Rekayyat (owner Nakilat) in the Strait of Hormuz early 7-Jul — the first vessel strike since the interim truce — re-injecting a war premium into a crude market that had just priced it out (Brent fell ~10% the prior week on Hormuz-reopening hopes). A fresh, dated shock to the world's most important oil chokepoint is exactly the trigger a tactical convexity trade waits for.",
+      "levels": {
+        "tenor": "2-3 months",
+        "entry": "Brent ~$72 (spot); buy a ~$80/$92 call spread (~1% premium)",
+        "target": "$88-95 on a sustained escalation; monetise into a spike",
+        "stop": "premium at risk; let it decay if Hormuz de-escalates and contango deepens"
+      },
+      "chart": {
+        "kind": "spark",
+        "unit": "$",
+        "series": [
+          80,
+          78,
+          76,
+          74,
+          72.4,
+          71.9,
+          72.1,
+          72.0
+        ],
+        "band": {
+          "lo": 80,
+          "hi": 92,
+          "label": "Call spread $80/$92"
+        },
+        "refs": [
+          {
+            "y": 72,
+            "label": "Spot ~$72"
+          }
+        ],
+        "caption": "Brent eased ~10% to ~$72 on Hormuz-reopening hopes; the 7-Jul tanker strike re-opens the upside tail. Shaded = call-spread strikes. Levels sourced; line indicative."
+      },
+      "headline": "A missile just hit an LNG tanker in Hormuz — own cheap Brent upside convexity while the structural tape is soft",
+      "thesis": "The oil tape is genuinely two-sided and the cleanest expression is convexity, not direction. The STRUCTURAL picture is soft: Rory Johnston (Commodity Context, 2-3 Jul) reads Middle-East supply and Hormuz flows recovering faster than expected against weak Chinese demand, with prompt contango re-emerging for the first time since February — a 'dour', mini-glut tape around $72 Brent / $69 WTI, and OPEC+ having added a third +188K b/d step for August. Against that, the TAIL just re-fattened: an Iranian missile struck a Qatari LNG carrier in the Strait of Hormuz overnight, the first vessel strike since the truce, and TSCS ('The Paper Strait', 2-Jul) argues the market is underpricing the DURATION of a Hormuz disruption; Doomberg, structurally 'lower for longer', still carries a ~$140 one-year tail on Middle-East escalation. When flat price is soft but the tail is fat and oil vol is cheap — Moontower (2-Jul) notes oil vol concentrates in exactly these overnight/weekend windows — the honest trade is to buy defined-risk upside convexity via a 2-3 month Brent call spread, not to chase the spot glut in either direction.",
+      "themeId": null,
+      "offThemeWhy": "Tactical, event-driven commodity trade around a specific geopolitical shock — a short-dated defined-risk convexity position, not a standing desk commodity theme.",
+      "structures": [
+        "Brent call spread",
+        "Brent calls",
+        "Energy-equity calls",
+        "Commodity-linked note"
+      ],
+      "variant": {
+        "street": "Consensus is a soft, oversupplied summer crude tape drifting toward contango",
+        "us": "Flat price may be soft, but the Hormuz disruption tail is underpriced and oil vol is cheap — own upside convexity, not direction",
+        "gap": "The market prices the glut and discounts the chokepoint; a fresh tanker strike is exactly the tail it's underpricing"
+      },
+      "changeMyMind": "A rapid Hormuz de-escalation — flows fully normalising with no follow-on strikes — that lets the structural glut and contango dominate and decays the premium; or a genuine sustained supply outage that turns this from a convexity trade into an outright long.",
+      "conviction": {
+        "pillars": [
+          {
+            "key": "asymmetry",
+            "score": 2,
+            "dq": "estimated",
+            "note": "A ~$80/$92 call spread for ~1% premium pays a large multiple on a sustained escalation spike against a defined premium — strong long-tail convexity; the target is a soft, options-desk input."
+          },
+          {
+            "key": "catalyst",
+            "score": 2,
+            "dq": "sourced",
+            "note": "Hard, dated overnight catalyst — a missile strike on an LNG tanker in the Strait of Hormuz, the first vessel hit since the truce, into a market that had priced the risk out."
+          },
+          {
+            "key": "consensus",
+            "score": 1,
+            "dq": "estimated",
+            "note": "The soft-tape consensus (Rory Johnston: contango, weak demand) is a confirming contra — we are not fighting flat price, we are buying the tail it discounts — but with no aligned bullish flow this is one leg, not two."
+          },
+          {
+            "key": "thesis",
+            "score": 2,
+            "dq": "sourced",
+            "note": "Quantified, sourced drivers (Brent ~$72, ~10% weekly drop, prompt contango, OPEC+ +188K, the Hormuz strike) and a computable variant — own convexity because flat price is soft while the disruption tail and oil vol are cheap."
+          },
+          {
+            "key": "houseview",
+            "score": 1,
+            "dq": "sourced",
+            "note": "Adjacent to the gold/geopolitics preservation lean, expressed as a tactical energy-convexity trade rather than a standing commodity theme."
+          },
+          {
+            "key": "positioning",
+            "score": 1,
+            "dq": "estimated",
+            "note": "Speculative length bled out on the reopening-hope selloff, so the crowd is offside a snap higher — mild fuel — but without a hard CoT read this is mixed, not extreme."
+          },
+          {
+            "key": "technical",
+            "score": 1,
+            "dq": "estimated",
+            "note": "Brent basing ~$72 after a ~10% drop, below its recent range — a soft trend for flat price, but the trade is upside vol/convexity, so entry quality for the option is good even where the underlying trend is not."
+          }
+        ]
+      },
+      "macro": {
+        "metric": "Brent ~$72 · WTI ~$69 · prompt contango · fresh Hormuz strike",
+        "detail": "Buy a 2-3 month ~$80/$92 Brent call spread (~1% premium) as defined-risk upside convexity into the re-opened Hormuz tail. Monetise into an escalation spike ($88-95); premium at risk if flows normalise and contango deepens. A soft structural tape (supply recovery, weak China demand) offset by an underpriced disruption tail.",
+        "source": "sourced",
+        "watch": "Follow-on Hormuz strikes or flow disruptions, OPEC+ (next 2-Aug), Chinese demand data (CPI/PPI ~9-Jul), and oil-vol / timespread signals."
+      },
+      "facts": [
+        {
+          "text": "An Iranian missile struck the Qatari LNG carrier Al Rekayyat (owner Nakilat) in the Strait of Hormuz early 7-Jul — the first vessel strike since the interim truce — re-injecting a geopolitical risk premium into oil",
+          "tag": "sourced"
+        },
+        {
+          "text": "Brent trades ~$72 and WTI ~$69, having fallen ~10% the prior week on Hormuz-reopening hopes; OPEC+ agreed a third consecutive +188K b/d step for August at its 5-Jul meeting (next 2-Aug)",
+          "tag": "sourced"
+        },
+        {
+          "text": "Rory Johnston (Commodity Context, 2-3 Jul) flags Middle-East supply and Hormuz flows recovering faster than expected against weak Chinese demand, with prompt contango re-emerging for the first time since February",
+          "tag": "sourced"
+        },
+        {
+          "text": "TSCS ('The Paper Strait', 2-Jul) argues the market underprices the DURATION of a Hormuz disruption; Doomberg carries a ~$140 one-year tail on Middle-East escalation despite a 'lower for longer' base case",
+          "tag": "sourced"
+        }
+      ],
+      "sources": [
+        {
+          "name": "Bloomberg / Times of Israel (Strait of Hormuz LNG tanker strike, 7-Jul)",
+          "kind": "news"
+        },
+        {
+          "name": "Reuters / Trading Economics / Investing.com (Brent, WTI, OPEC+)",
+          "kind": "data"
+        },
+        {
+          "name": "Commodity Context (Rory Johnston) — 'Oil Context Weekly W27' / 'Getting Our Bearings Strait', 2-3-Jul-2026",
+          "kind": "view",
+          "basis": "Read via web sweep 7-Jul-2026 (commoditycontext.com, free portions of the 2-3 Jul posts): Brent ~flat ~$72 in a 'dour' summer tape, Middle-East/Hormuz supply recovering faster than expected against weak Chinese demand, prompt contango re-emerging for the first time since February — used as the structural soft-tape counterweight that justifies a convexity (not flat-price-long) expression."
+        },
+        {
+          "name": "TSCS / The Short Case Scenario — 'The Paper Strait', 2-Jul-2026",
+          "kind": "view",
+          "basis": "Read via web sweep 7-Jul-2026 (tscsw.substack.com, 2-Jul): argues tanker values, shipping insurers and regional trade underprice the DURATION of a Strait of Hormuz disruption — used to support that the disruption tail is underpriced."
+        },
+        {
+          "name": "Doomberg — 'Why Energy Abundance May Be Ahead' podcast, 23-Jun-2026",
+          "kind": "view",
+          "basis": "Read via web sweep 7-Jul-2026 (monetary-metals/ZeroHedge transcript, 23-Jun): a 'lower for longer' base case but a ~$140 one-year target weighting Middle-East escalation risk — used to frame the fat upside tail the convexity trade owns."
+        },
+        {
+          "name": "Moontower / Kris Abdelmessih — 'war only happens at night', 2-Jul-2026",
+          "kind": "view",
+          "basis": "Read via web sweep 7-Jul-2026 (moontower.substack.com, 2-Jul): oil vol concentrates in overnight/weekend low-liquidity windows so uniform-daily-vol models misprice oil options — used to support that short-dated oil convexity is cheap relative to the realised-vol regime a Hormuz shock creates."
         }
       ]
     }
   ],
   "meta": {
-    "technicalsAsOf": "2026-07-06 06:05 UTC",
-    "technicalsFeed": "TradingView scanner (7 sourced)"
+    "technicalsAsOf": "2026-07-07 05:31 UTC",
+    "technicalsFeed": "TradingView scanner (9 sourced)"
   }
 }

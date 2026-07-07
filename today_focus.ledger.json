@@ -1,41 +1,41 @@
 {
   "mu-fq3-react": {
-    "fp": "d266e7f5aa311331a5490556dff1de009e2c88bb",
+    "fp": "0ee97a2383edd47690418d3fe34ab62507b86a89",
     "postedAt": "2026-07-07",
     "updatedAt": "2026-07-07"
   },
   "dal-q2": {
-    "fp": "30a940f44d2005f327474d9a3f9b88a8df9a09d1",
+    "fp": "088c96d704ac0c55bda043a5e6f19c9e9ee7fb7f",
     "postedAt": "2026-07-07",
     "updatedAt": "2026-07-07"
   },
   "msft-capex-pullback": {
-    "fp": "d06da3f66bc0aee3e197d44b2dc18f9ef3acf943",
+    "fp": "abaf474c1f068d0cd224f8abbaed636fb69443f4",
     "postedAt": "2026-07-07",
     "updatedAt": "2026-07-07"
   },
   "avgo-capex-readthrough": {
-    "fp": "591ed220686a9d856862789faad0a36b0c63428b",
+    "fp": "da8adeffa562a9a10c84ddd550f2ccdb850addbe",
     "postedAt": "2026-07-07",
     "updatedAt": "2026-07-07"
   },
   "spx-cheap-convexity": {
-    "fp": "b4a2a2de60becf64103e543452946c3f979d2d4b",
+    "fp": "cad08a1caba870d16c29d21c02ea9d3db6846e30",
     "postedAt": "2026-07-07",
     "updatedAt": "2026-07-07"
   },
   "gold-pullback": {
-    "fp": "0674d816739774a3e22ccdaff991100c4dfc3403",
+    "fp": "efd6736ed894ac80343b5d66491fb27b7a0f69fb",
     "postedAt": "2026-07-07",
     "updatedAt": "2026-07-07"
   },
   "ai-power": {
-    "fp": "e9a1604fe321b1659a76f190ac71d665e3d76430",
+    "fp": "d4aea300ecf53706677155b97a535d5661ada6ba",
     "postedAt": "2026-07-07",
     "updatedAt": "2026-07-07"
   },
   "lock-yields": {
-    "fp": "41efc50242c801d6c10bb1a161b7dca16bb7af02",
+    "fp": "37a90e16c4157a623336711729dda5a4bbdf79f9",
     "postedAt": "2026-07-07",
     "updatedAt": "2026-07-07"
   },
@@ -45,17 +45,22 @@
     "updatedAt": "2026-07-07"
   },
   "fx-usd-hedge": {
-    "fp": "aaee6af0804d857b0c01d40e0fa80967add39a3d",
+    "fp": "7f2c1428c9a6869d3902c67de6c7608be174ca78",
     "postedAt": "2026-07-07",
     "updatedAt": "2026-07-07"
   },
   "fx-carry-income": {
-    "fp": "594284f950ffb70d136b11763933c427dd66d1e6",
+    "fp": "4433397c53bdc8031110f763b5ab0aec885ac4ba",
     "postedAt": "2026-07-07",
     "updatedAt": "2026-07-07"
   },
   "tac-usdjpy-strangle": {
-    "fp": "81378c50a8f45f0539c466cfc8629ab028b5104c",
+    "fp": "1598adf483e06a481ce8587046a439c00a3be0f7",
+    "postedAt": "2026-07-07",
+    "updatedAt": "2026-07-07"
+  },
+  "tac-brent-hormuz": {
+    "fp": "1509056fd749d475495bed5dfdf56968a5e3aa77",
     "postedAt": "2026-07-07",
     "updatedAt": "2026-07-07"
   }
