@@ -197,15 +197,18 @@
     return `<svg viewBox="0 0 ${W} ${H}" width="100%" height="${H}" role="img" preserveAspectRatio="xMidYMid meet">${bandRect}${refLines}${line}${dot}</svg>`;
   }
 
-  /* dispatcher used by the idea card. Returns a full <figure> or "" if no/blank data. */
+  /* dispatcher used by the idea card. Returns a full <figure> or "" if no/blank data.
+     HARD RULE: a chart renders ONLY with a real, sourced series (seriesSource is the
+     provenance written by fetch_chart_series.py) — fabricated paths never ship. */
   function ideaChart(chart) {
-    if (!chart || !Array.isArray(chart.series) || chart.series.length < 2) return "";
+    if (!chart || !Array.isArray(chart.series) || chart.series.length < 2 || !chart.seriesSource) return "";
     const svg = _lineChart(chart.series, chart);
     if (!svg) return "";
     const bandLbl = chart.band && chart.band.label
       ? `<span class="ipc-band"><i></i>${chart.band.label}</span>` : "";
     const cap = chart.caption ? `<figcaption class="ipc-cap">${chart.caption}</figcaption>` : "";
-    return `<figure class="ip-chart">${bandLbl ? `<div class="ipc-key">${bandLbl}</div>` : ""}${svg}${cap}</figure>`;
+    const src = `<div class="ipc-src">Source: ${chart.seriesSource}</div>`;
+    return `<figure class="ip-chart">${bandLbl ? `<div class="ipc-key">${bandLbl}</div>` : ""}${svg}${cap}${src}</figure>`;
   }
   const sparkline = (series, opts) => _lineChart(series, opts || {});
   const bandChart = (series, opts) => _lineChart(series, opts || {});

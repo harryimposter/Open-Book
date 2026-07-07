@@ -210,6 +210,9 @@ button { font-family: var(--sans); }
 
 /* ---- Solutions bar (curate the feed) + card remove + draft pill ---- */
 .ob-solbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; border: 1px dashed var(--bronze-l); background: #FBF7F0; border-radius: 10px; padding: 9px 13px; margin-bottom: 4px; }
+/* `display:flex` above would defeat the [hidden] attribute — never show the
+   Solutions bar (or its Add-idea button) outside Solutions view */
+.ob-solbar[hidden] { display: none !important; }
 [data-theme="dark"] .ob-solbar { background: rgba(235,201,141,.07); }
 .sol-k { font-size: 10px; font-weight: 700; letter-spacing: .18em; color: var(--bronze); }
 .sol-hint { font-size: 11.5px; color: var(--grey-soft); }
@@ -233,12 +236,12 @@ button { font-family: var(--sans); }
 .ic-f input:focus, .ic-f textarea:focus, .ic-f select:focus { border-color: var(--bronze); }
 .ic-note { font-size: 11px; line-height: 1.5; color: var(--grey-soft); border-top: 1px dotted var(--hairline); padding-top: 10px; }
 
-/* ---- desk brief: short authored lines + full-note toggle ---- */
+/* ---- desk brief: one neutral summary + "to watch today" (no full-note view) ---- */
 .ob-brief-text .obb-line { margin: 0 0 9px; font-size: 16px; line-height: 1.52; }
-.ob-brief-text .obb-line:last-of-type { margin-bottom: 4px; }
-.ob-brief-text .obb-full { font-size: 13.5px; line-height: 1.6; font-weight: 400; }
-.obb-more { appearance: none; background: none; border: none; cursor: pointer; padding: 0; font-family: var(--sans); font-size: 11px; font-weight: 600; letter-spacing: .06em; color: var(--gold); }
-.obb-more:hover { text-decoration: underline; }
+.ob-brief-text .obb-sum { margin: 0 0 12px; font-size: 17px; line-height: 1.5; }
+.obb-watch-k { font-family: var(--sans); font-size: 10px; font-weight: 700; letter-spacing: .2em; color: var(--gold); margin: 0 0 8px; }
+.obb-watch { display: flex; gap: 10px; align-items: baseline; font-family: var(--sans); font-size: 13px; line-height: 1.5; font-weight: 400; margin-bottom: 6px; }
+.obb-wn { flex: none; font-family: var(--serif); font-size: 13px; font-weight: 600; color: var(--gold); }
 
 /* inline idea chart (sits on the dark card window) + attribution + updated chip */
 .ip-chart { margin: 13px 0 2px; border-top: 1px solid rgba(244,241,234,.12); padding-top: 12px; }
@@ -247,6 +250,7 @@ button { font-family: var(--sans); }
 .ipc-band i { width: 14px; height: 8px; border-radius: 2px; background: var(--gold); opacity: .32; }
 .ip-chart svg { display: block; overflow: visible; }
 .ipc-cap { margin: 6px 0 0; font-size: 10.5px; line-height: 1.42; color: var(--grey-soft); font-style: italic; }
+.ipc-src { margin-top: 4px; font-size: 9.5px; letter-spacing: .04em; color: var(--grey-soft); opacity: .8; }
 .ip-via { margin-top: 10px; font-size: 10.5px; font-weight: 600; letter-spacing: .02em; color: var(--gold); opacity: .92; }
 .ip-via.own { color: var(--grey-soft); font-style: italic; font-weight: 500; }
 .ip-upd { color: var(--bronze); font-weight: 600; }

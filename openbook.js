@@ -516,17 +516,17 @@
     $("#briefStamp").textContent = `${fmtDateLong(d).toUpperCase()} · 08:10 ET`;
     const host = $("#briefText");
     const brief = (TF.sweep || {}).brief;
-    if (Array.isArray(brief) && brief.length) {
-      /* authored desk brief: a few short, opinionated lines — the full sweep
-         note stays one tap away rather than filling the tile */
-      const lines = () => brief.map(l => `<p class="obb-line">${esc(l)}</p>`).join("");
-      const render = (full) => {
-        host.innerHTML = full
-          ? `<p class="obb-line obb-full">${esc((TF.sweep || {}).note || "")}</p><button type="button" class="obb-more" id="briefMore">◂ Back to the brief</button>`
-          : lines() + `<button type="button" class="obb-more" id="briefMore">Full sweep note ▸</button>`;
-        $("#briefMore").addEventListener("click", () => render(!full));
-      };
-      render(false);
+    if (brief && typeof brief === "object" && !Array.isArray(brief) && brief.summary) {
+      /* client-friendly desk brief: one neutral summary line + three things to
+         watch. Deliberately short — the full sweep note is internal and is NOT
+         surfaced here. Factual, not editorial. */
+      const watch = Array.isArray(brief.watch) ? brief.watch.slice(0, 3) : [];
+      host.innerHTML = `<p class="obb-sum">${esc(brief.summary)}</p>` + (watch.length
+        ? `<div class="obb-watch-k">TO WATCH TODAY</div>` +
+          watch.map((w, i) => `<div class="obb-watch"><span class="obb-wn">${i + 1}</span><span>${esc(w)}</span></div>`).join("")
+        : "");
+    } else if (Array.isArray(brief) && brief.length) {
+      host.innerHTML = brief.map(l => `<p class="obb-line">${esc(l)}</p>`).join("");
     } else {
       const note = clampSentences((TF.sweep || {}).note || "", 3, 560);
       const t3 = top3();
@@ -731,7 +731,7 @@
     if (!bar) return;
     const sol = state.viewMode === "solutions";
     bar.hidden = !sol;
-    if (!sol) return;
+    if (!sol) { bar.innerHTML = ""; return; }   // empty it too — Advisor view must carry zero curation UI
     const removed = (userData.dismissedFocus || []).length;
     bar.innerHTML = `
       <span class="sol-k">SOLUTIONS VIEW</span>
@@ -773,6 +773,7 @@
   }
 
   function openIdeaComposer() {
+    if (state.viewMode !== "solutions") return;   // curation is Solutions-view only
     const AC = ["Equity", "Fixed Income", "Commodity", "Multi-Asset"];
     const BK = ["Growth", "Income", "Preservation", "Structured"];
     openModal(`<div class="ob-overlay"><div class="ob-pop" style="max-width:640px">

@@ -305,6 +305,16 @@ def validate(idea, as_of, warns):
             warns.append(f"{idea['id']}: view-citation '{s.get('name','?')}' has NO `basis` — "
                          "never cite an author whose content wasn't read; state what was read "
                          "and when, or drop the citation and set ownView:true instead")
+    # CHART INTEGRITY (HARD RULE): a chart that claims to show market moves must BE
+    # market data. Any chart without a fetched series + provenance is STRIPPED here —
+    # no data, no graph. Fill series with:  python fetch_chart_series.py
+    chart = idea.get("chart")
+    if chart is not None:
+        series = chart.get("series")
+        if not (isinstance(series, list) and len(series) >= 2 and str(chart.get("seriesSource", "")).strip()):
+            warns.append(f"{idea['id']}: chart has no SOURCED series (symbol {chart.get('symbol', '?')}) — "
+                         "stripped from the output; run fetch_chart_series.py or remove the chart block")
+            del idea["chart"]
     ts = idea.get("tradeStatement")
     if not (ts and str(ts).strip()):
         warns.append(f"{idea['id']}: no tradeStatement — REQUIRED (one precise sentence: instrument + direction + the actual view; for FX, name which currency is long vs short and whether it's a spot or differential/carry bet)")
