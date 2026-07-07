@@ -604,26 +604,34 @@
     $("#briefStamp").textContent = `${fmtDateLong(d).toUpperCase()} · 08:10 ET`;
     const host = $("#briefText");
     const brief = (TF.sweep || {}).brief;
-    if (brief && typeof brief === "object" && !Array.isArray(brief) && (brief.lead || brief.summary)) {
-      /* flowing, market-strategist prose: a short lead read by default, with the
-         complete read behind "Full brief". Cause-and-effect woven in — what
-         happened and what it implies in the same breath, not fact-then-gloss.
-         (Legacy summary/watch data still renders if a sweep predates lead/full.) */
-      const lead = Array.isArray(brief.lead) ? brief.lead
-        : (brief.summary ? [brief.summary] : []);
-      const full = Array.isArray(brief.full) && brief.full.length ? brief.full : lead;
-      const hasMore = full.length > lead.length || full.join("¦") !== lead.join("¦");
-      const proseHTML = (paras) => paras.map(p => `<p class="obb-p">${esc(p)}</p>`).join("");
-      const render = () => {
-        host.innerHTML =
-          `<div class="obb-prose">${proseHTML(state.briefOpen ? full : lead)}</div>` +
-          (hasMore ? `<button type="button" class="obb-fulltoggle${state.briefOpen ? " open" : ""}" id="briefFullToggle" aria-expanded="${state.briefOpen ? "true" : "false"}">
-            <span class="obb-ft-ico">${state.briefOpen ? "–" : "+"}</span>${state.briefOpen ? "Show less" : "Full brief"}
-          </button>` : "");
-        const tg = $("#briefFullToggle");
-        if (tg) tg.addEventListener("click", () => { state.briefOpen = !state.briefOpen; render(); });
-      };
-      render();
+    if (brief && typeof brief === "object" && !Array.isArray(brief) && (brief.summary || brief.full)) {
+      /* concise default (unchanged): the neutral summary line + the "to watch"
+         bullets. The "Full brief" expander opens the complete read as flowing
+         market-strategist prose — what happened and what it implies in the same
+         breath, cause-and-effect woven in, no points and no "what this means". */
+      const watch = Array.isArray(brief.watch) ? brief.watch.slice(0, 3) : [];
+      const full = Array.isArray(brief.full) ? brief.full : [];
+      const concise = `<p class="obb-sum">${esc(brief.summary || "")}</p>` + (watch.length
+        ? `<div class="obb-watch-k">TO WATCH TODAY</div>` +
+          watch.map((w, i) => `<div class="obb-watch"><span class="obb-wn">${i + 1}</span><span>${esc(w)}</span></div>`).join("")
+        : "");
+      const expander = full.length ? `
+        <button type="button" class="obb-fulltoggle${state.briefOpen ? " open" : ""}" id="briefFullToggle" aria-expanded="${state.briefOpen ? "true" : "false"}">
+          <span class="obb-ft-ico">${state.briefOpen ? "–" : "+"}</span>${state.briefOpen ? "Show less" : "Full brief"}
+        </button>
+        <div class="obb-full" id="briefFull"${state.briefOpen ? "" : " hidden"}>
+          <div class="obb-prose">${full.map(p => `<p class="obb-p">${esc(p)}</p>`).join("")}</div>
+        </div>` : "";
+      host.innerHTML = concise + expander;
+      const tg = $("#briefFullToggle");
+      if (tg) tg.addEventListener("click", () => {
+        state.briefOpen = !state.briefOpen;
+        const fl = $("#briefFull");
+        if (fl) fl.hidden = !state.briefOpen;
+        tg.classList.toggle("open", state.briefOpen);
+        tg.setAttribute("aria-expanded", state.briefOpen ? "true" : "false");
+        tg.innerHTML = `<span class="obb-ft-ico">${state.briefOpen ? "–" : "+"}</span>${state.briefOpen ? "Show less" : "Full brief"}`;
+      });
     } else if (Array.isArray(brief) && brief.length) {
       host.innerHTML = brief.map(l => `<p class="obb-line">${esc(l)}</p>`).join("");
     } else {

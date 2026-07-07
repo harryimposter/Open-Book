@@ -19,9 +19,11 @@ window.TODAY_FOCUS = {
     ],
     "rule": "A fact is stated only if >=2 independent sources agree. Pending/forward events are kept in the future tense. Every datapoint is tagged sourced or estimated.",
     "brief": {
-      "lead": [
-        "US equities closed Monday at fresh records, the Dow above 53,000 for the first time at 53,056, the S&P 500 at 7,537 and the Nasdaq at 26,121, with the VIX near 15.6. That combination says the tape is priced for a soft landing rather than braced for a shock, which keeps downside protection inexpensive and argues for trimming into strength rather than chasing it.",
-        "The mood turned overnight in Asia, and the driver was a chip story rather than a macro one. Samsung reported the largest quarterly operating profit in its history, roughly $58bn, yet the stock fell about 9% as attention shifted to peak-memory worries and the durability of AI capex; SK Hynix fell a further 7% to 9% and the KOSPI closed down about 3.6%. The read is two-sided, because the numbers confirm a genuine memory supercycle even as the market begins to sell the record, and it is that reflex that now caps the near term for memory and AI names, Micron included, where the better entry is more likely to arrive on the fade than on the strength."
+      "summary": "US markets closed Monday at fresh records — the Dow above 53,000 for the first time, the S&P 500 at 7,537. Asia then turned lower on a chip sell-off: Samsung posted a record quarterly profit but its shares fell on 'peak-memory' concerns, dragging the KOSPI down ~3.6% — while a separate overnight missile strike on an LNG tanker in the Strait of Hormuz put a bid back under oil and gold.",
+      "watch": [
+        "Oil and the Hormuz headlines — Brent traded near $72 before the strike, and tanker-transit news will set today's risk tone.",
+        "Wednesday's June FOMC minutes — the first under Chair Warsh — with the 10Y near 4.5% and 3/10/30-year Treasury auctions running Tuesday through Thursday.",
+        "The AI complex after its bounce — Microsoft (~$387) and Broadcom (~$374) recovered from last week's lows — as Q2 earnings open with Levi Strauss, PepsiCo and Delta."
       ],
       "full": [
         "US equities closed Monday at fresh records, the Dow above 53,000 for the first time at 53,056, the S&P 500 at 7,537 and the Nasdaq at 26,121, with the VIX near 15.6. That combination says the tape is priced for a soft landing rather than braced for a shock, which keeps downside protection inexpensive and argues for trimming into strength rather than chasing it.",

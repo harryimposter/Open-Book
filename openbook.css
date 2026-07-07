@@ -272,7 +272,9 @@ button { font-family: var(--sans); }
 .obb-watch-k { font-family: var(--sans); font-size: 10px; font-weight: 700; letter-spacing: .2em; color: var(--gold); margin: 0 0 8px; }
 .obb-watch { display: flex; gap: 10px; align-items: baseline; font-family: var(--sans); font-size: 13px; line-height: 1.5; font-weight: 400; margin-bottom: 6px; }
 .obb-wn { flex: none; font-family: var(--serif); font-size: 13px; font-weight: 600; color: var(--gold); }
-/* desk brief as flowing prose — a short lead by default, the full read on toggle */
+/* desk brief: concise summary + watch bullets by default; the "Full brief"
+   expander opens the complete read as flowing prose */
+.obb-full { margin-top: 16px; border-top: 1px solid rgba(244,241,234,.14); padding-top: 16px; animation: fadeIn .25s ease; }
 .obb-prose .obb-p { margin: 0 0 13px; font-family: var(--serif); font-size: 16px; line-height: 1.62; color: var(--cream); font-weight: 500; }
 .obb-prose .obb-p:last-child { margin-bottom: 0; }
 .obb-fulltoggle { appearance: none; cursor: pointer; margin-top: 16px; display: inline-flex; align-items: center; gap: 8px; background: rgba(244,241,234,.06); border: 1px solid rgba(244,241,234,.16); border-radius: 8px; padding: 8px 13px; font-family: var(--sans); font-size: 12px; font-weight: 600; letter-spacing: .02em; color: var(--gold); transition: background .15s ease, border-color .15s ease; }
