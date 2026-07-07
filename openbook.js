@@ -278,7 +278,7 @@
     savedOnly: !!uiData.savedOnly,
     viewMode: uiData.viewMode === "solutions" ? "solutions" : "advisor",
     bookClientId: null, expanded: {}, selected: {},
-    cmdIndex: 0,
+    cmdIndex: 0, briefOpen: false,
   };
   rebuildFocus();   // now that `state` exists (viewMode gates the approved set)
 
@@ -609,10 +609,33 @@
          watch. Deliberately short — the full sweep note is internal and is NOT
          surfaced here. Factual, not editorial. */
       const watch = Array.isArray(brief.watch) ? brief.watch.slice(0, 3) : [];
-      host.innerHTML = `<p class="obb-sum">${esc(brief.summary)}</p>` + (watch.length
+      const points = Array.isArray(brief.points) ? brief.points : [];
+      const concise = `<p class="obb-sum">${esc(brief.summary)}</p>` + (watch.length
         ? `<div class="obb-watch-k">TO WATCH TODAY</div>` +
           watch.map((w, i) => `<div class="obb-watch"><span class="obb-wn">${i + 1}</span><span>${esc(w)}</span></div>`).join("")
         : "");
+      /* "Full brief" — every point carries a plain-English "what this means" line,
+         so the reader gets the so-what, not just the fact. Concise stays default. */
+      const full = points.length ? `
+        <button type="button" class="obb-fulltoggle${state.briefOpen ? " open" : ""}" id="briefFullToggle" aria-expanded="${state.briefOpen ? "true" : "false"}">
+          <span class="obb-ft-ico">${state.briefOpen ? "–" : "+"}</span>${state.briefOpen ? "Hide the full brief" : "Full brief — what each point means"}
+        </button>
+        <div class="obb-full" id="briefFull"${state.briefOpen ? "" : " hidden"}>
+          ${points.map(p => `<div class="obb-pt">
+            <div class="obb-pt-fact">${esc(p.fact)}</div>
+            <div class="obb-pt-means"><span class="obb-pt-k">What this means</span> ${esc(p.means)}</div>
+          </div>`).join("")}
+        </div>` : "";
+      host.innerHTML = concise + full;
+      const tg = $("#briefFullToggle");
+      if (tg) tg.addEventListener("click", () => {
+        state.briefOpen = !state.briefOpen;
+        const fl = $("#briefFull");
+        if (fl) fl.hidden = !state.briefOpen;
+        tg.classList.toggle("open", state.briefOpen);
+        tg.setAttribute("aria-expanded", state.briefOpen ? "true" : "false");
+        tg.innerHTML = `<span class="obb-ft-ico">${state.briefOpen ? "–" : "+"}</span>${state.briefOpen ? "Hide the full brief" : "Full brief — what each point means"}`;
+      });
     } else if (Array.isArray(brief) && brief.length) {
       host.innerHTML = brief.map(l => `<p class="obb-line">${esc(l)}</p>`).join("");
     } else {
@@ -1257,7 +1280,7 @@
     const impl = defaultImplFor(idea, client);
     const em = buildEmail(idea, client, impl);
     const letter = $("#suitLetter", root), btns = $("#suitBtns", root);
-    streamInto(letter, esc(em.plainText), {}, () => { btns.style.opacity = "1"; });
+    streamInto(letter, em.html || esc(em.plainText), {}, () => { btns.style.opacity = "1"; });
     $("#suitOutlook", root).addEventListener("click", () => {
       downloadEmlText(`${slug(client.name + "-" + idea.id)}.eml`, em.subject, em.plainText);
     });
@@ -1420,7 +1443,7 @@
         const client = clientById(clientId);
         currentEm = buildEmail(idea, client, impl);
         $("#tepBtns", root).style.opacity = ".4";
-        streamInto($("#tepLetter", root), esc(currentEm.plainText), {}, () => { $("#tepBtns", root).style.opacity = "1"; });
+        streamInto($("#tepLetter", root), currentEm.html || esc(currentEm.plainText), {}, () => { $("#tepBtns", root).style.opacity = "1"; });
       };
       rebuildImpls(); renderWhy(); restream();
       clSel.addEventListener("change", () => { clientId = clSel.value; rebuildImpls(); renderWhy(); restream(); });

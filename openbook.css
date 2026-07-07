@@ -272,6 +272,16 @@ button { font-family: var(--sans); }
 .obb-watch-k { font-family: var(--sans); font-size: 10px; font-weight: 700; letter-spacing: .2em; color: var(--gold); margin: 0 0 8px; }
 .obb-watch { display: flex; gap: 10px; align-items: baseline; font-family: var(--sans); font-size: 13px; line-height: 1.5; font-weight: 400; margin-bottom: 6px; }
 .obb-wn { flex: none; font-family: var(--serif); font-size: 13px; font-weight: 600; color: var(--gold); }
+/* full brief — fact + plain-English "what this means" (on the dark brief panel) */
+.obb-fulltoggle { appearance: none; cursor: pointer; margin-top: 16px; display: inline-flex; align-items: center; gap: 8px; background: rgba(244,241,234,.06); border: 1px solid rgba(244,241,234,.16); border-radius: 8px; padding: 8px 13px; font-family: var(--sans); font-size: 12px; font-weight: 600; letter-spacing: .02em; color: var(--gold); transition: background .15s ease, border-color .15s ease; }
+.obb-fulltoggle:hover { background: rgba(244,241,234,.1); border-color: var(--bronze-l); }
+.obb-ft-ico { display: inline-flex; align-items: center; justify-content: center; width: 15px; height: 15px; border-radius: 50%; border: 1px solid currentColor; font-size: 12px; line-height: 1; }
+.obb-full { margin-top: 16px; border-top: 1px solid rgba(244,241,234,.14); padding-top: 2px; animation: fadeIn .25s ease; }
+.obb-pt { padding: 14px 0; border-bottom: 1px solid rgba(244,241,234,.08); }
+.obb-pt:last-child { border-bottom: none; }
+.obb-pt-fact { font-family: var(--serif); font-size: 15px; line-height: 1.5; color: var(--cream); font-weight: 500; }
+.obb-pt-means { margin-top: 7px; font-family: var(--sans); font-size: 12.5px; line-height: 1.55; color: #B9B4A8; }
+.obb-pt-k { display: inline-block; font-size: 9.5px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--green); margin-right: 8px; }
 
 /* inline idea chart (sits on the dark card window) + attribution + updated chip */
 .ip-chart { margin: 13px 0 2px; border-top: 1px solid rgba(244,241,234,.12); padding-top: 12px; }
@@ -308,6 +318,9 @@ button { font-family: var(--sans); }
 .ob-pop-x:hover { background: rgba(255,255,255,.2); }
 
 .ob-letter { background: #fff; border: 1px solid var(--hairline); border-radius: 11px; padding: 22px 24px; font-family: var(--serif); font-size: 15px; line-height: 1.62; color: #26221B; white-space: pre-wrap; min-height: 200px; }
+.ob-letter strong { font-weight: 700; color: inherit; }
+.ob-letter .eml-lbl { font-family: var(--sans); font-weight: 700; font-size: 11.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--bronze); }
+.ob-letter .eml-disc { color: var(--grey-soft); font-size: 13px; font-style: italic; }
 .ob-mailbtns { display: flex; gap: 11px; margin-top: 16px; transition: opacity .3s ease; }
 .ob-btn-dark { appearance: none; background: var(--charcoal); border: none; cursor: pointer; color: #fff; font-size: 13px; font-weight: 600; padding: 11px 18px; border-radius: 9px; }
 .ob-btn-line { appearance: none; background: #fff; border: 1px solid #DDD6C9; cursor: pointer; color: var(--brown); font-size: 13px; font-weight: 600; padding: 11px 18px; border-radius: 9px; }

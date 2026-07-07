@@ -49,6 +49,11 @@
   };
   const W = () => (typeof window !== "undefined" ? window : {});
   const themeById = (id) => (safe(() => W().SEED.themes, []) || []).find(t => t.id === id) || null;
+  const escHtml = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, c =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  // drop internal provenance tags ([sourced], [estimated], [sourced: TradingView]) + tidy whitespace
+  const stripTags = (s) => String(s || "").replace(/\s*\[[^\]]*(?:sourced|estimated|tradingview)[^\]]*\]/gi, "").replace(/\s+/g, " ").trim();
+  const ensurePeriod = (s) => { s = String(s || "").trim(); return (s && !/[.!?…:]$/.test(s)) ? s + "." : s; };
 
   /* whole-sentence take: keeps up to maxN sentences, stops BEFORE exceeding
      maxChars, but never splits a word (the old clamp's mid-word "…" bug). */
@@ -284,6 +289,80 @@
 
   const DISCLOSURE = "This note is a personal view based on your mandate and current holdings, not a formal recommendation; any structured or tax-related step would be confirmed in writing, with full suitability and risk detail, before we act.";
 
+  /* ===================== advisor-voice body (new) ======================== */
+
+  /* 2–3 sentence framing: the idea's own headline (the context), the dated
+     why-now, and the edge — sets the idea up sharply without weaving the book. */
+  function framingIntro(idea) {
+    const out = [];
+    const head = stripTags(idea.headline) || takeSentences(idea.thesis, 1, 200);
+    if (head) out.push(ensurePeriod(cap1(head)));
+    const wn = whyNow(idea);
+    if (wn) out.push(ensurePeriod(wn));
+    if (out.length < 2) { const g = stripTags(safe(() => idea.variant.gap)); if (g) out.push(ensurePeriod(cap1(g))); }
+    return out.slice(0, 3).join(" ");
+  }
+
+  /* 3–5 thesis points — each a BOLD lead-in + a specific, quantified rationale,
+     pulled from the idea's conviction pillars (label + note). Advisor drafts with
+     no pillars fall back to the variant reads / thesis sentences. A balanced
+     "Key risk" point closes it off from the idea's own change-my-mind. */
+  const PILLAR_LEAD = {
+    asymmetry: "Risk / reward", consensus: "Sell-side", catalyst: "The catalyst",
+    positioning: "Positioning", valuation: "Valuation", quality: "Quality",
+    thesis: "The thesis", moat: "Franchise", balance: "Balance sheet",
+    macro: "Macro backdrop", technicals: "Technicals", flow: "Flows", carry: "Carry"
+  };
+  function thesisPoints(idea) {
+    const pts = [];
+    const seen = new Set();
+    const add = (lead, body) => {
+      body = stripTags(body);
+      if (!lead || !body || body.length < 12) return;
+      const k = body.slice(0, 42).toLowerCase();
+      if (seen.has(k)) return; seen.add(k);
+      pts.push({ lead, body: ensurePeriod(cap1(body)) });
+    };
+    (safe(() => idea.conviction.pillars, []) || []).forEach(p => {
+      add(PILLAR_LEAD[p.key] || cap1(String(p.label || "")), p.authoredNote || p.note);
+    });
+    if (pts.length < 3) {
+      add("Our view", safe(() => idea.variant.us));
+      add("Where the edge is", safe(() => idea.variant.gap));
+      add("Sell-side", safe(() => idea.variant.street));
+    }
+    if (pts.length < 2) {
+      const parts = takeSentences(idea.thesis, 4, 620).split(/(?<=[.!?])\s+(?=[A-Z"“'(])/);
+      const leads = ["The setup", "The driver", "The read"];
+      parts.slice(0, 3).forEach((s, i) => add(leads[i] || "Also", s));
+    }
+    const out = pts.slice(0, 5);
+    const risk = stripTags(safe(() => idea.changeMyMind));
+    if (risk && out.length < 5) out.push({ lead: "Key risk", body: ensurePeriod(cap1(takeSentences(risk, 1, 240))) });
+    return out;
+  }
+
+  /* the implementation stated cleanly: the recommended structure + its key terms
+     ("a 12M reverse convertible, 95% strike"). Uses the Solutions-approved tweak
+     when present; else the expression's concrete example / the idea's levels. */
+  function implementationClean(idea, impl, tweaked) {
+    if (tweaked) return ensurePeriod(stripTags(tweaked));
+    const d = exprDetail(impl, idea);
+    const label = (d && d.label) || exprLabel(impl);
+    let terms = d && d.example ? String(d.example).trim() : "";
+    if (!terms && idea.levels) {
+      terms = [
+        idea.levels.tenor && "tenor " + idea.levels.tenor,
+        idea.levels.entry && "entry " + idea.levels.entry,
+        idea.levels.target && "target " + idea.levels.target,
+        idea.levels.stop && "stop " + idea.levels.stop
+      ].filter(Boolean).join(", ");
+    }
+    let s = cap1(label);
+    if (terms) s += ` — ${stripTags(terms)}`;
+    return ensurePeriod(s);
+  }
+
   /* ============================== assemble =============================== */
   /* opts.implText — an implementation the Solutions desk approved/tweaked. When
      present it REPLACES the engine-chosen implementation line in the email, so
@@ -303,33 +382,57 @@
     const risk = riskLine(idea);
     const signoff = "Happy to talk it through whenever suits.\n\nBest,\n[Your name]\nJ.P. Morgan Private Bank";
 
-    /* SHORT, idea-focused note: a one-line hello, the thesis, the implementation.
-       Deliberately does NOT weave the portfolio (the relevance hook / book-move /
-       goal-gap paragraphs) through the body — those stay available as return keys
-       for other renderers, but the client note itself leads with the IDEA. */
+    /* NEW advisor-voice note: greeting → a sharp framing intro (context + why now)
+       → the thesis as punchy bold-lead-in points → the implementation stated
+       cleanly → a brief close. Idea-focused and confident; NOT portfolio-woven.
+       Returned in two forms: plainText (copy / .eml) and html (the on-screen
+       streamed letter, where the lead-ins render bold). */
+    const hello = `Hi ${firstName(client)},`;
+    const framing = framingIntro(idea);
+    const points = thesisPoints(idea);
+    const implementation = implementationClean(idea, impl, tweaked);
     const tick = idea.ticker && idea.ticker !== "—" ? ` (${idea.ticker})` : "";
     const intro = `Hi ${firstName(client)}, wanted to flag ${idea.name || idea.headline || "an idea"}${tick} —`;
-    // the default impl line already opens "For your book I'd implement this as…";
-    // a Solutions-tweaked free text gets a short lead-in so it reads as the plan.
-    const implPara = tweaked ? `How I'd implement it: ${impLine}` : impLine;
-    const shortDisclosure = "A personal view based on your mandate and holdings, not a formal recommendation — we'd confirm any structured or tax step in writing first.";
+    const close = "Happy to walk through sizing and timing whenever suits — I can turn this into a one-pager if useful.";
+    const signName = "Best,\n[Your name]\nJ.P. Morgan Private Bank";
+    const shortDisclosure = "A personal view based on your mandate; not a formal recommendation — any structured or tax step would be confirmed in writing, with full suitability detail, before we act.";
 
+    // plain text (copy / .eml export)
+    const ptPoints = points.map(p => `• ${p.lead}: ${p.body}`).join("\n");
     const plainText = [
-      intro,
-      thesis,
-      implPara,
-      signoff,
+      hello,
+      framing,
+      "The case:\n" + ptPoints,
+      "Implementation: " + implementation,
+      close,
+      signName,
       shortDisclosure
     ].filter(Boolean).join("\n\n");
 
+    // html (streamed letter — bold lead-ins; pre-wrap keeps the newlines)
+    const htmlPoints = points.map(p => `• <strong>${escHtml(p.lead)}:</strong> ${escHtml(p.body)}`).join("\n");
+    const html = [
+      escHtml(hello),
+      escHtml(framing),
+      `<span class="eml-lbl">The case:</span>\n` + htmlPoints,
+      `<strong>Implementation:</strong> ${escHtml(implementation)}`,
+      escHtml(close),
+      escHtml(signName),
+      `<span class="eml-disc">${escHtml(shortDisclosure)}</span>`
+    ].filter(Boolean).join("\n\n");
+
     // keys kept backward-compatible (subject/greeting/relevance/ideaLine/thesis/impLine/signoff/plainText)
-    // plus the new grounded sections + `intro`, for any richer renderer.
-    return { subject, greeting, intro, relevance, ideaLine, thesis, whyFits: fits, bookHook: hook, impLine, whyNow: now, riskLine: risk, signoff, disclosure: DISCLOSURE, plainText };
+    // plus the new advisor-voice sections (framing/points/implementation/html).
+    return {
+      subject, greeting, intro, relevance, ideaLine, thesis, whyFits: fits, bookHook: hook, impLine, whyNow: now, riskLine: risk,
+      framing, points, implementation, signoff: signName, disclosure: shortDisclosure, plainText, html
+    };
   }
 
   return {
     buildEmail, relevanceLine, implLineFor,
     // exposed for reuse / testing
-    subjectFor, ideaSummary, whyFits, bookHook, whyNow, riskLine, takeSentences
+    subjectFor, ideaSummary, whyFits, bookHook, whyNow, riskLine, takeSentences,
+    framingIntro, thesisPoints, implementationClean
   };
 });
