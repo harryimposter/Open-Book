@@ -396,10 +396,41 @@
       const leads = ["The setup is clear", "The driver is specific", "The read is constructive"];
       parts.slice(0, 3).forEach((s, i) => push(leads[i] || "It also holds up", s));
     }
-    const out = pts.slice(0, 5);
+    return pts.slice(0, 5);   // the risk / catalysts move to the "what you're watching" close
+  }
+
+  /* WHY (the intro/hook): leads with the reason for the idea right now. The
+     headline is the setup; the second sentence is the timely angle (the dated
+     earnings catalyst, or the desk's differentiated read), NOT a watch list.
+     Complete sentences, dash-free. */
+  function whyIntro(idea) {
+    const out = [];
+    const head = stripTags(idea.headline) || takeSentences(idea.thesis, 1, 200);
+    if (head) out.push(ensureSentence(head));
+    let why2 = safe(() => idea.earnings.reportDate) ? whyNow(idea)
+      : (stripTags(safe(() => idea.variant.us)) || stripTags(safe(() => idea.variant.gap)));
+    if (why2) out.push(ensureSentence(why2));
+    return out.slice(0, 3).join(" ");
+  }
+
+  /* WHAT YOU'RE WATCHING (the close): the catalysts / levels / risk to monitor
+     from here, each a complete bold-lead-in sentence. */
+  function watchingPoints(idea) {
+    const pts = [];
+    const watch = stripTags(safe(() => idea.earnings.watch) || safe(() => idea.macro.watch));
+    if (watch) pts.push({ lead: "The signposts to track", body: ensureSentence(watch) });
+    if (idea.levels) {
+      const lv = [
+        idea.levels.entry && ("an entry around " + idea.levels.entry),
+        idea.levels.target && ("a target of " + idea.levels.target),
+        idea.levels.stop && ("a stop at " + idea.levels.stop),
+        idea.levels.tenor && ("a tenor of " + idea.levels.tenor)
+      ].filter(Boolean).join(", ");
+      if (lv) pts.push({ lead: "The levels I would work", body: ensureSentence("I would use " + lv) });
+    }
     const risk = safe(() => idea.changeMyMind);
-    if (risk && out.length < 5) out.push({ lead: "The main risk is clear", body: ensureSentence(stripTags(takeSentences(risk, 1, 240))) });
-    return out;
+    if (risk) pts.push({ lead: "What would change my mind", body: ensureSentence(stripTags(takeSentences(risk, 1, 240))) });
+    return pts.slice(0, 3);
   }
 
   /* the implementation as one clean, dash-free sentence: the recommended structure
@@ -450,35 +481,37 @@
        two forms: plainText (copy / .eml) and html (the streamed letter, lead-ins
        bold). */
     const hello = `Hi ${firstName(client)},`;
-    const framing = framingIntro(idea);
-    const points = thesisPoints(idea);
-    const implementation = implementationClean(idea, impl, tweaked);
+    const why = whyIntro(idea);                       // 2) WHY (the hook)
+    const framing = why;                              // back-compat alias
+    const points = thesisPoints(idea);                // 3) THE CASE
+    const implementation = implementationClean(idea, impl, tweaked);  // 4) IMPLEMENTATION
+    const watching = watchingPoints(idea);            // 5) WHAT YOU'RE WATCHING (the close)
     const tick = idea.ticker && idea.ticker !== "—" ? ` (${idea.ticker})` : "";
     const intro = `Hi ${firstName(client)}, wanted to flag ${idea.name || idea.headline || "an idea"}${tick}.`;
-    const close = "Happy to talk through the sizing and timing whenever suits, and I can put this on a single page if that helps.";
     const signName = "Best,\n[Your name]\nJ.P. Morgan Private Bank";
     const shortDisclosure = "This is a personal view based on your mandate, not a formal recommendation. Any structured or tax step would be confirmed in writing, with full suitability detail, before we act.";
 
-    // plain text (copy / .eml export)
-    const ptPoints = points.map(p => `• ${p.lead}: ${p.body}`).join("\n");
+    const bullets = (arr) => arr.map(p => `• ${p.lead}: ${p.body}`).join("\n");
+    const htmlBullets = (arr) => arr.map(p => `• <strong>${escHtml(p.lead)}</strong>: ${escHtml(p.body)}`).join("\n");
+
+    // plain text (copy / .eml export) — greeting, why, case, implementation, watching
     const plainText = [
       hello,
-      framing,
-      "The case:\n" + ptPoints,
+      why,
+      "The case:\n" + bullets(points),
       "Implementation: " + implementation,
-      close,
+      watching.length ? "What you're watching from here:\n" + bullets(watching) : null,
       signName,
       shortDisclosure
     ].filter(Boolean).join("\n\n");
 
     // html (streamed letter — bold lead-ins; pre-wrap keeps the newlines)
-    const htmlPoints = points.map(p => `• <strong>${escHtml(p.lead)}</strong>: ${escHtml(p.body)}`).join("\n");
     const html = [
       escHtml(hello),
-      escHtml(framing),
-      `<span class="eml-lbl">The case:</span>\n` + htmlPoints,
+      escHtml(why),
+      `<span class="eml-lbl">The case:</span>\n` + htmlBullets(points),
       `<strong>Implementation:</strong> ${escHtml(implementation)}`,
-      escHtml(close),
+      watching.length ? `<span class="eml-lbl">What you're watching from here:</span>\n` + htmlBullets(watching) : null,
       escHtml(signName),
       `<span class="eml-disc">${escHtml(shortDisclosure)}</span>`
     ].filter(Boolean).join("\n\n");
@@ -487,7 +520,7 @@
     // plus the new advisor-voice sections (framing/points/implementation/html).
     return {
       subject, greeting, intro, relevance, ideaLine, thesis, whyFits: fits, bookHook: hook, impLine, whyNow: now, riskLine: risk,
-      framing, points, implementation, signoff: signName, disclosure: shortDisclosure, plainText, html
+      framing, why, points, implementation, watching, signoff: signName, disclosure: shortDisclosure, plainText, html
     };
   }
 
@@ -495,6 +528,6 @@
     buildEmail, relevanceLine, implLineFor,
     // exposed for reuse / testing
     subjectFor, ideaSummary, whyFits, bookHook, whyNow, riskLine, takeSentences,
-    framingIntro, thesisPoints, implementationClean, deDash, ensureSentence
+    framingIntro, whyIntro, thesisPoints, watchingPoints, implementationClean, deDash, ensureSentence
   };
 });
