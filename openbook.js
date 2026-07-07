@@ -386,7 +386,30 @@
     const eml = ["To: ", "Subject: " + subject, "X-Unsent: 1", "MIME-Version: 1.0",
       "Content-Type: text/plain; charset=utf-8", "", plainText].join("\r\n");
     downloadBlob(filename, "message/rfc822", eml);
-    toast("Draft downloaded — opens in your mail app");
+    toast("Draft downloaded, it opens in your mail app");
+  }
+
+  /* ---- visible button feedback (Copy / Open in Outlook) ------------------
+     The behaviour is unchanged; this only swaps the label + a success colour
+     for a moment so a click clearly registers, then reverts. */
+  function flashButton(btn, msg, revert, ms) {
+    if (!btn) return;
+    clearTimeout(btn._flashT);
+    btn.textContent = msg;
+    btn.classList.add("is-flash");
+    btn._flashT = setTimeout(() => { btn.textContent = revert; btn.classList.remove("is-flash"); }, ms || 1500);
+  }
+  function flashCopy(btn) { flashButton(btn, "Copied ✓", "Copy", 1500); }
+  /* Outlook: a brief "Opening…" then a "Opened ✓" confirmation, then revert. */
+  function flashOutlook(btn) {
+    if (!btn) return;
+    clearTimeout(btn._flashT);
+    btn.textContent = "Opening…";
+    btn.classList.add("is-flash");
+    btn._flashT = setTimeout(() => {
+      btn.textContent = "Opened ✓";
+      btn._flashT = setTimeout(() => { btn.textContent = "Open in Outlook"; btn.classList.remove("is-flash"); }, 1300);
+    }, 700);
   }
 
   /* ========================================================================
@@ -1277,13 +1300,13 @@
     const em = buildEmail(idea, client, impl);
     const letter = $("#suitLetter", root), btns = $("#suitBtns", root);
     streamInto(letter, em.html || esc(em.plainText), {}, () => { btns.style.opacity = "1"; });
-    $("#suitOutlook", root).addEventListener("click", () => {
+    const ob = $("#suitOutlook", root);
+    ob.addEventListener("click", () => {
+      flashOutlook(ob);
       downloadEmlText(`${slug(client.name + "-" + idea.id)}.eml`, em.subject, em.plainText);
     });
     const cp = $("#suitCopy", root);
-    cp.addEventListener("click", () => copyText(em.plainText, () => {
-      cp.textContent = "Copied ✓"; setTimeout(() => { cp.textContent = "Copy"; }, 1600);
-    }));
+    cp.addEventListener("click", () => { flashCopy(cp); copyText(em.plainText); });
     const back = $("#suitBack", root);
     if (back) back.addEventListener("click", () => {
       $("#suitBody", root).innerHTML = treeHTML(idea);
@@ -1444,13 +1467,14 @@
       rebuildImpls(); renderWhy(); restream();
       clSel.addEventListener("change", () => { clientId = clSel.value; rebuildImpls(); renderWhy(); restream(); });
       imSel.addEventListener("change", () => { impl = imSel.value; restream(); });
-      $("#tepOutlook", root).addEventListener("click", () => {
-        if (currentEm) downloadEmlText(`${slug(clientById(clientId).name + "-" + idea.id)}.eml`, currentEm.subject, currentEm.plainText);
+      const ob = $("#tepOutlook", root);
+      ob.addEventListener("click", () => {
+        if (!currentEm) return;
+        flashOutlook(ob);
+        downloadEmlText(`${slug(clientById(clientId).name + "-" + idea.id)}.eml`, currentEm.subject, currentEm.plainText);
       });
       const cp = $("#tepCopy", root);
-      cp.addEventListener("click", () => { if (currentEm) copyText(currentEm.plainText, () => {
-        cp.textContent = "Copied ✓"; setTimeout(() => { cp.textContent = "Copy"; }, 1600);
-      }); });
+      cp.addEventListener("click", () => { if (currentEm) { flashCopy(cp); copyText(currentEm.plainText); } });
       return null;
     });
   }
@@ -2040,11 +2064,10 @@
       </div>`;
     streamInto($("#tkLetter", root), esc(text), {}, () => { $("#tkBtns", root).style.opacity = "1"; });
     $("#tkBack", root).addEventListener("click", () => renderTkBody(root));
-    $("#tkOutlook", root).addEventListener("click", () => downloadEmlText(`${slug(c.name)}-coordinated.eml`, subject, text));
+    const ob = $("#tkOutlook", root);
+    ob.addEventListener("click", () => { flashOutlook(ob); downloadEmlText(`${slug(c.name)}-coordinated.eml`, subject, text); });
     const cp = $("#tkCopy", root);
-    cp.addEventListener("click", () => copyText(text, () => {
-      cp.textContent = "Copied ✓"; setTimeout(() => { cp.textContent = "Copy"; }, 1600);
-    }));
+    cp.addEventListener("click", () => { flashCopy(cp); copyText(text); });
   }
 
   /* ========================================================================

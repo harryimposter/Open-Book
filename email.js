@@ -54,6 +54,35 @@
   // drop internal provenance tags ([sourced], [estimated], [sourced: TradingView]) + tidy whitespace
   const stripTags = (s) => String(s || "").replace(/\s*\[[^\]]*(?:sourced|estimated|tradingview)[^\]]*\]/gi, "").replace(/\s+/g, " ").trim();
   const ensurePeriod = (s) => { s = String(s || "").trim(); return (s && !/[.!?…:]$/.test(s)) ? s + "." : s; };
+  const MONTHS_FULL = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  function fmtDateLong(iso) {
+    const m = String(iso || "").match(/^(\d{4})-(\d{2})-(\d{2})/);
+    return m ? (String(+m[3]) + " " + (MONTHS_FULL[+m[2] - 1] || "")) : String(iso || "");
+  }
+  /* NO DASHES: strip every em dash, en dash, spaced hyphen-as-dash, parenthetical
+     dash and minus sign, rewriting each as proper punctuation. A dash connecting
+     two clauses becomes a full stop (if an independent clause follows) or a comma,
+     so nothing turns into a fragment. Intra-word hyphens (sell-side, ten-year) are
+     genuine hyphens, not dashes, and are left intact. */
+  function deDash(s) {
+    s = String(s == null ? "" : s);
+    s = s.replace(/(\d[\d.,%]*)\s*[–—-]\s*(\$?\d)/g, "$1 to $2");   // numeric ranges: 3-6m, $430-450, 4.00-4.90% -> "to"
+    s = s.replace(/−/g, "");                                    // minus sign (e.g. "-10%") -> drop; phrased "below 10%"
+    s = s.replace(/~\s*/g, "roughly ");                             // tilde -> "roughly"
+    // a dash connecting clauses becomes a comma, which keeps everything inside one
+    // sentence: nothing after a dash is ever promoted into its own (fragment) sentence.
+    s = s.replace(/\s*[—–]\s*/g, ", ");                            // em / en dash connector
+    s = s.replace(/\s+-\s+/g, ", ");                               // spaced hyphen used as a dash
+    s = s.replace(/,\s*,/g, ", ").replace(/,\s*\./g, ".").replace(/\.\s*\./g, ".").replace(/\s+([,.;:])/g, "$1").replace(/:\s*,/g, ": ");
+    return s.replace(/\s{2,}/g, " ").trim();
+  }
+  /* guarantee a complete sentence: capital start, terminal punctuation. */
+  function ensureSentence(s) {
+    s = deDash(String(s || "").trim());
+    if (!s) return "";
+    s = s.charAt(0).toUpperCase() + s.slice(1);
+    return /[.!?]$/.test(s) ? s : s + ".";
+  }
 
   /* whole-sentence take: keeps up to maxN sentences, stops BEFORE exceeding
      maxChars, but never splits a word (the old clamp's mid-word "…" bug). */
@@ -291,62 +320,93 @@
 
   /* ===================== advisor-voice body (new) ======================== */
 
-  /* 2–3 sentence framing: the idea's own headline (the context), the dated
-     why-now, and the edge — sets the idea up sharply without weaving the book. */
+  /* framing: two or three complete sentences setting up the idea. The headline
+     is the context, why-now is the timing, the edge is the so-what. Dash-free. */
   function framingIntro(idea) {
     const out = [];
     const head = stripTags(idea.headline) || takeSentences(idea.thesis, 1, 200);
-    if (head) out.push(ensurePeriod(cap1(head)));
+    if (head) out.push(ensureSentence(head));
     const wn = whyNow(idea);
-    if (wn) out.push(ensurePeriod(wn));
-    if (out.length < 2) { const g = stripTags(safe(() => idea.variant.gap)); if (g) out.push(ensurePeriod(cap1(g))); }
+    if (wn) out.push(ensureSentence(wn));
+    if (out.length < 2) { const g = stripTags(safe(() => idea.variant.gap)); if (g) out.push(ensureSentence(g)); }
     return out.slice(0, 3).join(" ");
   }
 
-  /* 3–5 thesis points — each a BOLD lead-in + a specific, quantified rationale,
-     pulled from the idea's conviction pillars (label + note). Advisor drafts with
-     no pillars fall back to the variant reads / thesis sentences. A balanced
-     "Key risk" point closes it off from the idea's own change-my-mind. */
-  const PILLAR_LEAD = {
-    asymmetry: "Risk / reward", consensus: "Sell-side", catalyst: "The catalyst",
-    positioning: "Positioning", valuation: "Valuation", quality: "Quality",
-    thesis: "The thesis", moat: "Franchise", balance: "Balance sheet",
-    macro: "Macro backdrop", technicals: "Technicals", flow: "Flows", carry: "Carry"
+  /* Each thesis point is a COMPLETE sentence: a bold lead-in clause (with its own
+     subject and verb) then a colon and the quantified rationale, so it never reads
+     as a fragment, and everything is run through deDash so no dashes survive.
+     The lead-in clauses are keyed to the conviction pillars; the catalyst point is
+     templated off the earnings date so it reads like the desk wrote it. */
+  const LEAD_CLAUSE = {
+    consensus:   () => "The sell side is aligned",
+    positioning: () => "Positioning has cleared",
+    asymmetry:   () => "The risk and reward are skewed our way",
+    thesis:      () => "The core thesis is intact",
+    technical:   () => "The technicals line up",
+    houseview:   () => "It sits squarely within our house view",
+    valuation:   () => "The valuation is undemanding",
+    quality:     () => "The franchise is high quality",
+    macro:       () => "The macro backdrop is supportive",
+    flow:        () => "Flows are turning",
+    carry:       () => "The carry pays you to wait"
   };
+  function catalystLead(idea) {
+    const e = idea.earnings;
+    if (e && e.reportDate) return idea.stance === "post-print" ? "The catalyst has already landed" : "The catalyst is dated and close";
+    return "The catalyst is defined";
+  }
+  function catalystBody(idea) {
+    const e = idea.earnings, nm = idea.name || "the company";
+    if (!e || !e.reportDate) return null;
+    const dl = fmtDateLong(e.reportDate);
+    if (idea.stance === "post-print") return `${nm} reported on ${dl}, so this is a reaction to the print rather than a bet into it.`;
+    const when = e.reportWhen ? " " + e.reportWhen : "";
+    return `${nm} reports on ${dl}${when}, which gives a defined window to be positioned before the event.`;
+  }
+  function pillarPoint(p, idea) {
+    let lead;
+    if (p.key === "catalyst") lead = catalystLead(idea);
+    else if (LEAD_CLAUSE[p.key]) lead = LEAD_CLAUSE[p.key]();
+    else lead = "This scores well on " + lc1(String(p.label || "this pillar").replace(/\s*\/\s*/g, " and "));
+    const body = (p.key === "catalyst" && catalystBody(idea)) || (p.authoredNote || p.note);
+    return { lead, body };
+  }
   function thesisPoints(idea) {
     const pts = [];
     const seen = new Set();
-    const add = (lead, body) => {
-      body = stripTags(body);
+    const push = (lead, body) => {
+      lead = deDash(String(lead || "")).replace(/[:.\s]+$/, "");
+      body = ensureSentence(stripTags(body));
       if (!lead || !body || body.length < 12) return;
       const k = body.slice(0, 42).toLowerCase();
       if (seen.has(k)) return; seen.add(k);
-      pts.push({ lead, body: ensurePeriod(cap1(body)) });
+      pts.push({ lead, body });
     };
     (safe(() => idea.conviction.pillars, []) || []).forEach(p => {
-      add(PILLAR_LEAD[p.key] || cap1(String(p.label || "")), p.authoredNote || p.note);
+      const lb = pillarPoint(p, idea);
+      push(lb.lead, lb.body);
     });
     if (pts.length < 3) {
-      add("Our view", safe(() => idea.variant.us));
-      add("Where the edge is", safe(() => idea.variant.gap));
-      add("Sell-side", safe(() => idea.variant.street));
+      push("Our read", safe(() => idea.variant.us));
+      push("The edge is in the expression", safe(() => idea.variant.gap));
+      push("The sell side backs it", safe(() => idea.variant.street));
     }
     if (pts.length < 2) {
       const parts = takeSentences(idea.thesis, 4, 620).split(/(?<=[.!?])\s+(?=[A-Z"“'(])/);
-      const leads = ["The setup", "The driver", "The read"];
-      parts.slice(0, 3).forEach((s, i) => add(leads[i] || "Also", s));
+      const leads = ["The setup is clear", "The driver is specific", "The read is constructive"];
+      parts.slice(0, 3).forEach((s, i) => push(leads[i] || "It also holds up", s));
     }
     const out = pts.slice(0, 5);
-    const risk = stripTags(safe(() => idea.changeMyMind));
-    if (risk && out.length < 5) out.push({ lead: "Key risk", body: ensurePeriod(cap1(takeSentences(risk, 1, 240))) });
+    const risk = safe(() => idea.changeMyMind);
+    if (risk && out.length < 5) out.push({ lead: "The main risk is clear", body: ensureSentence(stripTags(takeSentences(risk, 1, 240))) });
     return out;
   }
 
-  /* the implementation stated cleanly: the recommended structure + its key terms
-     ("a 12M reverse convertible, 95% strike"). Uses the Solutions-approved tweak
-     when present; else the expression's concrete example / the idea's levels. */
+  /* the implementation as one clean, dash-free sentence: the recommended structure
+     and its key terms. Uses the Solutions-approved tweak when present; else the
+     expression's concrete example or the idea's levels. */
   function implementationClean(idea, impl, tweaked) {
-    if (tweaked) return ensurePeriod(stripTags(tweaked));
+    if (tweaked) return ensureSentence(stripTags(tweaked));
     const d = exprDetail(impl, idea);
     const label = (d && d.label) || exprLabel(impl);
     let terms = d && d.example ? String(d.example).trim() : "";
@@ -358,9 +418,10 @@
         idea.levels.stop && "stop " + idea.levels.stop
       ].filter(Boolean).join(", ");
     }
-    let s = cap1(label);
-    if (terms) s += ` — ${stripTags(terms)}`;
-    return ensurePeriod(s);
+    let s = `I would express this as ${aOrAn(label)} ${lc1(String(label))}`;
+    terms = stripTags(terms);
+    if (terms) s = ensureSentence(s) + " " + ensureSentence(terms);
+    return ensureSentence(s);
   }
 
   /* ============================== assemble =============================== */
@@ -369,10 +430,10 @@
      "whatever Solutions signs off feeds the email". */
   function buildEmail(idea, client, impl, opts) {
     idea = idea || {}; client = client || {}; opts = opts || {};
-    const subject = subjectFor(idea);
+    const subject = deDash(subjectFor(idea));
     const greeting = `Dear ${firstName(client)},`;
     const relevance = relevanceLine(idea, client);
-    const ideaLine = `The idea — ${idea.headline || idea.name || ""}`;
+    const ideaLine = `The idea: ${idea.headline || idea.name || ""}`;
     const thesis = ideaSummary(idea);
     const fits = whyFits(idea, client);
     const hook = bookHook(idea, client);
@@ -382,20 +443,21 @@
     const risk = riskLine(idea);
     const signoff = "Happy to talk it through whenever suits.\n\nBest,\n[Your name]\nJ.P. Morgan Private Bank";
 
-    /* NEW advisor-voice note: greeting → a sharp framing intro (context + why now)
-       → the thesis as punchy bold-lead-in points → the implementation stated
-       cleanly → a brief close. Idea-focused and confident; NOT portfolio-woven.
-       Returned in two forms: plainText (copy / .eml) and html (the on-screen
-       streamed letter, where the lead-ins render bold). */
+    /* NEW advisor-voice note, in the user's own style: a warm greeting, a short
+       framing, the thesis as a few bold-lead-in points (each a COMPLETE sentence
+       with quantified figures), the implementation stated cleanly, and a brief
+       close. Every piece runs through deDash, so no dashes survive. Returned in
+       two forms: plainText (copy / .eml) and html (the streamed letter, lead-ins
+       bold). */
     const hello = `Hi ${firstName(client)},`;
     const framing = framingIntro(idea);
     const points = thesisPoints(idea);
     const implementation = implementationClean(idea, impl, tweaked);
     const tick = idea.ticker && idea.ticker !== "—" ? ` (${idea.ticker})` : "";
-    const intro = `Hi ${firstName(client)}, wanted to flag ${idea.name || idea.headline || "an idea"}${tick} —`;
-    const close = "Happy to walk through sizing and timing whenever suits — I can turn this into a one-pager if useful.";
+    const intro = `Hi ${firstName(client)}, wanted to flag ${idea.name || idea.headline || "an idea"}${tick}.`;
+    const close = "Happy to talk through the sizing and timing whenever suits, and I can put this on a single page if that helps.";
     const signName = "Best,\n[Your name]\nJ.P. Morgan Private Bank";
-    const shortDisclosure = "A personal view based on your mandate; not a formal recommendation — any structured or tax step would be confirmed in writing, with full suitability detail, before we act.";
+    const shortDisclosure = "This is a personal view based on your mandate, not a formal recommendation. Any structured or tax step would be confirmed in writing, with full suitability detail, before we act.";
 
     // plain text (copy / .eml export)
     const ptPoints = points.map(p => `• ${p.lead}: ${p.body}`).join("\n");
@@ -410,7 +472,7 @@
     ].filter(Boolean).join("\n\n");
 
     // html (streamed letter — bold lead-ins; pre-wrap keeps the newlines)
-    const htmlPoints = points.map(p => `• <strong>${escHtml(p.lead)}:</strong> ${escHtml(p.body)}`).join("\n");
+    const htmlPoints = points.map(p => `• <strong>${escHtml(p.lead)}</strong>: ${escHtml(p.body)}`).join("\n");
     const html = [
       escHtml(hello),
       escHtml(framing),
@@ -433,6 +495,6 @@
     buildEmail, relevanceLine, implLineFor,
     // exposed for reuse / testing
     subjectFor, ideaSummary, whyFits, bookHook, whyNow, riskLine, takeSentences,
-    framingIntro, thesisPoints, implementationClean
+    framingIntro, thesisPoints, implementationClean, deDash, ensureSentence
   };
 });

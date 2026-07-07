@@ -322,6 +322,9 @@ button { font-family: var(--sans); }
 .ob-mailbtns { display: flex; gap: 11px; margin-top: 16px; transition: opacity .3s ease; }
 .ob-btn-dark { appearance: none; background: var(--charcoal); border: none; cursor: pointer; color: #fff; font-size: 13px; font-weight: 600; padding: 11px 18px; border-radius: 9px; }
 .ob-btn-line { appearance: none; background: #fff; border: 1px solid #DDD6C9; cursor: pointer; color: var(--brown); font-size: 13px; font-weight: 600; padding: 11px 18px; border-radius: 9px; }
+/* click feedback for Copy / Open in Outlook: a brief green "done" state (light + dark) */
+.ob-btn-dark, .ob-btn-line { transition: background .15s ease, color .15s ease, border-color .15s ease; }
+.ob-btn-dark.is-flash, .ob-btn-line.is-flash { background: var(--green-pos); border-color: var(--green-pos); color: #fff; }
 
 /* ============================== SUITABILITY ============================= */
 .suit-pop { max-width: 1180px; }
@@ -761,3 +764,6 @@ button { font-family: var(--sans); }
 [data-theme="dark"] .ip-gate-edit.edited { color: var(--gold); border-color: var(--bronze-l); }
 [data-theme="dark"] .impl-edit-ta { background: var(--surface); color: var(--ink); }
 [data-theme="dark"] .why-sq { background: var(--surface-2); }
+/* keep the Copy/Outlook "done" flash green in dark (beats the dark .ob-btn-line surface override) */
+[data-theme="dark"] .ob-btn-line.is-flash,
+[data-theme="dark"] .ob-btn-dark.is-flash { background: var(--green-pos); border-color: var(--green-pos); color: #fff; }
