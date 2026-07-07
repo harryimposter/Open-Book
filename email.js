@@ -285,8 +285,11 @@
   const DISCLOSURE = "This note is a personal view based on your mandate and current holdings, not a formal recommendation; any structured or tax-related step would be confirmed in writing, with full suitability and risk detail, before we act.";
 
   /* ============================== assemble =============================== */
-  function buildEmail(idea, client, impl) {
-    idea = idea || {}; client = client || {};
+  /* opts.implText — an implementation the Solutions desk approved/tweaked. When
+     present it REPLACES the engine-chosen implementation line in the email, so
+     "whatever Solutions signs off feeds the email". */
+  function buildEmail(idea, client, impl, opts) {
+    idea = idea || {}; client = client || {}; opts = opts || {};
     const subject = subjectFor(idea);
     const greeting = `Dear ${firstName(client)},`;
     const relevance = relevanceLine(idea, client);
@@ -294,28 +297,34 @@
     const thesis = ideaSummary(idea);
     const fits = whyFits(idea, client);
     const hook = bookHook(idea, client);
-    const impLine = implLineFor(idea, client, impl);
+    const tweaked = (opts.implText != null && String(opts.implText).trim()) ? String(opts.implText).trim() : null;
+    const impLine = tweaked || implLineFor(idea, client, impl);
     const now = whyNow(idea);
     const risk = riskLine(idea);
-    const signoff = "Happy to walk through the detail whenever suits.\n\nBest regards,\n[Your name]\nJ.P. Morgan Private Bank";
+    const signoff = "Happy to talk it through whenever suits.\n\nBest,\n[Your name]\nJ.P. Morgan Private Bank";
 
-    const paragraphs = [
-      greeting,
-      relevance,
-      `${ideaLine}\n${thesis}`,
-      fits,
-      hook,
-      impLine,
-      now,
-      risk,
+    /* SHORT, idea-focused note: a one-line hello, the thesis, the implementation.
+       Deliberately does NOT weave the portfolio (the relevance hook / book-move /
+       goal-gap paragraphs) through the body — those stay available as return keys
+       for other renderers, but the client note itself leads with the IDEA. */
+    const tick = idea.ticker && idea.ticker !== "—" ? ` (${idea.ticker})` : "";
+    const intro = `Hi ${firstName(client)}, wanted to flag ${idea.name || idea.headline || "an idea"}${tick} —`;
+    // the default impl line already opens "For your book I'd implement this as…";
+    // a Solutions-tweaked free text gets a short lead-in so it reads as the plan.
+    const implPara = tweaked ? `How I'd implement it: ${impLine}` : impLine;
+    const shortDisclosure = "A personal view based on your mandate and holdings, not a formal recommendation — we'd confirm any structured or tax step in writing first.";
+
+    const plainText = [
+      intro,
+      thesis,
+      implPara,
       signoff,
-      DISCLOSURE
-    ].filter(Boolean);
+      shortDisclosure
+    ].filter(Boolean).join("\n\n");
 
-    const plainText = paragraphs.join("\n\n");
     // keys kept backward-compatible (subject/greeting/relevance/ideaLine/thesis/impLine/signoff/plainText)
-    // plus the new grounded sections, for any richer renderer.
-    return { subject, greeting, relevance, ideaLine, thesis, whyFits: fits, bookHook: hook, impLine, whyNow: now, riskLine: risk, signoff, disclosure: DISCLOSURE, plainText };
+    // plus the new grounded sections + `intro`, for any richer renderer.
+    return { subject, greeting, intro, relevance, ideaLine, thesis, whyFits: fits, bookHook: hook, impLine, whyNow: now, riskLine: risk, signoff, disclosure: DISCLOSURE, plainText };
   }
 
   return {

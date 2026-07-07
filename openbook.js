@@ -147,7 +147,87 @@
      thin wrappers keep every existing call site working. */
   function relevanceLine(idea, client) { return window.EMAIL.relevanceLine(idea, client); }
   function implLineFor(idea, client, impl) { return window.EMAIL.implLineFor(idea, client, impl); }
-  function buildEmail(idea, client, impl) { return window.EMAIL.buildEmail(idea, client, impl); }
+  function buildEmail(idea, client, impl, opts) {
+    opts = opts || {};
+    /* auto-carry a Solutions-approved implementation tweak into every email the
+       Advisor view drafts, so what Solutions signs off is what the client sees. */
+    if (opts.implText == null && hasImplEdit(idea)) opts = Object.assign({}, opts, { implText: uiData.implEdits[idea.id] });
+    return window.EMAIL.buildEmail(idea, client, impl, opts);
+  }
+
+  /* ---- Solutions approve/discard gate + implementation tweak ---------------
+     Persisted in ob_ui_v1 (uiData). Manually-added ideas count as approved;
+     sweep ideas default to approved so the Advisor feed keeps working — the
+     desk can DISCARD to pull one, or re-APPROVE it. Only approved ideas reach
+     the Advisor view (enforced in rebuildFocus). The mapping engine is untouched;
+     it simply runs over the approved set. */
+  function isApproved(idea) {
+    if (!idea) return false;
+    if (idea.custom) return true;                                  // manually-added = approved
+    return uiData.approval[idea.id] !== "discarded";               // default (absent) = approved
+  }
+  function approvalState(idea) {
+    if (!idea || idea.custom) return "approved";
+    return uiData.approval[idea.id] === "discarded" ? "discarded" : "approved";
+  }
+  function setApproval(id, st) {
+    if (st === "discarded") uiData.approval[id] = "discarded";
+    else delete uiData.approval[id];                               // approved is the default — keep storage lean
+    saveUi();
+  }
+  function hasImplEdit(idea) {
+    return !!(idea && uiData.implEdits[idea.id] != null && String(uiData.implEdits[idea.id]).trim());
+  }
+  /* the implementation Solutions has signed off on: their tweak if present, else
+     the idea's own recommended trade statement. Drives the card + the email. */
+  function implTextFor(idea) {
+    if (hasImplEdit(idea)) return String(uiData.implEdits[idea.id]).trim();
+    return ideaTradeStatement(idea);
+  }
+
+  /* ---- plain-English "why was this flagged for THIS client" ----------------
+     A simplified, human read of the mapping rationale (a holding they own, the
+     mandate fit, a goal bucket under target) — never raw axis scores. */
+  function whyFlaggedFor(idea, client) {
+    let res = null;
+    try { res = window.MAPPING.scoreIdeaForClient(idea, client); } catch (e) {}
+    const pts = [];
+    let rh = null; try { rh = window.MAPPING.relevantHolding(idea, client); } catch (e) {}
+    if (rh && rh.name) {
+      const own = rh.ownPct ? ` (~${Math.round(rh.ownPct)}% of the book)` : "";
+      pts.push(`They already hold ${rh.name}${own} — this idea acts on it directly.`);
+    }
+    if (idea.sector === "FX") {
+      let mm = 0;
+      try { (client.positions || []).forEach(p => { if (p.ccy && p.ccy !== client.ccy && p.ccy !== "Cash") mm += (+p.weightPct || 0); }); } catch (e) {}
+      mm = Math.round(mm);
+      if (mm >= 5) pts.push(`About ${mm}% of the book sits in non-base currency — this right-sizes that mismatch.`);
+    }
+    let mand = "balanced"; try { mand = window.MAPPING.mandateClass(client); } catch (e) {}
+    const mw = { income: "an income", preservation: "a preservation-first", growth: "a growth", balanced: "a balanced" }[mand] || ("a " + mand);
+    pts.push(`It suits ${mw} mandate like theirs.`);
+    const ga = res && res.goalAlignment;
+    if (ga && ga.gap >= 3 && ga.bucket) pts.push(`Their ${String(ga.bucket).toLowerCase()} allocation is running under target — this helps close the gap.`);
+    return { fit: res ? res.fit : 0, tier: res ? res.tier : "", flagged: !!(res && res.applies), points: pts.slice(0, 3) };
+  }
+  function whyFlaggedHTML(idea, client) {
+    if (!idea || !client) return "";
+    const w = whyFlaggedFor(idea, client);
+    if (!w.flagged) {
+      return `<div class="why-sq not-flagged">
+        <div class="why-sq-k">NOT ON THE FLAGGED LIST</div>
+        <div class="why-sq-body">This idea wasn't auto-flagged for ${esc(firstName(client))} — you can still send it as optional outreach.</div>
+      </div>`;
+    }
+    const col = scoreColor(w.fit || 0);
+    return `<div class="why-sq">
+      <div class="why-sq-top">
+        <span class="why-sq-k">WHY THIS WAS FLAGGED FOR ${esc(String(firstName(client)).toUpperCase())}</span>
+        <span class="why-sq-fit" style="color:${col}">${esc(w.tier)} · fit ${w.fit}</span>
+      </div>
+      <ul class="why-sq-list">${w.points.map(p => `<li>${esc(p)}</li>`).join("")}</ul>
+    </div>`;
+  }
 
   function downloadBlob(filename, mime, content) {
     const blob = new Blob([content], { type: mime });
@@ -170,11 +250,16 @@
   function rebuildFocus() {
     const sweep = [].concat(TF.earnings || [], TF.exEarnings || []).filter(i => !isDismissed(i.id));
     const custom = (userData.customIdeas || []).filter(i => !isDismissed(i.id));
-    FOCUS = sweep.concat(custom);
+    let all = sweep.concat(custom);
+    /* the Advisor view only sees APPROVED ideas; the Solutions view sees the whole
+       board so it can review + approve/discard. Ranking + client mapping then run
+       over whichever set this is — the scoring engines themselves are untouched. */
+    if (state.viewMode !== "solutions") all = all.filter(isApproved);
+    FOCUS = all;
     FOCUS_BY_ID = {}; FOCUS.forEach(i => { FOCUS_BY_ID[i.id] = i; });
     Object.keys(_fitCache).forEach(k => delete _fitCache[k]);
   }
-  rebuildFocus();
+  /* first build runs after `state` is declared below (rebuildFocus now reads it) */
 
   /* UI-only state (presentation): engagement bumps persisted separately from
      the engine's own store so nothing existing is disturbed. */
@@ -183,6 +268,8 @@
   try { uiData = JSON.parse(localStorage.getItem(UI_KEY)) || {}; } catch { uiData = {}; }
   uiData.drafted = uiData.drafted || {};
   uiData.checked = uiData.checked || {};
+  uiData.approval = uiData.approval || {};    // ideaId -> "discarded" (approved is the default; absent = approved)
+  uiData.implEdits = uiData.implEdits || {};  // ideaId -> Solutions-tweaked implementation text
   const saveUi = () => localStorage.setItem(UI_KEY, JSON.stringify(uiData));
 
   const state = {
@@ -193,6 +280,7 @@
     bookClientId: null, expanded: {}, selected: {},
     cmdIndex: 0,
   };
+  rebuildFocus();   // now that `state` exists (viewMode gates the approved set)
 
   const scoreColor = (v) => v >= 80 ? "#2C7A4B" : v >= 68 ? "#996F3D" : "#A97D48";
 
@@ -622,7 +710,9 @@
     const col = scoreColor(conv);
     const off = (97.39 * (1 - conv / 100)).toFixed(2);
     const liked = getReaction(idea.id) === "like";
-    const rec = ideaTradeStatement(idea);
+    const rec = implTextFor(idea);            // Solutions-signed-off implementation (tweak or default)
+    const edited = hasImplEdit(idea);
+    const gstate = approvalState(idea);       // "approved" | "discarded"
     const open = !!state.expanded[idea.id];
     const upd = updatedAgo(idea);
     const chartHTML = (idea.chart && window.BPCharts && window.BPCharts.ideaChart)
@@ -635,7 +725,18 @@
       : (idea.ownView ? `<div class="ip-via own">Own view — no outside research leaned on</div>` : "");
     const sol = state.viewMode === "solutions";
     const removeHTML = sol ? `<button type="button" class="ip-remove" data-remove="${esc(idea.id)}" title="${idea.custom ? "Delete this draft idea" : "Remove this idea from the feed"}">✕</button>` : "";
-    return `<div class="ob-post" id="post-${esc(idea.id)}">
+    /* Solutions-only approve/discard gate + implementation tweak. Only approved
+       ideas reach the Advisor view; custom ideas are locked approved. */
+    const gateHTML = sol ? `
+        <div class="ip-gate">
+          <div class="ip-gate-toggle">
+            <button type="button" class="ip-gate-btn approve${gstate === "approved" ? " on" : ""}" data-approve="${esc(idea.id)}"${idea.custom ? " disabled" : ""} title="Approve — feed this idea to the Advisor view">✓ Approve</button>
+            <button type="button" class="ip-gate-btn discard${gstate === "discarded" ? " on" : ""}" data-discard="${esc(idea.id)}"${idea.custom ? " disabled" : ""} title="Discard — keep it here but hide it from the Advisor view">✕ Discard</button>
+          </div>
+          <button type="button" class="ip-gate-edit${edited ? " edited" : ""}" data-impledit="${esc(idea.id)}" title="Tweak the implementation the advisor + email will use">✎ Edit implementation${edited ? ` <span class="ip-gate-dot" title="tweaked"></span>` : ""}</button>
+          <span class="ip-gate-note">${idea.custom ? "Manually added — approved" : gstate === "approved" ? "Feeds the Advisor view" : "Hidden from the Advisor view"}</span>
+        </div>` : "";
+    return `<div class="ob-post${sol && gstate === "discarded" ? " is-discarded" : ""}" id="post-${esc(idea.id)}">
       <article class="ob-card">
         <div class="ip-head">
           <span class="ip-avatar ${a.cls}">${a.init}</span>
@@ -668,13 +769,14 @@
             <h3 class="ip-wtitle">${esc(idea.name)}</h3>
             <p class="ip-wthesis">${esc(idea.thesis)}</p>
             <div class="ip-wrec">
-              <div class="ip-wrec-k">RECOMMENDATION</div>
+              <div class="ip-wrec-k">RECOMMENDATION${edited && sol ? ` · <span class="ip-wrec-edited">tweaked by Solutions</span>` : ""}</div>
               <div class="ip-wrec-v">${esc(rec)}</div>
             </div>
             ${chartHTML}${viaHTML}
             <button type="button" class="ip-more" data-more="${esc(idea.id)}" hidden>${open ? "– Show less" : "＋ Full thesis &amp; recommendation"}</button>
           </div>
         </div>
+        ${gateHTML}
         <div class="ip-actions">
           <button type="button" class="ip-like${liked ? " on" : ""}" data-like="${esc(idea.id)}" title="${liked ? "Saved — tap to remove from Saved" : "Save / like — filter to these with ♥ Saved"}">
             <span class="ip-heart">♥</span><span class="ip-likecount">${likeCount(idea.id)}</span>
@@ -836,6 +938,46 @@
     });
   }
 
+  /* ---- Solutions view: tweak an idea's recommended implementation ----------
+     What's saved here becomes the RECOMMENDATION shown in the Advisor view and
+     the implementation paragraph in every client email for this idea. */
+  function openImplEditor(ideaId) {
+    const idea = FOCUS_BY_ID[ideaId] || (userData.customIdeas || []).find(i => i.id === ideaId);
+    if (!idea) return;
+    const cur = implTextFor(idea);
+    const edited = hasImplEdit(idea);
+    openModal(`<div class="ob-overlay"><div class="ob-pop" style="max-width:560px">
+      <div class="ob-pop-head">
+        <div><div class="ob-pop-eyebrow">SOLUTIONS VIEW · IMPLEMENTATION</div>
+        <div class="ob-pop-title" style="font-size:20px">${esc(idea.name)}</div></div>
+        <button type="button" class="ob-pop-x" data-close aria-label="Close">✕</button>
+      </div>
+      <div class="email-pad">
+        <div class="email-note">Tweak the recommended implementation. Whatever you save is what the Advisor view shows and what every client email for this idea uses.</div>
+        <textarea id="implEditTa" class="impl-edit-ta" rows="4" placeholder="Instrument + direction + the plan, in one or two precise sentences.">${esc(cur)}</textarea>
+        <div class="ob-mailbtns">
+          <button type="button" class="ob-btn-dark" id="implSave">Save implementation</button>
+          ${edited ? `<button type="button" class="ob-btn-line" id="implReset">Reset to desk default</button>` : ""}
+          <button type="button" class="ob-btn-line" data-close>Cancel</button>
+        </div>
+      </div>
+    </div></div>`, (root) => {
+      $("#implSave", root).addEventListener("click", () => {
+        const v = $("#implEditTa", root).value.trim();
+        if (!v) { toast("The implementation can't be empty."); return; }
+        uiData.implEdits[idea.id] = v; saveUi();
+        closeModal(); renderAll();
+        toast("Implementation updated — feeds the Advisor view + email.");
+      });
+      const rs = $("#implReset", root);
+      if (rs) rs.addEventListener("click", () => {
+        delete uiData.implEdits[idea.id]; saveUi();
+        closeModal(); renderAll();
+        toast("Implementation reset to the desk default.");
+      });
+    });
+  }
+
   function wireFeed(root) {
     $$("[data-like]", root).forEach(el => el.addEventListener("click", () => {
       const id = el.dataset.like;
@@ -859,6 +1001,18 @@
       openTailoredEmail(el.dataset.email);
     }));
     $$("[data-score]", root).forEach(el => el.addEventListener("click", () => openConvScore(el.dataset.score)));
+    /* Solutions view: approve/discard gate — only approved ideas reach the Advisor view */
+    $$("[data-approve]", root).forEach(el => el.addEventListener("click", () => {
+      setApproval(el.dataset.approve, "approved");
+      toast("Approved — this idea now feeds the Advisor view.");
+      renderAll();
+    }));
+    $$("[data-discard]", root).forEach(el => el.addEventListener("click", () => {
+      setApproval(el.dataset.discard, "discarded");
+      toast("Discarded — hidden from the Advisor view.");
+      renderAll();
+    }));
+    $$("[data-impledit]", root).forEach(el => el.addEventListener("click", () => openImplEditor(el.dataset.impledit)));
     /* Solutions view: remove a sweep idea from the feed (dismiss) or delete a draft */
     $$("[data-remove]", root).forEach(el => el.addEventListener("click", () => {
       const id = el.dataset.remove;
@@ -928,11 +1082,6 @@
     income:       { label: "Income",       dot: "#996F3D", bg: "#FBF6EE" },
     growth:       { label: "Growth",       dot: "#1E1B16", bg: "#F5F3EF" },
   };
-  function whyChip(text) {
-    let t = String(text || "").split(/(?<=[.;])\s/)[0].replace(/[.;]\s*$/, "");
-    if (t.length > 46) t = t.slice(0, 43).trim() + "…";
-    return t ? `— ${t} →` : "";
-  }
   function suitFlow(idea) {
     let flags = [];
     try { flags = window.MAPPING.flagClients(idea); } catch (e) { flags = []; }
@@ -994,8 +1143,6 @@
         nodes.push({ cls: "tree-impl", label: esc(imn.im.name), w: iW, left: sc(imn.c) - iW / 2, top: iTop, delay: "0.56s" });
         imn.cliN.forEach((cn) => {
           lines.push(elbow(sc(imn.c), iTop + iH, sc(cn.c), cTop, "#996F3D", "0.74s"));
-          const why = whyChip(cn.f.why);
-          if (why) whys.push({ text: esc(why), left: sc(cn.c) - 90, top: cTop - 32, w: 180, delay: "0.84s" });
           nodes.push({ cls: "tree-client", client: cn.f.client, fit: cn.f.fit, w: cW, left: sc(cn.c) - cW / 2, top: cTop, delay: "0.9s" });
         });
       });
@@ -1056,6 +1203,7 @@
           <div class="suit-ton">${esc(client.name)}</div>
         </div>
       </div>
+      ${whyFlaggedHTML(idea, client)}
       <div class="ob-letter" id="suitLetter" style="min-height:220px"></div>
       <div class="ob-mailbtns" id="suitBtns" style="opacity:.4">
         <button type="button" class="ob-btn-dark" id="suitOutlook">Open in Outlook</button>
@@ -1240,6 +1388,7 @@
             <label class="tep-field"><span class="tep-lbl">CLIENT</span><select class="tep-sel" id="tepClient"></select></label>
             <label class="tep-field"><span class="tep-lbl">IMPLEMENTATION</span><select class="tep-sel" id="tepImpl"></select></label>
           </div>
+          <div id="tepWhy"></div>
           <div class="ob-letter" id="tepLetter" style="min-height:220px"></div>
           <div class="ob-mailbtns" id="tepBtns" style="opacity:.4">
             <button type="button" class="ob-btn-dark" id="tepOutlook">Open in Outlook</button>
@@ -1263,14 +1412,18 @@
         imSel.innerHTML = choices.map(s => `<option value="${esc(s)}"${s === impl ? " selected" : ""}>${esc(exprLabel(s))}</option>`).join("");
       };
       let currentEm = null;
+      const renderWhy = () => {
+        const el = $("#tepWhy", root);
+        if (el) el.innerHTML = whyFlaggedHTML(idea, clientById(clientId));
+      };
       const restream = () => {
         const client = clientById(clientId);
         currentEm = buildEmail(idea, client, impl);
         $("#tepBtns", root).style.opacity = ".4";
         streamInto($("#tepLetter", root), esc(currentEm.plainText), {}, () => { $("#tepBtns", root).style.opacity = "1"; });
       };
-      rebuildImpls(); restream();
-      clSel.addEventListener("change", () => { clientId = clSel.value; rebuildImpls(); restream(); });
+      rebuildImpls(); renderWhy(); restream();
+      clSel.addEventListener("change", () => { clientId = clSel.value; rebuildImpls(); renderWhy(); restream(); });
       imSel.addEventListener("change", () => { impl = imSel.value; restream(); });
       $("#tepOutlook", root).addEventListener("click", () => {
         if (currentEm) downloadEmlText(`${slug(clientById(clientId).name + "-" + idea.id)}.eml`, currentEm.subject, currentEm.plainText);

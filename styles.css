@@ -708,6 +708,8 @@ button.struct-chip.struct-toggle:focus-visible { outline: 2px solid var(--gold);
 .fund-bar span { display: block; height: 100%; background: linear-gradient(90deg, var(--bronze), var(--gold)); border-radius: 5px; }
 .fund-meta { font-size: 12px; color: var(--ink-soft); margin-top: 7px; }
 .fund-meta b { color: var(--ink); }
+/* wrapper card the funding bar sits in (inside the dark Objective panel) */
+.fund-card { background: #fff; color: var(--ink); border-radius: var(--radius); padding: 14px 16px; margin-top: 14px; }
 
 /* ===== Next Best Action ================================================= */
 .nba-banner {
@@ -1440,3 +1442,11 @@ button.struct-chip.struct-toggle:focus-visible { outline: 2px solid var(--gold);
 [data-theme="dark"] .gap-comfort.gc-amber { background: rgba(199,154,84,.14); color: var(--warn); }
 [data-theme="dark"] .pl-head:hover,
 [data-theme="dark"] .ri-head:hover { background: var(--cream-2); }
+
+/* drift banner "away" variant + off-track funding pills (light pastels -> translucent, hue kept) */
+[data-theme="dark"] .pt-verdict.away { background: rgba(203,113,96,.15); color: var(--neg); border-color: rgba(203,113,96,.32); }
+[data-theme="dark"] .fund-pill.warn { background: rgba(199,154,84,.14); color: var(--warn); }
+[data-theme="dark"] .fund-pill.behind { background: rgba(203,113,96,.15); color: var(--neg); }
+
+/* funding-bar wrapper: elevated inset card instead of a glaring white block */
+[data-theme="dark"] .fund-card { background: var(--espresso-2); }

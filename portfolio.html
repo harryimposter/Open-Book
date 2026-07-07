@@ -17,7 +17,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=20260706a-dark" />
+  <link rel="stylesheet" href="styles.css?v=20260707a-dark" />
   <!-- embed mode: shown inside the Open Book shell's Advisor Book tab. Hide the
        duplicate masthead; the shell provides the "← All clients" bar. -->
   <style>
@@ -73,6 +73,23 @@
       .pf-toc { position: static; flex-direction: row; flex-wrap: wrap; gap: 4px; margin-bottom: 8px; }
       .pf-toc-h { display: none; }
       .pf-toc a { border-left: 0; border-radius: 6px; background: #F2EEE6; }
+    }
+
+    /* ---- dark mode: these page-scoped surfaces were built white-on-white
+           for light mode, so give them themed equivalents ---- */
+    [data-theme="dark"] .pf-toc a { color: var(--ink-soft); }
+    [data-theme="dark"] .pf-toc a:hover,
+    [data-theme="dark"] .pf-toc a.active { color: var(--ink); }
+    [data-theme="dark"] .pf-card { background: var(--paper); border-color: var(--line); box-shadow: 0 2px 5px rgba(0,0,0,.35); }
+    [data-theme="dark"] .pf-card.clickable:hover,
+    [data-theme="dark"] .pf-card.open { border-color: var(--bronze); box-shadow: 0 10px 24px -14px rgba(0,0,0,.6); }
+    [data-theme="dark"] .pf-card-title { color: var(--ink); }
+    [data-theme="dark"] .pf-card-why { color: var(--ink-soft); }
+    [data-theme="dark"] .pf-card-detail { color: var(--ink-soft); }
+    [data-theme="dark"] .pf-card-exp { border-top-color: var(--line); }
+    [data-theme="dark"] .pf-modal { background: var(--paper); }
+    @media (max-width: 900px) {
+      [data-theme="dark"] .pf-toc a { background: var(--cream-2); }
     }
   </style>
   <script>if (new URLSearchParams(location.search).get("embed") === "1") document.documentElement.classList.add("embed");</script>
@@ -250,7 +267,7 @@
               <div class="agenda" style="margin:0">
                 <span class="eyebrow">Objective</span>
                 <p>${esc(c.goals.objective)}. Horizon: ${esc(c.goals.horizon)}.</p>
-                <div style="background:#fff;color:var(--ink);border-radius:var(--radius);padding:14px 16px;margin-top:14px">${BPCharts.fundingBar(c.goals.funding)}</div>
+                <div class="fund-card">${BPCharts.fundingBar(c.goals.funding)}</div>
               </div>
               <div class="panel">
                 <div class="panel-head"><h3>Strategic allocation — now vs target</h3></div>

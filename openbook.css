@@ -235,6 +235,36 @@ button { font-family: var(--sans); }
 .ic-f input, .ic-f select, .ic-f textarea { font-family: var(--sans); font-size: 13px; color: var(--ink); background: #fff; border: 1px solid var(--hairline); border-radius: 8px; padding: 9px 11px; outline: none; resize: vertical; }
 .ic-f input:focus, .ic-f textarea:focus, .ic-f select:focus { border-color: var(--bronze); }
 .ic-note { font-size: 11px; line-height: 1.5; color: var(--grey-soft); border-top: 1px dotted var(--hairline); padding-top: 10px; }
+.impl-edit-ta { width: 100%; box-sizing: border-box; font-family: var(--serif); font-size: 14px; line-height: 1.5; color: var(--ink); background: #fff; border: 1px solid var(--hairline); border-radius: 10px; padding: 12px 14px; resize: vertical; outline: none; margin-bottom: 14px; }
+.impl-edit-ta:focus { border-color: var(--bronze); }
+
+/* ---- Solutions approve/discard gate + implementation-tweak (Solutions view) ---- */
+.ip-gate { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 10px; padding: 11px 16px 2px; }
+.ip-gate-toggle { display: inline-flex; border: 1px solid var(--hairline); border-radius: 9px; overflow: hidden; }
+.ip-gate-btn { appearance: none; cursor: pointer; font-family: var(--sans); font-size: 11.5px; font-weight: 600; background: #fff; color: var(--grey); border: none; padding: 6px 12px; }
+.ip-gate-btn + .ip-gate-btn { border-left: 1px solid var(--hairline); }
+.ip-gate-btn.approve.on { background: rgba(47,191,113,.14); color: var(--green-pos); }
+.ip-gate-btn.discard.on { background: rgba(156,74,58,.12); color: var(--brick); }
+.ip-gate-btn:disabled { cursor: default; opacity: .5; }
+.ip-gate-btn:not(.on):not(:disabled):hover { background: var(--cream); }
+.ip-gate-edit { appearance: none; cursor: pointer; font-family: var(--sans); font-size: 11.5px; font-weight: 600; color: var(--bronze); background: none; border: 1px solid var(--hairline); border-radius: 8px; padding: 6px 11px; display: inline-flex; align-items: center; gap: 6px; }
+.ip-gate-edit:hover { border-color: var(--bronze-l); }
+.ip-gate-edit.edited { color: var(--brown); border-color: var(--bronze-l); }
+.ip-gate-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--gold); display: inline-block; box-shadow: 0 0 0 2px rgba(235,201,141,.3); }
+.ip-gate-note { font-size: 10.5px; color: var(--grey-faint); margin-left: auto; }
+.ip-wrec-edited { font-weight: 600; color: var(--bronze); letter-spacing: .03em; }
+.ob-post.is-discarded .ob-card { opacity: .6; }
+
+/* ---- "why flagged for this client" small square (email compose) ---- */
+.why-sq { border: 1px solid var(--hairline); border-left: 3px solid var(--green); border-radius: 10px; background: var(--cream); padding: 12px 14px; margin-bottom: 14px; max-width: 340px; }
+.why-sq.not-flagged { border-left-color: var(--grey-faint); }
+.why-sq-top { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+.why-sq-k { font-size: 9.5px; font-weight: 700; letter-spacing: .12em; color: var(--bronze); }
+.why-sq-fit { font-size: 11px; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.why-sq-list { margin: 0; padding-left: 16px; }
+.why-sq-list li { font-size: 12px; line-height: 1.5; color: var(--ink); margin-bottom: 4px; }
+.why-sq-list li:last-child { margin-bottom: 0; }
+.why-sq-body { font-size: 12px; line-height: 1.5; color: var(--grey); }
 
 /* ---- desk brief: one neutral summary + "to watch today" (no full-note view) ---- */
 .ob-brief-text .obb-line { margin: 0 0 9px; font-size: 16px; line-height: 1.52; }
@@ -710,3 +740,13 @@ button { font-family: var(--sans); }
 [data-theme="dark"] .cmd-kind,
 [data-theme="dark"] .top3-note { color: var(--grey-faint); }
 [data-theme="dark"] .cmd-foot .brand { color: var(--grey-faint); }
+
+/* Solutions gate + impl-edit + why-flagged square */
+[data-theme="dark"] .ip-gate-btn { background: var(--surface); color: var(--grey); }
+[data-theme="dark"] .ip-gate-btn.approve.on { background: rgba(82,179,126,.16); color: var(--green-pos); }
+[data-theme="dark"] .ip-gate-btn.discard.on { background: rgba(203,113,96,.16); color: var(--brick); }
+[data-theme="dark"] .ip-gate-btn:not(.on):not(:disabled):hover { background: var(--surface-2); }
+[data-theme="dark"] .ip-gate-edit { color: var(--bronze); }
+[data-theme="dark"] .ip-gate-edit.edited { color: var(--gold); border-color: var(--bronze-l); }
+[data-theme="dark"] .impl-edit-ta { background: var(--surface); color: var(--ink); }
+[data-theme="dark"] .why-sq { background: var(--surface-2); }
