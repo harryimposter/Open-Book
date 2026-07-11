@@ -1,67 +1,72 @@
 {
   "mu-fq3-react": {
-    "fp": "384d9ec0d37b0e13cacaded06c5566c621b62512",
+    "fp": "d693dfc6af5e5b0890b387f92fc50b2edc201208",
     "postedAt": "2026-07-07",
-    "updatedAt": "2026-07-07"
+    "updatedAt": "2026-07-11"
   },
   "dal-q2": {
-    "fp": "088c96d704ac0c55bda043a5e6f19c9e9ee7fb7f",
+    "fp": "4e596ab4140dd7f4af9cd96b4053f70155ebe09d",
     "postedAt": "2026-07-07",
-    "updatedAt": "2026-07-07"
+    "updatedAt": "2026-07-11"
+  },
+  "pep-q2": {
+    "fp": "bcc1d78fa76cf2ba75c855dabc6b7320d1da711b",
+    "postedAt": "2026-07-11",
+    "updatedAt": "2026-07-11"
+  },
+  "tsm-q2": {
+    "fp": "2a27b5b2e12f02ebb66f279bf2c1f940e459101d",
+    "postedAt": "2026-07-11",
+    "updatedAt": "2026-07-11"
   },
   "msft-capex-pullback": {
-    "fp": "abaf474c1f068d0cd224f8abbaed636fb69443f4",
+    "fp": "617bb8c5a430fc44a887933a52b1600c9b96c5b1",
     "postedAt": "2026-07-07",
-    "updatedAt": "2026-07-07"
-  },
-  "avgo-capex-readthrough": {
-    "fp": "da8adeffa562a9a10c84ddd550f2ccdb850addbe",
-    "postedAt": "2026-07-07",
-    "updatedAt": "2026-07-07"
+    "updatedAt": "2026-07-11"
   },
   "spx-cheap-convexity": {
-    "fp": "202687c511ca3bf341dd24aca2e6127616a48e24",
+    "fp": "8395d4cd9b241689f5afb8115846d0c1ae2cf7a4",
     "postedAt": "2026-07-07",
-    "updatedAt": "2026-07-07"
+    "updatedAt": "2026-07-11"
   },
   "gold-pullback": {
-    "fp": "efd6736ed894ac80343b5d66491fb27b7a0f69fb",
+    "fp": "20390598e7618d5924aa6a6e6069bb245b7a3c28",
     "postedAt": "2026-07-07",
-    "updatedAt": "2026-07-07"
+    "updatedAt": "2026-07-11"
   },
   "ai-power": {
-    "fp": "d4aea300ecf53706677155b97a535d5661ada6ba",
+    "fp": "fbd7533d0bb47282755d2c7e8dbf3d0016701fbb",
     "postedAt": "2026-07-07",
-    "updatedAt": "2026-07-07"
+    "updatedAt": "2026-07-11"
   },
   "lock-yields": {
-    "fp": "37a90e16c4157a623336711729dda5a4bbdf79f9",
+    "fp": "bfd35a175f0a5483f07e051a7204c0faa9e63594",
     "postedAt": "2026-07-07",
-    "updatedAt": "2026-07-07"
+    "updatedAt": "2026-07-11"
   },
   "rate-range-accrual": {
-    "fp": "801e8cfe00272098488907f8d6e11b7a717eb116",
+    "fp": "b9e29ce359a6ddb8039531200cae2a456de8ae3a",
     "postedAt": "2026-07-07",
-    "updatedAt": "2026-07-07"
+    "updatedAt": "2026-07-11"
   },
   "fx-usd-hedge": {
-    "fp": "7f2c1428c9a6869d3902c67de6c7608be174ca78",
+    "fp": "f9b8bee9c96c9e3d59e81dbdbddcb38620a5a05c",
     "postedAt": "2026-07-07",
-    "updatedAt": "2026-07-07"
+    "updatedAt": "2026-07-11"
   },
   "fx-carry-income": {
-    "fp": "4433397c53bdc8031110f763b5ab0aec885ac4ba",
+    "fp": "0f20e39321d4db6935be0b428fd462a5cbb22222",
     "postedAt": "2026-07-07",
-    "updatedAt": "2026-07-07"
+    "updatedAt": "2026-07-11"
   },
   "tac-usdjpy-strangle": {
-    "fp": "1598adf483e06a481ce8587046a439c00a3be0f7",
+    "fp": "5b89a808512955907c2682af45d87fa25d83b4e4",
     "postedAt": "2026-07-07",
-    "updatedAt": "2026-07-07"
+    "updatedAt": "2026-07-11"
   },
   "tac-brent-hormuz": {
-    "fp": "1509056fd749d475495bed5dfdf56968a5e3aa77",
+    "fp": "8c0bb0f60550486ca0851565c660410d8e8ab19f",
     "postedAt": "2026-07-07",
-    "updatedAt": "2026-07-07"
+    "updatedAt": "2026-07-11"
   }
 }
