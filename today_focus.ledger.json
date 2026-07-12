@@ -1,4 +1,14 @@
 {
+  "banks-q2": {
+    "fp": "26bcae405d67b10d90a378ecf0e51237358b1a96",
+    "postedAt": "2026-07-12",
+    "updatedAt": "2026-07-12"
+  },
+  "nflx-q2": {
+    "fp": "5bd849e8a961e7ca2930308a8d86fc714faa8fbb",
+    "postedAt": "2026-07-12",
+    "updatedAt": "2026-07-12"
+  },
   "mu-fq3-react": {
     "fp": "d693dfc6af5e5b0890b387f92fc50b2edc201208",
     "postedAt": "2026-07-07",
