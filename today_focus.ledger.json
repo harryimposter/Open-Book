@@ -15,9 +15,9 @@
     "updatedAt": "2026-07-11"
   },
   "dal-q2": {
-    "fp": "4e596ab4140dd7f4af9cd96b4053f70155ebe09d",
+    "fp": "df106bee0303ee30465f14fef0248690dc86cb22",
     "postedAt": "2026-07-07",
-    "updatedAt": "2026-07-11"
+    "updatedAt": "2026-07-13"
   },
   "pep-q2": {
     "fp": "bcc1d78fa76cf2ba75c855dabc6b7320d1da711b",
@@ -35,14 +35,14 @@
     "updatedAt": "2026-07-11"
   },
   "spx-cheap-convexity": {
-    "fp": "8395d4cd9b241689f5afb8115846d0c1ae2cf7a4",
+    "fp": "af655b227f49611f5c5a146bc57245598ba643ee",
     "postedAt": "2026-07-07",
-    "updatedAt": "2026-07-11"
+    "updatedAt": "2026-07-13"
   },
   "gold-pullback": {
-    "fp": "20390598e7618d5924aa6a6e6069bb245b7a3c28",
+    "fp": "c02d18a19572e7b0e9f24183662ccbfe42aefcfa",
     "postedAt": "2026-07-07",
-    "updatedAt": "2026-07-11"
+    "updatedAt": "2026-07-13"
   },
   "ai-power": {
     "fp": "fbd7533d0bb47282755d2c7e8dbf3d0016701fbb",
@@ -75,8 +75,8 @@
     "updatedAt": "2026-07-11"
   },
   "tac-brent-hormuz": {
-    "fp": "8c0bb0f60550486ca0851565c660410d8e8ab19f",
+    "fp": "4ae71b500639a79f09786999d5ae744cbc2fe6f0",
     "postedAt": "2026-07-07",
-    "updatedAt": "2026-07-11"
+    "updatedAt": "2026-07-13"
   }
 }
