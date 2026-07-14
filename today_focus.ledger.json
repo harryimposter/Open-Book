@@ -1,8 +1,8 @@
 {
   "banks-q2": {
-    "fp": "26bcae405d67b10d90a378ecf0e51237358b1a96",
+    "fp": "1bf4009440a311f1eeaa14d8e155f3bf8f687ac1",
     "postedAt": "2026-07-12",
-    "updatedAt": "2026-07-12"
+    "updatedAt": "2026-07-14"
   },
   "nflx-q2": {
     "fp": "5bd849e8a961e7ca2930308a8d86fc714faa8fbb",
@@ -10,14 +10,14 @@
     "updatedAt": "2026-07-12"
   },
   "mu-fq3-react": {
-    "fp": "d693dfc6af5e5b0890b387f92fc50b2edc201208",
+    "fp": "54de13bb9df339c278bf1c2643a6cab39d8082ad",
     "postedAt": "2026-07-07",
-    "updatedAt": "2026-07-11"
+    "updatedAt": "2026-07-14"
   },
   "dal-q2": {
-    "fp": "df106bee0303ee30465f14fef0248690dc86cb22",
+    "fp": "15d9c2d684e40a6924161b75c509f2b7de3c088d",
     "postedAt": "2026-07-07",
-    "updatedAt": "2026-07-13"
+    "updatedAt": "2026-07-14"
   },
   "pep-q2": {
     "fp": "bcc1d78fa76cf2ba75c855dabc6b7320d1da711b",
@@ -25,24 +25,24 @@
     "updatedAt": "2026-07-11"
   },
   "tsm-q2": {
-    "fp": "2a27b5b2e12f02ebb66f279bf2c1f940e459101d",
+    "fp": "0274da0f9d38dc3baae0ea99f0ee2b2860add401",
     "postedAt": "2026-07-11",
-    "updatedAt": "2026-07-11"
+    "updatedAt": "2026-07-14"
   },
   "msft-capex-pullback": {
-    "fp": "617bb8c5a430fc44a887933a52b1600c9b96c5b1",
+    "fp": "85347636958182bf0567697fd7b6c9a3dcfd6c52",
     "postedAt": "2026-07-07",
-    "updatedAt": "2026-07-11"
+    "updatedAt": "2026-07-14"
   },
   "spx-cheap-convexity": {
-    "fp": "af655b227f49611f5c5a146bc57245598ba643ee",
+    "fp": "3487ec10243b600747d59a24d2eb95a66ea59fdb",
     "postedAt": "2026-07-07",
-    "updatedAt": "2026-07-13"
+    "updatedAt": "2026-07-14"
   },
   "gold-pullback": {
-    "fp": "c02d18a19572e7b0e9f24183662ccbfe42aefcfa",
+    "fp": "195a3d4a8d9ed805a1fe650f6612f648899d8ffe",
     "postedAt": "2026-07-07",
-    "updatedAt": "2026-07-13"
+    "updatedAt": "2026-07-14"
   },
   "ai-power": {
     "fp": "fbd7533d0bb47282755d2c7e8dbf3d0016701fbb",
@@ -50,33 +50,33 @@
     "updatedAt": "2026-07-11"
   },
   "lock-yields": {
-    "fp": "bfd35a175f0a5483f07e051a7204c0faa9e63594",
+    "fp": "7bd22d23134c302e66a92c47b5d826ae8af984a8",
     "postedAt": "2026-07-07",
-    "updatedAt": "2026-07-11"
+    "updatedAt": "2026-07-14"
   },
   "rate-range-accrual": {
-    "fp": "b9e29ce359a6ddb8039531200cae2a456de8ae3a",
+    "fp": "a526ba24f43d507146586897758e39ae51820861",
     "postedAt": "2026-07-07",
-    "updatedAt": "2026-07-11"
+    "updatedAt": "2026-07-14"
   },
   "fx-usd-hedge": {
-    "fp": "f9b8bee9c96c9e3d59e81dbdbddcb38620a5a05c",
+    "fp": "de4200bcd7ac135a6b7d6dd9c582a2fb6009f6cf",
     "postedAt": "2026-07-07",
-    "updatedAt": "2026-07-11"
+    "updatedAt": "2026-07-14"
   },
   "fx-carry-income": {
-    "fp": "0f20e39321d4db6935be0b428fd462a5cbb22222",
+    "fp": "ca0980d3ef0e86db86386e5509e1ae8f03116aec",
     "postedAt": "2026-07-07",
-    "updatedAt": "2026-07-11"
+    "updatedAt": "2026-07-14"
   },
   "tac-usdjpy-strangle": {
-    "fp": "5b89a808512955907c2682af45d87fa25d83b4e4",
+    "fp": "5a02035054b6916fbd8ba0d2c1be4d1dc90787c9",
     "postedAt": "2026-07-07",
-    "updatedAt": "2026-07-11"
+    "updatedAt": "2026-07-14"
   },
   "tac-brent-hormuz": {
-    "fp": "4ae71b500639a79f09786999d5ae744cbc2fe6f0",
+    "fp": "73083abf4f46d87afd4fa2a26e145abca49f6dee",
     "postedAt": "2026-07-07",
-    "updatedAt": "2026-07-13"
+    "updatedAt": "2026-07-14"
   }
 }
