@@ -1,82 +1,77 @@
 {
-  "banks-q2": {
-    "fp": "76a62b276409541ec0021edd62d45f764a56bcde",
-    "postedAt": "2026-07-12",
-    "updatedAt": "2026-07-15"
+  "nvda-q2": {
+    "fp": "cf1ab70ee76c43842bac8b5a184a7541b17f323c",
+    "postedAt": "2026-08-11",
+    "updatedAt": "2026-08-11"
+  },
+  "msft-fq4-react": {
+    "fp": "db2a4102fb3d44e92b39e541a57ace31e9102769",
+    "postedAt": "2026-08-11",
+    "updatedAt": "2026-08-11"
   },
   "nflx-q2": {
-    "fp": "5bd849e8a961e7ca2930308a8d86fc714faa8fbb",
+    "fp": "0d08efd85b563d4d00ef717e929d567387584a19",
     "postedAt": "2026-07-12",
-    "updatedAt": "2026-07-12"
+    "updatedAt": "2026-08-11"
   },
-  "mu-fq3-react": {
-    "fp": "3582df02d3083bd21831394e5867fe2aaec8e9e1",
-    "postedAt": "2026-07-07",
-    "updatedAt": "2026-07-15"
-  },
-  "dal-q2": {
-    "fp": "6ced0aaf04858ff886d51f9d65f4002c62427a28",
-    "postedAt": "2026-07-07",
-    "updatedAt": "2026-07-15"
-  },
-  "pep-q2": {
-    "fp": "bcc1d78fa76cf2ba75c855dabc6b7320d1da711b",
-    "postedAt": "2026-07-11",
-    "updatedAt": "2026-07-11"
-  },
-  "tsm-q2": {
-    "fp": "4e7845d313df8f27f5084be1e054c37370247fb0",
-    "postedAt": "2026-07-11",
-    "updatedAt": "2026-07-15"
-  },
-  "msft-capex-pullback": {
-    "fp": "b0f54e6332426ba69df1f4d37bc5424ac9063807",
-    "postedAt": "2026-07-07",
-    "updatedAt": "2026-07-15"
-  },
-  "spx-cheap-convexity": {
-    "fp": "61a8260948679acea17a0801f9850b71e6c77497",
-    "postedAt": "2026-07-07",
-    "updatedAt": "2026-07-15"
+  "mu-memory-dislocation": {
+    "fp": "b237a1912b48749f372b43b7ee6ac5750d82d646",
+    "postedAt": "2026-08-11",
+    "updatedAt": "2026-08-11"
   },
   "gold-pullback": {
-    "fp": "5b9af6fbdec3788e46125f656c782eab10544f76",
+    "fp": "93413f256f5f2cd5bd89fef948f8a15db3b2acd3",
     "postedAt": "2026-07-07",
-    "updatedAt": "2026-07-15"
+    "updatedAt": "2026-08-11"
+  },
+  "silver-ratio-catchup": {
+    "fp": "546fce74c9e28835f816d65b0a40680c551dcaa8",
+    "postedAt": "2026-08-11",
+    "updatedAt": "2026-08-11"
   },
   "ai-power": {
-    "fp": "fbd7533d0bb47282755d2c7e8dbf3d0016701fbb",
+    "fp": "fc6d095935e769be96d6bb94f70dd1f098481034",
     "postedAt": "2026-07-07",
-    "updatedAt": "2026-07-11"
+    "updatedAt": "2026-08-11"
   },
   "lock-yields": {
-    "fp": "999e977fe92edc31f18158c1ec467588ac5840a9",
+    "fp": "14369e7d2859717dd70174c410645c8301a3e91a",
     "postedAt": "2026-07-07",
-    "updatedAt": "2026-07-15"
+    "updatedAt": "2026-08-11"
   },
   "rate-range-accrual": {
-    "fp": "81711ea355ef4cf407224679a607fc62a753baa9",
+    "fp": "fb8d5decbedd888df66c8dafaf2a46d9df37b5f4",
     "postedAt": "2026-07-07",
-    "updatedAt": "2026-07-15"
+    "updatedAt": "2026-08-11"
+  },
+  "spx-cheap-convexity": {
+    "fp": "b520329af11213b2403dd77e49fef7551bc0ab86",
+    "postedAt": "2026-07-07",
+    "updatedAt": "2026-08-11"
   },
   "fx-usd-hedge": {
-    "fp": "9e9818e1980751a83711c4ff32b9da052efef021",
+    "fp": "48d9be1288186746923d5ef98d2e8100104e9294",
     "postedAt": "2026-07-07",
-    "updatedAt": "2026-07-15"
+    "updatedAt": "2026-08-11"
   },
   "fx-carry-income": {
-    "fp": "dd4fab43df44a0742756f744d5350f601c2518b9",
+    "fp": "c930858861bbe14447b686d0c32149a8d4f8cab6",
     "postedAt": "2026-07-07",
-    "updatedAt": "2026-07-15"
+    "updatedAt": "2026-08-11"
   },
-  "tac-usdjpy-strangle": {
-    "fp": "106038a4810810a6ca1be0a76da001976b39d48f",
-    "postedAt": "2026-07-07",
-    "updatedAt": "2026-07-15"
+  "tac-usdjpy-puts": {
+    "fp": "9f5dddfd6fadb03831211679190ad57a4a17589d",
+    "postedAt": "2026-08-11",
+    "updatedAt": "2026-08-11"
+  },
+  "tac-usdcnh-puts": {
+    "fp": "8beb35fec022a5724d3ce1be630290abfdb00a7f",
+    "postedAt": "2026-08-11",
+    "updatedAt": "2026-08-11"
   },
   "tac-brent-hormuz": {
-    "fp": "4cd01d209c67b148f29c068c1c4e951e7ff61937",
+    "fp": "812b7f32d3ac66afe775ee5ebbf563607503f277",
     "postedAt": "2026-07-07",
-    "updatedAt": "2026-07-15"
+    "updatedAt": "2026-08-11"
   }
 }

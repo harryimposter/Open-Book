@@ -17,7 +17,7 @@
 const SEED_THEMES = [
   { id: "ai",         name: "AI & Productivity",        blurb: "The productivity boom — compute leaders, the software layer and the adopters monetising AI." },
   { id: "power",      name: "Power & Infrastructure",   blurb: "Electricity is the new oil of AI: generation, the grid and the names that build it." },
-  { id: "duration",   name: "Core Fixed Income",        blurb: "Own quality duration for the ~4.5% carry and ballast — the Fed's hawkish hold has pushed the cutting cycle into 2027." },
+  { id: "duration",   name: "Core Fixed Income",        blurb: "Own quality duration for the ~4.7% carry and ballast — a hawkish-hold Fed keeps entry yields high just as the first labor crack restores the hedge value." },
   { id: "broaden",    name: "Broadening Equity",        blurb: "Diversify beyond the mega-caps — quality cyclicals, value and international catch-up." },
   { id: "realassets", name: "Real Assets",              blurb: "Infrastructure and real estate for inflation-protected, contracted income." },
   { id: "resilience", name: "Resilience & Protection",  blurb: "Structured downside protection and diversifiers to carry risk through the cycle." },
@@ -35,7 +35,7 @@ const SEED_IDEAS = [
     type: "Thematic", assetClass: "Equity", sector: "Technology", bucket: "Growth",
     conviction: "High", horizon: "Strategic",
     thesis: "The build-out of AI compute remains supply-constrained into 2027. We stay long the leaders but increasingly express it with downside-defined structures given valuations and concentration.",
-    structures: ["Direct equity", "Index core", "Structured note"]
+    structures: ["Structured note", "Zero-cost collar", "Call spread", "Direct equity"]
   },
   {
     id: "ai-software", themeId: "ai", intent: "add", title: "Software & the AI adopters",
@@ -43,7 +43,7 @@ const SEED_IDEAS = [
     type: "Thematic", assetClass: "Equity", sector: "Technology", bucket: "Growth",
     conviction: "Medium-High", horizon: "Strategic",
     thesis: "The next leg of the AI trade broadens from infrastructure to the software and services layer attaching AI to existing revenue. Quality compounders with pricing power.",
-    structures: ["Direct equity", "Call overwrite"]
+    structures: ["Buffered note", "Call overwrite", "Direct equity"]
   },
 
   /* ---- Power & Infrastructure ---- */
@@ -52,7 +52,7 @@ const SEED_IDEAS = [
     type: "Thematic", assetClass: "Equity", sector: "Utilities", bucket: "Income",
     conviction: "High", horizon: "Strategic",
     thesis: "After two flat decades, US power demand is inflecting on datacenters, reshoring and electrification. Utilities and grid suppliers with the right footprint get unprecedented rate-base growth.",
-    structures: ["Load-growth utilities", "Utility basket"]
+    structures: ["Load-growth utilities", "Phoenix autocall", "Utility basket"]
   },
   {
     id: "power-gas-nuclear", themeId: "power", intent: "add", title: "Natural gas & nuclear as AI power",
@@ -67,8 +67,8 @@ const SEED_IDEAS = [
     id: "extend-duration", themeId: "duration", intent: "income", title: "Lock in yields — extend duration",
     type: "Strategic", assetClass: "Fixed Income", sector: "Rates", bucket: "Income",
     conviction: "High", horizon: "Strategic",
-    thesis: "The Fed held but turned hawkish — the first cut is now a 2027 story, so this is about carry and ballast, not a rally. You're paid ~4.5% to wait in intermediate high-quality bonds, with a true equity diversifier for books running at all-time highs.",
-    structures: ["Govt / IG bonds", "Bond ladder"]
+    thesis: "The Fed held but turned hawkish — the first cut is now a 2027 story, so this is about carry and ballast, not a rally. You're paid ~4.7% to wait in intermediate high-quality bonds, with a true equity diversifier for books running at all-time highs.",
+    structures: ["Bond ladder", "Range accrual (BREN)", "Govt / IG bonds"]
   },
   {
     id: "quality-credit", themeId: "duration", intent: "income", title: "Quality credit carry",
@@ -103,15 +103,10 @@ const SEED_IDEAS = [
     thesis: "Toll roads, midstream and contracted power deliver inflation-linked, equity-like income with lower drawdown — a core diversifier for income-oriented books.",
     structures: ["Infrastructure fund", "Private markets"]
   },
-  {
-    id: "real-estate", themeId: "realassets", intent: "income", title: "Real estate, selectively",
-    type: "Opportunistic", assetClass: "Real Assets", sector: "Real Estate", bucket: "Income",
-    conviction: "Medium", horizon: "12m",
-    thesis: "With rates peaking, high-quality logistics, data-center and residential real estate offer a re-rating opportunity and a contracted income stream.",
-    structures: ["REIT basket", "Private real estate"]
-  },
-
   /* ---- Resilience & Protection ---- */
+  /* (the old "Real estate, selectively" idea was retired 11-Aug-2026: its "rates peaking"
+     premise is contradicted by a ~5.2% 30Y on oil-passthrough and supply — the re-rating
+     never came; listed-infra carries the real-asset income sleeve on its own) */
   {
     id: "structured-protection", themeId: "resilience", intent: "protect", title: "Structured downside protection",
     riskProfile: { vol: "moderate", beta: "low", structured: true },
@@ -137,7 +132,7 @@ const SEED_IDEAS = [
     type: "Strategic", assetClass: "Commodity", sector: "Gold", bucket: "Preservation",
     conviction: "High", horizon: "Strategic",
     thesis: "Persistent deficits, central-bank buying and geopolitical risk underpin gold as the cleanest tail hedge. We treat it as strategic ballast, sized to the book's protection gap.",
-    structures: ["Physical / ETC", "Gold accumulator"]
+    structures: ["Capital-protected note", "Gold accumulator", "Physical / ETC"]
   },
   {
     id: "fx-diversify", themeId: "gold", intent: "protect", title: "Currency diversification & FX overlays",
@@ -207,9 +202,9 @@ const SEED_CLIENTS = [
       funding: { headline: "Grow to $75m by 2034", metricLabel: "Projected value", current: 38, target: 75, unit: "$m", status: "On track" }
     },
     positions: [
-      { name: "NVIDIA",   ticker: "NVDA US", assetClass: "Equity", sector: "Technology", ccy: "USD", weightPct: 24.0, pnlPct: 11,  entryDate: "2025-11-04", entrySpot: 178.00, mat: null, note: "Largest position; ~$197 as the Mag7 carried the tape to a record H1 close." },
-      { name: "Broadcom", ticker: "AVGO US", assetClass: "Equity", sector: "Technology", ccy: "USD", weightPct: 14.0, pnlPct: 27,  entryDate: "2026-02-10", entrySpot: 295.00, mat: null, note: "~$375 after the quarter-end rally to records." },
-      { name: "Micron",   ticker: "MU US",   assetClass: "Equity", sector: "Technology", ccy: "USD", weightPct: 13.0, pnlPct: 142, entryDate: "2023-05-15", entrySpot: 62.00, mat: null, note: "HBM supercycle; record FQ3 (24-Jun) priced — ~$1,037, fade extended to ~15% off the 25-Jun ATH; ~2.4x unrealised at the book's basis." },
+      { name: "NVIDIA",   ticker: "NVDA US", assetClass: "Equity", sector: "Technology", ccy: "USD", weightPct: 24.0, pnlPct: 11,  entryDate: "2025-11-04", entrySpot: 178.00, mat: null, note: "Largest position; ~$217 near records into the 26-Aug print — collar/overwrite candidate." },
+      { name: "Broadcom", ticker: "AVGO US", assetClass: "Equity", sector: "Technology", ccy: "USD", weightPct: 14.0, pnlPct: 27,  entryDate: "2026-02-10", entrySpot: 295.00, mat: null, note: "~$375 area; carried through the July AI-capex whipsaw." },
+      { name: "Micron",   ticker: "MU US",   assetClass: "Equity", sector: "Technology", ccy: "USD", weightPct: 13.0, pnlPct: 142, entryDate: "2023-05-15", entrySpot: 62.00, mat: null, note: "HBM supercycle; ~$861-869, ~29% off the 25-Jun ATH even with HBM sold out through 2027 — ~2.2x unrealised, the collar conversation." },
       { name: "ASML",     ticker: "ASML NA", assetClass: "Equity", sector: "Technology", ccy: "EUR", weightPct: 19.0, pnlPct: 121, entryDate: "2024-09-20", entrySpot: 720.00, mat: null, note: "Semi-cap leader; ~€1,591." },
       { name: "Microsoft",ticker: "MSFT US", assetClass: "Equity", sector: "Technology", ccy: "USD", weightPct: 18.0, pnlPct: -4,  entryDate: "2024-03-12", entrySpot: 410.00, mat: null, note: "AI monetization core; modest drawdown YTD." },
       { name: "Phoenix autocall (semis)", ticker: "—", assetClass: "Structured", sector: "Technology", ccy: "USD", weightPct: 6.0, pnlPct: 4, entryDate: "2025-12-01", entrySpot: null, mat: "2027-12-01", note: "Yield on range-bound semis." },
@@ -233,9 +228,9 @@ const SEED_CLIENTS = [
       funding: { headline: "Grow to €70m by 2035 while drawing income", metricLabel: "Projected value", current: 50.2, target: 70, unit: "€m", status: "On track" }
     },
     positions: [
-      { name: "Micron",        ticker: "MU US",  assetClass: "Equity", sector: "Technology", ccy: "USD", weightPct: 25.8, pnlPct: 295, entryDate: "2019-06-10", entrySpot: 38.00, mat: null, note: "~4x gain at the book's basis; record FQ3 (24-Jun) priced, ~$1,037 (fade extended to ~15% off its ATH) — protect the concentration." },
-      { name: "SPDR S&P 500",  ticker: "SPY US", assetClass: "Equity", sector: "Broad",     ccy: "USD", weightPct: 25.2, pnlPct: 108, entryDate: "2021-02-01", entrySpot: 360.00, mat: null, note: "Core beta anchor; S&P closed H1 at a record ~7,493." },
-      { name: "NVIDIA",        ticker: "NVDA US",assetClass: "Equity", sector: "Technology", ccy: "USD", weightPct: 7.2,  pnlPct: -4,  entryDate: "2026-01-20", entrySpot: 205.00, mat: null, note: "~$197 after the quarter-end rally to records; house still likes it." },
+      { name: "Micron",        ticker: "MU US",  assetClass: "Equity", sector: "Technology", ccy: "USD", weightPct: 25.8, pnlPct: 295, entryDate: "2019-06-10", entrySpot: 38.00, mat: null, note: "~4x gain at the book's basis; ~$861-869, ~29% off the 25-Jun ATH with HBM sold out through 2027 — protect the concentration." },
+      { name: "SPDR S&P 500",  ticker: "SPY US", assetClass: "Equity", sector: "Broad",     ccy: "USD", weightPct: 25.2, pnlPct: 108, entryDate: "2021-02-01", entrySpot: 360.00, mat: null, note: "Core beta anchor; S&P ~7,728 after a record 7,757.64 on 7-Aug." },
+      { name: "NVIDIA",        ticker: "NVDA US",assetClass: "Equity", sector: "Technology", ccy: "USD", weightPct: 7.2,  pnlPct: -4,  entryDate: "2026-01-20", entrySpot: 205.00, mat: null, note: "~$217 near records into the 26-Aug print; house still likes it." },
       { name: "US Treasury 1.25% '31", ticker: "T 1.25 08/31", assetClass: "Fixed Income", sector: "Rates", ccy: "USD", weightPct: 6.0, pnlPct: -15, entryDate: "2021-08-15", entrySpot: 98.50, mat: "2031-08-31", note: "Underwater on rates — bond-swap candidate." },
       { name: "Xetra-Gold ETC",ticker: "4GLD GY",assetClass: "Commodity", sector: "Gold",  ccy: "EUR", weightPct: 5.2,  pnlPct: 180, entryDate: "2020-03-01", entrySpot: 42.00, mat: null, note: "Tail hedge — protective." },
       { name: "TotalEnergies", ticker: "TTE FP", assetClass: "Equity", sector: "Energy",    ccy: "EUR", weightPct: 4.3,  pnlPct: 50,  entryDate: "2022-05-10", entrySpot: 48.00, mat: null, note: "Energy hedge." },
@@ -269,7 +264,7 @@ const SEED_CLIENTS = [
       { name: "Realty Income (REIT)", ticker: "O US",   assetClass: "Real Assets",  sector: "Real Estate",ccy: "USD", weightPct: 5.0,  pnlPct: -11, entryDate: "2021-09-01", entrySpot: 68.00, mat: null, note: "Underwater on rates; high yield." },
       { name: "Listed infra fund",    ticker: "—",      assetClass: "Real Assets",  sector: "Infrastructure", ccy: "USD", weightPct: 4.0, pnlPct: 9, entryDate: "2023-03-01", entrySpot: null, mat: null, note: "Inflation-linked income." },
       { name: "Procter & Gamble",     ticker: "PG US",  assetClass: "Equity",       sector: "Consumer",   ccy: "USD", weightPct: 9.0,  pnlPct: 22,  entryDate: "2022-02-01", entrySpot: 138.00, mat: null, note: "Defensive dividend." },
-      { name: "Gold ETF",             ticker: "GLD US", assetClass: "Commodity",    sector: "Gold",       ccy: "USD", weightPct: 3.0,  pnlPct: 127, entryDate: "2021-06-01", entrySpot: 168.00, mat: null, note: "Small hedge sleeve; gold ~$4,052, bounced back above $4,000 off an 8-month low as Warsh flagged easing inflation expectations." },
+      { name: "Gold ETF",             ticker: "GLD US", assetClass: "Commodity",    sector: "Gold",       ccy: "USD", weightPct: 3.0,  pnlPct: 127, entryDate: "2021-06-01", entrySpot: 168.00, mat: null, note: "Small hedge sleeve; gold ~$4,400 at a two-month high on record-pace PBoC buying and ETF re-inflows." },
       { name: "IG corporate bonds",   ticker: "—",      assetClass: "Fixed Income", sector: "Credit",     ccy: "USD", weightPct: 10.0, pnlPct: 0,   entryDate: "2025-08-01", entrySpot: null, mat: "2030-08-01", note: "Core fixed income." },
       { name: "USD cash",             ticker: "—",      assetClass: "Cash",         sector: "Cash",       ccy: "USD", weightPct: 10.0, pnlPct: 0,   entryDate: null, entrySpot: null, mat: null, note: "Drawdown buffer; some redeployable." }
     ],
@@ -291,11 +286,11 @@ const SEED_CLIENTS = [
     },
     positions: [
       { name: "Bitcoin",            ticker: "BTC",     assetClass: "Alternatives", altKind: "directional", sector: "Crypto",         ccy: "USD", weightPct: 16.0, pnlPct: -35, entryDate: "2024-11-01", entrySpot: 92000.00, mat: null, note: "Bought near the highs; ~$59k now after a ~20% June drop (worst month of 2026; record ~$4.5bn ETF outflows) — the book's problem child." },
-      { name: "Gold (allocated)",   ticker: "XAU",     assetClass: "Commodity",    sector: "Gold",           ccy: "USD", weightPct: 12.0, pnlPct: 118, entryDate: "2022-01-01", entrySpot: 1850.00, mat: null, note: "Strategic hard-asset core; gold ~$4,052, bounced back above $4,000 off an 8-month low." },
+      { name: "Gold (allocated)",   ticker: "XAU",     assetClass: "Commodity",    sector: "Gold",           ccy: "USD", weightPct: 12.0, pnlPct: 118, entryDate: "2022-01-01", entrySpot: 1850.00, mat: null, note: "Strategic hard-asset core; gold ~$4,400 at a two-month high on record-pace PBoC buying." },
       { name: "Global infra fund",  ticker: "—",       assetClass: "Real Assets",  sector: "Infrastructure", ccy: "USD", weightPct: 13.0, pnlPct: 12,  entryDate: "2023-05-01", entrySpot: null, mat: null, note: "Listed infrastructure." },
       { name: "Shell",              ticker: "SHEL LN", assetClass: "Equity",       sector: "Energy",         ccy: "GBP", weightPct: 8.0,  pnlPct: 42,  entryDate: "2022-06-01", entrySpot: 22.50, mat: null, note: "Majors / energy premium; ~£32." },
       { name: "EM equity sleeve",   ticker: "—",       assetClass: "Equity",       sector: "Broad",          ccy: "USD", weightPct: 12.0, pnlPct: 5,   entryDate: "2024-02-01", entrySpot: null, mat: null, note: "APAC / EM growth." },
-      { name: "GDX gold miners",    ticker: "GDX US",  assetClass: "Equity",       sector: "Materials",      ccy: "USD", weightPct: 6.0,  pnlPct: 118, entryDate: "2025-09-01", entrySpot: 38.00, mat: null, note: "Miners ~$83 as gold slips to an 8-month low — still +118%." },
+      { name: "GDX gold miners",    ticker: "GDX US",  assetClass: "Equity",       sector: "Materials",      ccy: "USD", weightPct: 6.0,  pnlPct: 118, entryDate: "2025-09-01", entrySpot: 38.00, mat: null, note: "Miners riding gold's breakout to ~$4,400 — still +118%." },
       { name: "Private infra co-invest", ticker: "—",  assetClass: "Real Assets",  sector: "Infrastructure", ccy: "USD", weightPct: 6.0,  pnlPct: 0,   entryDate: "2024-06-01", entrySpot: null, mat: "2034-06-01", note: "Datacenter power." },
       { name: "EUR IG bonds",       ticker: "—",       assetClass: "Fixed Income", sector: "Credit",         ccy: "EUR", weightPct: 12.0, pnlPct: -6,  entryDate: "2023-10-01", entrySpot: null, mat: "2029-10-01", note: "Diversifier; mild duration loss." },
       { name: "Macro hedge fund",   ticker: "—",       assetClass: "Alternatives", altKind: "uncorrelated", sector: "Broad",          ccy: "USD", weightPct: 7.0,  pnlPct: 8,   entryDate: "2023-01-01", entrySpot: null, mat: null, note: "Uncorrelated sleeve." },
@@ -322,7 +317,7 @@ const SEED_CLIENTS = [
       funding: { headline: "Net worth to $120m by 2033 (after liabilities)", metricLabel: "Net projected value", current: 75, target: 120, unit: "$m", status: "On track" }
     },
     positions: [
-      { name: "S&P 500 index core", ticker: "VOO US",  assetClass: "Equity",       sector: "Broad",      ccy: "USD", weightPct: 29.0, pnlPct: 95, entryDate: "2021-03-01", entrySpot: 360.00, mat: null, note: "Passive core; S&P closed H1 at a record ~7,493." },
+      { name: "S&P 500 index core", ticker: "VOO US",  assetClass: "Equity",       sector: "Broad",      ccy: "USD", weightPct: 29.0, pnlPct: 95, entryDate: "2021-03-01", entrySpot: 360.00, mat: null, note: "Passive core; S&P ~7,728 after a record 7,757.64 on 7-Aug." },
       { name: "Microsoft",          ticker: "MSFT US", assetClass: "Equity",       sector: "Technology", ccy: "USD", weightPct: 10.0, pnlPct: 41, entryDate: "2022-08-01", entrySpot: 280.00, mat: null, note: "Quality compounder." },
       { name: "Apple",              ticker: "AAPL US", assetClass: "Equity",       sector: "Technology", ccy: "USD", weightPct: 8.0,  pnlPct: 99, entryDate: "2022-10-01", entrySpot: 150.00, mat: null, note: "Mega-cap quality." },
       { name: "UnitedHealth",       ticker: "UNH US",  assetClass: "Equity",       sector: "Healthcare", ccy: "USD", weightPct: 6.0,  pnlPct: -26,entryDate: "2024-09-01", entrySpot: 540.00, mat: null, note: "Underwater (~$400); defensive compounder." },
@@ -350,7 +345,7 @@ const SEED_CLIENTS = [
       funding: { headline: "Grow to $70m by 2034; $4m house deposit by 2028", metricLabel: "Projected value", current: 44, target: 70, unit: "$m", status: "On track" }
     },
     positions: [
-      { name: "NVIDIA",          ticker: "NVDA US", assetClass: "Equity",       sector: "Technology", ccy: "USD", weightPct: 22.0, pnlPct: 279, entryDate: "2023-08-01", entrySpot: 52.00, mat: null, note: "Concentrated; ~$197 after the quarter-end rally to records — still a huge unrealised gain that needs protecting." },
+      { name: "NVIDIA",          ticker: "NVDA US", assetClass: "Equity",       sector: "Technology", ccy: "USD", weightPct: 22.0, pnlPct: 279, entryDate: "2023-08-01", entrySpot: 52.00, mat: null, note: "Concentrated; ~$217 near records into the 26-Aug print — still a huge unrealised gain that needs protecting." },
       { name: "Constellation Energy", ticker: "CEG US", assetClass: "Equity",   sector: "Utilities",  ccy: "USD", weightPct: 15.0, pnlPct: 181, entryDate: "2023-04-01", entrySpot: 95.00, mat: null, note: "Concentrated; datacenter-power winner." },
       { name: "S&P 500 index core", ticker: "VOO US",assetClass: "Equity",      sector: "Broad",      ccy: "USD", weightPct: 26.0, pnlPct: 74,  entryDate: "2023-01-01", entrySpot: 400.00, mat: null, note: "Diversified core." },
       { name: "ASML",            ticker: "ASML NA", assetClass: "Equity",       sector: "Technology", ccy: "EUR", weightPct: 7.0,  pnlPct: 115, entryDate: "2024-10-01", entrySpot: 740.00, mat: null, note: "Semi-cap." },
@@ -405,7 +400,7 @@ const SEED_CLIENTS = [
          → source "stated-risk"). */
     },
     positions: [
-      { name: "NVIDIA",                ticker: "NVDA US", assetClass: "Equity",       sector: "Technology", ccy: "USD", weightPct: 24.0, pnlPct: 310, entryDate: "2022-11-01", entrySpot: 48.00, mat: null, note: "Core AI position — ~$197 after the quarter-end rally to records, still ~4x, deliberately unhedged." },
+      { name: "NVIDIA",                ticker: "NVDA US", assetClass: "Equity",       sector: "Technology", ccy: "USD", weightPct: 24.0, pnlPct: 310, entryDate: "2022-11-01", entrySpot: 48.00, mat: null, note: "Core AI position — ~$217 near records into the 26-Aug print, still ~4x, deliberately unhedged." },
       { name: "Bitcoin",               ticker: "BTC",     assetClass: "Alternatives", altKind: "directional", sector: "Crypto",     ccy: "USD", weightPct: 18.0, pnlPct: 81,  entryDate: "2021-02-01", entrySpot: 33000.00, mat: null, note: "Direct digital-asset holding in custody; ~$59.8k (~-18% on the month)." },
       { name: "Tesla",                 ticker: "TSLA US", assetClass: "Equity",       sector: "Consumer",   ccy: "USD", weightPct: 11.0, pnlPct: 230, entryDate: "2023-01-01", entrySpot: 120.00, mat: null, note: "High-beta growth." },
       { name: "S&P 500 index core",    ticker: "VOO US",  assetClass: "Equity",       sector: "Broad",      ccy: "USD", weightPct: 12.0, pnlPct: 94,  entryDate: "2022-06-01", entrySpot: 360.00, mat: null, note: "The only diversified sleeve." },
@@ -433,14 +428,14 @@ const SEED_CLIENTS = [
          "revealed"). The balanced book should reveal a moderate appetite on its own. */
     },
     positions: [
-      { name: "S&P 500 index core",  ticker: "VOO US",  assetClass: "Equity",       sector: "Broad",      ccy: "USD", weightPct: 24.0, pnlPct: 71, entryDate: "2021-05-01", entrySpot: 410.00, mat: null, note: "Diversified core; S&P closed H1 at a record ~7,493." },
+      { name: "S&P 500 index core",  ticker: "VOO US",  assetClass: "Equity",       sector: "Broad",      ccy: "USD", weightPct: 24.0, pnlPct: 71, entryDate: "2021-05-01", entrySpot: 410.00, mat: null, note: "Diversified core; S&P ~7,728 after a record 7,757.64 on 7-Aug." },
       { name: "Global equity fund",  ticker: "—",       assetClass: "Equity",       sector: "Broad",      ccy: "USD", weightPct: 16.0, pnlPct: 20, entryDate: "2021-09-01", entrySpot: null, mat: null, note: "Ex-US diversification." },
       { name: "Microsoft",           ticker: "MSFT US", assetClass: "Equity",       sector: "Technology", ccy: "USD", weightPct: 9.0,  pnlPct: 36, entryDate: "2022-03-01", entrySpot: 290.00, mat: null, note: "Largest single name — still modest." },
       { name: "Berkshire Hathaway",  ticker: "BRK/B US",assetClass: "Equity",       sector: "Financials", ccy: "USD", weightPct: 8.0,  pnlPct: 64, entryDate: "2022-01-01", entrySpot: 300.00, mat: null, note: "Quality compounder." },
       { name: "IG corporate bonds",  ticker: "—",       assetClass: "Fixed Income", sector: "Credit",     ccy: "USD", weightPct: 12.0, pnlPct: 0,  entryDate: "2025-06-01", entrySpot: null, mat: "2030-06-01", note: "Core income sleeve." },
       { name: "US Treasury ladder",  ticker: "—",       assetClass: "Fixed Income", sector: "Rates",      ccy: "USD", weightPct: 8.0,  pnlPct: 1,  entryDate: "2024-02-01", entrySpot: null, mat: "2031-02-01", note: "2–7yr ladder." },
       { name: "Listed infra fund",   ticker: "—",       assetClass: "Real Assets",  sector: "Infrastructure", ccy: "USD", weightPct: 8.0, pnlPct: 6, entryDate: "2023-04-01", entrySpot: null, mat: null, note: "Contracted income diversifier." },
-      { name: "Gold ETF",            ticker: "GLD US",  assetClass: "Commodity",    sector: "Gold",       ccy: "USD", weightPct: 3.0,  pnlPct: 127, entryDate: "2021-06-01", entrySpot: 168.00, mat: null, note: "Small hedge sleeve; gold ~$4,030 at an 8-month low as the dollar wins the haven bid." },
+      { name: "Gold ETF",            ticker: "GLD US",  assetClass: "Commodity",    sector: "Gold",       ccy: "USD", weightPct: 3.0,  pnlPct: 127, entryDate: "2021-06-01", entrySpot: 168.00, mat: null, note: "Small hedge sleeve; gold ~$4,400 at a two-month high as the dollar breaks below 100." },
       { name: "USD cash",            ticker: "—",       assetClass: "Cash",         sector: "Cash",       ccy: "USD", weightPct: 12.0, pnlPct: 0,  entryDate: null, entrySpot: null, mat: null, note: "Idle buffer." }
     ],
     summary: "A textbook 'no stated goal' case: never risk-profiled, no targets, no funding goal, no liabilities. The book itself is the only signal — broadly balanced (~57% equity, ~35% defensive, no concentrated name), which reads as a moderate appetite. The whole point of Fotis is to watch the system infer a moderate goal from the portfolio alone, with no form to read off."
