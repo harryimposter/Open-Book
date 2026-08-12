@@ -53,7 +53,7 @@
   <p class="subtitle">Everything a human needs to know to rebuild this project from scratch — the process, the methodology, the client mapping, the criteria, the goal derivation, and the daily research discipline.</p>
   <table class="meta"><tr>
     <td><b>Document</b><br/>Replication guide (for humans)</td>
-    <td><b>As of</b><br/>11 August 2026</td>
+    <td><b>As of</b><br/>12 August 2026</td>
     <td><b>Live app</b><br/>open-book-eta.vercel.app</td>
     <td><b>Stack</b><br/>Static HTML/CSS/JS + two Python scripts</td>
   </tr></table>
@@ -62,7 +62,7 @@
 <div class="toc">
 <h2>Contents</h2>
 <ol>
-  <li><b>What this project is</b> — the one-paragraph pitch and the four tabs</li>
+  <li><b>What this project is</b> — the one-paragraph pitch and the shell (two views × two tabs)</li>
   <li><b>Design principles</b> — the seven rules everything else follows from</li>
   <li><b>Architecture</b> — files, data flow, why there is no build step</li>
   <li><b>The client books</b> — eight engineered clients and what each one tests</li>
@@ -70,7 +70,7 @@
   <li><b>The idea→client mapping engine</b> — four axes, a gate, and a goals multiplier</li>
   <li><b>Conviction scoring</b> — two rubrics, data-quality tags, and the Medium cap</li>
   <li><b>The daily sweep</b> — coverage spec, source rules, named authors, attribution</li>
-  <li><b>The idea data contract</b> — every field of a Today's Focus idea</li>
+  <li><b>The idea data contract</b> — every field of an Idea Feed (sweep) idea</li>
   <li><b>Integrity machinery</b> — honest dates, the tactical gate, chart/technicals sourcing</li>
   <li><b>Supporting engines</b> — expressions, the email engine, scanner, pre-trade</li>
   <li><b>Design system</b> — the J.P. Morgan Private Bank aesthetic</li>
@@ -82,22 +82,24 @@
 
 <!-- ============================== 1 ============================== -->
 <h2>1 · What this project is</h2>
-<p><b>Open Book</b> (repo name "Brokerage Playground") is a client-facing replica of an investment-desk
-tool, restyled in a J.P. Morgan Private Bank aesthetic. It simulates the daily life of a private-bank
-advisory desk: standing investment <em>themes</em>, a daily AI-generated <em>trade-idea board</em>, a
-multi-client <em>advisor book</em>, and a <em>pre-trade suitability</em> check. The point of the project
-is not the ideas themselves — it is the <b>discipline around them</b>: every idea is scored by a
-published rubric, mapped to clients by a transparent engine that reads their real holdings, dated
-honestly by a fingerprint ledger, and sourced under a two-source rule with citation integrity enforced
-by a validator.</p>
+<p><b>Open Book</b> is a private-bank investment-desk simulator with a two-sided premise: a
+<b>Solutions desk</b> that manufactures and curates a daily trade-idea feed, and an <b>Advisor</b> who
+consumes it against a live book of eight clients. It runs as one page —
+<code>index.html</code> + <code>openbook.js</code> — with two header <b>views</b> (Advisor ·
+Solutions) and two <b>tabs</b> (Idea Feed · Advisor Book), plus a light/dark theme, a
+"Search everything" ⌘K command palette, and an embedded legacy app for the deep client pages. The
+point of the project is not the ideas themselves — it is the <b>discipline around them</b>: every idea
+is scored by a published rubric, mapped to clients by a transparent engine that reads their real
+holdings, dated honestly by a fingerprint ledger, and sourced under a two-source rule with citation
+integrity enforced by a validator.</p>
 
-<h3>The four tabs</h3>
+<h3>The shell — two views × two tabs</h3>
 <table class="data">
-<tr><th>Tab</th><th>What it does</th><th>Backed by</th></tr>
-<tr><td><b>Solutions Views</b></td><td>Standing desk themes on a left rail; each theme carries idea tiles; each idea shows how to express it (clickable expressions) and which client books it fits. A "draft a view" flow turns a one-line thesis into a suggested theme, asset class, expressions and candidate clients.</td><td><code>data.js</code>, <code>scanner.js</code>, <code>expressions.js</code></td></tr>
-<tr class="alt"><td><b>Today's Focus</b></td><td>The daily sweep output in two sections — Earnings and Ex-earnings. Each card carries a conviction score (rubric-computed), flagged clients each with a separate client-fit score and a one-line why, clickable expressions, an on-theme/off-theme tag, and for earnings the report date and implied-vs-historical move.</td><td><code>today_focus.json → build_today_focus.py → today_focus.js</code>, <code>mapping.js</code></td></tr>
-<tr><td><b>Advisor Book</b></td><td>The whole book as line items with a client dropdown; each client opens to their portfolio: allocation vs derived goal target, the desk agenda, mapped ideas with reasoning, top holdings.</td><td><code>data.js</code>, <code>goals.js</code>, <code>scanner.js</code>, <code>portfolio.html</code></td></tr>
-<tr class="alt"><td><b>Pre-Trade Analysis</b></td><td>Stage a trade (client × idea × structure × size) for a first-pass read on suitability, funding, concentration, currency and desk view.</td><td><code>app.js</code> + the same engines</td></tr>
+<tr><th>Surface</th><th>What it does</th><th>Backed by</th></tr>
+<tr><td><b>Idea Feed</b> (tab)</td><td>The daily sweep as a social-style origination feed. A <b>Market Brief</b> card (sweep summary, expandable) sits on top; below it, a three-column layout: a left rail with the <b>Top&nbsp;3</b> tiles (ranked by breadth — how many clients the live engine flags — then conviction; a sweep-pinned idea leads as <b>DESK PICK</b>; tap to focus the feed) and the <b>Client Toolkit</b> (tap a client to build their email); the middle feed with search, asset-class chips and a client filter; and a right-rail <b>Ask your book</b> panel (Morgan AI, answered live from the engines — "it never invents a number").</td><td><code>today_focus.js</code>, <code>mapping.js</code>, <code>openbook.js</code>, <code>morgan.js</code>, <code>email.js</code></td></tr>
+<tr class="alt"><td><b>Idea cards</b> (in the feed)</td><td>Each idea renders as a post: an author identity (<em>Solutions Desk</em> for on-theme sweep ideas, <em>Claude's Views</em> for off-theme ones, <em>You — Solutions view</em> for advisor drafts), a "posted&nbsp;Nd&nbsp;ago / updated" chip driven by the honest-date ledger, the <b>CONV ring</b> (the desk's rubric-computed conviction /100 — click for the scoring breakdown), ticker/asset tags, headline, thesis, a <b>RECOMMENDATION</b> block (the tradeStatement — Solutions can tweak the implementation text advisors and emails use), an inline sourced chart, a "Via …" attribution line (only actually-read view-sources; own calls say <em>"Own view — no outside research leaned on"</em>), ♥ save with engagement counters (liked / drafted / checked by N advisors), and two actions: <b>Idea Suitability</b> (the per-client fit flowchart — flagged clients with fit scores and the plain-English why; suppressed clients shown with their MiFID reason) and <b>Email</b> (the book-aware letter composer).</td><td><code>openbook.js</code>, <code>charts.js</code>, <code>mapping.js</code>, <code>email.js</code></td></tr>
+<tr><td><b>Solutions view</b> (header switch)</td><td>The manufacturing side. Sees the <em>whole</em> board including unapproved ideas, with a curation bar ("You curate this feed"): <b>＋&nbsp;Add idea</b> opens a composer (name, ticker, asset class, goal bucket, direction, thesis, one-sentence recommendation, expressions) — drafts carry the advisor's name, are <em>not</em> desk-scored (a DRAFT pill instead of a CONV ring) but map to clients through the same live fit engine; each sweep card carries an <b>✓&nbsp;Approve / ✕&nbsp;Discard</b> gate (only approved ideas reach the Advisor view; custom drafts are locked approved), an <b>✎&nbsp;Edit implementation</b> control, and a remove/restore flow. The Advisor view carries zero curation UI.</td><td><code>openbook.js</code> (localStorage-persisted approval/edit state)</td></tr>
+<tr class="alt"><td><b>Advisor Book</b> (tab)</td><td>Coverage at a glance — a grid of client tiles; tapping one embeds that client's full <b>current-portfolio report</b> (<code>portfolio.html?embed=1&amp;client=…</code>) in-shell with a "←&nbsp;All clients" bar: allocation vs the derived goal target, the desk agenda, mapped ideas with reasoning, holdings. The legacy app (<code>classic.html</code>, the original Brokerage Playground) survives in embed mode for the deep pages, and <code>onepager.html</code> renders a printable client one-pager.</td><td><code>data.js</code>, <code>goals.js</code>, <code>scanner.js</code>, <code>portfolio.html</code>, <code>classic.html</code></td></tr>
 </table>
 
 <div class="key"><b>The two-axis idea philosophy.</b> "How good is the idea" (conviction) and "how right
@@ -138,9 +140,10 @@ deployable as a free Vercel static site and auditable file-by-file.</p>
 
 <table class="data">
 <tr><th>File</th><th>Role</th></tr>
-<tr><td><code>index.html</code></td><td>App shell + the four tab views</td></tr>
-<tr class="alt"><td><code>styles.css / openbook.css</code></td><td>JPM Private Bank design system (espresso + bronze/gold, serif display, hairline rules)</td></tr>
-<tr><td><code>data.js</code></td><td>Seed themes, Solutions Views ideas, the eight client books (positions, splits, goals, liabilities), synthetic 24-month sector history, MiFID complexity taxonomy</td></tr>
+<tr><td><code>index.html</code> + <code>openbook.js</code> + <code>openbook.css</code></td><td>The shell: sticky header (Advisor/Solutions view switch, light/dark theme with a pre-paint apply + iframe sync, ⌘K command palette, as-of stamp), the Idea Feed (brief, Top 3, toolkit, feed, Ask-your-book rail), the Solutions curation layer (approve/discard gate, idea composer, implementation edits), the Advisor Book client grid and the embed plumbing</td></tr>
+<tr class="alt"><td><code>classic.html</code> + <code>app.js</code> + <code>styles.css</code></td><td>The legacy Brokerage Playground app (the original four-tab UI), kept fully working and hosted in <em>embed mode</em> (masthead/tabs hidden, theme-synced) for the deep client pages; also openable standalone</td></tr>
+<tr><td><code>portfolio.html</code> / <code>onepager.html</code></td><td>Per-client current-portfolio report (what an Advisor Book tile embeds) / printable client one-pager</td></tr>
+<tr><td><code>data.js</code></td><td>Seed themes, standing theme ideas, the eight client books (positions, splits, goals, liabilities), synthetic 24-month sector history, MiFID complexity taxonomy</td></tr>
 <tr class="alt"><td><code>goals.js</code></td><td>Goal-inference engine <code>deriveGoals()</code> — the 3-bucket goal vector, willingness blend, goal-alignment multiplier</td></tr>
 <tr><td><code>mapping.js</code></td><td>The single idea→client scorer <code>scoreIdeaForClient()</code> — four axes, tradability gate, tiers</td></tr>
 <tr class="alt"><td><code>scanner.js</code></td><td>Portfolio scan (11 severity-ranked findings rules) + thin facades over the mapping engine for the Views tab</td></tr>
@@ -153,7 +156,7 @@ deployable as a free Vercel static site and auditable file-by-file.</p>
 <tr><td><code>today_focus.js</code></td><td><code>window.TODAY_FOCUS</code> — what the app loads. Auto-generated; never hand-edited</td></tr>
 <tr class="alt"><td><code>today_focus.ledger.json</code></td><td>Committed fingerprint ledger keeping postedAt/updatedAt honest</td></tr>
 <tr><td><code>methodology.js</code></td><td><code>window.METHODOLOGY</code> — reads every constant LIVE from the engines so the in-app methodology can't drift from the code</td></tr>
-<tr class="alt"><td><code>app.js / openbook.js / morgan.js / charts.js / portfolio.html</code></td><td>Rendering, drawers/modals, the Morgan AI assistant (answers from METHODOLOGY), inline spark/band charts, the portfolio view</td></tr>
+<tr class="alt"><td><code>morgan.js / charts.js</code></td><td>The "Ask your book" Morgan AI panel (answers from METHODOLOGY + the live engines) and the inline spark/band chart renderer</td></tr>
 </table>
 
 <h3>The daily data flow</h3>
@@ -249,8 +252,8 @@ Income, else Growth).</p>
 
 <!-- ============================== 6 ============================== -->
 <h2>6 · The idea→client mapping engine (<code>mapping.js</code>)</h2>
-<p><code>scoreIdeaForClient(idea, client)</code> is the <b>single scorer</b> — Today's Focus flags,
-Advisor Book top-3, draft-a-view previews, Solutions Views client lists and pre-trade all funnel
+<p><code>scoreIdeaForClient(idea, client)</code> is the <b>single scorer</b> — the Idea Feed's flagged clients,
+the Top 3 breadth ranking, the suitability flowchart, advisor-draft mapping and the legacy pages all funnel
 through it, so no two tabs can ever disagree. It reads sector-level signals off the reconciled book:
 sector exposure, the 24-month sector history, in-sector holdings, and the parsed mandate.</p>
 
@@ -370,7 +373,7 @@ of the file (the ledger forgets them).</p>
 <tr class="alt"><td><code>intent / action / preferredExpression / structures[]</code></td><td>add·protect·trim·income; the action line; the lead expression; the clickable expression list (use vocabulary expressions.js resolves — "Call spread", "Zero-cost collar", "Phoenix autocall", "Buffered note", "Risk reversal", "Strangle", "Dual-currency deposit"…).</td></tr>
 <tr><td><code>name / ticker / sector / assetClass / bucket / goalType / riskProfile</code></td><td>Classification the engines read. bucket ∈ Growth·Income·Preservation·Structured; sector "FX" and "Rates" satisfy the coverage check; riskProfile {vol, beta, structured} feeds Mandate & Risk.</td></tr>
 <tr class="alt"><td><code>headline / thesis / variant {street, us, gap} / changeMyMind</code></td><td>The argument. variant is what the thesis pillar's variant-view check reads; changeMyMind is the surfaced kill condition.</td></tr>
-<tr><td><code>themeId / offThemeWhy / ownView</code></td><td>Link to a Solutions Views theme, or an explicit off-theme reason. ownView marks a desk-original call.</td></tr>
+<tr><td><code>themeId / offThemeWhy / ownView</code></td><td>Link to a standing desk theme (drives the card's author identity: on-theme = Solutions Desk, off-theme = Claude's Views), or an explicit off-theme reason. ownView marks a desk-original call.</td></tr>
 <tr class="alt"><td><code>conviction.pillars[]</code></td><td>Authored scores + dq + one-line notes per rubric pillar (4 for earnings, 7 for ex-earnings). Totals/labels are computed, never authored.</td></tr>
 <tr><td><code>earnings {…}</code></td><td>Earnings ideas: reportDate, reportWhen, stance-dependent fields — pre: impliedMovePct vs historicalAvgMovePct (+ sources); post: result + resultSource="sourced" (validator-enforced) + reaction + watch.</td></tr>
 <tr class="alt"><td><code>facts[] / sources[]</code></td><td>Facts each tagged sourced|estimated. Sources typed kind ∈ data·news·calendar·analysis·view; view requires basis.</td></tr>
@@ -429,18 +432,23 @@ agenda and next-best-action; plus thin facades over the mapping engine.</li>
 
 <!-- ============================== 12 ============================== -->
 <h2>12 · Design system</h2>
+<p>Two coordinated systems, both theme-aware:</p>
 <ul>
-<li><b>Palette:</b> espresso <code>#29211A</code> on warm paper <code>#FBF8F2</code>; bronze/gold
-accent <code>#9A7B4F</code>; supporting umber <code>#5A3E2B</code>, green <code>#3F6B4E</code>
-(Preservation / positive), slate <code>#6E7E8C</code>, muted red <code>#8C3F3F</code>; hairlines
-<code>#D8C9B2</code>; panel fill <code>#F4ECE0</code>.</li>
-<li><b>Type:</b> serif display (Georgia stack) for headings and body; small-caps/letter-spaced
-Helvetica for kickers, tags and table headers; Consolas for code/formulas.</li>
-<li><b>Texture:</b> hairline rules, double-rule section breaks, generous margins, tag chips
-(uppercase, 7.5pt, letter-spaced), left-border callouts. No gradients, no shadows, no rounded cards —
-a printed-research-note feel.</li>
-<li><b>Goal-bucket colours:</b> Growth espresso · Income bronze <code>#9A7B4F</code> · Preservation
-green <code>#3F6B4E</code>.</li>
+<li><b>The shell (<code>openbook.css</code>):</b> light ground <code>#FBFAF7</code> / white surfaces
+with a full <b>dark theme</b> (<code>[data-theme="dark"]</code>, gold-accented) toggled in the header,
+persisted in <code>localStorage</code> (<code>ob-theme</code>), applied pre-paint to avoid flash and
+synced into the embedded iframe. Ink <code>#17150F</code>, charcoal <code>#1E1B16</code>, brown
+<code>#54301A</code>, bronze <code>#996F3D</code> / light bronze <code>#C7A97A</code>, gold
+<code>#EBC98D</code>, greens <code>#2FBF71</code> / <code>#2C7A4B</code> (positive/fit), brick
+<code>#9C4A3A</code>, hairlines <code>#E5E1DA</code>/<code>#F0ECE4</code>, creams
+<code>#F4F1EA</code>/<code>#EEEAE2</code>. Type: <b>Source Serif 4</b> (display/serif) +
+<b>Archivo</b> (UI sans), Google-Fonts loaded. Texture: letter-spaced uppercase kickers, colour
+strip-bars on cards, conviction rings, soft card shadows — an editorial-feed feel.</li>
+<li><b>The legacy pages (<code>styles.css</code> — classic/portfolio/onepager):</b> the original
+printed-research-note aesthetic — espresso <code>#29211A</code> on warm paper, bronze
+<code>#9A7B4F</code>, hairline rules, tag chips — with its own dark-theme mapping so the embed
+matches the shell's theme.</li>
+<li><b>Goal-bucket colours (shared):</b> Growth dark · Income bronze · Preservation green.</li>
 </ul>
 
 <!-- ============================== 13 ============================== -->
@@ -457,7 +465,7 @@ changed)</code> — the git log doubles as the desk's sweep journal.</li>
 <!-- ============================== 14 ============================== -->
 <h2 class="pagebreak">14 · Step-by-step replication checklist</h2>
 <ol>
-<li><b>Scaffold the static app:</b> index.html with four tab shells; the design system in styles.css.</li>
+<li><b>Scaffold the static app:</b> the shell (index.html + openbook.js + openbook.css: header with view switch/theme/⌘K, Idea Feed, Advisor Book grid) plus the legacy pages (classic.html + app.js + styles.css, portfolio.html, onepager.html) in embed mode.</li>
 <li><b>Author data.js:</b> themes → ideas (typed, bucketed, with structures) → the eight client books
 (reconciled positions) → the synthetic sector-history generator → the MiFID complexity taxonomy
 (structured-keywords before OTC-keywords).</li>
@@ -500,7 +508,7 @@ history and nothing else changes.</li>
 flag.</li>
 </ul>
 
-<div class="footer">Open Book · Complete Replication Guide · generated 11 August 2026 · This document
+<div class="footer">Open Book · Complete Replication Guide · generated 12 August 2026 · This document
 describes a research/portfolio simulation project. Nothing in it is investment advice.</div>
 
 </div>

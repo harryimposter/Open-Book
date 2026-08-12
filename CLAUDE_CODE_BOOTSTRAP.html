@@ -46,8 +46,10 @@
 </div>
 
 <div class="key"><b>Mission statement for the building agent.</b> You are building <b>Open Book</b>: a
-static, no-build-step advisory-desk simulator (four tabs: Solutions Views, Today's Focus, Advisor Book,
-Pre-Trade Analysis) in a J.P. Morgan Private Bank aesthetic, whose defining property is <b>transparent,
+static, no-build-step advisory-desk simulator with a two-sided shell — an <b>Advisor / Solutions view
+switch</b> over two tabs, <b>Idea Feed</b> (the daily sweep as a social-style origination feed with a
+Solutions curation layer) and <b>Advisor Book</b> (a client-tile grid embedding per-client portfolio
+reports) — in a J.P. Morgan Private Bank aesthetic, whose defining property is <b>transparent,
 derived, validated research discipline</b>: a goal-inference engine, a single idea→client fit engine,
 two conviction rubrics computed by a Python generator with hard validation, honest-dating via a
 fingerprint ledger, a tactical trigger gate, and sourced-or-stripped charts/technicals. Build files in
@@ -69,7 +71,7 @@ that constant. Where a detail is unspecified, choose the simplest option consist
 <h2>2 · File manifest (build in this order)</h2>
 <table class="data">
 <tr><th>#</th><th>File</th><th>Contents</th></tr>
-<tr><td>1</td><td><code>styles.css</code></td><td>Design system (§9)</td></tr>
+<tr><td>1</td><td><code>openbook.css</code> + <code>styles.css</code></td><td>Design systems: the shell (light/dark, Source Serif 4 + Archivo) and the legacy pages (§9)</td></tr>
 <tr class="alt"><td>2</td><td><code>data.js</code></td><td><code>window.SEED</code>: themes, seed ideas, 8 clients, synthetic sector history, complexity taxonomy (§3)</td></tr>
 <tr><td>3</td><td><code>goals.js</code></td><td><code>window.GOALS</code>: deriveGoals + helpers (§4)</td></tr>
 <tr class="alt"><td>4</td><td><code>mapping.js</code></td><td><code>window.MAPPING</code>: scoreIdeaForClient + flagClients + tradability (§5)</td></tr>
@@ -79,7 +81,8 @@ that constant. Where a detail is unspecified, choose the simplest option consist
 <tr class="alt"><td>8</td><td><code>tv_technicals.py</code>, <code>fetch_chart_series.py</code></td><td>Enrichment scripts (§6.5)</td></tr>
 <tr><td>9</td><td><code>today_focus.json</code></td><td>First sweep payload (author via §8 procedure)</td></tr>
 <tr class="alt"><td>10</td><td><code>email.js</code>, <code>charts.js</code>, <code>methodology.js</code>, <code>morgan.js</code></td><td>Support engines</td></tr>
-<tr><td>11</td><td><code>app.js</code>, <code>openbook.js</code>, <code>index.html</code>, <code>portfolio.html</code></td><td>Shell, tabs, drawers, modals, pre-trade</td></tr>
+<tr><td>11</td><td><code>index.html</code> + <code>openbook.js</code></td><td>THE SHELL (§7b) — header, view switch, theme, ⌘K palette, Idea Feed, Solutions curation, Advisor Book grid + embeds</td></tr>
+<tr class="alt"><td>12</td><td><code>classic.html</code> + <code>app.js</code>, <code>portfolio.html</code>, <code>onepager.html</code></td><td>Legacy full app kept working in embed mode (masthead/tabs hidden via <code>?embed=1</code>, theme-synced); per-client portfolio report (what a book tile embeds); printable one-pager</td></tr>
 </table>
 
 <h2 class="pagebreak">3 · data.js contract</h2>
@@ -256,6 +259,15 @@ delegating to MAPPING.</li>
 copy constants) so the in-app "how scoring works" and the Morgan assistant cannot drift from code.</li>
 </ul>
 
+<h2>7b · The shell (index.html + openbook.js) — UX contract</h2>
+<ul class="small">
+<li><b>Header:</b> "Open Book · PRIVATE BANK" lockup; an Advisor/Solutions <b>view switch</b>; a light/dark theme toggle (localStorage key <code>ob-theme</code>, applied before first paint, synced into the embedded iframe and across pages via storage events); a "Search everything ⌘K" command palette over ideas + clients; an as-of stamp; two tabs: <b>Idea Feed</b>, <b>Advisor Book</b>.</li>
+<li><b>Idea Feed layout:</b> Market Brief card (sweep summary, expandable to the watch bullets + full narrative) above a three-column grid — left rail: <b>TOP 3</b> tiles ranked by BREADTH (count of clients the live engine flags) then conviction, with a sweep-pinned idea leading as DESK PICK (label only — scores untouched), tap-to-focus; below it the <b>CLIENT TOOLKIT</b> (tap a client → their email builder). Middle: search input, asset-class chips, client-filter dropdown, count line, the feed. Right rail: <b>Ask your book</b> — the Morgan AI panel answering only from the live engines ("it never invents a number").</li>
+<li><b>Idea card anatomy:</b> author identity from provenance (themeId set → "Solutions Desk"; themeId null → "Claude's Views"; advisor draft → "You — Solutions view" + DRAFT pill, no conviction ring); "posted Nd ago" reads the idea's OWN ledger postedAt (never the sweep date) with an "updated" chip when updatedAt differs; the CONV ring = conviction.score /100 (click → scoring modal); ticker/asset tags; name; thesis; RECOMMENDATION block = tradeStatement, overridable by a Solutions implementation edit; inline chart (charts.js) only when a sourced series shipped; "Via …" line listing ONLY kind="view" sources, else an "Own view — no outside research leaned on" pill when ownView; ♥ save with engagement counters (liked/drafted/checked by N advisors, localStorage-bumped); actions: <b>Idea Suitability</b> (per-client flowchart from scoreIdeaForClient — flagged clients with fit/tier + plain-English why, suppressed clients WITH their MiFID reason) and <b>Email</b> (email.js composer, drafts downloadable).</li>
+<li><b>Solutions view (curation):</b> sees the whole board; Advisor view sees only APPROVED ideas. Curation bar: "＋ Add idea" composer (name, ticker, asset class, goal bucket, direction, thesis, one-sentence recommendation, comma-separated expressions → a custom idea mapped by the same fit engine, never desk-scored), restore-removed. Per-card: ✓ Approve / ✕ Discard toggle (custom ideas locked approved), ✎ Edit implementation (persisted per idea; the edited text feeds cards and emails), ✕ remove. All curation state in localStorage (<code>ob_ui_v1</code>: approval, implEdits, drafted/checked counters, viewMode; user store: customIdeas, dismissedFocus). The Advisor view renders ZERO curation UI.</li>
+<li><b>Advisor Book tab:</b> a client-tile grid (name, headline stats); tap → hide the grid, show an iframe at <code>portfolio.html?embed=1&amp;client=&lt;id&gt;</code> with an "← All clients" bar. Legacy pages detect <code>embed=1</code>, hide their own masthead/tab bar, add a back pill, and inherit the theme.</li>
+</ul>
+
 <h2>8 · The daily sweep procedure (operating loop)</h2>
 <ol class="small">
 <li>Verify market state across five workstreams with ≥2 independent sources per fact: (a) Fed/rates/macro,
@@ -278,16 +290,21 @@ commit is invisible — the site deploys from the remote).</li>
 </ol>
 
 <h2>9 · Design system</h2>
-<pre class="spec">Palette: ink #29211A on paper #FBF8F2 · bronze #9A7B4F · umber #5A3E2B · green #3F6B4E
-(Preservation/positive) · slate #6E7E8C · red #8C3F3F · hairline #D8C9B2 · panel #F4ECE0.
-Type: Georgia serif display+body; Helvetica small-caps letter-spaced kickers/tags/table heads;
-Consolas code. Texture: hairline rules, double-rule breaks, uppercase 7.5pt tag chips,
-left-border callouts. NO gradients/shadows/rounded cards — printed-research-note feel.
-Goal colours: Growth #29211A · Income #9A7B4F · Preservation #3F6B4E.</pre>
+<pre class="spec">SHELL (openbook.css) — light + dark themes, [data-theme="dark"] on &lt;html&gt;:
+--ground #FBFAF7 · --surface #FFF · --ink #17150F · --charcoal #1E1B16 · --brown #54301A
+--bronze #996F3D · --bronze-l #C7A97A · --gold #EBC98D (dark-mode accent) · --green #2FBF71
+--green-pos #2C7A4B · --brick #9C4A3A · hairlines #E5E1DA / #F0ECE4 · creams #F4F1EA / #EEEAE2
+Type: 'Source Serif 4' (serif display) + 'Archivo' (UI sans), Google Fonts. Texture: uppercase
+letter-spaced kickers, colour strip-bars on cards, SVG conviction rings, soft card shadows.
+Theme: localStorage 'ob-theme', applied PRE-PAINT (inline head script), synced to the iframe
+and across pages via storage events.
+LEGACY pages (styles.css — classic/portfolio/onepager): espresso #29211A on warm paper,
+bronze #9A7B4F, hairline rules, printed-research-note feel, with its own dark mapping.
+Goal colours: Growth dark · Income bronze · Preservation green.</pre>
 
 <h2>10 · Acceptance tests (run before calling it done)</h2>
 <ol class="small">
-<li>Serve the folder; all four tabs render; no console errors.</li>
+<li>Serve the folder; both tabs render in both views and both themes; no console errors.</li>
 <li>Gold idea × Amar → Gap fit 0 (Preservation full); × Scott → high Gap fit.</li>
 <li>A zero-cost-collar idea × Aurora (Retail) → fit 0, suppressed, MiFID reason SHOWN.</li>
 <li>Mitch's derived goals ≈ Growth-dominant (~70%+) from stated-risk; Fotis ≈ moderate from revealed.</li>
@@ -297,6 +314,8 @@ Goal colours: Growth #29211A · Income #9A7B4F · Preservation #3F6B4E.</pre>
 <li>A chart block without a fetched series is stripped from today_focus.js.</li>
 <li>Every structures[] string resolves in expressions.js (no dead expression links).</li>
 <li>Conviction labels: any estimated pillar caps at Medium / "High — data gap".</li>
+<li>Discarding an idea in Solutions view hides it from the Advisor view; approving restores it; a Solutions "add idea" draft shows a DRAFT pill (no ring), maps to clients via the live engine, and survives reload (localStorage).</li>
+<li>An Advisor Book tile opens the embedded per-client portfolio report with the shell's theme applied and a working "← All clients" return.</li>
 </ol>
 
 <div class="warn"><b>What NOT to do.</b> No build tooling, no frameworks, no npm — plain JS files loaded by
@@ -304,7 +323,7 @@ script tags. No server-side rendering. Never hand-edit today_focus.js. Never fab
 consensus number, or an earnings result — the validators treat these as defects, and so does the project's
 whole reason for existing.</div>
 
-<div class="footer">Open Book · Claude Code Bootstrap Specification · generated 11 August 2026 · Companion
+<div class="footer">Open Book · Claude Code Bootstrap Specification · generated 12 August 2026 · Companion
 document: "The Complete Replication Guide" (human-readable). Simulation project — not investment advice.</div>
 
 </div>
