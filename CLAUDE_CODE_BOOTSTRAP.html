@@ -72,7 +72,7 @@ that constant. Where a detail is unspecified, choose the simplest option consist
 <table class="data">
 <tr><th>#</th><th>File</th><th>Contents</th></tr>
 <tr><td>1</td><td><code>openbook.css</code> + <code>styles.css</code></td><td>Design systems: the shell (light/dark, Source Serif 4 + Archivo) and the legacy pages (§9)</td></tr>
-<tr class="alt"><td>2</td><td><code>data.js</code></td><td><code>window.SEED</code>: themes, seed ideas, 8 clients, synthetic sector history, complexity taxonomy (§3)</td></tr>
+<tr class="alt"><td>2</td><td><code>data.js</code></td><td><code>window.SEED</code>: themes, seed ideas, 9 clients, synthetic sector history, complexity taxonomy (§3)</td></tr>
 <tr><td>3</td><td><code>goals.js</code></td><td><code>window.GOALS</code>: deriveGoals + helpers (§4)</td></tr>
 <tr class="alt"><td>4</td><td><code>mapping.js</code></td><td><code>window.MAPPING</code>: scoreIdeaForClient + flagClients + tradability (§5)</td></tr>
 <tr><td>5</td><td><code>scanner.js</code></td><td>11-rule portfolio scan + thin facades over MAPPING</td></tr>
@@ -96,7 +96,7 @@ gold (Gold &amp; Currency) · health (Healthcare Innovation) · structured (Stru
   bucket: Growth|Income|Preservation, conviction: "High"|"Medium-High"|"Medium",
   horizon, thesis, structures: [lead expression first — derivatives-first],
   riskProfile?: {vol, beta, structured}, tradeStatement?, tickers? }</pre>
-<h3>3.3 Client object (8 clients)</h3>
+<h3>3.3 Client object (9 clients)</h3>
 <pre class="spec">{ id, name, ccy, aum ($m), classification: Retail|Professional, mifid, relationship,
   risk (free text — parsed), profile, split {assetClass: pct}, goals { objective,
   horizon ("Long-term · 7-10 yrs" — parsed), funding? { headline ("Grow to $75m by 2034" /
@@ -105,7 +105,7 @@ gold (Gold &amp; Currency) · health (Healthcare Innovation) · structured (Stru
   assetClass, sector, ccy, weightPct, pnlPct, entryDate, entrySpot, mat, note,
   altKind?: uncorrelated|directional }], summary }
 INVARIANTS: Σ weightPct = 100 exactly; split ≡ Σ positions per assetClass.</pre>
-<h3>3.4 The eight books (engineered test cases — reproduce these shapes)</h3>
+<h3>3.4 The nine books (engineered test cases — reproduce these shapes)</h3>
 <table class="data">
 <tr><th>id</th><th>Shape</th><th>Tests</th></tr>
 <tr><td>aurora</td><td>Retail EUR €50m; MU 25.8% @ +295pnl; 72% USD; bond -15; gold+energy hedges; 10% cash</td><td>Concentration, FX mismatch, tax-harvest, Retail-OTC suppression</td></tr>
@@ -113,9 +113,10 @@ INVARIANTS: Σ weightPct = 100 exactly; split ≡ Σ positions per assetClass.</
 <tr><td>scott</td><td>Retail $124m; 48% FI (one -24% long bond), dividend equity, PFE -38, O -11; 10% cash</td><td>Income mandate, bond swap, loss harvest, cash ladder</td></tr>
 <tr class="alt"><td>amar</td><td>Pro $71m; BTC 16% @ -35; gold 12 +118; infra 19; EM 12; macro HF 7</td><td>Preservation-bucket-full (gold gap-fit = 0), crypto rehab</td></tr>
 <tr><td>jacob</td><td>Pro $96m; balanced; liabilities $19m mortgage + $2.4m Q3 tax; 5% cash; UNH -26</td><td>Liability-driven Income/Preservation push</td></tr>
-<tr class="alt"><td>prahnav</td><td>Retail $44m; NVDA 22 +279, CEG 15 +181; buckets on target</td><td>Goals-aligned top-down, Retail-collar problem bottom-up</td></tr>
-<tr><td>morgan ("Mitch")</td><td>Pro $38m; NVDA 24, BTC 18, TSLA 11, 2x QQQ 10, venture 10; NO funding goal</td><td>Goal inference from stated-risk (aggressive) + book</td></tr>
-<tr class="alt"><td>tejpaul ("Fotis")</td><td>Retail $60m; balanced 57/35; no risk profile, no goals, no liabilities</td><td>Pure revealed inference → moderate</td></tr>
+<tr class="alt"><td>ben</td><td>Retail $29m; 82% equity value/energy book (XOM 13, SHEL 10, BRK 18, AAPL 14, JPM 12, CAT 8, DGE 7 @ -53); only 6% FI, 4% real assets; income run-rate behind goal ($0.5m vs $0.8m/yr)</td><td>Income-gap + protection-gap rules, loss harvest (Diageo), non-complex-only expressions for Retail</td></tr>
+<tr><td>prahnav</td><td>Retail $44m; NVDA 22 +279, CEG 15 +181; buckets on target</td><td>Goals-aligned top-down, Retail-collar problem bottom-up</td></tr>
+<tr class="alt"><td>morgan ("Mitch")</td><td>Pro $38m; NVDA 24, BTC 18, TSLA 11, 2x QQQ 10, venture 10; NO funding goal</td><td>Goal inference from stated-risk (aggressive) + book</td></tr>
+<tr><td>tejpaul ("Fotis")</td><td>Retail $60m; balanced 57/35; no risk profile, no goals, no liabilities</td><td>Pure revealed inference → moderate</td></tr>
 </table>
 <h3>3.5 Synthetic sector history</h3>
 <pre class="spec">client.sectorHistory[sector] = 24 monthly numbers, index 0 = current allocation EXACTLY.
@@ -323,8 +324,7 @@ script tags. No server-side rendering. Never hand-edit today_focus.js. Never fab
 consensus number, or an earnings result — the validators treat these as defects, and so does the project's
 whole reason for existing.</div>
 
-<div class="footer">Open Book · Claude Code Bootstrap Specification · generated 12 August 2026 · Companion
-document: "The Complete Replication Guide" (human-readable). Simulation project — not investment advice.</div>
+<div class="footer">Open Book · Claude Code Bootstrap Specification · generated 12 August 2026 · Companion documents (human-readable, canonical): METHODOLOGY.pdf · GOAL_DERIVATION.pdf · MAPPING_AND_TAGGING.pdf. Simulation project — not investment advice.</div>
 
 </div>
 </body>
