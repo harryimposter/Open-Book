@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Brokerage Playground — Complete Methodology</title>
+<title>Open Book — Complete Methodology</title>
 <style>
   @page { size: A4; margin: 18mm 15mm 16mm 15mm; }
   html { -webkit-text-size-adjust: 100%; }
@@ -88,21 +88,21 @@
 
 <!-- ============================ COVER ============================ -->
 <div class="cover">
-  <p class="kicker">Brokerage Playground &middot; Complete Methodology Reference</p>
-  <h1>The Brokerage Playground</h1>
+  <p class="kicker">Open Book &middot; Complete Methodology Reference</p>
+  <h1>Open Book</h1>
   <p class="subtitle">How the desk tool turns a balance sheet into goals, ideas into client-specific recommendations, and research into a scored daily focus &mdash; every formula, end to end.</p>
   <table class="meta">
     <tr>
-      <td><b>Prepared</b><br/>18 June 2026</td>
+      <td><b>Prepared</b><br/>18 June 2026<br/><span style="color:#9A7B4F">Amended 12 Aug 2026</span></td>
       <td><b>Audience</b><br/>The detail-oriented reader who needs the ins and outs</td>
-      <td><b>Source of truth</b><br/>data.js · goals.js · mapping.js · scanner.js · charts.js · build_today_focus.py · app.js</td>
+      <td><b>Source of truth</b><br/>data.js · goals.js · mapping.js · scanner.js · charts.js · build_today_focus.py · tv_technicals.py · fetch_chart_series.py · openbook.js · app.js</td>
       <td><b>Nature</b><br/>Static client-side app · no build step · all logic is pure functions</td>
     </tr>
   </table>
 </div>
 
 <div class="key">
-  <b>The one-sentence version.</b> The Brokerage Playground is a private-bank desk tool that
+  <b>The one-sentence version.</b> Open Book is a private-bank desk tool that
   <b>infers</b> each client's goals from their balance sheet, <b>derives</b> (never hand-picks) which
   investment ideas fit which clients through a single transparent scoring engine, and <b>scores</b> each
   idea's standalone conviction from a research feed &mdash; so every recommendation on screen can be
@@ -120,7 +120,7 @@ paraphrased.</p>
 <div class="toc">
 <ol>
   <li class="l1"><a href="#s1">The goal of the project</a></li>
-  <li class="l1"><a href="#s2">The four tabs — what the user sees</a></li>
+  <li class="l1"><a href="#s2">The app — what the user sees</a></li>
   <li class="l1"><a href="#s3">The data model</a></li>
   <li class="l1"><a href="#s4">Goal inference — deriveGoals()</a></li>
   <li class="l1"><a href="#s5">The unified idea→client fit engine</a></li>
@@ -129,7 +129,7 @@ paraphrased.</p>
   <li class="l1"><a href="#s8">Conviction scoring — two rubrics</a></li>
   <li class="l1"><a href="#s9">Where ideas come from</a></li>
   <li class="l1"><a href="#s10">The portfolio scanner — 11 rules</a></li>
-  <li class="l1"><a href="#s11">Supporting analytics &amp; pre-trade</a></li>
+  <li class="l1"><a href="#s11">Supporting analytics — charts, Morgan &amp; email</a></li>
   <li class="l1"><a href="#s12">Worked end-to-end example</a></li>
   <li class="l1"><a href="#s13">Calibration, limitations &amp; honesty</a></li>
 </ol>
@@ -138,9 +138,9 @@ paraphrased.</p>
 <!-- ============================ 1 ============================ -->
 <h2 id="s1">1 &nbsp;·&nbsp; The goal of the project</h2>
 
-<p>The Brokerage Playground is a <b>client-focused desk tool</b> for a private-bank investment advisor,
-restyled in a <b>J.P. Morgan Private Bank</b> aesthetic (espresso and bronze, serif display type,
-hairline rules). It is a static website &mdash; no server, no build step, no database. Everything is a
+<p>Open Book is a <b>client-focused desk tool</b> for a private-bank investment advisor, in a
+<b>J.P. Morgan Private Bank</b> aesthetic — a light/dark editorial shell over the original espresso-and-bronze
+research-note styling. It is a static website &mdash; no server, no build step, no database. Everything is a
 <b>pure function over seed data</b> held in the browser, which is the whole point: every recommendation is
 <b>reproducible and inspectable</b>, never a black box and never hand-curated.</p>
 
@@ -154,7 +154,8 @@ hairline rules). It is a static website &mdash; no server, no build step, no dat
       per-axis breakdown you can open up. (The fit engine.)</li>
   <li><b>Of today's market events, which are worth acting on, and for whom?</b> &mdash; a daily sweep
       scored for conviction and mapped to the live book. (Today's Focus.)</li>
-  <li><b>If I stage this trade, is it suitable, fundable and on-plan?</b> (Pre-trade analysis.)</li>
+  <li><b>If I put this idea in front of <em>this</em> client, is it appropriate — and how do I say it?</b>
+      &mdash; the suitability read (MiFID gating with the reason shown) and the book-aware email. (Suitability &amp; email.)</li>
 </ol>
 
 <div class="key">
@@ -176,32 +177,87 @@ under-allocated client needs. The two scores are shown side by side and never bl
 misleading number.</p>
 
 <!-- ============================ 2 ============================ -->
-<h2 id="s2">2 &nbsp;·&nbsp; The four tabs — what the user sees</h2>
+<h2 id="s2">2 &nbsp;·&nbsp; The app — what the user sees <span class="tag tag-live">index.html · openbook.js</span></h2>
 
-<h3>2.1 &nbsp; Solutions Views</h3>
-<p>The desk's standing investment <b>themes</b> on a left rail (AI &amp; Productivity, Power &amp;
-Infrastructure, Core Fixed Income, …). Selecting a theme filters its idea tiles. Opening an idea shows
-<b>how the desk would express it</b> (clickable expressions / structures) and <b>which client books it
-fits</b> &mdash; that client list is produced live by the fit engine, not stored. The tab also offers
-<b>Draft a view</b>: type a one-line thesis and the app suggests a theme, asset class, expressions and
-candidate client books to keep or edit, persisting the result to <code>localStorage</code> (§9.3).</p>
+<p>The live app is a <b>redesigned shell</b> over the original engines: one page, two header
+<b>views</b> (Advisor · Solutions) crossed with two <b>tabs</b> (Idea Feed · Advisor Book). The original
+four-tab app survives intact as <code>classic.html</code> and is embedded for the deep client pages
+(§2.5), so nothing was thrown away — the shell is a new front door onto the same machinery.</p>
 
-<h3>2.2 &nbsp; Today's Focus</h3>
-<p>An AI-generated daily market sweep, split into <b>Earnings</b> and <b>Ex-earnings</b> sections. Every
-idea card carries a <b>conviction score</b> (the rubric of §8), the <b>clients it is flagged to</b> &mdash;
-each with its own <b>client-fit score</b> and a one-line <em>why</em> &mdash; clickable expressions, and,
-for earnings, the report date, implied-vs-historical move and the conviction pillars. A tag shows whether
-the idea leans on a Solutions Views theme or is <b>off-theme</b> (with the reason). The data is generated
-from a file, not hand-coded into the app (§9.2).</p>
+<h3>2.1 &nbsp; The shell</h3>
+<p>A sticky header carries the <b>"Open Book · PRIVATE BANK"</b> lockup and, on the right: the
+<b>Advisor / Solutions view switch</b> (who you are — §2.4), a <b>light / dark theme toggle</b>
+(persisted in <code>localStorage</code> under <code>ob-theme</code>, applied by an inline script
+<em>before first paint</em> so there is no flash, and synced into the embedded iframe and across open
+pages via storage events), a <b>"Search everything ⌘K"</b> command palette across ideas and clients, and
+the <b>as-of stamp</b> read from the sweep file. Below it, the two tabs.</p>
 
-<h3>2.3 &nbsp; Advisor Book</h3>
-<p>Your whole book as line items, with a client dropdown. Each client opens to their portfolio: the
-allocation-vs-goal-target bar, the desk's agenda, the ideas mapped to them with reasoning, and top
-holdings. The "how were these goals derived" panel exposes the full goal-inference arithmetic (§4).</p>
+<h3>2.2 &nbsp; The Idea Feed</h3>
+<p>The daily sweep rendered as a <b>social-style origination feed</b>. At the top sits the
+<b>Market Brief</b> card — the sweep's summary paragraph, expandable to its "to watch today" bullets and
+full narrative. Below it, a three-column layout:</p>
+<table class="data">
+  <tr><th>Column</th><th>What lives there</th></tr>
+  <tr><td><b>Left rail</b></td><td><b>TOP 3</b> — three tiles ranked for <em>your</em> book: by <b>breadth</b> first (how many of your clients the live fit engine flags the idea to), then desk conviction; shown in conviction order. A sweep idea flagged <code>pinned</code> leads the board as a <b>DESK PICK</b> — a label only; its scores are untouched. Tapping a tile focuses the feed on that idea; tapping again clears. Underneath, the <b>CLIENT TOOLKIT</b> — tap a client to open their action list and build their email.</td></tr>
+  <tr class="alt"><td><b>Middle</b></td><td>The feed itself: a search box ("gold", "MU", "autocall" or a client name), asset-class filter chips, a client dropdown (filters to ideas suited to that client), a count line, and the idea cards (§2.3).</td></tr>
+  <tr><td><b>Right rail</b></td><td><b>Ask your book</b> — the Morgan AI panel. It answers questions about clients, ideas and risk <em>from the live engines only</em> (per-client fit, conviction, comfort limits, goal derivation) — "it never invents a number" (§11.2 / <code>morgan.js</code> + <code>methodology.js</code>).</td></tr>
+</table>
 
-<h3>2.4 &nbsp; Pre-Trade Analysis</h3>
-<p>Stage a trade (client × idea × structure × size) for a first-pass read on suitability,
-funding, concentration, currency and the desk view (§11.2).</p>
+<h3>2.3 &nbsp; Anatomy of an idea card</h3>
+<p>Every idea renders as a post, and every element on it is derived, not typed:</p>
+<ul>
+  <li><b>Author identity</b> — from provenance: an on-theme sweep idea (<code>themeId</code> set) posts as
+      <em>Solutions Desk</em>; an off-theme one as <em>Claude's Views</em>; an advisor draft as
+      <em>You — Solutions view</em>.</li>
+  <li><b>"Posted Nd ago"</b> — reads the idea's <em>own</em> <code>postedAt</code>, stamped by the
+      honest-date ledger (§9.2), never the global sweep date. A separate <b>"updated Nd ago"</b> chip
+      appears only when the idea's argument was re-grounded after first posting.</li>
+  <li><b>The CONV ring</b> — the idea's conviction score /100 from the rubric of §8, drawn as an SVG arc.
+      Clicking it opens the full scoring breakdown (pillars, data-quality tags, the banding). This is the
+      <em>idea</em> axis; per-client fit deliberately lives elsewhere (§1).</li>
+  <li><b>Ticker + asset tags, name, thesis</b> — the argument itself.</li>
+  <li><b>The RECOMMENDATION block</b> — the idea's one-sentence <code>tradeStatement</code> (instrument +
+      direction + the view). If the Solutions view has tweaked the implementation (§2.4), the tweaked text
+      shows here — and feeds the email engine — with a "tweaked by Solutions" marker.</li>
+  <li><b>An inline chart</b> — only when the sweep shipped a <em>sourced</em> series (§9.2); no data, no
+      graph.</li>
+  <li><b>The "Via …" line</b> — lists only the named authors whose work was <em>actually read</em>
+      (sources of kind <code>view</code>). An idea that is entirely the desk's own call shows
+      <em>"Own view — no outside research leaned on"</em> instead. Borrowed authority is structurally
+      impossible: the generator rejects a view-citation without a reading basis (§9.2).</li>
+  <li><b>♥ Save</b> + engagement counters (liked / drafted / checked by N advisors — presentation-layer
+      counters persisted in <code>localStorage</code>).</li>
+  <li><b>Two actions:</b> <b>Idea Suitability</b> — the per-client flowchart: every flagged client with
+      their fit score, tier and a plain-English "why this was flagged for X" (holdings hook, mandate fit,
+      goal-gap line), plus the suppressed clients <em>with their MiFID reason</em>; and <b>Email</b> — the
+      book-aware letter composer (§11.4).</li>
+</ul>
+
+<h3>2.4 &nbsp; The Solutions view — curating the feed</h3>
+<p>The view switch is a <b>role switch</b>. The Advisor view sees only <b>approved</b> ideas and zero
+curation UI. The Solutions view sees the whole board and manufactures it:</p>
+<table class="data">
+  <tr><th>Control</th><th>What it does</th></tr>
+  <tr><td><b>✓ Approve / ✕ Discard</b></td><td>The gate on every sweep card. Only approved ideas reach the Advisor view (approved is the default; a discard keeps the idea visible in Solutions, greyed, with "Hidden from the Advisor view"). Custom drafts are locked approved.</td></tr>
+  <tr class="alt"><td><b>✎ Edit implementation</b></td><td>Rewrites the recommendation text the advisor cards and emails use, per idea — the desk's sign-off layer over the sweep's default wording.</td></tr>
+  <tr><td><b>＋ Add idea</b></td><td>The composer: name, ticker, asset class, goal bucket, direction, thesis, a one-sentence recommendation, comma-separated expressions. The draft joins the feed under the advisor's own name, is <b>not desk-scored</b> (a DRAFT pill instead of a conviction ring — the rubric only scores the sweep), but maps to clients through <em>exactly the same live fit engine</em> as every other idea.</td></tr>
+  <tr class="alt"><td><b>✕ Remove / ↺ Restore</b></td><td>Takes a desk idea off the feed (or deletes a draft); removed ideas are restorable in one click.</td></tr>
+</table>
+<p class="small">All curation state persists in <code>localStorage</code> (<code>ob_ui_v1</code>:
+approvals, implementation edits, engagement counters, the chosen view; a user store holds custom drafts
+and removals) — so the demo behaves like a stateful product with no server.</p>
+
+<h3>2.5 &nbsp; The Advisor Book — and the embedded legacy pages</h3>
+<p>The second tab is <b>coverage at a glance</b>: a grid of client tiles. Tapping a client hides the grid
+and embeds that client's <b>current-portfolio report</b> — <code>portfolio.html?embed=1&amp;client=…</code> —
+inside the shell with an "← All clients" bar: the allocation-vs-goal bar, the desk agenda, the ideas
+mapped to them with reasoning, holdings, and the "how were these goals derived" panel that exposes the
+full §4 arithmetic. The legacy pages detect <code>embed=1</code>, hide their own masthead and tab bar,
+add a back pill, and inherit the shell's theme.</p>
+<p>The <b>original app</b> lives on as <code>classic.html</code> (+ <code>app.js</code>) — kept so the
+embedded client pages and the draft-a-view flow keep working; it is not part of the live navigation.
+<code>onepager.html</code> renders a printable client one-pager. Everything in §§3–11 powers both front
+ends identically, which is the point: the engines don't know or care which UI is asking.</p>
 
 <!-- ============================ 3 ============================ -->
 <h2 id="s3">3 &nbsp;·&nbsp; The data model <span class="tag tag-data">data.js</span></h2>
@@ -228,13 +284,13 @@ Productivity, Power &amp; Infrastructure, Core Fixed Income, Broadening Equity, 
   <tr><td><code>intent</code></td><td>add · protect · trim · income</td><td>Legacy/display field; no longer drives the engine</td></tr>
   <tr class="alt"><td><code>tickers</code></td><td>optional alias list, e.g. gold = [XAU, GLD, 4GLD, …]</td><td>Lets the engine recognise the idea in a book by name</td></tr>
 </table>
-<p>The seed carries roughly 17 ideas across the nine themes &mdash; from "AI infrastructure &amp; compute
+<p>The seed carries roughly 16 ideas across the nine themes &mdash; from "AI infrastructure &amp; compute
 leaders" (Equity / Technology / Growth) to "Gold as a debasement hedge" (Commodity / Gold / Preservation)
 to the desk's flagship structured note, a HALO equal-weight basket autocall paying a fixed 24% p.a.
 coupon with a 20% cushion.</p>
 
-<h3>3.3 &nbsp; Clients — the seven books</h3>
-<p>Seven deliberately different books (<code>SEED_CLIENTS</code>), each engineered so the scanner and the
+<h3>3.3 &nbsp; Clients — the nine books</h3>
+<p>Nine deliberately different books (<code>SEED_CLIENTS</code>), each engineered so the scanner and the
 fit engine surface a <em>different</em> set of actions. Each carries: <code>aum</code>,
 <code>ccy</code> (base currency), <code>classification</code> (Retail / Professional) and
 <code>mifid</code>, a free-text <code>risk</code> string, a <code>split</code> (asset-class weights), an
@@ -244,9 +300,9 @@ holding a free-text objective, horizon, and (sometimes) a <code>funding</code> h
 <table class="data">
   <tr><th>Client</th><th>AUM</th><th>Class</th><th>Stated risk</th><th>The teaching point</th></tr>
   <tr><td><b>Fable</b></td><td>$38m</td><td>Professional</td><td>Aggressive</td><td>Concentrated AI book, options-fluent</td></tr>
-  <tr class="alt"><td><b>Aurora</b> <span class="small">(real anchor)</span></td><td>€50.2m</td><td>Retail</td><td>Growth + income</td><td>25.8% Micron on a ~10× gain; 72% USD vs EUR base</td></tr>
+  <tr class="alt"><td><b>Aurora</b> <span class="small">(real anchor)</span></td><td>€50.2m</td><td>Retail</td><td>Growth + income</td><td>25.8% Micron on a ~4× gain; 72% USD vs EUR base</td></tr>
   <tr><td><b>Scott</b></td><td>$124m</td><td>Retail</td><td>Conservative income</td><td>Large diversified retirement/preservation estate</td></tr>
-  <tr class="alt"><td><b>Amar</b></td><td>$71m</td><td>Professional</td><td>Growth, real-asset tilt</td><td>Real assets + a 16% Bitcoin position down 38%</td></tr>
+  <tr class="alt"><td><b>Amar</b></td><td>$71m</td><td>Professional</td><td>Growth, real-asset tilt</td><td>Real assets + a 16% Bitcoin position down ~35%</td></tr>
   <tr><td><b>Jacob</b></td><td>$96m</td><td>Professional</td><td>Moderate</td><td>Balanced book + a $19m mortgage &amp; tax bill (liabilities)</td></tr>
   <tr class="alt"><td><b>Prahnav</b></td><td>$44m</td><td>Retail</td><td>Growth</td><td>Buckets on-target, but two concentrated winners; Retail collar problem</td></tr>
   <tr><td><b>Ben</b></td><td>$29m</td><td>Retail</td><td>Moderate, value tilt</td><td>82% equity, thin income/protection</td></tr>
@@ -291,8 +347,8 @@ monthly series — nothing else changes.</p>
   <tr class="alt"><td><b>otc</b></td><td>collar, risk reversal, accumulator, prepaid variable forward, FX forward, covered call, protective put</td><td><b>No</b> — a bilateral OTC <em>derivative</em>; needs Professional re-classification</td></tr>
   <tr><td><b>non-complex</b></td><td>direct equity, ETF, index core, bond ladder, fund</td><td><b>Yes</b></td></tr>
 </table>
-<p>This single classifier drives the global <b>tradability gate</b> (§7.1) and the pre-trade
-appropriateness check (§11.2). The distinction it encodes — packaged structured <em>notes</em> are
+<p>This single classifier drives the global <b>tradability gate</b> (§7.1) and every appropriateness
+read in the app. The distinction it encodes — packaged structured <em>notes</em> are
 Retail-eligible, OTC <em>derivatives</em> are not — is the heart of the app's suitability logic.</p>
 
 <!-- ============================ 4 ============================ -->
@@ -311,7 +367,7 @@ by how hard the money must work. Every coefficient is a calibration choice and l
 <div class="note"><b>Anti-circularity (the crucial design choice).</b> The current book sets only a
 <em>willingness knob</em> (a single scalar), <b>not</b> the target vector. The target is still built
 bottom-up by the bucket logic, so the gap between what the client <em>has</em> and what they
-<em>need</em> stays meaningful. Without this, the model would always report "you're on target."</p>
+<em>need</em> stays meaningful. Without this, the model would always report "you're on target."</div>
 
 <h3>4.1 &nbsp; Step 1 — measure the inputs off the balance sheet</h3>
 
@@ -388,7 +444,7 @@ max(0, topName% − 15)</code>.</p>
 <div class="note"><b>Willingness is bidirectional.</b> A low appetite must <em>add ballast</em>, not merely
 shrink Growth — otherwise a client with no liabilities and no income need comes out growth-heavy no matter
 how cautious they are (Income/Preservation would only ever get weight from needs). The
-<code>caution = 1 − willingness</code> terms on Preservation (×28) and Income (×18) fix this.</p>
+<code>caution = 1 − willingness</code> terms on Preservation (×28) and Income (×18) fix this.</div>
 
 <h3>4.3 &nbsp; Step 3 — normalise to exactly 100</h3>
 <p>The three raw scores are normalised with <b>largest-remainder rounding</b> (<code>normalizeTo100</code>)
@@ -488,8 +544,7 @@ but the UI <b>surfaces them separately</b> with the MiFID reason rather than sil
 exposure, the 24-month history, in-sector holdings) plus the client's parsed mandate. The client's
 <b>mandate class</b> — growth / income / preservation — is derived from the parsed risk string
 (<code>mandateClass</code>), and the <b>strategic sector peg</b> is a single source of truth
-(<code>PARAMS.affinity.comfort = {growth:25, income:15, preservation:10}</code>, read by
-<code>sectorPeg(client, sector)</code>).</p>
+(<code>PARAMS.affinity.comfortByBucket = {Growth:25, Income:15, Preservation:12}</code> &mdash; keyed by the <em>asset's</em> goal bucket, with optional per-sector overrides &mdash; read by <code>sectorPeg(client, sector)</code>).</p>
 
 <h3 id="ax-gap">6.1 &nbsp; Gap fit — bucket-aware <span class="small">(weight 0.24)</span></h3>
 <p>Does the idea fill a <em>goal bucket</em> the client is under on? It pegs the idea's bucket to the
@@ -554,7 +609,7 @@ raw = (1 − HHI) × 100     concentrated → 0, diversified → 100</span>
 name, so it should fit <b>more</b>:
 <code>fitContribution = invertForFit ? (100 − raw) : raw</code>, controlled by the single flippable line
 <code>PARAMS.concWithinSector.invertForFit</code> (default <code>true</code>). The breakdown shows both
-the raw diversification score and the fit contribution. No in-sector holdings → neutral 50.</p>
+the raw diversification score and the fit contribution. No in-sector holdings → neutral 50.</div>
 <p class="small"><b>Live example.</b> Fable's six spread Technology names → HHI ≈ 0.19, diversification 81,
 inverted fit contribution <b>19</b> — already diversified within tech, so a new tech name adds little.</p>
 
@@ -646,14 +701,15 @@ Low            raw &lt; 4, OR two-plus zero pillars   (excluded)</span>
 view + the thesis-bearing pillars (Asymmetry, Catalyst, Consensus) carry <b>11/15 ≈ 73%</b>; Positioning +
 Technical carry <b>4/15 ≈ 27%</b> and are framed as <em>confirmation / veto, not drivers</em> — they can
 support or kill a view but can't manufacture conviction. RSI lives only in Positioning; moving averages
-only in Technical — no overlap.</p>
+only in Technical — no overlap.</div>
 
 <h3>8.3 &nbsp; The data-quality cap (global modifier)</h3>
 <p>If <em>any</em> pillar's core input is <code>estimated</code> or <code>unverified</code>
 (<code>capped = true</code>), the ex-earnings label cannot exceed <b>Medium</b>; the earnings model
-expresses the same idea through the "High — data gap" label. With the current playground data (straddle /
-short-interest / RSI feeds not wired up, so those pillars are <code>estimated</code>), the cap is binding
-on every idea — wire sourced inputs in and Highs unlock.</p>
+expresses the same idea through the "High — data gap" label. The <b>Technical</b> pillar is now sourced
+live from TradingView by <code>tv_technicals.py</code> (§9.2), but the straddle and short-interest inputs
+remain <code>estimated</code>, so the cap still binds most ideas — an honest ceiling that lifts pillar by
+pillar as sourced feeds are wired in, not a hidden one.</p>
 
 <h3>8.4 &nbsp; <code>changeMyMind</code> — stated but not scored</h3>
 <p>Every idea — earnings and ex-earnings — carries a <code>changeMyMind</code> field: the condition that
@@ -674,27 +730,91 @@ healthcare, structured outcomes). The copy is original; each idea is hand-author
 <code>thesis</code>, <code>conviction</code> and <code>structures</code>, then <b>everything client-facing
 is derived</b> — which clients it applies to is computed, never typed.</p>
 
-<h3>9.2 &nbsp; Channel B — the daily market sweep (Today's Focus)</h3>
-<p>Today's Focus is <b>schedule-ready</b>: it is generated from a data file, not hand-coded into the app.
-The pipeline:</p>
+<h3>9.2 &nbsp; Channel B — the daily market sweep (the Idea Feed's board)</h3>
+<p>The feed's board is <b>schedule-ready</b>: it is generated from a data file, never hand-coded into the
+app. A refresh is one pipeline run:</p>
 <table class="data">
   <tr><th>Step</th><th>File</th><th>What happens</th></tr>
-  <tr><td>1 · Sweep</td><td><code>today_focus.json</code></td><td>A Claude Code routine sweeps the market (Reuters, WSJ, Bloomberg, Yahoo, Seeking Alpha, Barron's), applies a <b>≥2-source rule</b>, tags every fact <code>sourced</code> / <code>estimated</code>, authors the conviction pillar scores + <code>dq</code> tags, and overwrites the raw payload.</td></tr>
-  <tr class="alt"><td>2 · Build</td><td><code>build_today_focus.py</code></td><td>Validates (≥2 sources each, facts tagged, no forward event described in past tense), applies the conviction rubric (§8), and writes the app file.</td></tr>
-  <tr><td>3 · Load</td><td><code>today_focus.js</code></td><td><code>window.TODAY_FOCUS</code> — what the app loads. Auto-generated; never edited by hand.</td></tr>
+  <tr><td>1 · Sweep</td><td><code>today_focus.json</code></td><td>A Claude Code session verifies the market across five parallel workstreams (Fed/rates/macro · energy/gold/commodities · FX/central banks · US equities/earnings + the dislocation scan · global markets + the named-author list), applies the <b>≥2-source rule</b>, tags every fact <code>sourced</code> / <code>estimated</code>, authors each idea's pillar scores + <code>dq</code> tags as a first pass, and overwrites the raw payload — ideas, the market brief, and a desk note recording what changed and why.</td></tr>
+  <tr class="alt"><td>2 · Technicals</td><td><code>tv_technicals.py</code></td><td>Rewrites each idea's <b>Technical</b> pillar from TradingView's public scanner (SMA 50/100/200 alignment, Bollinger entry, RSI), <em>direction-aware</em> — a rising trend confirms a long and vetoes a short; range/carry ideas are scored on tape-calmness instead — and flips that pillar's <code>dq</code> to <code>sourced</code>. Positioning gets the RSI reading as colour but keeps its authored <code>dq</code>: short interest / CoT aren't in the feed, and flipping the tag wholesale would be dishonest. Unresolvable symbols are reported and left <code>estimated</code> — never silently skipped.</td></tr>
+  <tr><td>3 · Charts</td><td><code>fetch_chart_series.py</code></td><td>Fills each idea's chart block with <b>real Yahoo Finance daily closes</b> plus a provenance stamp (<code>seriesSource</code>, <code>seriesAsOf</code>). The build <b>strips any chart without a sourced series</b> — a chart that claims to show market moves must <em>be</em> market data.</td></tr>
+  <tr class="alt"><td>4 · Build</td><td><code>build_today_focus.py</code></td><td>Validates everything (below), applies the conviction rubric (§8), runs the tactical gate and the date ledger, and writes <code>today_focus.js</code> (<code>window.TODAY_FOCUS</code>) — auto-generated, never edited by hand.</td></tr>
+  <tr><td>5 · Ship</td><td><code>git commit + push</code></td><td>The site deploys from the remote; the client mapping is computed in the browser at render time, so flagged clients always reflect the current book with no app edits.</td></tr>
 </table>
-<p>A daily scheduled run does steps 1–3 and commits; <b>no app edits are needed</b>, and because the client
-mapping is computed in the browser at render time, the flagged clients always reflect the current book.</p>
+
+<h4>What every sweep must cover</h4>
+<p>The sweep is a <b>whole-market</b> pass, not a US-equity screen, and the validator warns when coverage
+slips:</p>
+<table class="data">
+  <tr><th>Requirement</th><th>Rule</th></tr>
+  <tr><td>Asset classes</td><td>Equities, rates, credit, FX, commodities (+ structured where it fits); regions: US, Europe, UK, Asia. <b>FX and rates must appear in every run</b> — they are the most often missed.</td></tr>
+  <tr class="alt"><td>Earnings stances</td><td>The earnings book must carry <b>both</b>: <code>pre-position</code> (into a future print — report date must be ≥ asOf, kept future-tense) and <code>post-print</code> (a reaction to a landed print — report date &lt; asOf <b>and</b> the actual result stated as a verified fact, <code>resultSource: "sourced"</code>; fabricated results are a validator defect).</td></tr>
+  <tr><td>Tactical trades</td><td>At least one short-dated option trade with a concrete construction and a <code>levels</code> block — tenor, entry, target (early unwind), stop — primarily in FX.</td></tr>
+  <tr class="alt"><td>Dislocation scan</td><td>Large-cap drawdowns are candidates, not noise: any widely-held name &gt;~15% off its highs is scanned and either actioned or logged with the reason it wasn't.</td></tr>
+  <tr><td>Expression</td><td><b>Derivatives-first:</b> every idea leads with an options / structured / OTC construction (<code>preferredExpression</code>); direct lines are listed as alternates. The MiFID taxonomy (§3.6) then decides who can trade what.</td></tr>
+</table>
+
+<h4>The source rules — and citation integrity</h4>
+<p>A fact is stated only if <b>two independent sources</b> agree; single-sourced figures are tagged
+<code>estimated</code>; pending events stay future-tense. On top of the broad tape (Reuters, Bloomberg,
+CNBC, official releases), the desk reads <b>named authors</b> in two tiers:</p>
+<table class="data">
+  <tr><th>Tier</th><th>Who</th><th>When</th></tr>
+  <tr><td><b>Core</b></td><td>Citrini Research (thematic) · Serenity · TSCS · Brent Donnelly, am/FX (FX) · Cem Karsan (vol / dealer positioning) · Joseph Wang, Fed Guy (rates &amp; Fed plumbing) · SemiAnalysis (AI capex / semis)</td><td>Every sweep, alongside the tape</td></tr>
+  <tr class="alt"><td><b>Conditional</b></td><td>The Transcript (earnings) · Benn Eifert, Moontower, Tier1 Alpha (options &amp; vol) · Fabricated Knowledge (semis) · Rory Johnston, Doomberg (commodities) · HighYield Harry (credit) · The Market Ear, Brad Setser (flows) · Andy Constan, Joseph Politano (macro data)</td><td>When an idea touches their domain — the natural second independent source</td></tr>
+</table>
+<span class="formula">CITATION INTEGRITY (hard rule, validator-enforced):
+a source of kind "view" MUST carry a `basis` — what was read, when, and what was
+taken from it. No basis → the build rejects the citation.
+Nothing readable found → the idea carries ownView: true and the card says
+"Own view — no outside research leaned on".
+Fresh commentary that merely RESTATES an unchanged thesis is not a reason to
+cite it or re-date the idea — the ledger keeps the dates honest.</span>
+<p class="small">An author's read informs conviction; it never bypasses the rubric or the client-fit
+mapping. And attribution stays disciplined the other way too: moves are attributed to <em>named,
+verified</em> drivers, never to the scariest headline nearby.</p>
+
+<h4>The tactical trigger gate</h4>
+<p>Event-driven option trades must not sit on the board permanently. Any idea carrying a
+<code>levels</code> block must also declare:</p>
+<span class="formula">trigger    the stated condition that justifies the trade NOW
+                        (e.g. "a confirmed daily close above 1.17")
+triggered  boolean — true only when that condition is actually met today</span>
+<p>Only <b>triggered</b> tacticals ship to the app; untriggered ones stay in the payload and are reported
+as <em>held back</em> on every run — an auditable record of discipline. The board has carried the
+EUR/USD and GBP/USD upside trades as held-back for weeks because spot sat below their stated levels;
+"1.3503 is not 1.355" is the system working, not the idea failing.</p>
+
+<h4>Honest dates — the fingerprint ledger</h4>
+<p>Every card's "posted Nd ago" reads the idea's own <code>postedAt</code>, and a committed ledger
+(<code>today_focus.ledger.json</code>) keeps those dates honest. The build fingerprints each idea's
+<b>argument</b> — tradeStatement, headline, thesis, changeMyMind, direction, intent, structures, fact
+texts, pillar scores/notes, levels, the earnings result — deliberately excluding chart series, indicator
+timestamps and computed totals, so a pure price refresh doesn't count as change:</p>
+<span class="formula">id unseen            → postedAt = updatedAt = asOf        (a new idea)
+fingerprint same     → both dates carry                   (a no-op re-commit moves nothing)
+fingerprint changed  → postedAt carries, updatedAt = asOf (the "updated Nd ago" chip)
+updatedAt &gt; 10 days  → the build WARNS: re-ground the commentary or retire the idea</span>
 
 <h4>The shape of one swept idea</h4>
-<p>Each Today's Focus idea carries: identity (<code>id, name, ticker, sector, assetClass, bucket</code>),
-a <code>headline</code> and <code>thesis</code>, its <code>themeId</code> (or <code>offThemeWhy</code>),
-<code>structures</code>, <code>changeMyMind</code>, the <code>conviction.pillars[]</code> (each
-<code>{key, score, dq, note}</code>), an <code>earnings</code> block (report date/time, implied vs
-historical move, what to watch) for earnings ideas, a tagged <code>facts[]</code> list, and a
-<code>sources[]</code> list. The generator validates all of it and refuses to silently pass — it prints
-warnings for any idea with fewer than two sources, an untagged fact, or a report date before
-<code>asOf</code>.</p>
+<p>Each idea carries: identity (<code>id, name, ticker, sector, assetClass, bucket, goalType,
+riskProfile, direction</code>); the argument (<code>headline, thesis</code>, a required one-sentence
+<code>tradeStatement</code>, the <code>variant</code> street/us/gap triplet that feeds the thesis
+pillar, <code>changeMyMind</code>); its provenance (<code>themeId</code> or <code>offThemeWhy</code>,
+optional <code>ownView</code>); its expression (<code>preferredExpression, structures[],
+naturalExpression</code> — the string the tradability gate tests); the authored
+<code>conviction.pillars[]</code> (each <code>{key, score, dq, note}</code>); an <code>earnings</code>
+block (stance-dependent: implied-vs-historical move pre-print, the verified result post-print) or an
+ex-earnings <code>macro</code> block; optional <code>tactical / trigger / triggered / levels</code> and
+a <code>chart</code> block; and the evidence — tagged <code>facts[]</code> and typed
+<code>sources[]</code>.</p>
+
+<h4>Validation — warn, never silently pass</h4>
+<ul class="small">
+  <li>≥2 sources per idea · every fact tagged · <code>tradeStatement</code> present (FX must name the long and short legs and spot-vs-carry) · view-citations must carry a basis.</li>
+  <li>Stance-aware date checks (a forward event must never be described as already happened; a reaction idea needs a verified result).</li>
+  <li>Coverage checks (FX, rates, both stances, tacticals) · tactical-gate contract · chart integrity (unsourced series stripped) · pillar count/keys/max checks · intent defaulting.</li>
+</ul>
 
 <h3>9.3 &nbsp; Channel C — Draft a view (advisor-authored, on the fly)</h3>
 <p>The advisor types a one-line thesis; <code>draftFromThesis()</code> matches it against a keyword table
@@ -717,6 +837,15 @@ warnings for any idea with fewer than two sources, an untagged fact, or a report
 with live fit scores before saving</b>. On save it is appended to <code>userData.ideas</code> and
 persisted to <code>localStorage</code>, joining the Views board exactly like a seed idea. No keyword
 match falls back to a generic Equity / Broad / Growth idea.</p>
+
+
+<h3>9.4 &nbsp; Channel D — Solutions curation in the shell</h3>
+<p>The redesigned shell adds a fourth entry point (§2.4): the Solutions view's <b>composer</b>. Advisor
+drafts join the feed under the author's own name, are <em>not</em> desk-scored (the rubric only scores
+the sweep), and map to clients through the same live fit engine as everything else. The same view holds
+the <b>approve / discard gate</b> over the sweep's output — a human desk signs off on what the automated
+sweep proposes before an advisor ever sees it. Curation state persists in <code>localStorage</code>;
+the engines are untouched.</p>
 
 <!-- ============================ 10 ============================ -->
 <h2 id="s10">10 &nbsp;·&nbsp; The portfolio scanner — 11 rules <span class="tag tag-live">scanner.js</span></h2>
@@ -748,45 +877,41 @@ Findings are sorted by descending severity; the top one (else the top matched Vi
 <b>Next Best Action</b>.</p>
 
 <!-- ============================ 11 ============================ -->
-<h2 id="s11" class="pagebreak">11 &nbsp;·&nbsp; Supporting analytics &amp; pre-trade <span class="tag tag-live">charts.js · app.js</span></h2>
+<h2 id="s11" class="pagebreak">11 &nbsp;·&nbsp; Supporting analytics — charts, Morgan &amp; the email engine <span class="tag tag-live">charts.js · morgan.js · email.js</span></h2>
 
 <h3>11.1 &nbsp; Allocation analytics (<code>charts.js</code>)</h3>
 <ul>
   <li><b>Donut / legend</b> — pure-SVG allocation rings from a split, in the house palette.</li>
   <li><b><code>bucketAlloc(split)</code></b> — folds an asset-class split into the three goal buckets
-      (delegates to <code>goals.js</code> so charts and pre-trade share one classifier).</li>
+      (delegates to <code>goals.js</code> so every consumer shares one classifier).</li>
   <li><b><code>goalTargetBar3(target, current)</code></b> — the "now vs goal" bar: the <em>bar</em> is the
       book's current weight in each bucket, the <em>notch</em> marks the inferred goal, and a label reads
       "Now X% · target Y% · ±Δ" (on plan if |Δ| &lt; 4).</li>
   <li><b><code>targetDistance(buckets, target)</code></b> = <code>Σ |bucketₖ − targetₖ|</code> — the L1
-      distance from plan, used by pre-trade to say a trade moves the book <em>closer to</em> or
+      distance from plan — used to say a proposed change moves the book <em>closer to</em> or
       <em>further from</em> target.</li>
   <li><b><code>fundingBar(f)</code></b> — funding-goal progress, <code>min(100, current/target × 100)</code>
       with an On-track / Slightly-behind / Behind pill.</li>
 </ul>
 
-<h3>11.2 &nbsp; Pre-trade analysis (<code>app.js::runPretrade</code>)</h3>
-<p>Stage a trade — client × idea (or portfolio finding, or ad-hoc) × structure × notional %. The engine
-applies the trade to a copy of the split (<code>applyTrade</code>: fund from cash first, then trim the
-largest non-cash sleeve), recomputes the bucket allocation and its distance from the derived goal, and
-emits a checklist:</p>
-<table class="data">
-  <tr><th>Check</th><th>How it is decided</th></tr>
-  <tr><td><b>Appropriateness</b></td><td>Retail + OTC structure → <b>blocked</b> (warn); structured note → Retail-eligible but complex (ok); non-complex → cleared (ok)</td></tr>
-  <tr class="alt"><td><b>Suitability</b></td><td>the idea's live fit reason if it applies, else a prompt to confirm fit against the mandate &amp; objective</td></tr>
-  <tr><td><b>Funding</b></td><td>covered by cash, or flags how much would come from trimming an existing holding</td></tr>
-  <tr class="alt"><td><b>Concentration</b></td><td>warns if the largest position is ≥ 20% of the book</td></tr>
-  <tr><td><b>Goal alignment</b></td><td>moves the book ~X pts <em>closer to</em> / <em>further from</em> the strategic target (via <code>targetDistance</code>), and quotes the funding-goal status</td></tr>
-  <tr class="alt"><td><b>Currency</b></td><td>flags an FX overlay if the book base isn't USD</td></tr>
-  <tr><td><b>Desk view</b></td><td>conviction · horizon · preferred expression</td></tr>
-</table>
-<p>The result also renders before/after donuts and the goal-bucket deltas — a complete first-pass read
-before anything is committed.</p>
+<h3>11.2 &nbsp; Morgan — "Ask your book" (<code>morgan.js</code> · <code>methodology.js</code>)</h3>
+<p>The shell's right-rail assistant answers questions about clients, ideas and risk from the live
+engines: per-client fit (with the axis breakdown), conviction and its pillars, comfort limits, and the
+goal derivation. Its knowledge base is <code>window.METHODOLOGY</code>, which <b>reads every constant
+live from the engines' PARAMS objects</b> — so the in-app description of the methodology can never drift
+from the code that runs it, and the assistant never invents a number.</p>
+
+<h3>11.3 &nbsp; The email engine (<code>email.js</code>)</h3>
+<p>Any idea × client becomes a personalised letter: a real-holding hook (naming a position and its
+P&amp;L), the desk view in client language, a concrete implementation block (structure, tenor, terms —
+the Solutions-signed-off text where one exists), a tax-swap / loss-harvest / cash-redeploy / FX-sizing
+action where the scanner flags one, a balanced risk paragraph, and a disclosure. One shared code path
+serves every surface, so the copy can't drift between the card, the toolkit and the drafted email.</p>
 
 <!-- ============================ 12 ============================ -->
 <h2 id="s12">12 &nbsp;·&nbsp; Worked end-to-end example — gold for Amar</h2>
 <p>To see the whole machine run on one idea×client pair, take <b>"Gold as a debasement hedge"</b>
-(Commodity / Gold / Preservation, natural expression "Physical / ETC") scored for <b>Amar</b>
+(Commodity / Gold / Preservation, natural expression "Capital-protected note") scored for <b>Amar</b>
 (Professional; ~35% of his book already in Preservation-role assets via gold + cash).</p>
 <ol>
   <li><b>Goal inference (§4)</b> derives Amar's three-bucket goal from his real-asset book, multi-decade
@@ -801,7 +926,7 @@ before anything is committed.</p>
       inverted fit contribution.</li>
   <li><b>Bracketed sum</b> of the four weighted axes → a 0–100 <code>bracketFit</code>.</li>
   <li><b>Goal-alignment multiplier (§7.2)</b>: Preservation gap ≈ 0 → multiplier ≈ 1.0 (no boost).</li>
-  <li><b>Tradability gate (§7.1)</b>: Professional + physical gold (non-complex) → <b>1</b> → passes.</li>
+  <li><b>Tradability gate (§7.1)</b>: a capital-protected note is a packaged <em>security</em> (structured, not OTC) → <b>1</b> — it passes for Amar, and would for the Retail books too.</li>
 </ol>
 <p>The Gap-fit zero is what correctly demotes gold for Amar from a misleading "Strong" to a "Good" — he
 already <em>has</em> his protection. The exact same idea scores high for a client <em>under</em> their
@@ -818,9 +943,10 @@ the client's goals and book, automatically.</b></p>
       <code>window.SEED</code> — is how they were sanity-checked and where they'd be recalibrated.</li>
   <li><b>The 24-month sector history is synthetic seed data</b>, clearly labelled, swappable for a real
       monthly series with no other change.</li>
-  <li><b>The data-quality cap is currently binding on every idea</b> (straddle / short-interest / RSI
-      feeds aren't wired up), so conviction tops out at Medium until sourced inputs are connected — an
-      honest reflection of the data on hand, not a hidden ceiling.</li>
+  <li><b>The data-quality cap still binds most ideas.</b> The Technical pillar is now sourced live
+      (TradingView, §9.2), but straddle and short-interest inputs remain estimated, so conviction tops
+      out at Medium / "High — data gap" until those feeds are wired — an honest reflection of the data
+      on hand, not a hidden ceiling.</li>
   <li><b>What still doesn't enter the fit:</b> AUM, currency-hedging depth, liquidity and liability
       funding (the scanner handles some of this separately). <code>riskProfile</code> /
       <code>goalType</code> are derived sensibly but per-idea curation would sharpen them.</li>
@@ -836,9 +962,9 @@ the client's goals and book, automatically.</b></p>
 </div>
 
 <div class="footer">
-  Brokerage Playground — Complete Methodology Reference · Prepared 18 June 2026 ·
+  Open Book — Complete Methodology Reference · Prepared 18 June 2026 · Amended 12 August 2026 ·
   Source of truth: <span class="mono">data.js · goals.js · mapping.js · scanner.js · charts.js ·
-  build_today_focus.py · app.js</span>. All formulas transcribed from the live code. Idea→client links
+  build_today_focus.py · tv_technicals.py · fetch_chart_series.py · openbook.js · app.js</span>. All formulas transcribed from the live code. Idea→client links
   are derived, never hand-picked, so the views can't drift.
 </div>
 

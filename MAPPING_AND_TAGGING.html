@@ -85,15 +85,15 @@
 
   <!-- ============================ COVER ============================ -->
   <div class="cover">
-    <p class="kicker">Brokerage Playground &middot; Methodology Reference</p>
+    <p class="kicker">Open Book &middot; Methodology Reference</p>
     <h1>Client-Fit &amp; Idea-Tagging Logic</h1>
     <p class="subtitle">How an idea is scored against a client &mdash; today's live engine, and a proposed redesign</p>
     <table class="meta">
       <tr>
-        <td><b>Prepared</b><br/>18 June 2026</td>
+        <td><b>Prepared</b><br/>18 June 2026<br/><span style="color:#9A7B4F">Amended 12 Aug 2026</span></td>
         <td><b>Scope</b><br/>Today's Focus &amp; Solutions Views tagging</td>
         <td><b>Source of truth</b><br/>mapping.js &middot; scanner.js &middot; data.js</td>
-        <td><b>Status</b><br/>&sect;1&ndash;&sect;2 live &middot; &sect;3 proposed</td>
+        <td><b>Status</b><br/>&sect;1&ndash;&sect;2 live, see status note &middot; &sect;3 since built (modified)</td>
       </tr>
     </table>
   </div>
@@ -113,7 +113,26 @@
   <code>data.js</code>) against the real seed book for <b>Aurora</b>. They are exact, not illustrative.</p>
 
   <!-- ============================ SECTION 1 ============================ -->
-  <h2>1 &nbsp;&middot;&nbsp; Current process &mdash; Today's Focus mapping <span class="tag tag-current">Live</span></h2>
+  
+<div class="note"><b>Status note &mdash; amended 12 August 2026.</b> This document is kept as the design
+record of the fit engine. Three things have moved since it was prepared:
+<ul>
+  <li><b>Naming:</b> the board it describes now surfaces as the <b>Idea Feed</b> in the redesigned
+      shell ("Today's Focus" was the old tab's name); the engine underneath is the same.</li>
+  <li><b>Two engine changes landed after &sect;1&ndash;&sect;2 were written:</b> Gap fit is now
+      <b>bucket-aware</b> — headroom is measured against the client's <em>derived goal vector</em>
+      (a Preservation idea scores 0 once that bucket is full), falling back to the sector peg only when
+      no goal target exists; and a bounded <b>goal-alignment multiplier (0.85&ndash;1.15)</b> now
+      multiplies the bracketed sum before the tradability gate.</li>
+  <li><b>&sect;3 was subsequently built, in modified form:</b> Preference's trajectory read became the
+      recency-weighted <b>Affinity percentile</b> (&lambda; = 0.94); the 0.5&ndash;1.0 "goal dial"
+      became the tamer 0.85&ndash;1.15 multiplier; the sector-peg Gap became the bucket-aware Gap; the
+      tradability gate and inverted sector-concentration landed as proposed.</li>
+</ul>
+The authoritative description of the engine as it runs today is <b>METHODOLOGY.pdf &sect;5&ndash;&sect;7</b>;
+the worked examples below remain correct for the mechanics they illustrate.</div>
+
+<h2>1 &nbsp;&middot;&nbsp; Current process &mdash; Today's Focus mapping <span class="tag tag-current">Live</span></h2>
 
   <p>Today's Focus surfaces market ideas (earnings prints, structural calls) and, per idea, flags the
   clients it fits via <code>MAPPING.flagClients(idea)</code>. That function scores every client with
@@ -345,10 +364,10 @@
   </div>
 
   <!-- ============================ SECTION 3 ============================ -->
-  <h2 class="pagebreak">3 &nbsp;&middot;&nbsp; Proposed redesign <span class="tag tag-proposed">Proposed &mdash; not built</span></h2>
+  <h2 class="pagebreak">3 &nbsp;&middot;&nbsp; Proposed redesign <span class="tag tag-proposed">Since built &mdash; in modified form</span></h2>
 
   <div class="proposed">
-    <b>This section is a design proposal, not the live system.</b> Nothing here is implemented. It reframes the
+    <b>This section is preserved as the original design proposal — and it has since been built, in modified form</b> (see the status note on page 1: Preference&rsquo;s trajectory read became the Affinity percentile, the 0.5&ndash;1.0 goal dial became the bounded 0.85&ndash;1.15 multiplier, the sector-peg Gap became bucket-aware; the gate and inverted concentration landed as written). As proposed, it reframes the
     &ldquo;why does this fit&rdquo; signal around a <b>Preference</b> score (trajectory + house view), demotes the client's
     <b>goal</b> from a weighted axis to a <b>dial (multiplier)</b>, and is explicit that <b>ownership and P&amp;L never add
     points</b>.
@@ -392,7 +411,7 @@
   the allocation <em>trajectory</em> and the <em>house view</em>, not from whether the client holds the name or is up/down on it.</p>
 
   <h3>3.2 &nbsp; Worked examples (proposed)</h3>
-  <p class="small">Inputs below are illustrative (the redesign is not built, so there is no live data to read); the
+  <p class="small">Inputs below are illustrative (they predate the build, so they read no live data); the
   arithmetic shows the proposed mechanics and lands in the target bands.</p>
 
   <h4>Example A &mdash; Gold &rarr; Amar (growth) &rarr; ~43 &nbsp;<span class="small">(drops off via the goal dial)</span></h4>
@@ -497,7 +516,7 @@
   <div class="footer">
     Brokerage Playground &mdash; Client-Fit &amp; Idea-Tagging Logic &middot; Prepared 18 June 2026 &middot;
     Today's Focus data as-of 18 June 2026 &middot; Sources of truth: <span class="mono">mapping.js, scanner.js, data.js</span> &middot;
-    Engine unification: commit <span class="mono">007131c</span>. &sect;1&ndash;&sect;2 describe the live system; &sect;3 is a proposal, not built.
+    Engine unification: commit <span class="mono">007131c</span>. &sect;1&ndash;&sect;2 describe the engine as of June 2026 (two later changes in the status note); &sect;3 was subsequently built in modified form. The authoritative current spec is METHODOLOGY &sect;5&ndash;&sect;7.
   </div>
 
 </div>

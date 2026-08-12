@@ -102,7 +102,7 @@
 </div>
 
 <div class="key">
-  <b>The one-sentence version.</b> The Brokerage Playground is a private-bank desk tool that
+  <b>The one-sentence version.</b> Open Book is a private-bank desk tool that
   <b>infers</b> each client's goals from their balance sheet, <b>derives</b> (never hand-picks) which
   investment ideas fit which clients through a single transparent scoring engine, and <b>scores</b> each
   idea's standalone conviction from a research feed &mdash; so every recommendation on screen can be
@@ -116,6 +116,39 @@ thing runs on. Sections 4&ndash;8 are the engines, with every calculation writte
 supporting analytics. Section 12 runs one idea through the whole machine. Sections 13&ndash;16 cover
 calibration, the daily operating loop, design &amp; deployment, and the replication checklist. Every
 formula here is copied from the live code, not paraphrased.</p>
+
+
+<h2 id="s0">The whole machine on one page</h2>
+<p>Before the detail, here is the entire system in plain English — every section later in this document
+expands one of these rows.</p>
+<table class="data">
+  <tr><th>Step</th><th>What happens</th><th>In plain terms</th></tr>
+  <tr><td><b>1 · Research</b></td><td>A daily market sweep writes a data file of trade ideas, each with sourced facts, a one-sentence recommendation, and honest tags on anything estimated (§9.2, §14)</td><td>"Here is what the desk thinks today, and here is the evidence."</td></tr>
+  <tr class="alt"><td><b>2 · Score the idea</b></td><td>A generator grades every idea against a published rubric and computes a conviction score out of 100 (§8)</td><td>"How good is this idea, on its own merits?"</td></tr>
+  <tr><td><b>3 · Know the client</b></td><td>An inference engine reads each client's balance sheet — goals, liabilities, behaviour — and derives what they actually need: Growth / Income / Preservation percentages (§4)</td><td>"What does this client really want, whatever the form says?"</td></tr>
+  <tr class="alt"><td><b>4 · Match them</b></td><td>A single fit engine scores every idea against every client on four transparent axes, gated by what the client is legally allowed to trade (§5–7)</td><td>"Is this idea right for <em>this</em> person — and can they even trade it?"</td></tr>
+  <tr><td><b>5 · Curate</b></td><td>The Solutions desk approves, discards or rewrites what the sweep produced; only approved ideas reach advisors (§2.4)</td><td>"A human signs off before anyone sees it."</td></tr>
+  <tr class="alt"><td><b>6 · Act</b></td><td>The advisor sees a ranked feed, opens the per-client suitability read, and drafts a personalised email — all from the same live numbers (§2.2–2.3, §11)</td><td>"From idea to client conversation, with the reasoning attached."</td></tr>
+</table>
+<div class="key"><b>The two numbers to keep apart.</b> Every idea carries a <b>conviction</b> score
+("how good is the idea?") and, per client, a <b>fit</b> score ("how right is it for them?"). They are
+computed by different engines, shown side by side, and never blended — a brilliant idea can be wrong
+for a cautious book, and a modest idea can be exactly what an under-allocated client needs.</div>
+
+<h3>Speaking the desk's language — a short glossary</h3>
+<table class="data">
+  <tr><th>Term</th><th>Meaning here</th></tr>
+  <tr><td><b>Bucket</b></td><td>One of three goal roles money can play: <span class="pill b-growth">Growth</span> (make it), <span class="pill b-income">Income</span> (pay me), <span class="pill b-pres">Preservation</span> (don't lose it). Both clients' goals and ideas are expressed in these.</td></tr>
+  <tr class="alt"><td><b>Mandate</b></td><td>The client's overall stance — growth / income / preservation — parsed from their stated risk profile.</td></tr>
+  <tr><td><b>Expression / structure</b></td><td><em>How</em> a view is implemented: directly (buy the stock), as a packaged note (autocall, buffered note), or as an OTC derivative (collar, call spread, FX forward).</td></tr>
+  <tr class="alt"><td><b>Structured note vs OTC</b></td><td>The key legal split: packaged <em>notes</em> are securities a Retail client can buy; bilateral <em>OTC derivatives</em> require Professional classification. One keyword classifier encodes this (§3.6).</td></tr>
+  <tr><td><b>Pre-position / post-print</b></td><td>An earnings idea's stance: entering <em>before</em> a company reports vs trading the <em>reaction</em> after a verified result.</td></tr>
+  <tr class="alt"><td><b>Tactical</b></td><td>A short-dated option trade with explicit entry / target / stop levels and a stated trigger — it only appears on the board while its trigger is actually met (§9.2).</td></tr>
+  <tr><td><b>Sourced / estimated</b></td><td>Every datapoint's honesty tag: confirmed by two independent sources, or not. Estimated inputs cap how high an idea's conviction label can go (§8.3).</td></tr>
+  <tr class="alt"><td><b>Own view</b></td><td>An idea the desk built without any outside research to cite — labelled as such rather than dressed with borrowed authority.</td></tr>
+  <tr><td><b>Posted / updated</b></td><td>Card dates driven by a fingerprint ledger: "posted" only moves when an idea's <em>argument</em> changes; "updated" marks a re-grounding (§9.2).</td></tr>
+  <tr class="alt"><td><b>Flagged / suppressed</b></td><td>A client the fit engine recommends an idea to — versus one blocked by the MiFID gate, always shown <em>with the reason</em> rather than hidden.</td></tr>
+</table>
 
 <!-- ============================ TOC ============================ -->
 <h2>Contents</h2>
@@ -131,7 +164,7 @@ formula here is copied from the live code, not paraphrased.</p>
   <li class="l1"><a href="#s8">Conviction scoring — two rubrics</a></li>
   <li class="l1"><a href="#s9">Where ideas come from</a></li>
   <li class="l1"><a href="#s10">The portfolio scanner — 11 rules</a></li>
-  <li class="l1"><a href="#s11">Supporting analytics &amp; pre-trade</a></li>
+  <li class="l1"><a href="#s11">Supporting analytics — charts, Morgan &amp; email</a></li>
   <li class="l1"><a href="#s12">Worked end-to-end example</a></li>
   <li class="l1"><a href="#s13">Calibration, limitations &amp; honesty</a></li>
   <li class="l1"><a href="#s14">The daily operating loop</a></li>
@@ -159,7 +192,8 @@ hairline rules). It is a static website &mdash; no server, no build step, no dat
       per-axis breakdown you can open up. (The fit engine.)</li>
   <li><b>Of today's market events, which are worth acting on, and for whom?</b> &mdash; a daily sweep
       scored for conviction and mapped to the live book. (Today's Focus.)</li>
-  <li><b>If I stage this trade, is it suitable, fundable and on-plan?</b> (Pre-trade analysis.)</li>
+  <li><b>If I put this idea in front of <em>this</em> client, is it appropriate — and how do I say it?</b>
+      &mdash; the suitability read (MiFID gating with reasons shown) and the book-aware email. (Suitability &amp; email.)</li>
 </ol>
 
 <div class="key">
@@ -204,7 +238,7 @@ full narrative. Below it, a three-column layout:</p>
   <tr><th>Column</th><th>What lives there</th></tr>
   <tr><td><b>Left rail</b></td><td><b>TOP 3</b> — three tiles ranked for <em>your</em> book: by <b>breadth</b> first (how many of your clients the live fit engine flags the idea to), then desk conviction; shown in conviction order. A sweep idea flagged <code>pinned</code> leads the board as a <b>DESK PICK</b> — a label only; its scores are untouched. Tapping a tile focuses the feed on that idea; tapping again clears. Underneath, the <b>CLIENT TOOLKIT</b> — tap a client to open their action list and build their email.</td></tr>
   <tr class="alt"><td><b>Middle</b></td><td>The feed itself: a search box ("gold", "MU", "autocall" or a client name), asset-class filter chips, a client dropdown (filters to ideas suited to that client), a count line, and the idea cards (§2.3).</td></tr>
-  <tr><td><b>Right rail</b></td><td><b>Ask your book</b> — the Morgan AI panel. It answers questions about clients, ideas and risk <em>from the live engines only</em> (per-client fit, conviction, comfort limits, goal derivation) — "it never invents a number" (§11.3 / <code>morgan.js</code> + <code>methodology.js</code>).</td></tr>
+  <tr><td><b>Right rail</b></td><td><b>Ask your book</b> — the Morgan AI panel. It answers questions about clients, ideas and risk <em>from the live engines only</em> (per-client fit, conviction, comfort limits, goal derivation) — "it never invents a number" (§11.2 / <code>morgan.js</code> + <code>methodology.js</code>).</td></tr>
 </table>
 
 <h3>2.3 &nbsp; Anatomy of an idea card</h3>
@@ -234,7 +268,7 @@ full narrative. Below it, a three-column layout:</p>
   <li><b>Two actions:</b> <b>Idea Suitability</b> — the per-client flowchart: every flagged client with
       their fit score, tier and a plain-English "why this was flagged for X" (holdings hook, mandate fit,
       goal-gap line), plus the suppressed clients <em>with their MiFID reason</em>; and <b>Email</b> — the
-      book-aware letter composer (§11.4).</li>
+      book-aware letter composer (§11.3).</li>
 </ul>
 
 <h3>2.4 &nbsp; The Solutions view — curating the feed</h3>
@@ -258,11 +292,10 @@ inside the shell with an "← All clients" bar: the allocation-vs-goal bar, the 
 mapped to them with reasoning, holdings, and the "how were these goals derived" panel that exposes the
 full §4 arithmetic. The legacy pages detect <code>embed=1</code>, hide their own masthead and tab bar,
 add a back pill, and inherit the shell's theme.</p>
-<p>The <b>original four-tab app</b> — Solutions Views (standing themes + draft-a-view), Today's Focus,
-Advisor Book, Pre-Trade Analysis — lives on unchanged as <code>classic.html</code> (+
-<code>app.js</code>), fully working standalone; <code>onepager.html</code> renders a printable client
-one-pager. Everything in §§3–11 powers both front ends identically, which is the point: the engines
-don't know or care which UI is asking.</p>
+<p>The <b>original app</b> lives on as <code>classic.html</code> (+ <code>app.js</code>) — kept so the
+embedded client pages and the draft-a-view flow keep working; it is not part of the live navigation.
+<code>onepager.html</code> renders a printable client one-pager. Everything in §§3–11 powers both front
+ends identically, which is the point: the engines don't know or care which UI is asking.</p>
 
 <!-- ============================ 3 ============================ -->
 <h2 id="s3">3 &nbsp;·&nbsp; The data model <span class="tag tag-data">data.js</span></h2>
@@ -352,8 +385,8 @@ monthly series — nothing else changes.</p>
   <tr class="alt"><td><b>otc</b></td><td>collar, risk reversal, accumulator, prepaid variable forward, FX forward, covered call, protective put</td><td><b>No</b> — a bilateral OTC <em>derivative</em>; needs Professional re-classification</td></tr>
   <tr><td><b>non-complex</b></td><td>direct equity, ETF, index core, bond ladder, fund</td><td><b>Yes</b></td></tr>
 </table>
-<p>This single classifier drives the global <b>tradability gate</b> (§7.1) and the pre-trade
-appropriateness check (§11.2). The distinction it encodes — packaged structured <em>notes</em> are
+<p>This single classifier drives the global <b>tradability gate</b> (§7.1) and every appropriateness
+read in the app. The distinction it encodes — packaged structured <em>notes</em> are
 Retail-eligible, OTC <em>derivatives</em> are not — is the heart of the app's suitability logic.</p>
 
 <!-- ============================ 4 ============================ -->
@@ -372,7 +405,7 @@ by how hard the money must work. Every coefficient is a calibration choice and l
 <div class="note"><b>Anti-circularity (the crucial design choice).</b> The current book sets only a
 <em>willingness knob</em> (a single scalar), <b>not</b> the target vector. The target is still built
 bottom-up by the bucket logic, so the gap between what the client <em>has</em> and what they
-<em>need</em> stays meaningful. Without this, the model would always report "you're on target."</p>
+<em>need</em> stays meaningful. Without this, the model would always report "you're on target."</div>
 
 <h3>4.1 &nbsp; Step 1 — measure the inputs off the balance sheet</h3>
 
@@ -449,7 +482,7 @@ max(0, topName% − 15)</code>.</p>
 <div class="note"><b>Willingness is bidirectional.</b> A low appetite must <em>add ballast</em>, not merely
 shrink Growth — otherwise a client with no liabilities and no income need comes out growth-heavy no matter
 how cautious they are (Income/Preservation would only ever get weight from needs). The
-<code>caution = 1 − willingness</code> terms on Preservation (×28) and Income (×18) fix this.</p>
+<code>caution = 1 − willingness</code> terms on Preservation (×28) and Income (×18) fix this.</div>
 
 <h3>4.3 &nbsp; Step 3 — normalise to exactly 100</h3>
 <p>The three raw scores are normalised with <b>largest-remainder rounding</b> (<code>normalizeTo100</code>)
@@ -614,7 +647,7 @@ raw = (1 − HHI) × 100     concentrated → 0, diversified → 100</span>
 name, so it should fit <b>more</b>:
 <code>fitContribution = invertForFit ? (100 − raw) : raw</code>, controlled by the single flippable line
 <code>PARAMS.concWithinSector.invertForFit</code> (default <code>true</code>). The breakdown shows both
-the raw diversification score and the fit contribution. No in-sector holdings → neutral 50.</p>
+the raw diversification score and the fit contribution. No in-sector holdings → neutral 50.</div>
 <p class="small"><b>Live example.</b> Fable's six spread Technology names → HHI ≈ 0.19, diversification 81,
 inverted fit contribution <b>19</b> — already diversified within tech, so a new tech name adds little.</p>
 
@@ -706,7 +739,7 @@ Low            raw &lt; 4, OR two-plus zero pillars   (excluded)</span>
 view + the thesis-bearing pillars (Asymmetry, Catalyst, Consensus) carry <b>11/15 ≈ 73%</b>; Positioning +
 Technical carry <b>4/15 ≈ 27%</b> and are framed as <em>confirmation / veto, not drivers</em> — they can
 support or kill a view but can't manufacture conviction. RSI lives only in Positioning; moving averages
-only in Technical — no overlap.</p>
+only in Technical — no overlap.</div>
 
 <h3>8.3 &nbsp; The data-quality cap (global modifier)</h3>
 <p>If <em>any</em> pillar's core input is <code>estimated</code> or <code>unverified</code>
@@ -882,50 +915,31 @@ Findings are sorted by descending severity; the top one (else the top matched Vi
 <b>Next Best Action</b>.</p>
 
 <!-- ============================ 11 ============================ -->
-<h2 id="s11" class="pagebreak">11 &nbsp;·&nbsp; Supporting analytics &amp; pre-trade <span class="tag tag-live">charts.js · app.js</span></h2>
+<h2 id="s11" class="pagebreak">11 &nbsp;·&nbsp; Supporting analytics — charts, Morgan &amp; the email engine <span class="tag tag-live">charts.js · morgan.js · email.js</span></h2>
 
 <h3>11.1 &nbsp; Allocation analytics (<code>charts.js</code>)</h3>
 <ul>
   <li><b>Donut / legend</b> — pure-SVG allocation rings from a split, in the house palette.</li>
   <li><b><code>bucketAlloc(split)</code></b> — folds an asset-class split into the three goal buckets
-      (delegates to <code>goals.js</code> so charts and pre-trade share one classifier).</li>
+      (delegates to <code>goals.js</code> so every consumer shares one classifier).</li>
   <li><b><code>goalTargetBar3(target, current)</code></b> — the "now vs goal" bar: the <em>bar</em> is the
       book's current weight in each bucket, the <em>notch</em> marks the inferred goal, and a label reads
       "Now X% · target Y% · ±Δ" (on plan if |Δ| &lt; 4).</li>
   <li><b><code>targetDistance(buckets, target)</code></b> = <code>Σ |bucketₖ − targetₖ|</code> — the L1
-      distance from plan, used by pre-trade to say a trade moves the book <em>closer to</em> or
+      distance from plan — used to say a proposed change moves the book <em>closer to</em> or
       <em>further from</em> target.</li>
   <li><b><code>fundingBar(f)</code></b> — funding-goal progress, <code>min(100, current/target × 100)</code>
       with an On-track / Slightly-behind / Behind pill.</li>
 </ul>
 
-<h3>11.2 &nbsp; Pre-trade analysis (<code>app.js::runPretrade</code> — the classic app)</h3>
-<p>Stage a trade — client × idea (or portfolio finding, or ad-hoc) × structure × notional %. The engine
-applies the trade to a copy of the split (<code>applyTrade</code>: fund from cash first, then trim the
-largest non-cash sleeve), recomputes the bucket allocation and its distance from the derived goal, and
-emits a checklist:</p>
-<table class="data">
-  <tr><th>Check</th><th>How it is decided</th></tr>
-  <tr><td><b>Appropriateness</b></td><td>Retail + OTC structure → <b>blocked</b> (warn); structured note → Retail-eligible but complex (ok); non-complex → cleared (ok)</td></tr>
-  <tr class="alt"><td><b>Suitability</b></td><td>the idea's live fit reason if it applies, else a prompt to confirm fit against the mandate &amp; objective</td></tr>
-  <tr><td><b>Funding</b></td><td>covered by cash, or flags how much would come from trimming an existing holding</td></tr>
-  <tr class="alt"><td><b>Concentration</b></td><td>warns if the largest position is ≥ 20% of the book</td></tr>
-  <tr><td><b>Goal alignment</b></td><td>moves the book ~X pts <em>closer to</em> / <em>further from</em> the strategic target (via <code>targetDistance</code>), and quotes the funding-goal status</td></tr>
-  <tr class="alt"><td><b>Currency</b></td><td>flags an FX overlay if the book base isn't USD</td></tr>
-  <tr><td><b>Desk view</b></td><td>conviction · horizon · preferred expression</td></tr>
-</table>
-<p>The result also renders before/after donuts and the goal-bucket deltas — a complete first-pass read
-before anything is committed.</p>
-
-
-<h3>11.3 &nbsp; Morgan — "Ask your book" (<code>morgan.js</code> · <code>methodology.js</code>)</h3>
+<h3>11.2 &nbsp; Morgan — "Ask your book" (<code>morgan.js</code> · <code>methodology.js</code>)</h3>
 <p>The shell's right-rail assistant answers questions about clients, ideas and risk from the live
 engines: per-client fit (with the axis breakdown), conviction and its pillars, comfort limits, and the
 goal derivation. Its knowledge base is <code>window.METHODOLOGY</code>, which <b>reads every constant
 live from the engines' PARAMS objects</b> — so the in-app description of the methodology can never drift
 from the code that runs it, and the assistant never invents a number.</p>
 
-<h3>11.4 &nbsp; The email engine (<code>email.js</code>)</h3>
+<h3>11.3 &nbsp; The email engine (<code>email.js</code>)</h3>
 <p>Any idea × client becomes a personalised letter: a real-holding hook (naming a position and its
 P&amp;L), the desk view in client language, a concrete implementation block (structure, tenor, terms —
 the Solutions-signed-off text where one exists), a tax-swap / loss-harvest / cash-redeploy / FX-sizing
