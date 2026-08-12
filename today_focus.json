@@ -1,50 +1,39 @@
 {
-  "asOf": "2026-08-11",
-  "generated": "2026-08-11",
+  "asOf": "2026-08-12",
+  "generated": "2026-08-12",
   "sweep": {
     "sources": [
       "Reuters",
       "CNBC",
       "Bloomberg",
-      "Yahoo Finance / TheStreet (US closes)",
-      "BLS (July jobs report) / Federal Reserve (July FOMC statement + Warsh presser transcript)",
-      "CME FedWatch (via CNBC)",
-      "Trading Economics",
-      "FXStreet",
-      "BoJ statement 31-Jul / Japan MoF + US Treasury (joint intervention, confirmed 3-Aug)",
-      "ECB Economic Bulletin / Eurostat (HICP flash, Q2 GDP)",
-      "Bank of England (30-Jul MPC) / ONS",
-      "Al Jazeera / CNN / Kpler / Bloomberg (Hormuz traffic + talks)",
-      "CNBC / World Oil / Rigzone (OPEC+ 2-Aug)",
-      "World Gold Council / Caixin (PBoC July gold)",
-      "EIA (jet cracks, LNG) / Forbes (refining)",
-      "Company IR + SEC filings (MSFT / NFLX / TSMC / AAPL / AMZN / GOOGL / META Q2)",
-      "MacroTrends / Investing.com (MU, SK Hynix ADR)",
-      "Commodity Context (Rory Johnston, W32 + Beijing Swing)",
-      "The Short Case Scenario (TSCS, 8/11-Aug)",
-      "SemiAnalysis (7/10-Aug)",
-      "Citrini Research (7-Aug)",
-      "The Transcript (10/11-Aug)",
-      "Moontower (22-Jul / 2-Aug)",
-      "Spectra Markets / am-FX (Brent Donnelly, 7-11 Aug)"
+      "Yahoo Finance / STL.News (US close)",
+      "Trading Economics (FX, rates, commodities)",
+      "TradingView scanner (prices, off-high screens)",
+      "BLS / Federal Reserve / CME-Polymarket via CNBC (CPI setup, Sept odds)",
+      "BoJ Summary of Opinions 10-Aug / Japan Times",
+      "TipRanks / AlphaStreet / Blockonomi / 24-7 Wall St (earnings previews)",
+      "Benzinga / Investing.com / TradingKey (recent prints: DDOG, AMD, PLTR, SHOP, LLY)",
+      "FactSet Earnings Insight 7-Aug",
+      "Kpler / Al Jazeera / CBS / CNN (Hormuz)",
+      "Tradingpedia / EBC / FXStreet (EUR/JPY)",
+      "Caixin / World Gold Council (gold flows)",
+      "Commodity Context (Rory Johnston) · TSCS · SemiAnalysis · The Transcript · Moontower · am/FX (named authors, as cited per idea)"
     ],
     "rule": "A fact is stated only if >=2 independent sources agree. Pending/forward events are kept in the future tense. Every datapoint is tagged sourced or estimated.",
     "brief": {
-      "summary": "Four weeks after the July fulcrum, the board re-underwrites into a NEW September fulcrum — and the tape got there the hard way. The AI-capex fear the desk traded in July resolved decisively BULLISH: combined 2026 hyperscaler capex is now ~$725bn (+77% YoY) after Microsoft (FQ4 revenue $90.0bn, Azure past $100bn annual revenue +43% cc, FY27 capex guided $255-260bn — stock +8-9%) and Amazon (AWS +36.7%, capex ~$220bn — +9%) flipped the market from punishing spend (Alphabet -5% on a $195-205bn guide and its first negative-FCF quarter since 2004; Meta -10% on an EPS miss) to rewarding demand evidence — the S&P made new records on 4-Aug and 7-Aug (7,757.64) before easing to 7,728. Then the macro cracked: July payrolls printed -23,000 (first contraction; -103k revisions; participation 61.4%, a 5-year low), cutting September HIKE odds from ~62% to ~40-50% a week after the Fed held 3.50-3.75% on a 9-3 vote with three hawkish dissents. July CPI lands TOMORROW (12-Aug, cons. ~3.4% / core 2.5%) — Zentner calls it 'the deciding factor' — with PPI Thursday, retail sales Friday, FOMC minutes 19-Aug, Warsh's first Jackson Hole keynote 28-Aug and the 15-16-Sep FOMC stacked behind it. The dollar broke: DXY ~99.8 (two-month low), and the yen story went historic — USD/JPY spiked to 163.73 on 30-Jul, Japan's MoF and the US Treasury ran the FIRST COORDINATED YEN PURCHASE SINCE 1998 on 31-Jul (both governments confirmed 3-Aug; Bessent 'will not hesitate' to repeat), the BoJ held 1.00% at 8-1 with a September hike >60% priced, and the pair now sits ~159.3 under the market's assumed 160 re-intervention line — the confirmed lower high the desk's held-back USD/JPY downside trade demanded, so that gate OPENS today. Hormuz stayed a live tail: no ceasefire, transits at 5-8/day vs ~20 normal, Iran demanding compensation, Brent ~$88 (path $86 -> $90+ -> $82 on deal hopes -> $88 on their collapse) with OPEC+'s final +188kb/d hike now done. Gold answered everything with a breakout — ~$4,400, a two-month high, on the largest PBoC purchase since Nov-2023 (19.9t in July, month 21) and $3bn of ETF re-inflows — and silver ran +15% on the month to ~$66. The standing dislocations into NVDA's 26-Aug print: Netflix -42-46% off its peak, Micron -29% off its ATH with HBM sold out through 2027, SK Hynix's ADR below its IPO price despite record results, IBM -29% with a fraud-inquiry overhang.",
+      "summary": "CPI day. July CPI lands 8:30am ET — consensus ~3.4% headline / ~2.5% core, September-hike odds sitting ~32-36% after the payrolls contraction, and the reaction function is asymmetric: an in-line-or-cool print holds the relief tape; a hot core (0.3%+ m/m) re-arms the September hike into a long end already at 5.24%. The tape steps into it two sessions off record highs (S&P 7,728, VIX ~15) with earnings season historically strong — blended Q2 growth +50.4%, the best ever, 86% beating — but grading on perfection: Datadog beat, raised, and fell a record 19% on one customer. Oil is the other live wire: Brent ~$89 (briefly above $90) as Hormuz runs at 5-8 transits a day and the deal-vs-no-deal headlines whipsaw daily. The yen complex is the desk's focus — USD/JPY ~159.3 under the 160 re-intervention line, EUR/JPY ~183.8 after retracing 60% of the intervention break, both against a >60%-priced September BoJ hike. Gold consolidates ~$4,370-4,400 after its breakout; Korea's semi tape (exports +155% y/y, first 10 days of August) keeps the memory dislocation live.",
       "watch": [
-        "The September fulcrum, part 1 — the Fed: July CPI TOMORROW 8:30am ET (cons. headline +0.1/+0.2% m/m -> ~3.4% y/y from 3.5%; core +0.2% -> ~2.5%) into a Fed that held 3.50-3.75% on 29-Jul at 9-3 (Hammack, Kashkari, Logan dissenting for a hike) and a jobs tape that just printed -23k with participation at a 5-year low. September-hike odds have swung ~82% -> ~62% -> ~40-50% in three weeks; Warsh says the Fed will state CONDITIONS, not forecasts. PPI Thursday, retail sales Friday, minutes 19-Aug, Jackson Hole keynote 28-Aug ('Financial Innovation' symposium, 27-29 Aug). The rates sleeves (quality carry, the 10Y range accrual) and cheap index convexity are all tuned to this window: front end anchored by the labor crack (2Y ~4.19%), long end pressured by oil and supply (10Y ~4.65-4.70%, 30Y ~5.2%).",
-        "The September fulcrum, part 2 — the yen: after the 163.73 spike, the first joint US-Japan yen intervention since 1998 (31-Jul, confirmed by both governments 3-Aug, ~$59bn equivalent implied by BoJ current-account data), an 8-1 BoJ hold at 1.00% with Ueda signalling September (>60% priced) and a 28-year-high 10y JGB (~2.9% on 6-Aug), USD/JPY at ~159.3 sits just under the 160 re-intervention line with a CONFIRMED lower high — the tactical USD/JPY put spread's gate finally opens (am/FX frames the post-intervention range 152.50/160.50). The dollar side agrees: DXY ~99.8 at a two-month low, EUR/USD ~1.154 and cable ~1.350 still just short of their 1.17 / 1.355 triggers (both correctly held back), and CNH at its strongest since Feb-2023 (~6.74) with the PBoC leaning against the pace — a new tactical.",
-        "The AI trade after the verdict: hyperscaler 2026 capex ~$725bn (+77%) settled the 'is the spend real' question — the market now pays for DEMAND EVIDENCE (Microsoft +8-9%, Amazon +9%) and punishes its absence (Alphabet, Meta, Apple -8.6% on a supply-constrained guide). NVIDIA (26-Aug, cons. ~$91.8bn revenue) is the season's last and largest demand print — pre-position with defined risk, and collar the concentrated winners the books actually hold. The dislocation stack is where the next sweep's alpha sits: Micron $861 vs a $1,213 ATH close with HBM sold out through 2027 and 2027 ASPs seen +87-100%; SK Hynix's ADR below its $149 IPO price despite +257% YoY revenue; Netflix ~$74, -42-46% off its peak at ~20x forward — get PAID to own the washouts (autocalls, reverse convertibles, cash-secured puts) rather than chasing the records."
+        "July CPI, 8:30am ET — the deciding input for September (odds ~32-36%): in-line/cool extends the relief rally and the front-end anchor (2Y ~4.22%); a hot core (>0.25% m/m / >2.5% y/y) re-prices the hike toward the mid-40s%, pressures a 30Y already at ~5.24%, and lifts USD/JPY toward the 160 line — the rates range accrual, the convexity hedge and both yen trades all key off this print. PPI tomorrow, retail sales Friday.",
+        "The earnings gauntlet: Cisco tonight (implied ~8.2% vs 7.75% realised — sell the rich straddle, not buy it), Applied Materials tomorrow night (-29% off its high, Strong Buy street, the China overhang the swing), then the consumer window — HD Tue 18th (-17% off high, the discounted rate-sensitive), Target Wed (priced at -1.7% off high), Walmart Thu (the macro print). NVDA 26-Aug remains the season's last big demand test; CoreWeave's backlog (+$25bn to $129bn) fed the AI tape overnight.",
+        "The yen policy stack into September: BoJ hike >60% priced, 10y JGB at 28-year highs, and a demonstrated joint-intervention function — USD/JPY ~159.3 drifting at the 160 line and EUR/JPY ~183.8 back in the policed 184+ zone. Both desk trades (158/152 USD/JPY puts; 183/177 EUR/JPY puts) are premium-capped against the same catalyst from two angles — one carries today's CPI risk, the other is dollar-neutral by design."
       ],
       "full": [
-        "The July fulcrum resolved, and a new one built for September. Start with the Fed: on 29-Jul the FOMC held 3.50-3.75% for a fifth straight meeting, but the vote was 9-3 — Hammack, Kashkari and Logan all dissenting for a +25bp hike — and Warsh's deliberately short statement framed a September hike as live ('a good family fight'; the Fed should state 'the conditions under which it would act', not forecasts). Then the labor market answered: July payrolls fell 23,000 — the first contraction of the cycle, against +83k expected, with -103k of revisions, unemployment down to 4.1% only because participation fell to 61.4% (a 5-year low), and wages at +3.2% YoY, the slowest since May-2021. The market read it as 'hikes can wait' — the S&P closed at a record 7,757.64 that day, the 2Y fell to ~4.19%, and September-hike odds collapsed from ~62% to ~40-50%. But the long end refuses to confirm the all-clear: the 10Y backed up to ~4.65-4.70% and the 30Y to ~5.2% on oil, auction supply ($125bn of 3s/10s/30s this week) and the unresolved oil-passthrough — household 1-year inflation expectations are still 4.2% (vs 3.4% pre-conflict) and Barclays' Rajadhyaksha argues the passthrough 'still isn't over'. July CPI (tomorrow, 12-Aug: cons. ~3.4% headline / 2.5% core) is the named deciding input, with PPI, retail sales, the minutes (19-Aug), Warsh's first Jackson Hole keynote (28-Aug) and the 15-16-Sep FOMC stacked behind it.",
-        "The AI-capex season delivered a verdict. Alphabet (22-Jul) beat on revenue ($119.8bn, Cloud +82%) but raised 2026 capex a third time to $195-205bn, printed its first negative-FCF quarter since its 2004 IPO and halted buybacks — the stock fell ~4-5% and dragged the complex into a 29-Jul trough. Meta (29-Jul) compounded it: revenue +28% but an EPS miss ($6.18 vs $7.22) on legal charges and an 8,000-role severance, capex to $130-145bn — down 9-10%. Then the demand evidence flipped the tape in 48 hours: Microsoft (29-Jul) grew FQ4 revenue 18% to $90.0bn with Azure crossing $100bn of annual revenue (+43% cc) and disclosed FY27 capex of $255-260bn — and ROSE 8-9%, adding ~$260bn of value; Amazon (30-Jul) printed its first $200bn quarter with AWS accelerating to +36.7% (fastest in 18 quarters) and capex to ~$220bn — up 9%. Apple was the odd one out: a record June quarter (revenue $109.4bn, iPhone +22%) but a Services and China miss plus a supply-constrained guide — down 8.6%, ~$430bn, its worst open since 2024. Net: combined 2026 hyperscaler capex ~$725bn, +77% YoY — the 'capex pullback' fear the board traded in early July is dead, replaced by a sharper question the market now prices name-by-name: WHO SHOWS THE DEMAND. That is the setup into NVIDIA on 26-Aug (cons. ~$91.8bn revenue, roughly 2x YoY), the season's last big demand print. TSMC's monster Q2 (16-Jul: revenue $40.2bn +37%, GM 67.7%, FY26 growth guided 'slightly above 40%', capex raised to $60-64bn) already anchored the supply-side case; SemiAnalysis (7-Aug) adds a demand datapoint the street hasn't priced — a claimed ~10GW SpaceX compute build for 2027 with Microsoft the largest offtaker.",
-        "The dislocation stack is the board's contrarian sleeve. Micron closed 10-Aug at $861 — ~29% below its 25-Jun ATH close of $1,213.37 — despite HBM being SOLD OUT for 2026 with 2027 capacity fully allocated, Goldman modelling 2027 HBM ASPs +87-100%, and Micron's DRAM share (25%) now one point behind SK Hynix's; the whole memory complex briefly printed a bear market in the July swoon before Street PT hikes pulled MU +6% on 4-Aug. SK Hynix's ADR — July's record-breaking $26.5bn listing — trades at $135, BELOW its $149 IPO price, despite record Q2 revenue of KRW 79.3tn (+257% YoY): the market is questioning memory-pricing durability, not memory demand — that is the two-sided risk the structures monetise (the supply-response warning from Samsung/SK Hynix capacity adds is the changeMyMind). Netflix (16-Jul print: EPS in line, revenue a slight miss, a LIGHT Q3 guide of $12.86bn vs ~$13bn and reduced disclosure — -9% after hours to 52-week lows) now sits ~$74, 42-46% off its peak at ~20x forward — the desk's July pre-position lost, the defined-risk structure did its job capping the damage, and the reaction trade now is to get paid to own the washout (reverse convertible / cash-secured puts), not to chase a knife. IBM (-25% preannounce confirmed by the 22-Jul print; now $236, ~-29% off highs) stays surfaced-not-added: a securities-fraud inquiry into its pipeline disclosures is exactly the kind of overhang the desk does not underwrite. KOSPI's July was the cautionary tale — a -8.95% crash day (13-Jul), record margin debt (₩38.6tn) unwinding 25% in 37 days per TSCS's tracker — and Korea still whipsawed to -4.6% on 6-Aug before Monday's +0.7% stabilisation.",
-        "FX made the month's history. USD/JPY ran the desk's feared path — 162 mid-July to 163.73 on 30-Jul — and then the policy answer arrived at scale: Tokyo intervened Thursday night, and on Friday 31-Jul Japan's MoF and the US TREASURY jointly bought yen — the first coordinated US-Japan yen purchase since 1998, confirmed by both governments on 3-Aug (Katayama: 'close communication with counterparts'; Bessent: 'will not hesitate to participate in further joint intervention'; ~$59bn equivalent implied by BoJ current-account data). The same day the BoJ held 1.00% at 8-1 (Takata dissenting for 1.25%) with Ueda strongly signalling September — >60% priced — and the 10y JGB touched 2.90%, a 28-year high, on 6-Aug. The pair snapped to ~157.6 and now drifts ~159.3 with 160 the market's assumed re-intervention trigger and am/FX framing a 152.50/160.50 range: the desk's held-back USD/JPY downside tactical finally has its confirmed lower high, coordinated policy behind it, and a dated catalyst ahead — the gate opens. Elsewhere the dollar's slide extended (DXY ~99.8, weakest since early June): EUR/USD ~1.154 against an ECB that held 2.25% on 23-Jul with a live September-hike option (July HICP 2.9%, Q2 GDP +0.4% double consensus); cable ~1.350 against a BoE that held 3.75% on 30-Jul at 6-3 with all three dissents for a HIKE (June CPI 2.6%; July CPI 19-Aug) — both tactical upside trades stay correctly held back a whisker below their 1.17 / 1.355 triggers. The sleeper is CNH: ~6.74, strongest since Feb-2023, +6% YoY, with the PBoC visibly fixing AGAINST the pace — a new defined-risk tactical.",
-        "Commodities: the Hormuz tail neither fired fully nor died — it round-tripped. Brent ran $86 -> above $90 (19-20-Jul, tanker attacks) -> ~$82 into 7-Aug as Trump cancelled planned strikes and deal headlines ran -> ~$88 now (fifth session of gains) after Trump's demand that Iran pay compensation stalled the talks; Kpler counts 5-8 tanker transits/day against ~20 pre-crisis, CENTCOM says the blockade has redirected 44 vessels, and three more UAE tankers were hit on 5-Aug. OPEC+ completed its rollback with a final +188kb/d for September (2-Aug) and signalled a halt — trivial against the chokepoint. Rory Johnston's W32 (7-Aug) frames the two-sidedness the rolled call spread owns: an $8 selloff on deal hopes with spec liquidation modest, backwardation still historically strong ($1-2/bbl) and product inventories at/below 5-year lows; his 'Beijing Swing' (5-Aug) names China's unprecedented crude-import pullback as the single largest counterweight. The refining complex is the quiet extreme — USGC jet cracks averaged $1.25/gal vs $0.42 at the start of the year, diesel cracks >4x seasonal norms — and Europe's TTF (~€60, +17% m/m, storage at 2009-era seasonal lows) carries the LNG risk while Henry Hub (~$2.90) is insulated. And gold finally confirmed: ~$4,400, a two-month high, on the largest PBoC purchase since Nov-2023 (19.9t in July — month 21 of the streak) and July's $3bn global ETF re-inflow (the first in three months), with silver running +15.3% on the month to ~$66 and the gold/silver ratio compressing to ~66 — the debasement bid is broadening down the metals stack."
+        "The print: consensus has July CPI at +0.1-0.15% m/m headline (3.4% y/y, from 3.5%) and +0.2-0.3% core (2.4-2.5% y/y), with prediction markets leaning tame and September-hike odds at ~32-36% (from ~56% before the -23k payrolls report). The asymmetry is hawkish-side: Warsh's stated doctrine is conditions-not-forecasts and the FOMC's July hold carried three hike dissents, so a core surprise above ~0.25% m/m does more damage than a cool print does good — the 30Y at ~5.24% and $125bn of auction supply this week leave the long end no cushion. The desk's rates positioning (the 4.25-5.00% range accrual), the VIX-15 convexity hedge and the dollar book are all explicitly built for the two-sidedness of the next six hours.",
+        "Earnings season is simultaneously the strongest on record and the least forgiving: FactSet has blended Q2 growth at +50.4% (86% beating, and still +32% ex-Alphabet/Amazon) — yet the reaction tape fines anything short of perfection, most dramatically Datadog's record -19% drop on a beat-and-raise after flagging ONE AI-native customer cutting usage. That asymmetry shapes the desk's whole earnings book: sell the overpriced binaries (Cisco's 8.2%-implied straddle tonight; Datadog's post-crash vol), buy the discounted ones with defined premium (AMAT at -29% off its high into tomorrow's print; HD at -17% into Tuesday's), and treat NVDA (26-Aug) as both the season's last demand print and a monetisation event for the books' concentrated positions. Overnight Korea underlined the demand side: first-10-days August semi exports +155% y/y, Samsung +2-4%, KOSPI the region's standout.",
+        "Oil and the yen carry the geopolitical tape. Brent ~$89 after briefly clearing $90: Hormuz transits still run 5-8/day against ~20 normal, a tanker reported explosions off Oman, and the Iran-Oman transit-scheme/US-deal headlines (Pakistan says 'close') collide with Tehran's hard conditions — war-end, troop withdrawal, compensation — so the desk stays long the tail through the rolled $90/$105 call spread, premium-defined in both directions. The yen complex is the cleaner policy trade: the July joint intervention has fully faded from spot (USD/JPY ~159.3, back at the 160 line), but not from the reaction function — both governments remain publicly committed against yen weakness while the BoJ's September hike is >60% priced and the 10y JGB sits at 28-year highs. Gold consolidates just under $4,400 on record-pace official-sector demand; the dollar (DXY ~99.8) waits on the print like everything else."
       ]
     },
-    "note": "Tuesday 6am-London desk sweep, 11-Aug-2026 — a FULL RE-UNDERWRITE after a four-week gap (last sweep 15-Jul); every idea re-graded from a fresh five-workstream verification sweep (macro/Fed, oil-gold-commodities, FX/central banks, US equities/earnings, global + named authors), and the board pivots to DERIVATIVES-FIRST expression throughout (every idea leads with an options/structured/OTC construction; direct lines are listed as alternates). THE DATA (all sourced unless noted): FED 29-Jul hold 3.50-3.75%, 9-3 (Hammack/Kashkari/Logan for +25bp), Warsh 'conditions not forecasts'; JOBS 7-Aug: payrolls -23k (first contraction; cons +83k; revisions -103k), U3 4.1% on participation 61.4% (5-yr low), AHE +3.2%; Sept-hike odds ~82% (late-Jul) -> ~62% (4-Aug) -> ~40-50% (post-jobs; 11-Aug '50-50' is single-source, estimated); JULY CPI lands 12-Aug 8:30ET (cons +0.1/+0.2% m/m, ~3.4% y/y; core +0.2%, ~2.5%); PPI 13-Aug, retail sales 14-Aug, minutes 19-Aug, Jackson Hole 27-29-Aug (Warsh keynote Fri 28-Aug), FOMC 15-16-Sep. RATES: 2Y ~4.19-4.20%, 10Y ~4.65-4.70%, 30Y ~5.19-5.25% (ranges — sources differ by a few bp; stated as ranges, not resolved). EQUITIES: S&P record closes 7,737 (4-Aug) and ~7,757.64 (7-Aug), Mon 10-Aug 7,728.20 (-0.32%); Nasdaq 26,445.45; Dow 53,791.85 (crossed 54,000 4-Aug); VIX 15.46 Mon / 14.90 Fri. EARNINGS VERDICT: hyperscaler 2026 capex ~$725bn +77% — MSFT FQ4 $90.0bn/+18%, EPS $4.74, Azure >$100bn annual +43% cc, FY27 capex $255-260bn, stock +8-9%; AMZN $200.6bn, AWS +36.7%, capex ~$220bn, +9%; GOOGL $119.8bn, capex $195-205bn, first neg-FCF since 2004, -4-5%; META EPS miss $6.18 vs $7.22, capex $130-145bn, -9-10%; AAPL record $109.4bn but Services/China miss + supply-constrained guide, -8.6%; TSMC 16-Jul $40.2bn +37%, GM 67.7%, FY guide >40%, capex $60-64bn; NFLX 16-Jul EPS in line, rev slight miss, Q3 guide LIGHT ($12.86bn vs ~$13bn), -9% AH, now ~$73.80, -42-46% off peak; NVDA reports Wed 26-Aug AMC (confirmed), cons ~$91.8bn (estimated, single source), spot ~$217 (estimated). MEMORY: MU $861.00 (10-Aug) vs $1,213.37 ATH close (25-Jun) = -29%; HBM sold out 2026, 2027 fully allocated, GS 2027 ASPs +87-100%, MU DRAM share 25% vs SKH 26%; SKHY ADR $135.29 < $149 IPO despite record KRW79.3tn +257% Q2. IBM $236.31, -29% off highs, 22-Jul print confirmed the preannounce, securities-fraud inquiry into pipeline disclosures (single source, estimated) — surfaced, NOT added (value-trap + legal overhang). FX: USD/JPY 163.73 (30-Jul) -> JOINT MoF+UST yen-buying 31-Jul (first since 1998; confirmed by both governments 3-Aug; ~$59bn implied, estimated), BoJ hold 1.00% 8-1 (Takata for 1.25%), Ueda signals Sept (>60% priced), 10y JGB 2.90% 6-Aug (28-yr high), spot ~159.3 with 160 the assumed re-intervention line, am/FX range-frame 152.50/160.50; DXY ~99.8 (2-mo low); EUR/USD ~1.1542 (ECB 23-Jul hold, depo 2.25%, Sept hike optional; HICP 2.9%, Q2 GDP +0.4%); GBP/USD ~1.3503 (BoE 30-Jul hold 3.75%, 6-3, ALL dissents for a hike; UK CPI 2.6%, July CPI 19-Aug); USD/CNH ~6.74 strongest since Feb-2023, PBoC fixing against the pace. COMMODITIES: Brent ~$87.6-88.7 (path $86 -> $90+ 19/20-Jul -> ~$82 7-Aug on deal hopes -> $88 on collapse; one $92.54 outlier quote treated unreliable); Hormuz transits 5-8/day vs ~20 (Kpler); 3 UAE tankers hit 5-Aug; OPEC+ 2-Aug final +188kb/d, halt signalled; OVX ~60s (estimated); jet crack $1.25/gal avg Mar-May vs $0.42 Jan (EIA), diesel >4x seasonal; TTF ~€60 +17% m/m, storage lowest since 2009; HH ~$2.90; GOLD ~$4,396-4,400 (2-mo high), PBoC +19.9t July (21st month, largest since Nov-2023), July ETF +$3bn / +23t (first inflow in 3 months), GS end-26 target $4,900 (June vintage, estimated); SILVER ~$65.4-66.4, +15.3% m/m, +75% y/y, G/S ratio ~66 (driver not found — the silver idea is flagged ownView); COPPER ~$6.64/lb +6.6% m/m. GLOBAL: Nikkei 66,970 (+2.08% Mon; record 72,366 25-Jun; -11.4% correction from 17-Jul); KOSPI 6,345 (13-Jul -8.95% crash, 6-Aug -4.58%, margin debt -25% in 37 days per TSCS tracker); HSI 25,937; China July exports +23.9%, CPI +0.5%, PPI +3.5%, Politburo: faster fiscal, no consumer stimulus; DAX ~26,391 (first-ever close >26,500 this month), FTSE 10,862, Stoxx ~661; ASML FY26 raised to €43-45bn; SAP cloud +24%; LVMH F&L +1% after 7 down quarters; EU banks record run (UBS record trading, $3bn buyback). WHAT CHANGED ON THE BOARD: RETIRED banks-q2 (post-print blow-out fully played; a month stale), dal-q2 (thesis overtaken — record jet cracks turn the fuel line hostile; IATA profit-halving stands), pep-q2 (played, stale), tsm-q2 (printed a monster 16-Jul; folded into the AI-complex context), msft-capex-pullback (the pullback thesis PAID — superseded by the post-print earnings idea msft-fq4-react), avgo-capex-readthrough (held-back add-zone never re-offered; worked without us), mu-fq3-react (superseded by mu-memory-dislocation — the argument changed from 'monetise the gap' to 'own the dislocation'), tac-usdjpy-strangle (the intervention binary RESOLVED — the vol was realised at 163.73 and the joint intervention; replaced by the directional tac-usdjpy-puts). NEW: nvda-q2 (pre-position, 26-Aug), msft-fq4-react (post-print continuation), mu-memory-dislocation (get paid to own the washout), silver-ratio-catchup (ownView — no named driver found, flagged as the desk's own call), tac-usdcnh-puts (CNH strongest since Feb-2023, PBoC leaning against — defined-risk spread). STANCE FLIPS: nflx-q2 pre-position -> POST-PRINT (the July pre-position LOST — the light Q3 guide validated the engagement worry; the capped structure did its job; now a get-paid-to-own reaction trade). RE-GROUNDED (id kept, argument updated, updatedAt bumps): gold-pullback (the pullback accumulation PAID — breakout to ~$4,400 on sourced official-sector demand; expression shifts to capital-protected participation + accumulator), lock-yields (2Y anchored by the labor crack; carry ~4.7% with recession-insurance value finally visible), rate-range-accrual (range re-struck 4.25-5.00%; the two-sided pin is now labor-crack vs oil-passthrough), spx-cheap-convexity (VIX ~15 vs a record tape, -23k payrolls, a September catalyst stack and single-name air pockets all season — convexity still cheap), fx-usd-hedge (DXY sub-100: the post-peak turn is running, not starting; the US Treasury itself sold dollars), fx-carry-income (the carry regime CRACKED — joint intervention + a hiking BoJ; pivot DCD pairs off JPY-funding, cut size). TACTICAL GATE: tac-usdjpy-puts TRIGGERED (the 15-Jul hold-back reason — 'no confirmed lower high' — is void: 163.73 rejected by coordinated intervention to ~157.6, spot ~159.3, BoJ Sept >60%); tac-brent-hormuz STAYS TRIGGERED and is ROLLED (the $80/$92 spread went deep ITM at ~$88 — bank it, re-strike $90/$105 while transits run 5-8/day); tac-usdcnh-puts NEW-triggered; tac-eurusd-callspread HELD BACK (1.1542 < 1.17), tac-gbpusd-rr HELD BACK (1.3503 < 1.355 — a whisker, but the gate is the gate). DISLOCATIONS SCANNED: NFLX -42-46% (added, post-print), MU -29% (added), SKHY -31%/below IPO (expressed through MU — one memory idea, not two), IBM -29% (surfaced NOT added — fraud-inquiry overhang), AAPL -8.6% single-day (not a >15% dislocation; watched), CSGP -57.6% YTD / SMCI / DG / INTC lists (single-source screener vintages, unverified — NOT actioned). NAMED-AUTHOR discipline — fresh reads THIS run (all read via the 11-Aug web sweep, cited with basis where used): Rory Johnston (W32 7-Aug; 'The Beijing Swing, Part 1' 5-Aug; NA Data Deck 10-Aug), TSCS ('When Can I Get Out of This Hell?' 8-Aug — the Korean margin-unwind tracker; 'It's Not The Poor. It's You.' 11-Aug), SemiAnalysis ('SpaceX 10GW in 2027' 7-Aug; 'Gemini is Cooked but GCP is Cooking' 7-Aug; 'TileRT InferenceX' 10-Aug), Citrini ('Protection Matters' 7-Aug — cybersecurity screen; read, informs no current idea, logged for the theme shelf), The Transcript ('Steady as She Goes' 10-Aug; 'Catalyst Watch' 11-Aug; 'Reaction Functions' 3-Aug), Moontower ('Cracks in the Singularity Trade?' 22-Jul; #323 2-Aug), Brent Donnelly (am/FX 7/10/11-Aug — titles + the 152.50/160.50 USD/JPY range frame via the Spectra library; bodies paywalled, cited only to that extent). NOT cited this run (nothing datable found/readable): Cem Karsan (X posts unretrievable — flagged, not cited), Joseph Wang (nothing post-Feb), Benn Eifert, Andy Constan (paywalled, unverifiable), Joseph Politano (nothing post-May), Serenity, Fabricated Knowledge, HighYield Harry, The Market Ear, Brad Setser, Tier1 Alpha. Where no author was read, ideas carry ownView or lean on the verified tape. NOTE ON ATTRIBUTION: drivers named from verified prints, not proximity — the record run is the CPI-relief + demand-evidence rally (MSFT/AMZN), Monday's dip is oil/Iran + chip weakness, the yen move is the intervention/BoJ mechanism, gold's breakout is dated official-sector flow (PBoC 19.9t) + the labor crack, NOT 'war fears' generically; the silver move has NO verified named driver and is honestly flagged ownView. DISCREPANCIES LOGGED, not resolved: one CNBC line called 4-Aug 'the first record in two months' vs the desk's 10-Jul record ~7,575 — both kept, flagged; Fortune's $92.54 Brent quote conflicts with all other sources — discarded as unreliable; KOSPI 'worst month on record' claims (-23/-29%) unverified against index math — not stated as fact. TECHNICALS/CHARTS: tv_technicals.py and fetch_chart_series.py re-run THIS pass — Technical pillars and chart series carry an 11-Aug as-of where the feeds resolved (see meta.technicalsAsOf); anything the scanner could not source stays authored-estimated and says so. Consensus/implied figures flagged estimated where not dual-confirmed. Prior-sweep archival notes (11-15 Jul) are preserved in git history (today_focus.json @ commit a9b6527) rather than appended here — a four-week gap made inline archiving unreadable; the ledger, not the note, is the date authority."
+    "note": "Wednesday 6am-London desk sweep, 12-Aug-2026 — CPI-morning refresh of the 11-Aug re-underwrite; the board tightens to an overnight cadence (present-tense commentary; history only where a landed result is itself the fact). THE DATA (sourced unless noted): US Tue close S&P 7,728.20 -0.32% / Nasdaq 26,445.45 -0.60% / Dow 53,791.85 -0.34% / VIX ~15.3 (estimated, single source) — pre-CPI step-back on oil and the Iran impasse; Alphabet -3.6% Tuesday (raised 2026 capex $195-205bn, first negative-FCF quarter, $25bn senior-notes deal, DeepMind leadership exit — logged, not actioned). ASIA (Wed): Nikkei ~66,869 flat-to-lower on the post-holiday reopen; KOSPI +1.3-2% intraday, Samsung +2-4%, SK Hynix +1.7% on first-10-days August semi exports +$9.95bn +155% y/y (close not confirmed at write time); HSI Tue 25,652.82 -1.10%, futures softer. FX: USD/JPY ~159.3 (intervention effect fully faded from spot; 160 the assumed re-intervention line), EUR/USD ~1.1534, GBP/USD ~1.3503, DXY ~99.7-99.8; EUR/JPY ~183.8 (record 187.95 17-Apr; intervention low 179.37 3-Aug; ~60% retraced; 50-day EMA 184.63; Scotiabank: both governments still pushing back on yen weakness). RATES: 2Y ~4.22%, 10Y ~4.73%, 30Y ~5.24%; 10y JGB ~2.78-2.84%. COMMODITIES: Brent settled ~$88.91 after >$90 intraday (+12% over five sessions), WTI ~$84; gold eased below $4,400 (~$4,367-4,400) on profit-taking; silver ~$64.8 -2.7% (estimated). CPI SETUP: cons +0.1-0.15%/3.4% headline, +0.2-0.3%/2.4-2.5% core; Polymarket Sept-hike ~36%, futures ~32%; reaction function per TD/Phemex — in-line holds ~36%, hot core -> mid-40s%, cool -> low-30s%. EARNINGS SCREEN (the requested densification): FactSet 7-Aug — blended Q2 +50.4% y/y (highest ever), 86% EPS beats, +32% ex-GOOGL/AMZN, bottom-up estimates RAISED +3.4% into the season. Recent prints scanned: DDOG (added — record -19% on a beat-and-raise, single-customer disclosure), AMD (scanned NOT added — beat/raise but GM 54% vs 56% on the Helios ramp, -19% off high; margin-trough timing unresolved and the board is already AI-heavy), PLTR (+29.5% blowout — chased, no entry), SHOP (blowout faded flat — watched), LLY (beat/raise, -2.8% off high — no dislocation), DIS/ABNB/Sony (logged), Coinbase -63% off high (third straight miss — not touched). Upcoming confirmed: CSCO tonight (added — implied 8.2-8.3% vs 7.75% realised = RICH, sell-premium expression), AMAT Thu (added — -28.9% off high, 38-analyst Strong Buy, PT ~$630), HD 18-Aug BMO (added — -16.9% off high, the rate-sensitive laggard), TGT 19-Aug (watched — -1.7% off high, priced), WMT 20-Aug (watched — the macro print), TJX/ADI/DE/LOW in the window (estimated dates); CALENDAR CORRECTIONS from the screen: PANW is 1-Sep (not ~24-Aug), Snowflake 2-Sep. WHAT CHANGED ON THE BOARD: REMOVED lock-yields (the vanilla bond-ladder sleeve — cut on desk feedback; rates coverage now carried by the structured range accrual, which is the derivative expression of the same range view). NEW: csco-fq4 (sell the rich straddle), amat-fq3 (discounted capex print, call spread), hd-q2 (paid-to-enter the rate-sensitive laggard), ddog-q2-react (sell the one-customer panic), tac-eurjpy-puts (the dollar-neutral yen short — 183/177 put spread sold into the 60%-retracement of the intervention break). SHARPENED: fx-carry-income now carries CONCRETE DCS terms (1m EUR/USD strike 1.1300, ~8-10% p.a. indicative, estimated; 1m GBP/USD 1.3200; NO JPY-side strikes) — vagueness cut on desk feedback. RE-GROUNDED to overnight levels (updatedAt bumps; theses rewritten to overnight-desk tense): nvda-q2 (+CoreWeave backlog $104.2bn -> $129.2bn as fresh sourced demand), mu-memory-dislocation (+Korea semi-export surge and Samsung/Hynix target-trim two-sidedness), gold-pullback (consolidation under $4,400), silver-ratio-catchup (~$64.8, still ownView — no named driver found again), rate-range-accrual (10Y 4.73 mid-band), spx-cheap-convexity (VIX ~15 into the stack), fx-usd-hedge, tac-usdjpy-puts (spot drift to the 160 line = better entry, unchanged invalidation), tac-usdcnh-puts, tac-brent-hormuz (~$89, deal-vs-conditions whipsaw), msft-fq4-react, nflx-q2, ai-power. TACTICAL GATE: tac-eurusd-callspread HELD (1.1534 < 1.17), tac-gbpusd-rr HELD (1.3503 < 1.355) — no rounding up. NAMED AUTHORS this run: the 11-Aug reads carry (Rory Johnston W32/Beijing Swing, TSCS margin-tracker, SemiAnalysis SpaceX-10GW, The Transcript, Moontower, Donnelly titles+range frames — all with basis fields where cited); no fresh datable notes found this morning; Karsan/Wang/Eifert/Constan still not citable (nothing readable located). ATTRIBUTION: Tuesday's dip is oil + the Iran impasse + pre-CPI caution (named), Alphabet's drag is its capex/notes/leadership news (named), the KOSPI pop is the sourced export print (named) — no headline-blaming. DISCREPANCIES LOGGED: VIX single-sourced; Samsung target-trims vs the export surge kept as the two-sided memory read; a stale Brent-October quote discarded; KOSPI close unconfirmed at write time and stated as intraday. TECHNICALS/CHARTS: tv_technicals.py and fetch_chart_series.py re-run this pass — as-of stamps in meta; unresolved symbols stay authored-estimated and say so. Prior-sweep note (11-Aug) preserved in git history rather than appended."
   },
   "earnings": [
     {
@@ -68,7 +57,7 @@
       },
       "naturalExpression": "Call spread",
       "headline": "NVIDIA reports 26 August into a market that just voted: capex is real, demand evidence gets paid — own the print with a call spread, collar the concentrated holdings",
-      "thesis": "The AI-capex season resolved its central question before NVIDIA even reports. Combined 2026 hyperscaler capex is now ~$725bn (+77% YoY) after Microsoft raised FY27 capex to $255-260bn and Amazon to ~$220bn — but the tape's reaction function sharpened: Microsoft (+8-9% on Azure crossing $100bn annual revenue, +43% cc) and Amazon (+9% on AWS accelerating to +36.7%) were rewarded for demand evidence, while Alphabet (-4-5% on a capex raise with its first negative-FCF quarter since 2004), Meta (-9-10% on an EPS miss) and Apple (-8.6% on a supply-constrained guide) were punished for blemishes. NVIDIA on 26 August is the last and largest demand print of the season: consensus sees ~$91.8bn of revenue (~2x YoY), Deutsche Bank just raised to $220, and the stock sits ~$217 near records after leading the index's 25th ATH of the year. The two-sided risks are real and named: China (cleared to ship compliant chips from August per one report, but domestic makers shipped 1.65m AI GPUs and Beijing's ~$295bn compute grid mandates >=80% domestic — China was ~9% of FY26 revenue) and the sheer height of the bar after TSMC's blowout already confirmed the supply chain. So the desk expresses the view in structure, not size: a defined-premium call spread for adders, and for the three books carrying NVDA at 22-24% single-name weight, a collar or overwrite that SELLS the event vol rather than buying it — the print is as much a monetisation event for the books as a directional one.",
+      "thesis": "The market has already voted on how it will grade this print: capex is forgiven, demand evidence is paid (Microsoft +8-9% on Azure, Amazon +9% on AWS), blemishes are fined (Alphabet, Meta, Apple -5 to -10%). NVIDIA on 26-Aug is the season's last and largest demand print — consensus ~$91.8bn of revenue (~2x YoY), the stock ~$217 near records, Deutsche Bank at $220 — into a bar set by ~$725bn of confirmed 2026 hyperscaler capex and TSMC's blowout supply-side print. The two-sided risks are named: China (compliant chips cleared to ship per one report, but domestic makers shipped 1.65m AI GPUs and Beijing's ~$295bn compute grid mandates >=80% domestic — China was ~9% of FY26 revenue) and the sheer height of the post-record bar. The desk expresses the view in structure, not size: a 4-6 week ~$220/$250 call spread for adders (2-3% premium, defined), and for the three books carrying NVDA at 22-24% single-name weight (Fable, Mitch, Prahnav) a zero-cost collar or overwrite INTO the print — selling the rich event vol rather than buying it. The print is as much a monetisation event for the books as a directional one.",
       "themeId": "ai",
       "offThemeWhy": null,
       "structures": [
@@ -112,7 +101,7 @@
             "authoredNote": "A crowded long at record levels — the index's own records are credited to NVDA and the AI complex; no short-interest or flow edge, and the crowd is with us, which is unwind risk into any blemish. Scored honestly at zero.",
             "indicators": {
               "rsi": 58.0,
-              "asOf": "2026-08-11 22:39 UTC",
+              "asOf": "2026-08-12 04:42 UTC",
               "symbol": "NASDAQ:NVDA",
               "direction": "long"
             }
@@ -145,6 +134,10 @@
         {
           "text": "China risk is two-sided: one report says new China-compliant AI processors ship from August, while domestic makers shipped 1.65m AI GPUs and Beijing's ~$295bn national compute grid mandates >=80% domestic chips; China was ~$19.7bn (~9%) of FY26 revenue",
           "tag": "estimated"
+        },
+        {
+          "text": "CoreWeave's Q2 (11-Aug, after close) fed the demand tape overnight: revenue +112% YoY to $2.58bn and backlog up from $104.2bn to $129.2bn as of 11-Aug (~$25bn added in under six weeks) — stock +12% after hours",
+          "tag": "sourced"
         }
       ],
       "sources": [
@@ -163,6 +156,340 @@
         {
           "name": "Tom's Hardware / TechTimes-Bloomberg / GuruFocus (China: 1.65m domestic AI GPUs, ~$295bn compute grid >=80% domestic mandate, August compliant-chip clearance)",
           "kind": "news"
+        },
+        {
+          "name": "SiliconANGLE / Benzinga / 24-7 Wall St (CoreWeave Q2, backlog $129.2bn, +12% AH)",
+          "kind": "news"
+        }
+      ]
+    },
+    {
+      "id": "csco-fq4",
+      "direction": "long",
+      "stance": "pre-position",
+      "tradeStatement": "Sell the rich event vol into Cisco's FQ4 print (TONIGHT, after close) rather than buy it — options price an ~8.2% move against a 7.75% average realised move over the last four prints, on a name with 18 upward / 0 downward estimate revisions in three months and a two-year double-beat streak — so write a 1-month reverse convertible (double-digit annualised coupon, barrier ~12% below spot) or sell cash-secured puts ~8% below ~$120: the AI-networking order momentum is the upside driver, component-cost pressure on margins the fade risk, and at -7.6% off its high the entry needs no heroics — the trade is collecting an overpriced straddle, not predicting the print.",
+      "intent": "income",
+      "action": "Sell the rich straddle",
+      "preferredExpression": "Reverse convertible",
+      "name": "Cisco — paid for an overpriced print",
+      "ticker": "CSCO",
+      "sector": "Technology",
+      "assetClass": "Equity",
+      "bucket": "Income",
+      "goalType": "yield",
+      "riskProfile": {
+        "vol": "moderate",
+        "beta": "moderate",
+        "structured": true
+      },
+      "naturalExpression": "Reverse convertible",
+      "headline": "Cisco reports tonight with an ~8.2% implied move vs 7.75% realised, 18-0 upward revisions and a two-year beat streak — the derivative trade is selling that premium, not paying it",
+      "thesis": "Cisco's FQ4 lands tonight after the close with consensus at $1.17 EPS (+18% YoY) on $16.83bn revenue (+14.7%) — and the options market pricing an ~8.2-8.3% move against a 7.75% average absolute move over the trailing four prints. That is a RICH straddle on a name where the estimate tape is one-way (18 upward EPS revisions, zero downward, over three months) and both lines have beaten every quarter for two years. The debate the premium is pricing: AI-infrastructure order momentum (the bull driver — Cisco has become a live AI-networking story) against component-cost pressure on gross margins. The desk's read is that the binary is real but overpaid — so the expression takes the other side of the premium: a 1-month reverse convertible with a barrier ~12% below spot pays a double-digit annualised coupon for agreeing to own a two-year serial beater at ~$106, or cash-secured puts ~8% below collect the inflated downside premium directly. At $120.43, -7.6% off its high, the name is neither dislocated nor euphoric — which is exactly the profile where sold vol, not bought direction, is the edge.",
+      "themeId": "ai",
+      "offThemeWhy": null,
+      "structures": [
+        "Reverse convertible",
+        "Cash-secured puts",
+        "Call overwrite",
+        "Direct equity"
+      ],
+      "variant": {
+        "street": "One-way bullish revisions (18 up / 0 down) with the AI-networking order book the headline driver — and an options market paying up for the event",
+        "us": "Agree with the direction, disagree with the price of the bet: implied > realised on a serial beater makes the sold-premium structures the higher-probability expression than paid-for upside",
+        "gap": "The market prices Cisco like a high-variance AI story; four quarters of realised moves say it is a lower-variance compounder — the spread between those two is the coupon"
+      },
+      "changeMyMind": "A genuine order-book shock (AI orders decelerating or a guide-down on component costs) that breaks the two-year beat pattern — the barrier is sized for a normal miss, not a regime change; if implied vol deflates below realised before the print, the premium edge is gone and the trade lapses.",
+      "conviction": {
+        "pillars": [
+          {
+            "key": "asymmetry",
+            "score": 0,
+            "dq": "sourced",
+            "note": "Implied ~8.2-8.3% vs 7.75% trailing-four realised — the event is PRICED RICH, scored zero by the rubric's long-event lens; that richness is precisely what the sold-premium expression harvests."
+          },
+          {
+            "key": "consensus",
+            "score": 2,
+            "dq": "sourced",
+            "note": "18 upward / 0 downward EPS and revenue revisions over three months, a two-year double-beat streak, consensus $1.17 / $16.83bn — as one-way as sell-side tape gets."
+          },
+          {
+            "key": "catalyst",
+            "score": 2,
+            "dq": "sourced",
+            "note": "Dated and immediate — tonight after the close; AI-networking orders vs component-cost margins is the named swing factor."
+          },
+          {
+            "key": "positioning",
+            "score": 1,
+            "dq": "estimated",
+            "note": "-7.6% off the high with no washout and no euphoria — a neutral setup; no hard short-interest read, honestly a lean. RSI 57 — no sentiment extreme. [sourced: TradingView].",
+            "authoredNote": "-7.6% off the high with no washout and no euphoria — a neutral setup; no hard short-interest read, honestly a lean.",
+            "indicators": {
+              "rsi": 57.4,
+              "asOf": "2026-08-12 04:42 UTC",
+              "symbol": "NASDAQ:CSCO",
+              "direction": "long"
+            }
+          }
+        ]
+      },
+      "earnings": {
+        "reportDate": "2026-08-12",
+        "reportWhen": "after close",
+        "impliedMovePct": 8.2,
+        "impliedSource": "sourced",
+        "historicalAvgMovePct": 7.75,
+        "historicalSource": "sourced",
+        "impliedVsHist": "rich",
+        "watch": "AI-infrastructure order growth (the number the market keys on), gross-margin commentary on component costs, FY guide, and whether the realised move once again undershoots the 8%+ implied."
+      },
+      "facts": [
+        {
+          "text": "Cisco reports FQ4 tonight (Wed 12-Aug) after the close; consensus EPS $1.17 (+18% YoY) on revenue $16.83bn (+14.7%); estimate revisions over three months run 18 up / 0 down on both lines, and Cisco has beaten on both lines every quarter for two years",
+          "tag": "sourced"
+        },
+        {
+          "text": "Options imply an ~8.2-8.3% post-print move against a 7.75% average absolute move over the trailing four prints — the event is priced rich relative to realised history",
+          "tag": "sourced"
+        },
+        {
+          "text": "The stock trades $120.43, -7.6% off its $130.37 52-week high; the named debate is AI-infrastructure order momentum vs component-cost pressure on margins",
+          "tag": "sourced"
+        }
+      ],
+      "sources": [
+        {
+          "name": "TipRanks (implied ~8.2% vs 7.75% realised; revision counts)",
+          "kind": "analysis"
+        },
+        {
+          "name": "AlphaStreet (FQ4 consensus $1.17 / $16.83bn, 12-Aug date)",
+          "kind": "calendar"
+        },
+        {
+          "name": "Investing.com (bull/bear debate: AI orders vs component costs)",
+          "kind": "analysis"
+        }
+      ]
+    },
+    {
+      "id": "amat-fq3",
+      "direction": "long",
+      "stance": "pre-position",
+      "tradeStatement": "Pre-position long Applied Materials into tomorrow night's FQ3 print (Thu 13-Aug, after close) via a 4-6 week ~$525/$590 call spread (~2-2.5% premium): at $525.61 the stock is -28.9% off its high — the deepest discount of any large cap reporting this window — while 38 analysts carry a Strong Buy at an average target of ~$630 (+18%) and the AI wafer-fab-equipment cycle just got re-verified by TSMC's $60-64bn capex and ~$725bn of hyperscaler spend; the China overhang (24-27% of revenue, post-BIS-settlement, export-control tail) is the reason the discount exists and the reason the risk is defined — a call spread prices the beat, caps the China tail, and costs a fraction of the gap to the street's own target.",
+      "intent": "add",
+      "action": "Pre-position with a structure",
+      "preferredExpression": "Call spread",
+      "name": "Applied Materials — the discounted capex print",
+      "ticker": "AMAT",
+      "sector": "Technology",
+      "assetClass": "Equity",
+      "bucket": "Growth",
+      "goalType": "appreciation",
+      "riskProfile": {
+        "vol": "high",
+        "beta": "high",
+        "structured": false
+      },
+      "naturalExpression": "Call spread",
+      "headline": "AMAT reports tomorrow night -29% off its high with the street at +18% upside and the WFE cycle re-verified — a call spread prices the beat and caps the China tail",
+      "thesis": "Applied Materials is the screen's standout setup in the window: FQ3 lands tomorrow (Thu 13-Aug) after the close with consensus at $3.39 EPS on ~$9.0bn revenue (+23% YoY, inside the company's own $8.95bn ±$500m guide) — while the stock trades $525.61, -28.9% off its $739.67 high, the deepest large-cap discount reporting this fortnight. The street hasn't abandoned it: 38 analysts, Strong Buy consensus, average target ~$630 (+18%). The demand side of the equipment cycle is not the question — TSMC raised capex to $60-64bn, hyperscaler 2026 spend is ~$725bn, Korea's first-10-days-of-August semi exports ran +155% YoY — the question is CHINA: 24-27% of revenue sits behind an export-control regime that already cost a $253m BIS settlement, and that tail risk is why the discount exists. Last quarter was a beat-and-raise that still dipped — the market sells first and asks later on this name — which argues for pricing the print with defined risk rather than open delta: a ~$525/$590 call spread for ~2-2.5% costs a fraction of the gap to the street's own target, pays ~4:1 if the WFE numbers pull the discount in, and caps the loss if a China headline lands on the print. Implied move data was not findable — the premium estimate is the desk's, tagged accordingly.",
+      "themeId": "ai",
+      "offThemeWhy": null,
+      "structures": [
+        "Call spread",
+        "Cash-secured puts",
+        "Buffered note",
+        "Direct equity"
+      ],
+      "variant": {
+        "street": "Strong Buy at ~$630 average target — the sell side models the AI-WFE cycle through the China noise",
+        "us": "Same direction, defined expression: the -29% discount plus the sell-first reaction pattern makes a capped-premium spread the honest way to own a print where the fundamental answer and the headline answer can differ",
+        "gap": "The market prices AMAT's China tail as if it offsets the verified WFE demand; the street's own +18% target says it doesn't — the spread monetises that gap without owning the tail"
+      },
+      "changeMyMind": "A China guide-down that is structural (export-control escalation, not timing) — that validates the discount and kills the catch-up case; a print-day beat that still sells off for a second straight quarter would also say the discount is about something the desk isn't seeing.",
+      "conviction": {
+        "pillars": [
+          {
+            "key": "asymmetry",
+            "score": 1,
+            "dq": "estimated",
+            "note": "No findable implied-move print — the desk's ~2-2.5% spread premium against a ~12% run to the street target reads attractive, but the input is estimated, so scored moderate."
+          },
+          {
+            "key": "consensus",
+            "score": 2,
+            "dq": "sourced",
+            "note": "38 analysts, Strong Buy, average target ~$630.56 (+18%) — clean alignment with meaningful upside to the mean."
+          },
+          {
+            "key": "catalyst",
+            "score": 2,
+            "dq": "sourced",
+            "note": "Dated — tomorrow night (Thu 13-Aug AMC), with company guidance brackets ($8.95bn ±$500m, $3.36 ±$0.20) making the beat/miss line explicit."
+          },
+          {
+            "key": "positioning",
+            "score": 1,
+            "dq": "estimated",
+            "note": "-28.9% off the high says the momentum crowd has left — washed-out enough to be contrarian fuel, but no hard SI/flow read; a lean. RSI 48 — no sentiment extreme. [sourced: TradingView].",
+            "authoredNote": "-28.9% off the high says the momentum crowd has left — washed-out enough to be contrarian fuel, but no hard SI/flow read; a lean.",
+            "indicators": {
+              "rsi": 48.0,
+              "asOf": "2026-08-12 04:42 UTC",
+              "symbol": "NASDAQ:AMAT",
+              "direction": "long"
+            }
+          }
+        ]
+      },
+      "earnings": {
+        "reportDate": "2026-08-13",
+        "reportWhen": "after close",
+        "impliedMovePct": 6.5,
+        "impliedSource": "estimated",
+        "historicalAvgMovePct": 6.0,
+        "historicalSource": "estimated",
+        "impliedVsHist": "fair",
+        "watch": "China revenue share and any export-control commentary (the swing factor), WFE demand color vs the TSMC/hyperscaler capex tape, gross margins, and whether a beat finally holds against the sell-first pattern."
+      },
+      "facts": [
+        {
+          "text": "Applied Materials reports FQ3 Thursday 13-Aug after the close; consensus EPS $3.39 on ~$9.0bn revenue (+23% YoY), inside company guidance of $8.95bn ±$500m and $3.36 ±$0.20",
+          "tag": "sourced"
+        },
+        {
+          "text": "The stock trades $525.61, -28.9% off its $739.67 high — the deepest discount among large caps reporting this window — against a Strong Buy consensus (38 analysts) and ~$630.56 average target (+18%)",
+          "tag": "sourced"
+        },
+        {
+          "text": "China is 24-27% of revenue behind an export-control regime (including a $253m BIS settlement); last quarter's beat-and-raise still dipped on the print — the sell-first pattern the defined-risk structure is built for",
+          "tag": "sourced"
+        }
+      ],
+      "sources": [
+        {
+          "name": "Blockonomi / 24-7 Wall St (FQ3 preview, consensus, China share, BIS settlement)",
+          "kind": "analysis"
+        },
+        {
+          "name": "TIKR (prior beat-and-raise-still-dipped pattern)",
+          "kind": "analysis"
+        },
+        {
+          "name": "TradingView scanner (AMAT $525.61, -28.9% off high; street PT ~$630)",
+          "kind": "data"
+        }
+      ]
+    },
+    {
+      "id": "hd-q2",
+      "direction": "long",
+      "stance": "pre-position",
+      "tradeStatement": "Get paid to pre-position in Home Depot into Tuesday's print (18-Aug, before open) — sell 1-2 month cash-secured puts ~7-8% below $354 (collecting elevated pre-print premium) or buy a ~$355/$395 call spread for the direct view: at -16.9% off its $426.75 high HD is the value side of a retail window where Walmart and Target trade at or near their highs, consensus has Q2 EPS roughly flat ($4.71 vs $4.68 LY), and the swing factor is whether the housing/remodel freeze shows first signs of thawing — with the front end rallying on the payrolls crack, the rate-sensitivity that crushed the stock is the same channel that re-rates it; puts-side expression preferred because the thaw timing is genuinely uncertain and the desk would own HD ~8% cheaper without complaint.",
+      "intent": "income",
+      "action": "Get paid to enter",
+      "preferredExpression": "Cash-secured puts",
+      "name": "Home Depot — the discounted consumer print",
+      "ticker": "HD",
+      "sector": "Consumer",
+      "assetClass": "Equity",
+      "bucket": "Income",
+      "goalType": "yield",
+      "riskProfile": {
+        "vol": "moderate",
+        "beta": "moderate",
+        "structured": false
+      },
+      "naturalExpression": "Cash-secured puts",
+      "headline": "Home Depot reports Tuesday at -17% off its high while Walmart and Target sit at theirs — sell puts to enter the rate-sensitive laggard of the consumer window",
+      "thesis": "Next week's retail prints are the consumer read of the season — Home Depot Tuesday 18-Aug, Target Wednesday, Walmart Thursday — and the desk wants the one the market has already discounted. HD trades $354.48, -16.9% off its $426.75 high, because its big-ticket remodel business is the most rate-frozen corner of US retail; Target, by contrast, has already rallied to -1.7% off its high on turnaround hopes (a beat is priced), and Walmart is the macro barometer everyone owns. Consensus asks almost nothing of HD — $4.71 EPS vs $4.68 a year ago, ~$47.5bn revenue (single-sourced, estimated) — so the print's swing factor is the housing signal: any first evidence that the remodel freeze thaws as the front end rallies (2Y ~4.22% after the payrolls crack, September-hike odds fading) re-rates the most rate-sensitive name in the group. The desk's honest uncertainty is the TIMING of that thaw — which is why the preferred expression collects rather than pays: 1-2 month cash-secured puts ~7-8% below spot harvest elevated pre-print premium and set an entry near $325-330, a level that prices the freeze continuing; the ~$355/$395 call spread is the direct-view alternative for Growth books. Walmart and Target stay on the watch list, not the board — nothing is asked of a discount, and both are priced for their good news.",
+      "themeId": null,
+      "offThemeWhy": "No standing desk theme on US retail — a dated consumer-window catalyst surfaced by the earnings screen, judged on the discount and the rate channel.",
+      "structures": [
+        "Cash-secured puts",
+        "Call spread",
+        "Buffered note",
+        "Direct equity"
+      ],
+      "variant": {
+        "street": "A cautious flat-EPS consensus with the debate parked on when housing turns — the window's attention sits on Walmart (macro) and Target (turnaround momentum)",
+        "us": "Own the discounted, rate-sensitive laggard with income structures while the priced-for-perfection names carry the headline risk — the front-end rally is the unpriced channel into HD's remodel demand",
+        "gap": "Consensus treats HD's rate sensitivity as the reason it lagged; the desk treats it as the embedded call option on the September easing-of-hike-fear the rest of the board already prices"
+      },
+      "changeMyMind": "Comps and big-ticket categories deteriorating WITH rates falling — that would say the remodel freeze is demand, not financing, and the rate-channel thesis is wrong; a hot CPI today that re-arms September hike odds also delays the thaw and argues for smaller size at lower strikes.",
+      "conviction": {
+        "pillars": [
+          {
+            "key": "asymmetry",
+            "score": 1,
+            "dq": "estimated",
+            "note": "Pre-print premium is elevated but not extreme; the put-write's edge is entry price rather than vol mispricing — moderate, desk-estimated inputs."
+          },
+          {
+            "key": "consensus",
+            "score": 1,
+            "dq": "estimated",
+            "note": "The $4.71 EPS consensus is solid but the revenue figure is single-sourced and there's no revision-momentum read — partial, honestly tagged estimated."
+          },
+          {
+            "key": "catalyst",
+            "score": 2,
+            "dq": "sourced",
+            "note": "Dated — Tuesday 18-Aug before the open, the opening print of the retail window, with the housing-thaw question as the named swing factor."
+          },
+          {
+            "key": "positioning",
+            "score": 1,
+            "dq": "estimated",
+            "note": "-16.9% off the high while its peers sit at theirs — the relative washout is the setup, but no hard flow/SI read; a lean. RSI 59 — no sentiment extreme. [sourced: TradingView].",
+            "authoredNote": "-16.9% off the high while its peers sit at theirs — the relative washout is the setup, but no hard flow/SI read; a lean.",
+            "indicators": {
+              "rsi": 59.5,
+              "asOf": "2026-08-12 04:42 UTC",
+              "symbol": "NYSE:HD",
+              "direction": "long"
+            }
+          }
+        ]
+      },
+      "earnings": {
+        "reportDate": "2026-08-18",
+        "reportWhen": "before open",
+        "impliedMovePct": 4.0,
+        "impliedSource": "estimated",
+        "historicalAvgMovePct": 3.5,
+        "historicalSource": "estimated",
+        "impliedVsHist": "fair",
+        "watch": "Comps and big-ticket/remodel categories (the housing-thaw signal), FY guide, commentary on the rate channel; then Target (19-Aug) and Walmart (20-Aug) as the rest of the consumer window."
+      },
+      "facts": [
+        {
+          "text": "Home Depot reports Q2 Tuesday 18-Aug before the open; consensus EPS $4.71 (vs $4.68 LY) on ~$47.5bn revenue (revenue figure single-sourced); the named debate is whether the housing/rate freeze is thawing into big-ticket remodel demand",
+          "tag": "estimated"
+        },
+        {
+          "text": "HD trades $354.48, -16.9% off its $426.75 high — while Target ($152.29) sits -1.7% off its high with the turnaround substantially priced and Walmart (20-Aug) is the window's macro print",
+          "tag": "sourced"
+        },
+        {
+          "text": "The rate channel moved first: the 2Y sits ~4.22% with September-hike odds cut to ~32-36% after the July payrolls contraction — the easing of hike fear is the unpriced input into rate-sensitive remodel demand",
+          "tag": "sourced"
+        }
+      ],
+      "sources": [
+        {
+          "name": "Yahoo Finance previews / Fox Business week-ahead (HD 18-Aug, consensus, retail window dates)",
+          "kind": "calendar"
+        },
+        {
+          "name": "TradingView scanner (HD $354.48 -16.9%, TGT -1.7%, off-high figures)",
+          "kind": "data"
+        },
+        {
+          "name": "CNBC / Polymarket via CNBC (2Y ~4.22%, Sept-hike odds ~32-36% post-payrolls)",
+          "kind": "data"
         }
       ]
     },
@@ -187,7 +514,7 @@
       },
       "naturalExpression": "Buffered note",
       "headline": "Microsoft's FQ4 settled the July capex fear its own way: Azure past $100bn at +43%, FY27 capex $255-260bn — and the stock ROSE 8-9%; ride the continuation with a capped structure",
-      "thesis": "The desk's July idea was that the AI-capex derate had over-punished Microsoft; the print resolved it emphatically. On 29 July Microsoft reported FQ4-26 revenue of $90.0bn (+18%) and EPS of $4.74 against $4.24 expected, with the headline that matters: Azure crossed $100bn of ANNUAL revenue, growing +43% constant-currency against ~40% expected. Critically, Microsoft simultaneously disclosed FY27 capex of $255-260bn — a number that would have cratered the stock three weeks earlier (Alphabet fell ~5% on a $195-205bn guide the week before) — and instead the stock GAPPED UP 8-9%, adding roughly $260bn of market value overnight. That is the season's reaction function in one chart: spend is forgiven where the demand evidence is overwhelming. The forward case is a continuation with two supports: Amazon's AWS acceleration (+36.7%) confirms the category, and SemiAnalysis (7-Aug) argues the claimed ~10GW SpaceX compute build for 2027 is real with Microsoft the LARGEST OFFTAKER — a demand leg not in consensus numbers. The concessions: the re-rating is partly in the price, the stock sits at records in a tape two days off its own, and the next dated catalysts (NVDA 26-Aug, Warsh's Jackson Hole keynote 28-Aug, September CPI/FOMC) are macro. So: call spread or buffered note, not naked chase — and for Jacob and Fotis, who both hold MSFT, this is a hold-and-overwrite, not an add.",
+      "thesis": "Microsoft is the season's cleanest exhibit of the new reaction function: FQ4 revenue $90.0bn (+18%), EPS $4.74 vs $4.24, Azure past $100bn of ANNUAL revenue at +43% constant-currency — and an FY27 capex disclosure of $255-260bn that the market REWARDED with an 8-9% gap (+~$260bn of value), the same week Alphabet fell ~5% on a smaller guide. Spend is forgiven where demand evidence is overwhelming. The continuation case has two supports: Amazon's AWS acceleration (+36.7%) confirms the category, and SemiAnalysis (7-Aug) argues the claimed ~10GW SpaceX 2027 compute build is real with Microsoft the LARGEST OFFTAKER — a demand leg not in consensus numbers. Concessions: the gap already banked much of the re-rate, the stock sits at records, and the next dated tests (NVDA 26-Aug, Jackson Hole 28-Aug, September CPI/FOMC) are macro. So: a 3-6 month call spread or buffered note, not a naked chase — and for Jacob and Fotis, who hold MSFT, an overwrite rather than an add.",
       "themeId": "ai",
       "offThemeWhy": null,
       "structures": [
@@ -231,7 +558,7 @@
             "authoredNote": "Crowded-ish long at records after the gap, but the July derate had washed some length out; a lean, not an edge — no hard SI/flow read.",
             "indicators": {
               "rsi": 77.7,
-              "asOf": "2026-08-11 22:39 UTC",
+              "asOf": "2026-08-12 04:42 UTC",
               "symbol": "NASDAQ:MSFT",
               "direction": "long"
             }
@@ -289,7 +616,7 @@
       "id": "nflx-q2",
       "direction": "long",
       "stance": "post-print",
-      "tradeStatement": "Flip Netflix (NFLX) from the July pre-position (which LOST — the defined-risk structure capped the damage) to a get-paid-to-own reaction trade: at ~$73.80, 42-46% below its peak and ~20x forward after the 16-Jul print (EPS $0.80 in line, revenue $12.56bn a slight miss, a LIGHT Q3 guide of $12.86bn vs ~$13bn consensus and reduced viewership disclosure drove a -9% after-hours drop to 52-week lows), sell 3-6 month cash-secured puts ~10% below spot or buy a reverse convertible for a double-digit coupon — a washed-out mega-cap where the ad tier is still scaling and the bar is now on the floor; income structures, not knife-catching calls, because the guide cut and the disclosure reduction mean the engagement worry is live until the next print proves otherwise.",
+      "tradeStatement": "Get paid to own the Netflix washout — at ~$74, 42-46% below its peak and ~20x forward after the light Q3 guide ($12.86bn vs ~$13bn consensus) and reduced viewership disclosure knocked it -9% to 52-week lows, sell 3-6 month cash-secured puts ~10% below spot or buy a reverse convertible for a double-digit coupon with a barrier near the lows: post-crash implied vol is rich, the bar is on the floor, and the ad tier is still scaling — income structures, not knife-catching calls, because the engagement worry stays live until the October print answers it.",
       "intent": "income",
       "action": "Get paid to own the washout",
       "preferredExpression": "Reverse convertible",
@@ -305,8 +632,8 @@
         "structured": true
       },
       "naturalExpression": "Reverse convertible",
-      "headline": "The July pre-position lost — Netflix guided Q3 light and fell to 52-week lows, now -42-46% from its peak at ~20x forward; the honest next trade is income on the washout, not a directional chase",
-      "thesis": "Score the last trade first: the desk pre-positioned long into the 16-Jul print with defined risk, and the print went against us — EPS $0.80 was in line ($0.79 expected), revenue $12.56bn a slight miss, but the Q3 guide of $12.86bn (+11.7%) versus ~$13bn consensus was LIGHT and Netflix reduced its viewership disclosure — exactly the engagement worry Citi and Bernstein had flagged — and the stock fell ~9% after hours to fresh 52-week lows. The capped structure did its job: premium lost, position closed, thesis honestly failed. The REACTION setup a month later is a different trade. At ~$73.80 (a +5% bounce off the lows), Netflix is 42-46% below its early-2025 peak, -23% YTD, at roughly 20x forward earnings — the cheapest the franchise has traded in years — while the fundamental floor is intact: the print still showed +13.4% revenue growth and $3.4bn of quarterly net income, and the ad tier continues scaling. The desk does not need the bottom tick: selling 3-6 month cash-secured puts ~10% below an already-washed-out price, or buying a reverse convertible with a double-digit coupon and a barrier near the 52-week low, converts the elevated post-crash volatility into income and sets the effective entry near levels where the guide-cut is more than priced. The next print (~mid-Oct) is the proof point either way — until then, income, not conviction length.",
+      "headline": "Netflix ~$74 — 42-46% off its peak at ~20x forward after the light Q3 guide; sell the crash vol and get paid to own the washout",
+      "thesis": "Netflix trades ~$74 — 42-46% below its peak, -23% YTD, roughly 20x forward earnings, the cheapest the franchise has traded in years. The setup: the 16-Jul print was fine on the quarter (EPS $0.80 in line, revenue $12.56bn, +13.4% YoY, $3.4bn net income) but the Q3 guide of $12.86bn came in light against ~$13bn and viewership disclosure was reduced — the market read it as the engagement worry confirmed and cut the stock ~9% to 52-week lows, where it has since stabilised with a +5% bounce. The reaction trade is income, not direction: selling 3-6 month cash-secured puts ~10% below an already-washed-out price, or a reverse convertible with a double-digit coupon and a barrier near the 52-week low, converts rich post-crash volatility into yield and sets the effective entry at levels where the guide-cut is more than priced. The fundamental floor (revenue +13%, the ad tier scaling toward ~$3bn) argues the washout overshoots; the October print is the proof point either way — until then, get paid to wait.",
       "themeId": null,
       "offThemeWhy": "No standing desk theme on streaming/media — a single-name dislocation reaction judged on its own merit; surfaced by the dislocation scan (>40% off peak in a widely-held mega-cap).",
       "structures": [
@@ -350,7 +677,7 @@
             "authoredNote": "Maximum washout: -42-46% from peak, -23% YTD, 52-week lows in July, sentiment capitulated — the crowd is offside anything constructive, which is exactly the fuel an income-at-a-barrier structure wants. No hard SI read, hence estimated.",
             "indicators": {
               "rsi": 53.4,
-              "asOf": "2026-08-11 22:39 UTC",
+              "asOf": "2026-08-12 04:42 UTC",
               "symbol": "NASDAQ:NFLX",
               "direction": "long"
             }
@@ -374,10 +701,6 @@
         {
           "text": "A month on, NFLX trades ~$73.80 (10-Aug area) after a +5% bounce — 42-46% below its early-2025 peak, -23% YTD, 52-week high $126.71, roughly 20x forward earnings",
           "tag": "sourced"
-        },
-        {
-          "text": "The desk's July pre-position (a defined-risk call spread into the print) lost — the premium was the whole risk, and the loss is recorded here rather than re-framed",
-          "tag": "sourced"
         }
       ],
       "sources": [
@@ -391,6 +714,111 @@
         },
         {
           "name": "Shacknews / company IR (Q2 figures and guidance detail)",
+          "kind": "data"
+        }
+      ]
+    },
+    {
+      "id": "ddog-q2-react",
+      "direction": "long",
+      "stance": "post-print",
+      "tradeStatement": "Get paid to fade Datadog's single-customer panic — after a record -19% one-day drop on a print that BEAT and RAISED (EPS $0.65 vs $0.58, revenue $1.12bn +36% YoY, FY guide raised) because management flagged its largest customer (an AI-native firm, nine-figure contract) cutting usage from Q3, sell the crash-inflated vol: a 3-month reverse convertible or cash-secured puts struck ~$220 (~11% below $247) pays a double-digit coupon for agreeing to own a 36%-grower at ~18% below even the post-crash price — the concentration fear is real and priced twice over, the rest of the customer base grew through it, and the barrier sits where the bear case is already the base case.",
+      "intent": "income",
+      "action": "Sell the panic premium",
+      "preferredExpression": "Reverse convertible",
+      "name": "Datadog — fading the one-customer panic",
+      "ticker": "DDOG",
+      "sector": "Technology",
+      "assetClass": "Equity",
+      "bucket": "Income",
+      "goalType": "yield",
+      "riskProfile": {
+        "vol": "high",
+        "beta": "high",
+        "structured": true
+      },
+      "naturalExpression": "Reverse convertible",
+      "headline": "A beat-and-raise met a record -19% drop because one customer is cutting usage — sell the crash vol with a barrier below the bear case",
+      "thesis": "Datadog printed the season's most disproportionate reaction: Q2 beat on both lines (EPS $0.65 vs $0.58; revenue $1.12bn, +36% YoY), the FY guide was RAISED — and the stock fell ~19%, its worst day on record, because management disclosed that its largest customer, an AI-native firm running a nine-figure contract across 17 Datadog products, will cut usage starting in Q3 despite a recent renewal. That is a real risk honestly disclosed, and the market priced it as a regime change: ~$46 of market value per share out on a customer worth a single-digit percentage of revenue. At $246.78 (-15.7% off the high, and still choppy — -5.4% Monday after a partial bounce), the name now trades as if the deceleration is broad, while the print itself said the opposite: growth ex-that-customer accelerated across a customer base that expanded. The desk doesn't need to call the bottom of the chop — post-crash implied vol is rich, so a 3-month reverse convertible or cash-secured puts struck ~$220 (~11% below spot) pays a double-digit annualised coupon for agreeing to buy a 36%-grower roughly 25% below its pre-print price — a level where the single-customer cut plus a general usage-optimisation wave is already the base case. If the panic mean-reverts, the coupon is the whole return; if it deepens, the entry is one the desk wanted anyway. AI-usage concentration is the season's new risk vector (the same dynamic NVDA's buyers debate from the other side) — selling its premium at a discount beats predicting it.",
+      "themeId": null,
+      "offThemeWhy": "Single-name dislocation surfaced by the earnings screen (record one-day drop on a beat-and-raise) — a reaction trade on vol mispricing, not a standing desk theme.",
+      "structures": [
+        "Reverse convertible",
+        "Cash-secured puts",
+        "Risk reversal",
+        "Direct equity"
+      ],
+      "variant": {
+        "street": "'It all comes down to one customer' — the sell side split between defending the 36% growth and warning the AI-native cohort makes usage lumpy from here",
+        "us": "Both can be true, which is the income trade: sell the crash-priced vol with a barrier below where even the bears' numbers land, rather than argue the customer back",
+        "gap": "The market repriced the whole growth curve for one disclosed contract; the structures monetise the gap between a single-customer cut and the broad-deceleration price"
+      },
+      "changeMyMind": "A second large customer disclosure or Q3 actuals showing the optimisation wave is cohort-wide, not idiosyncratic — that converts the panic into the base case and puts the barrier genuinely at risk; stabilisation without coupon-worthy vol also removes the trade's edge.",
+      "conviction": {
+        "pillars": [
+          {
+            "key": "asymmetry",
+            "score": 1,
+            "dq": "estimated",
+            "note": "Post-crash implied vol is rich (the -19% record drop and continued chop), which is what the coupon harvests — but pricing is desk-estimated, so moderate."
+          },
+          {
+            "key": "consensus",
+            "score": 1,
+            "dq": "sourced",
+            "note": "Split street — beat-and-raise defenders vs single-customer warners ('it all comes down to one customer') — partial alignment only, honestly scored."
+          },
+          {
+            "key": "catalyst",
+            "score": 2,
+            "dq": "sourced",
+            "note": "The landed print and its textbook disproportionate reaction (record -19% on a double-beat with a raised guide) — the post-print rubric's cleanest case."
+          },
+          {
+            "key": "positioning",
+            "score": 1,
+            "dq": "estimated",
+            "note": "The growth crowd was long and is now forced out (record drop, choppy follow-through) — washed but unstable; no hard SI read. RSI 47 — no sentiment extreme. [sourced: TradingView].",
+            "authoredNote": "The growth crowd was long and is now forced out (record drop, choppy follow-through) — washed but unstable; no hard SI read.",
+            "indicators": {
+              "rsi": 47.2,
+              "asOf": "2026-08-12 04:42 UTC",
+              "symbol": "NASDAQ:DDOG",
+              "direction": "long"
+            }
+          }
+        ]
+      },
+      "earnings": {
+        "reportDate": "2026-08-06",
+        "reportWhen": "before open",
+        "result": "Q2 beat on both lines — EPS $0.65 vs $0.58 consensus, revenue $1.12bn vs $1.08bn (+36% YoY) — with the FY guide RAISED; management flagged its largest customer (an AI-native firm, nine-figure contract, 17 products) cutting usage from Q3 despite a recent renewal",
+        "resultSource": "sourced",
+        "reaction": "The stock fell ~19% — its record one-day drop — and remains choppy (a ~5.5% five-session claw-back, then -5.4% Monday); now $246.78, -15.7% off the $292.72 52-week high",
+        "reactionSource": "sourced",
+        "watch": "Any further disclosure on the AI-native customer cohort's usage, Q3 consumption trends, whether implied vol stays rich enough to fund the coupon, and the stock's behaviour around the $240 post-crash shelf."
+      },
+      "facts": [
+        {
+          "text": "Datadog reported Q2 on 6-Aug: EPS $0.65 vs $0.58, revenue $1.12bn vs $1.08bn (+36% YoY), FY guidance raised — and fell ~19%, its record one-day drop, on management flagging its largest customer (AI-native, nine-figure contract, 17 products) cutting usage from Q3",
+          "tag": "sourced"
+        },
+        {
+          "text": "DDOG trades $246.78, -15.7% off its $292.72 high, with unstable follow-through (a ~5.5% five-session bounce, then -5.4% Monday) — post-crash vol remains elevated",
+          "tag": "sourced"
+        },
+        {
+          "text": "AI-usage concentration is the season's emerging risk vector — the same lumpy-AI-customer dynamic runs through the whole complex — and Datadog is where it is now most explicitly priced",
+          "tag": "sourced"
+        }
+      ],
+      "sources": [
+        {
+          "name": "Benzinga / Investing.com / TradingKey / Yahoo Finance (DDOG Q2 results, the single-customer disclosure, record -19% drop)",
+          "kind": "news"
+        },
+        {
+          "name": "TradingView scanner (DDOG $246.78, -15.7% off high, 5-day chop)",
           "kind": "data"
         }
       ]
@@ -417,7 +845,7 @@
       },
       "naturalExpression": "Phoenix autocall",
       "headline": "Micron is -29% from its ATH with HBM sold out through 2027 and 2027 ASPs seen +87-100% — the crowd doubts the pricing, so sell them the insurance: autocall coupons with a barrier near $700",
-      "thesis": "The memory complex has spent six weeks arguing with its own fundamentals. Micron closed 10-Aug at $861 — roughly 29% below the $1,213.37 all-time-high close of 25-Jun — after the July swoon briefly put the group in an official bear market. Against that price action stands a sourced supply-demand picture that has only tightened: all three HBM vendors are sold out for 2026 and 2027 capacity is FULLY ALLOCATED; Goldman models 2027 HBM ASPs up 87% (Samsung) to 100% (SK Hynix); Micron's DRAM share has climbed to 25%, one point behind SK Hynix's 26%; and the demand side was just re-confirmed by the hyperscalers' ~$725bn (+77%) 2026 capex and Microsoft's FY27 $255-260bn disclosure. The tell for what the market actually fears is SK Hynix: its ADR — July's record $26.5bn listing — trades at $135, BELOW the $149 IPO price, despite record Q2 revenue of KRW 79.3tn (+257% YoY). Blowout numbers, falling stock: the market is pricing PEAK PRICING, i.e. a 2027 supply response (Samsung and SK Hynix capacity warnings are the named risk), not absent demand. The desk's edge is not to out-argue that debate with direction — it is to monetise it: post-swoon implied vol on MU is rich, so a Phoenix autocall or cash-secured puts at a $700-730 barrier pays a double-digit coupon for agreeing to buy the stock ~35-40% below the ATH, a level that already prices a hard landing in 2027 ASPs. NVIDIA's 26-Aug print is the near catalyst for the whole chain; Micron's own FQ4 lands late September. This supersedes the old post-print idea (mu-fq3-react) — the argument has changed from 'monetise the gap after a record print' to 'own the dislocation at a discount, paid'.",
+      "thesis": "The memory complex is arguing with its own fundamentals, and the argument is for sale. MU trades ~$861-869 — roughly 29% below its $1,213 all-time-high close — against a supply-demand picture that keeps tightening: all three HBM vendors are sold out for 2026 with 2027 capacity FULLY ALLOCATED, Goldman models 2027 HBM ASPs +87-100%, Micron's DRAM share (25%) sits one point behind SK Hynix, and the demand side is underwritten by ~$725bn of 2026 hyperscaler capex. The tell for what the market fears is SK Hynix: its ADR trades at $135 — below the $149 IPO price — despite record revenue (+257% YoY). Blowout numbers, falling stock: the market is pricing PEAK PRICING (a 2027 supply response from Samsung/SK Hynix capacity adds), not absent demand. The desk doesn't out-argue that debate with direction — it monetises it: post-swoon implied vol is rich, so a Phoenix autocall or cash-secured puts at a $700-730 barrier pays a double-digit coupon for agreeing to buy the memory leader ~35-40% below its high, a level that already prices a hard 2027 ASP landing. NVDA (26-Aug) is the chain's near catalyst; MU's own FQ4 lands late September. For the books already concentrated in MU (Aurora 25.8%, Fable 13%), collars stand.",
       "themeId": "ai",
       "offThemeWhy": null,
       "structures": [
@@ -473,7 +901,7 @@
             "authoredNote": "The July swoon washed out the momentum crowd (bear-market prints, SKHY below IPO) but the name re-crowds fast on every bounce — mixed, no hard SI/flow read.",
             "indicators": {
               "rsi": 47.0,
-              "asOf": "2026-08-11 22:39 UTC",
+              "asOf": "2026-08-12 04:42 UTC",
               "symbol": "NASDAQ:MU",
               "direction": "long"
             }
@@ -486,7 +914,7 @@
             "authoredNote": "Downtrend from the ATH with a basing attempt above $800 — mixed; authored as estimated pending the TradingView scan.",
             "indicators": {
               "symbol": "NASDAQ:MU",
-              "asOf": "2026-08-11 22:39 UTC",
+              "asOf": "2026-08-12 04:42 UTC",
               "close": 868.52,
               "sma50": 967.6456,
               "sma100": 762.6022,
@@ -607,6 +1035,10 @@
         {
           "text": "The demand side re-confirmed in the same window: combined 2026 hyperscaler capex ~$725bn (+77% YoY), Microsoft FY27 capex $255-260bn, TSMC FY26 growth guided 'slightly above 40%' with capex raised to $60-64bn",
           "tag": "sourced"
+        },
+        {
+          "text": "Korea's first-10-days-of-August semiconductor exports ran +155% YoY ($9.95bn) on AI demand — Samsung +2-4% and SK Hynix +1.7% overnight (KOSPI the region's standout) — while brokerages trim Samsung/Hynix targets on 'traditional memory cycle peaking' concern: the demand-vs-pricing two-sidedness the barrier structures monetise",
+          "tag": "sourced"
         }
       ],
       "sources": [
@@ -632,7 +1064,7 @@
       "id": "gold-pullback",
       "direction": "long",
       "intent": "protect",
-      "tradeStatement": "The July accumulation thesis PAID — gold broke out to ~$4,400 (a two-month high) on the largest PBoC purchase since Nov-2023 (19.9t in July, month 21 of the streak) and the first global ETF inflow in three months (+$3bn) — so shift the expression from accumulating dips to OWNING the breakout with structure: a capital-protected gold participation note for the Retail books (upside participation, floor at par) or a 3-6 month accumulator / $4,400-$4,800 call spread for Professionals; still sized to each book's protection gap as strategic debasement ballast, not a momentum trade — the July CPI print and Warsh's Jackson Hole keynote are the near-term two-way risks.",
+      "tradeStatement": "Own gold's breakout with structure — spot ~$4,400 and futures pressing ~$4,458 at fresh two-month highs on the largest PBoC purchase since Nov-2023 (19.9t in July, month 21 of the streak) and the first global ETF inflow in three months (+$3bn): a capital-protected gold participation note for the Retail books (upside participation, floor at par) or a 3-6 month accumulator / $4,400-$4,800 call spread for Professionals, sized to each book's protection gap as strategic debasement ballast — today's CPI print and Warsh's Jackson Hole keynote (28-Aug) are the near-term two-way risks the protected structures exist for.",
       "action": "Own the breakout, protected",
       "preferredExpression": "Capital-protected note",
       "name": "Gold — the breakout, protected",
@@ -647,8 +1079,8 @@
         "structured": true
       },
       "naturalExpression": "Capital-protected note",
-      "headline": "Gold answered at last — ~$4,400, a two-month high, on record-pace PBoC buying and ETF re-inflows; own the breakout through capital-protected participation, sized to the protection gap",
-      "thesis": "For a month the desk's gold case ran on official-sector demand against a non-confirming price; the price has now confirmed. Spot trades ~$4,396-4,400 — a two-month high, up from ~$4,100 in mid-July — and the drivers are dated and sourced rather than narrative: the PBoC added 19.9 tonnes in July, its 21st consecutive monthly purchase and the LARGEST since Nov-2023; global gold ETFs took in $3bn in July (+23t to 4,068t), the first net inflow in three months, led by Europe; and the macro tail-winds rotated from headwind to support — the -23k payrolls print cut September-hike odds toward 40-50%, DXY sits at a two-month low (~99.8), and the US Treasury itself was in the market selling dollars (the joint yen intervention). The debasement argument the desk has carried (deficits, central-bank reallocation, geopolitical premium) now has the flow AND the tape. What changed in the expression: with spot at a breakout rather than a pullback, buying dips is no longer the entry — a capital-protected participation note gives the Retail-heavy Preservation books (Scott, Fotis, Aurora) the upside with a par floor, while Professionals can run an accumulator (buying programmatically on any dip, at a discount) or a defined $4,400/$4,800 call spread. Sizing stays goal-driven: this is the protection sleeve's ballast — the January record ($5,598) marks how far a debasement repricing can run, and Goldman's end-2026 $4,900 (June vintage) brackets the street's path — but a hot July CPI tomorrow or a hawkish Warsh at Jackson Hole would knock the near-term bid; the protected structures exist precisely for that two-way risk.",
+      "headline": "Gold extends the breakout toward $4,450+ on record-pace PBoC buying and ETF re-inflows — own it through capital-protected participation, sized to the protection gap",
+      "thesis": "Gold trades ~$4,400 — a two-month high — and the drivers are dated flow, not narrative: the PBoC added 19.9 tonnes in July (its 21st consecutive month, the largest purchase since Nov-2023), global gold ETFs took in $3bn (+23t), the first net inflow in three months, and the macro tailwinds line up — September-hike odds ~40-50% after the payrolls contraction, DXY at a two-month low, and a US Treasury that was in the market selling dollars last month. The debasement case (deficits, central-bank reallocation, geopolitical premium) now has the flow AND the tape. At a breakout rather than a pullback, the entry discipline is structural: a capital-protected participation note gives the Retail-heavy Preservation books (Scott, Fotis, Aurora) the upside with a par floor; Professionals run an accumulator (programmatic dip-buying at a discount) or a defined $4,400/$4,800 call spread. Sizing stays goal-driven off each book's protection gap — the January record ($5,598) frames how far a debasement repricing can run, Goldman's end-2026 $4,900 brackets the street — while a hot CPI today or a hawkish Warsh at Jackson Hole is the two-way risk the floors are for.",
       "themeId": "gold",
       "offThemeWhy": null,
       "structures": [
@@ -699,11 +1131,11 @@
             "key": "positioning",
             "score": 1,
             "dq": "estimated",
-            "note": "ETF re-inflows are only one month old — the crowd is returning, not crowded, but no longer offside either; neutral-to-supportive, no hard CoT read this pass. RSI 66 — no sentiment extreme. [sourced: TradingView].",
+            "note": "ETF re-inflows are only one month old — the crowd is returning, not crowded, but no longer offside either; neutral-to-supportive, no hard CoT read this pass. RSI 67 — no sentiment extreme. [sourced: TradingView].",
             "authoredNote": "ETF re-inflows are only one month old — the crowd is returning, not crowded, but no longer offside either; neutral-to-supportive, no hard CoT read this pass.",
             "indicators": {
-              "rsi": 66.1,
-              "asOf": "2026-08-11 22:39 UTC",
+              "rsi": 67.1,
+              "asOf": "2026-08-12 04:42 UTC",
               "symbol": "OANDA:XAUUSD",
               "direction": "long"
             }
@@ -712,19 +1144,19 @@
             "key": "technical",
             "score": 1,
             "dq": "sourced",
-            "note": "Price 4377 vs SMA50/100/200 4147/4388/4499 (1/3 above), RSI 66, at/through the upper band. Trend is mixed for the long. [sourced: TradingView]",
+            "note": "Price 4398 vs SMA50/100/200 4148/4388/4499 (2/3 above), RSI 67, at/through the upper band. Trend is mixed for the long. [sourced: TradingView]",
             "authoredNote": "Two-month-high breakout above the summer range — constructive trend; authored estimated pending the scan.",
             "indicators": {
               "symbol": "OANDA:XAUUSD",
-              "asOf": "2026-08-11 22:39 UTC",
-              "close": 4376.75,
-              "sma50": 4147.3197,
-              "sma100": 4388.1713,
-              "sma200": 4499.1106,
-              "rsi": 66.1,
-              "bbUpper": 4403.0181,
-              "bbLower": 3869.8454,
-              "recommendMA": 0.533,
+              "asOf": "2026-08-12 04:42 UTC",
+              "close": 4397.665,
+              "sma50": 4147.738,
+              "sma100": 4388.3804,
+              "sma200": 4499.2151,
+              "rsi": 67.1,
+              "bbUpper": 4407.962,
+              "bbLower": 3866.993,
+              "recommendMA": 0.667,
               "direction": "long",
               "directionSource": "explicit"
             }
@@ -732,7 +1164,7 @@
         ]
       },
       "macro": {
-        "metric": "Gold ~$4,400 (2-mo high) · PBoC +19.9t Jul (month 21, largest since Nov-23) · ETF +$3bn Jul · DXY ~99.8 · Sept-hike odds ~40-50%",
+        "metric": "Gold ~$4,400 spot / futures ~$4,458 Wed am · PBoC +19.9t Jul (month 21) · ETF +$3bn Jul · DXY ~99.8 · Sept-hike odds ~32-36%",
         "detail": "Own the breakout with structure: capital-protected gold participation notes for Retail Preservation books (par floor, capped/participating upside), accumulators or a $4,400/$4,800 call spread for Professionals. Sized to each book's protection gap — the mapping engine already zeroes it for clients whose Preservation bucket is full (Amar). July CPI (12-Aug) and Jackson Hole (28-Aug) are the near two-way events.",
         "source": "sourced",
         "watch": "July CPI (12-Aug) and the September Fed path; the monthly PBoC print (does the streak extend?); ETF flow follow-through; DXY sub-100 durability; the Hormuz tail (a genuine escalation adds the war premium gold refused in July)."
@@ -743,7 +1175,7 @@
         "refs": [
           {
             "y": 4400,
-            "label": "Breakout ~$4,400 (11-Aug)"
+            "label": "Breakout zone ~$4,400"
           },
           {
             "y": 4100,
@@ -754,7 +1186,6 @@
         "symbol": "GC=F",
         "range": "3mo",
         "series": [
-          4718.7,
           4677.6,
           4697.7,
           4678.1,
@@ -817,14 +1248,15 @@
           4242.0,
           4340.7,
           4361.8,
-          4434.9
+          4383.0,
+          4457.7
         ],
-        "seriesAsOf": "2026-08-11",
-        "seriesSource": "Yahoo Finance daily closes · GC=F · 3mo to 2026-08-11"
+        "seriesAsOf": "2026-08-12",
+        "seriesSource": "Yahoo Finance daily closes · GC=F · 3mo to 2026-08-12"
       },
       "facts": [
         {
-          "text": "Gold trades ~$4,396-4,400 (11-Aug), a two-month high, up from ~$4,100 in mid-July; the 29-Jan-2026 record was ~$5,598",
+          "text": "Gold trades ~$4,400 spot with December futures pushing ~$4,458 on Wednesday morning after a brief Tuesday profit-taking dip below $4,400 — extending the breakout from ~$4,100 in mid-July; still ~21% below the 29-Jan record (~$5,590)",
           "tag": "sourced"
         },
         {
@@ -863,7 +1295,7 @@
       "id": "silver-ratio-catchup",
       "direction": "long",
       "ownView": true,
-      "tradeStatement": "Own silver's catch-up with defined risk — a 3-month SLV call spread (~$66/$75, risking ~2% premium) or a silver-linked participation note: silver has run to ~$65.4-66.4 (+15.3% on the month, +75% YoY) and compressed the gold/silver ratio to ~66, and the desk's OWN read (flagged ownView — no named research driver was found this sweep) is that the verified debasement bid now broadening down the metals stack (gold $4,400 on official-sector flow) plus silver's industrial leg (grid/solar capex) keeps the ratio compressing — but a +15% month invites shakeouts, so spreads and notes, never naked length, and the position is Growth-bucket risk, not Preservation ballast.",
+      "tradeStatement": "Own silver's catch-up with defined risk — a 3-month SLV call spread (~$66/$75, risking ~2% premium) or a silver-linked participation note: silver sits ~$64.8 after a -2.7% Tuesday shakeout (still up ~14% on the month, ~+75% YoY) and compressed the gold/silver ratio to ~66, and the desk's OWN read (flagged ownView — no named research driver was found this sweep) is that the verified debasement bid now broadening down the metals stack (gold $4,400 on official-sector flow) plus silver's industrial leg (grid/solar capex) keeps the ratio compressing — but a +15% month invites shakeouts, so spreads and notes, never naked length, and the position is Growth-bucket risk, not Preservation ballast.",
       "intent": "add",
       "action": "Buy the catch-up, defined-risk",
       "preferredExpression": "Call spread",
@@ -880,7 +1312,7 @@
       },
       "naturalExpression": "Call spread",
       "headline": "Silver +15% on the month to ~$66, the gold/silver ratio down to ~66 — the desk's own call: the debasement bid is broadening down the metals stack; own it with spreads, not spot",
-      "thesis": "Silver is the sweep's honest anomaly: a verified, violent move — ~$65.4-66.4, +15.3% over the past month, +75% year-on-year, with the gold/silver ratio compressing to ~66 — for which the desk could NOT find a named research driver or a single attributable catalyst. Rather than borrow authority, the idea is flagged as the desk's own view (ownView), built from two verified adjacencies. First, the debasement bid is sourced and broadening: gold's breakout to $4,400 rests on dated official-sector flow (PBoC 19.9t in July, ETF re-inflows), and silver has historically caught that bid late and hard — the ratio at ~66 versus the 80s that prevailed through 2024-25 says the catch-up is running but not stretched by past-cycle standards. Second, silver's industrial half is tied to the sweep's most-verified theme: grid, solar and electrification capex (the AI-power build-out) is a structural demand leg gold does not have, and copper's quieter +6.6% month rhymes with it. The risk of a driver-less rally is that it reverses as fast — a +15% month in a metal with silver's leverage invites margin-driven shakeouts — so the expression is strictly defined-risk: a 3-month call spread (finances the rich skew) or a participation note, sized as Growth-bucket risk. If the ratio compresses toward the high 50s the trade has paid; if silver gives back half the monthly move the premium was the whole risk.",
+      "thesis": "Silver is the sweep's honest anomaly: a verified, violent move — ~$64.8 after a -2.7% Tuesday dip — still ~+14% over the past month, +75% year-on-year, with the gold/silver ratio compressing to ~66 — for which the desk could NOT find a named research driver or a single attributable catalyst. Rather than borrow authority, the idea is flagged as the desk's own view (ownView), built from two verified adjacencies. First, the debasement bid is sourced and broadening: gold's breakout to $4,400 rests on dated official-sector flow (PBoC 19.9t in July, ETF re-inflows), and silver has historically caught that bid late and hard — the ratio at ~66 versus the 80s that prevailed through 2024-25 says the catch-up is running but not stretched by past-cycle standards. Second, silver's industrial half is tied to the sweep's most-verified theme: grid, solar and electrification capex (the AI-power build-out) is a structural demand leg gold does not have, and copper's quieter +6.6% month rhymes with it. The risk of a driver-less rally is that it reverses as fast — a +15% month in a metal with silver's leverage invites margin-driven shakeouts — so the expression is strictly defined-risk: a 3-month call spread (finances the rich skew) or a participation note, sized as Growth-bucket risk. If the ratio compresses toward the high 50s the trade has paid; if silver gives back half the monthly move the premium was the whole risk.",
       "themeId": "gold",
       "offThemeWhy": null,
       "structures": [
@@ -942,14 +1374,14 @@
         ]
       },
       "macro": {
-        "metric": "Silver ~$65.4-66.4 · +15.3% m/m, +75% y/y · gold/silver ratio ~66 · copper +6.6% m/m",
+        "metric": "Silver ~$64.8 (-2.7% Tue shakeout) · +~14% m/m, +75% y/y · gold/silver ratio mid-60s · copper +6.6% m/m",
         "detail": "A 3-month SLV ~$66/$75 call spread (~2% premium) or a silver participation note — the desk's own catch-up call on the debasement bid broadening down the metals stack plus the electrification demand leg. Growth-bucket risk, defined premium, no naked spot. FLAGGED ownView: no named research driver was found for the move this sweep.",
         "source": "estimated",
         "watch": "The gold/silver ratio (compression toward high-50s = thesis paying; back above ~75 = squeeze over); gold's September macro window; any emerging named driver (exchange stocks, industrial buyer, mandate); copper as the electrification cross-check."
       },
       "facts": [
         {
-          "text": "Silver trades ~$65.4-66.4 (11-Aug, +1.1% d/d), up 15.3% over the past month and ~75% YoY; the gold/silver ratio has compressed to ~66",
+          "text": "Silver trades ~$64.8 (11-Aug close, -2.7% on the day — the first shakeout of the run), still up ~14% over the past month and ~75% YoY; the gold/silver ratio sits in the mid-60s",
           "tag": "sourced"
         },
         {
@@ -1101,130 +1533,10 @@
       ]
     },
     {
-      "id": "lock-yields",
-      "direction": "long",
-      "intent": "income",
-      "tradeStatement": "Keep locking quality yield — intermediate Treasuries/IG at ~4.4-4.7% via a bond ladder, or a fixed-coupon note for the structured sleeve — because the first genuine labor crack (-23k July payrolls, participation at a 5-year low) just gave duration back its INSURANCE value while the hawkish tail (9-3 Fed hold, three hike dissents, 30Y ~5.2% on oil-passthrough fear) keeps entry yields near cycle highs: you are paid ~4.7% at the 10-year point to hold ballast that finally has a recession scenario to hedge, with tomorrow's July CPI the gate — a hot print re-prices the September hike and cheapens the entry further (add tranche two), a cool print starts the rally you were paid to wait for.",
-      "action": "Ladder in / add on backups",
-      "preferredExpression": "Bond ladder",
-      "name": "Quality carry — get paid to wait",
-      "ticker": "",
-      "sector": "Rates",
-      "assetClass": "Fixed Income",
-      "bucket": "Income",
-      "goalType": "yield",
-      "riskProfile": {
-        "vol": "low",
-        "beta": "low",
-        "structured": false
-      },
-      "naturalExpression": "Bond ladder",
-      "headline": "-23k payrolls gave duration its insurance value back while three Fed dissents and 5.2% thirty-years keep the entry cheap — ~4.7% quality carry with a recession hedge attached, CPI tomorrow the gate",
-      "thesis": "The quality-carry case just acquired the thing it lacked all year: a live downside scenario for duration to insure. July payrolls printed -23,000 — the cycle's first contraction, with -103k of revisions, unemployment falling to 4.1% only via a 61.4% participation rate (a 5-year low) and wages at +3.2%, the slowest since May-2021. The front end responded instantly (2Y ~4.19%, September-hike odds from ~62% to ~40-50%); the long end did NOT — the 10Y backed up to ~4.65-4.70% and the 30Y to ~5.2% on oil-passthrough fear (household 1-year expectations still 4.2%), heavy auction supply ($125bn of 3s/10s/30s this week) and a Fed whose 29-Jul hold carried three hawkish dissents. That divergence IS the entry: intermediate quality paper pays ~4.4-4.7% while the growth data has started doing what finally makes bonds hedge equities again. The desk's long-standing framing — carry and ballast, not a rally bet — gets a sharpened tactical overlay: tomorrow's July CPI is the gate. Hot (oil passthrough showing): the September hike re-prices, yields back up, and the ladder adds its second tranche at better levels — the plan, not the failure. Cool: the labor crack becomes the story, the front-end rally extends out the curve, and the carry position gains its first capital kicker. Either branch pays the patient holder; only re-accelerating inflation WITH re-accelerating growth (the 2022 configuration) hurts both legs, and -23k payrolls argues against the growth half. Scott's ladder, Jacob's liability-matching sleeve and every cash-heavy book are the natural fits; the 20-year 2.0% Treasury lesson (Scott's -24% position) is why the desk ladders 2-7 years rather than buying the long bond's 5.2% headline.",
-      "themeId": "duration",
-      "offThemeWhy": null,
-      "structures": [
-        "Bond ladder",
-        "Govt / IG bonds",
-        "Fixed-coupon note",
-        "Callable note"
-      ],
-      "variant": {
-        "street": "Consensus is paralysed between the hike tail and the labor crack — positioning for September rather than owning the carry",
-        "us": "Both branches of the CPI gate pay a laddered holder (hot = better entry for tranche two, cool = capital kicker on top of carry) — the desk owns the carry now instead of forecasting the branch",
-        "gap": "The street trades the September meeting; the desk buys the ~4.7% intermediate yield the meeting-trading keeps on offer, with the first sourced recession signal as the free option"
-      },
-      "changeMyMind": "Re-accelerating inflation WITH re-accelerating growth — an upside CPI surprise alongside payrolls bouncing back above trend — is the one configuration that hurts carry and ballast together; a Warsh Jackson Hole speech that guides real rates structurally higher would also reset the entry math.",
-      "conviction": {
-        "pillars": [
-          {
-            "key": "asymmetry",
-            "score": 2,
-            "dq": "sourced",
-            "note": "Both CPI branches pay the position (cheaper second tranche vs capital kicker) while ~4.7% carry accrues — an unusual two-sided setup for a low-vol sleeve, grounded in sourced yield levels."
-          },
-          {
-            "key": "catalyst",
-            "score": 2,
-            "dq": "sourced",
-            "note": "Dated stack: July CPI 12-Aug, PPI 13-Aug, minutes 19-Aug, Jackson Hole 28-Aug, FOMC 15-16-Sep — the September fulcrum is the sleeve's explicit gate."
-          },
-          {
-            "key": "consensus",
-            "score": 1,
-            "dq": "sourced",
-            "note": "The street is split (that is the point) — no aligned sell-side leg, but the independent confirmation (front-end rally, -23k print) supports the carry case; one leg."
-          },
-          {
-            "key": "thesis",
-            "score": 2,
-            "dq": "sourced",
-            "note": "Quantified drivers (2Y 4.19, 10Y 4.65-4.70, 30Y ~5.2, -23k/-103k, participation 61.4%) and a computable variant — own the carry through the branch the street keeps trading."
-          },
-          {
-            "key": "houseview",
-            "score": 2,
-            "dq": "sourced",
-            "note": "The desk's Core Fixed Income theme — extend duration for carry and ballast — directly expressed, now with the insurance leg live."
-          },
-          {
-            "key": "positioning",
-            "score": 1,
-            "dq": "estimated",
-            "note": "Heavy auction supply is the technical headwind and asset-manager duration positioning is unreadable this pass — neutral, honestly estimated."
-          },
-          {
-            "key": "technical",
-            "score": 1,
-            "dq": "estimated",
-            "note": "The 10Y sits mid-range of its multi-month band with the trend contested — mixed; rates symbols don't resolve on the equity scanner, stays estimated by design."
-          }
-        ]
-      },
-      "macro": {
-        "metric": "2Y ~4.19% · 10Y ~4.65-4.70% · 30Y ~5.2% · payrolls -23k / participation 61.4% · Sept-hike odds ~40-50%",
-        "detail": "Ladder intermediate quality paper (2-7yr Treasuries/IG, ~4.4-4.7%) with tranche two reserved for a hot-CPI backup; fixed-coupon notes for the structured sleeve. The labor crack restores the hedge value; the hawkish tail keeps the entry cheap. Not the long bond — the 5.2% headline carries the oil-passthrough and supply risk the ladder deliberately avoids.",
-        "source": "sourced",
-        "watch": "July CPI (12-Aug) then PPI/retail sales; the 19-Aug minutes for the dissent logic; Warsh at Jackson Hole (28-Aug); auction tails at the 10Y/30Y sales; whether payrolls revisions deepen the labor crack."
-      },
-      "facts": [
-        {
-          "text": "July payrolls fell 23,000 (cons. +83k) with -103k revisions; unemployment 4.1% via participation falling to 61.4% (5-year low); AHE +3.2% YoY, slowest since May-2021 — the cycle's first labor contraction (released 7-Aug)",
-          "tag": "sourced"
-        },
-        {
-          "text": "The Fed held 3.50-3.75% on 29-Jul at 9-3 with Hammack, Kashkari and Logan dissenting for +25bp; September-hike odds fell from ~62% (4-Aug) to ~40-50% post-jobs; July CPI lands 12-Aug (cons. ~3.4% headline / 2.5% core)",
-          "tag": "sourced"
-        },
-        {
-          "text": "The curve diverged: 2Y ~4.19-4.20% rallied on the labor print while the 10Y backed up to ~4.65-4.70% and the 30Y to ~5.19-5.25% on oil-passthrough fear and $125bn of 3s/10s/30s supply this week; 1-year household inflation expectations remain 4.2%",
-          "tag": "sourced"
-        }
-      ],
-      "sources": [
-        {
-          "name": "BLS / CNBC / Indeed Hiring Lab (July jobs report, 7-Aug)",
-          "kind": "data"
-        },
-        {
-          "name": "Federal Reserve statement + Warsh presser transcript 29-Jul / CNBC (9-3 hold, dissents, 'conditions not forecasts')",
-          "kind": "data"
-        },
-        {
-          "name": "Forbes Advisor / Trading Economics / CNBC (2Y/10Y/30Y levels, auction supply, Sept odds)",
-          "kind": "data"
-        },
-        {
-          "name": "Newsquawk / Kiplinger / CNBC (July CPI consensus and 12-Aug date)",
-          "kind": "calendar"
-        }
-      ]
-    },
-    {
       "id": "rate-range-accrual",
       "direction": "neutral",
       "intent": "income",
-      "tradeStatement": "Re-strike the 10-year range-accrual for the September window — a 6-month USD range-accrual note (BREN-style) paying an enhanced coupon for every day the 10Y Treasury yield fixes inside 4.25-5.00% — because the pin that pays the structure is now explicit and two-sided: the cycle's first labor contraction (-23k payrolls) anchors the rally branch while three Fed hike-dissents, 4.2% household inflation expectations, the oil passthrough and $125bn auction weeks cap the sell-off branch below the 30Y's ~5.2%; the desk's proven 5%-ceiling / boxed-range read carries, with July CPI (tomorrow), the minutes, Jackson Hole and the September FOMC as the accrual window's live tests — income for a range view, capital at risk only to a decisive break.",
+      "tradeStatement": "Re-strike the 10-year range-accrual for the September window — a 6-month USD range-accrual note (BREN-style) paying an enhanced coupon for every day the 10Y Treasury yield (now ~4.73%) fixes inside 4.25-5.00% — because the pin that pays the structure is now explicit and two-sided: the cycle's first labor contraction (-23k payrolls) anchors the rally branch while three Fed hike-dissents, 4.2% household inflation expectations, the oil passthrough and $125bn auction weeks cap the sell-off branch below the 30Y's ~5.2%; the desk's proven 5%-ceiling / boxed-range read carries, with July CPI (tomorrow), the minutes, Jackson Hole and the September FOMC as the accrual window's live tests — income for a range view, capital at risk only to a decisive break.",
       "action": "Earn the range",
       "preferredExpression": "Range accrual (BREN)",
       "name": "10Y range accrual",
@@ -1240,7 +1552,7 @@
       },
       "naturalExpression": "Range accrual (BREN)",
       "headline": "The 10Y is pinned from both sides — a labor crack below, an oil-passthrough Fed above; a 4.25-5.00% range accrual turns the September stalemate into coupon",
-      "thesis": "The range thesis the desk has run since June now has both walls verified. The floor: July payrolls at -23,000 with participation at a 5-year low anchors the front end (2Y ~4.19%) and puts a genuine growth-scare bid under duration — a decisive break of 4.25% on the 10Y needs recession confirmation the data has only begun to hint at. The ceiling: the 29-Jul FOMC held with THREE dissents for a hike, household 1-year inflation expectations sit at 4.2%, Barclays argues the oil passthrough 'still isn't over' with Brent back at ~$88, and the Treasury is running $125bn coupon-auction weeks — yet even with all of that, the 10Y has repeatedly failed to sustain above ~4.7% and the desk's long-standing 5% ceiling has held every test since June. Result: the 10Y at ~4.65-4.70% sits mid-band in a 4.25-5.00% corridor with powerful, NAMED forces defending each side. A 6-month range accrual monetises exactly that stalemate — an enhanced coupon accrues each day the 10Y fixes inside the corridor, and the September catalyst stack (CPI tomorrow, PPI Thursday, minutes 19-Aug, Warsh's Jackson Hole keynote 28-Aug, FOMC 15-16-Sep) is precisely the sequence of two-sided tests the structure is paid to survive. The honest risk is a REGIME break, not a data wobble: a hiking Fed that follows through (both walls move up) or a recession confirmation (both walls move down) ends the range — which is why the note is sized in the Income sleeve alongside, not instead of, the directional carry ladder.",
+      "thesis": "The 10Y sits ~4.65-4.70%, mid-band in a 4.25-5.00% corridor with powerful, named forces defending each side. The floor: payrolls at -23k with participation at a 5-year low anchors the front end (2Y ~4.19%) — a decisive break below 4.25% needs recession confirmation the data has only begun to hint at. The ceiling: three FOMC dissents for a hike, household 1-year inflation expectations at 4.2%, Brent near $88 keeping the oil passthrough live, and $125bn coupon-auction weeks — yet the 10Y keeps failing to sustain above ~4.7% and the 5% ceiling has held every test. A 6-month range-accrual note (BREN-style) monetises exactly that stalemate: an enhanced coupon accrues each day the 10Y fixes inside the corridor, and the September catalyst stack — CPI today, PPI tomorrow, minutes 19-Aug, Warsh at Jackson Hole 28-Aug, FOMC 15-16-Sep — is the sequence of two-sided tests the structure is paid to survive. The honest risk is a REGIME break, not a data wobble: a Fed that actually hikes with follow-through, or a labor crack that deepens into confirmed recession, ends the range — which is why the note sits in the Income sleeve as a defined-outcome position, not a leveraged rates bet.",
       "themeId": "duration",
       "offThemeWhy": null,
       "structures": [
@@ -1301,14 +1613,14 @@
         ]
       },
       "macro": {
-        "metric": "10Y ~4.65-4.70% mid-band · corridor 4.25-5.00% · floor: -23k payrolls · ceiling: 3 hike dissents + 4.2% expectations + $125bn auction weeks",
+        "metric": "10Y ~4.73% upper-mid-band · corridor 4.25-5.00% · floor: -23k payrolls · ceiling: 3 hike dissents + 4.2% expectations + supply",
         "detail": "A 6-month USD range accrual (BREN-style) on the 10Y fixing inside 4.25-5.00% — enhanced daily-accrual coupon for the September stalemate, sized in the Income sleeve alongside the carry ladder. The corridor is re-struck from the July sweep's tighter band to respect the post-jobs front-end rally and the 30Y's 5.2% supply pressure.",
         "source": "sourced",
         "watch": "Each fixing through the catalyst stack (CPI 12-Aug -> FOMC 15-16-Sep); auction tails; whether the 10Y's ~4.7% rejection pattern or the 4.25% floor gives first; the 30Y as the early-warning wall."
       },
       "facts": [
         {
-          "text": "The 10Y trades ~4.65-4.70% (10-Aug, a month high on oil and $125bn of 3s/10s/30s supply this week), mid-band between the post-jobs front-end rally (2Y ~4.19%) and the 30Y's ~5.19-5.25%",
+          "text": "The 10Y trades ~4.73% (11-Aug), upper-mid-band on oil and $125bn of 3s/10s/30s supply this week, between the post-jobs front-end anchor (2Y ~4.22%) and the 30Y's ~5.24%",
           "tag": "sourced"
         },
         {
@@ -1359,7 +1671,7 @@
       },
       "naturalExpression": "Put spread",
       "headline": "VIX 15 against a record tape, a -23k payrolls print and a five-week catalyst stack into a two-sided September — index protection is still priced for a quiet summer that already ended",
-      "thesis": "The convexity case has survived every version of this tape, and the current version is its strongest. Price of insurance: VIX 15.46 Monday (14.90 Friday) — the complacency zone — with the S&P at 7,728, two days off its 25th record close of the year (7,757.64, 7-Aug). Against that: the macro has produced its first genuine crack (July payrolls -23,000, revisions -103k, participation 61.4% — a 5-year low; wages at a 5-year-slowest +3.2%), the inflation side is NOT resolved (Brent ~$88 keeps the oil passthrough live, household 1-year expectations at 4.2%, three FOMC members dissenting for hikes), and the event calendar is the densest of the year: July CPI tomorrow — Morgan Stanley's Zentner calls it 'the deciding factor' — PPI Thursday, retail sales Friday, minutes 19-Aug, NVDA 26-Aug (the AI complex's single-name event risk), Warsh's first Jackson Hole keynote 28-Aug, and a September FOMC the market cannot decide is a hike or a hold (~40-50% priced, swinging 20 points a week). Earnings season demonstrated exactly what an air pocket looks like at these valuations: Alphabet -5%, Meta -10%, Apple -8.6%, IBM -25%, Netflix -9% — single prints erasing $200-400bn — and Moontower's 22-Jul 'Cracks in the Singularity Trade?' articulated the crowding fragility just as Tokyo and Seoul corrected (Nikkei -11.4% from its June record; KOSPI's -8.95% crash day and a 25%-in-37-days margin unwind). The trade is unchanged in form and cheaper in substance: a ~5%-out put spread for a defined sub-1% premium hedges the September repricing scenario across every book running at record equity marks, and rolls cheaply while the VIX stays anchored. The desk holds it as PROTECTION (Preservation bucket) — it is the one idea on the board that is supposed to expire worthless in the good scenario.",
+      "thesis": "Price of insurance: VIX ~15 with the S&P two sessions off its 25th record close of the year. Against that: the cycle's first labor contraction (-23k payrolls, participation at a 5-year low), an unresolved inflation side (Brent ~$88, household expectations 4.2%, three FOMC hike-dissents), and the year's densest event calendar — CPI today ('the deciding factor' per Morgan Stanley's Zentner), PPI tomorrow, retail sales Friday, minutes 19-Aug, NVDA 26-Aug, Warsh's first Jackson Hole keynote 28-Aug, and a September FOMC the market can't decide is a hike or a hold. Earnings season keeps demonstrating what an air pocket looks like at these valuations — Alphabet -5%, Meta -10%, Apple -8.6%, IBM -25%, Netflix -9%, each a $200-400bn single-print repricing — and Asia has shown the index version (an -11% Nikkei correction, a KOSPI crash day, margin debt unwinding 25% in 37 days per TSCS's tracker). A ~5%-out 2-3 month put spread costs well under 1% and hedges the September repricing scenario across books running at record marks; it rolls cheaply while the VIX stays anchored, and it is the one position on the board that is SUPPOSED to expire worthless in the good branch. Take profit on a VIX repricing toward 20+ even without an index break.",
       "themeId": "resilience",
       "offThemeWhy": null,
       "structures": [
@@ -1421,14 +1733,14 @@
         ]
       },
       "macro": {
-        "metric": "S&P 7,728 (record 7,757.64 on 7-Aug) · VIX 15.46 / 14.90 Fri · payrolls -23k · Sept FOMC ~40-50% priced · five-week catalyst stack",
+        "metric": "S&P 7,728 (record 7,757.64 on 7-Aug) · VIX ~15.3 · payrolls -23k · Sept FOMC ~32-36% priced · CPI today",
         "detail": "Buy a 2-3 month SPX put spread ~5% OTM (e.g. 7,350/6,950) for a defined sub-1% premium; roll while vol stays anchored. Protection-bucket sizing across books at record equity marks — the hedge is supposed to die worthless in the good branch. Take profit on a VIX repricing toward 20+ even without an index break.",
         "source": "sourced",
         "watch": "July CPI (12-Aug) and the full macro stack; NVDA 26-Aug as the AI-complex single-name tail; Warsh 28-Aug; whether the VIX's 15-handle survives the first hot print; Hormuz escalation as the exogenous tail."
       },
       "facts": [
         {
-          "text": "The S&P closed 7,728.20 on 10-Aug, two sessions off its record 7,757.64 (7-Aug, the 25th ATH of the year); the VIX closed 15.46 Monday and 14.90 Friday — the complacency zone — down from ~16.5 in mid-July",
+          "text": "The S&P closed 7,728.20 on Tuesday (-0.32%, a second small step back from the record 7,757.64 of 7-Aug, the 25th ATH of the year) with the VIX ~15.3 — the complacency zone — into today's CPI",
           "tag": "sourced"
         },
         {
@@ -1481,7 +1793,7 @@
       },
       "naturalExpression": "FX forward / collar",
       "headline": "DXY sub-100 with the US Treasury itself selling dollars and every other G4 bank tilted hawkish — the post-peak turn is running; raise hedge ratios on the USD-concentrated books",
-      "thesis": "The desk added this hedge when the dollar's turn was a hypothesis; the past month made it a policy fact. DXY sits ~99.8 — its weakest since early June, extending the slide from ~101 in mid-July — and the drivers are structural rather than a single print. The rate story flipped: July payrolls at -23k cut September-hike odds from ~62% toward 40-50%, while the ECB holds a live September-hike option (July HICP 2.9%, Q2 GDP double consensus), the BoE's three dissents were all for HIKES, and the BoJ has a September hike >60% priced — the Fed is the only G4 bank whose next move might be nothing. Then the historic part: on 31-Jul the US TREASURY jointly intervened with Japan's MoF to buy yen — the first coordinated operation since 1998, confirmed by both governments, with Bessent promising more if needed. A US administration actively selling dollars to defend a foreign currency's floor is as clear a regime signal as FX policy produces. For the books this is not a trade but an exposure repair: Aurora runs 72% USD against an EUR base — an unmanaged short-EUR position the client never chose — and the overlay (forwards, or zero-cost collars that give away part of any dollar rebound to floor the mismatch) simply bounds it. The desk's discipline distinguishes this STRATEGIC overlay from the TACTICAL upside trades: EUR/USD at ~1.154 and cable at ~1.350 remain below their 1.17/1.355 triggers, so the directional call-spread ideas stay held back — but hedging an existing mismatch never needed a breakout, only the regime confirmation it now has. Retail complication intact: collars are OTC, so Aurora's version routes via reclassification or a currency-hedged share-class conversion — the suppression the mapping engine surfaces is the conversation.",
+      "thesis": "DXY sits ~99.8 — its weakest since early June — and the drivers are policy facts, not a single print: September-hike odds cut toward 40-50% by the payrolls contraction, an ECB with a live September-hike option, a BoE whose three dissents all voted for hikes, a BoJ with September >60% priced — and a US Treasury that jointly SOLD dollars with Japan's MoF on 31-Jul, the first coordinated operation since 1998. The Fed is the only G4 bank whose next move might be nothing, and the US administration is demonstrably willing to sell its own currency. For the books this is exposure repair, not a trade: Aurora runs 72% USD against an EUR base — an unmanaged short-EUR position the client never chose — and 6-12 month forwards or zero-cost collars (sell USD/buy EUR on ~a third of it, collared ~1.13-1.20) simply bound the mismatch. The discipline line: the tactical EUR and GBP upside trades stay separately gated at 1.17/1.355 — hedging an existing mismatch needs no breakout, only the regime confirmation it now has. Collars are OTC, so Aurora's version routes via reclassification or a currency-hedged share-class conversion — the suppression the engine surfaces IS the conversation.",
       "themeId": "gold",
       "offThemeWhy": null,
       "structures": [
@@ -1531,11 +1843,11 @@
             "key": "positioning",
             "score": 1,
             "dq": "estimated",
-            "note": "Dollar shorts have grown but the move's persistence suggests they are not yet extreme; mixed, no CFTC read this pass. RSI 40 (neutral).",
+            "note": "Dollar shorts have grown but the move's persistence suggests they are not yet extreme; mixed, no CFTC read this pass. RSI 41 (neutral).",
             "authoredNote": "Dollar shorts have grown but the move's persistence suggests they are not yet extreme; mixed, no CFTC read this pass.",
             "indicators": {
-              "rsi": 40.0,
-              "asOf": "2026-08-11 22:39 UTC",
+              "rsi": 41.4,
+              "asOf": "2026-08-12 04:42 UTC",
               "symbol": "TVC:DXY",
               "direction": "neutral"
             }
@@ -1544,19 +1856,19 @@
             "key": "technical",
             "score": 2,
             "dq": "sourced",
-            "note": "Price 99.81 vs SMA50/100/200 100.6/99.74/99.18 (2/3 above), RSI 40, mid-band. Tape is sideways, calm/range-bound — supports holding the range. [sourced: TradingView]",
+            "note": "Price 99.88 vs SMA50/100/200 100.6/99.75/99.18 (2/3 above), RSI 41, mid-band. Tape is sideways, calm/range-bound — supports holding the range. [sourced: TradingView]",
             "authoredNote": "DXY in a confirmed downtrend at two-month lows below round-number support — the trend agrees with the hedge's direction; authored estimated pending the scan.",
             "indicators": {
               "symbol": "TVC:DXY",
-              "asOf": "2026-08-11 22:39 UTC",
-              "close": 99.812,
-              "sma50": 100.5908,
-              "sma100": 99.7447,
+              "asOf": "2026-08-12 04:42 UTC",
+              "close": 99.88,
+              "sma50": 100.5974,
+              "sma100": 99.7472,
               "sma200": 99.1836,
-              "rsi": 40.0,
-              "bbUpper": 101.8678,
-              "bbLower": 99.1731,
-              "recommendMA": -0.357,
+              "rsi": 41.4,
+              "bbUpper": 101.8657,
+              "bbLower": 99.1137,
+              "recommendMA": -0.214,
               "direction": "neutral",
               "directionSource": "explicit"
             }
@@ -1606,7 +1918,7 @@
       "id": "fx-carry-income",
       "direction": "neutral",
       "intent": "income",
-      "tradeStatement": "The FX carry regime CRACKED — the first joint US-Japan yen intervention since 1998 plus a BoJ with a September hike >60% priced makes short-yen funding the crowded trade with a policy hammer over it — so rotate the income sleeve's dual-currency deposits OFF yen-funding: write 1-3 month DCDs on EUR/USD (strike ~1.13, yielding an enhanced USD coupon against conversion risk into a currency the desk is happy holding per the hedge overlay) or GBP/USD (~1.32 strike), sized down a notch overall because FX vol is bid — the coupon is richer, but so is the chance of conversion; this is income for currencies you would own anyway, never a carry bet against a hiking central bank with the Treasury on its side.",
+      "tradeStatement": "Rotate the dual-currency income sleeve off yen-funding and make it concrete: write a 1-month EUR/USD DCS — deposit USD, strike 1.1300 (~2% below spot 1.154), indicative coupon ~8-10% p.a. (options-desk estimate on the bid vol surface) — and a 1-month GBP/USD DCS struck 1.3200 (~2.2% below 1.350, similar coupon): above the strike at expiry you keep the enhanced USD coupon; below it you convert into EUR/GBP at the strike — currencies the dollar-hedge overlay wants the books holding anyway. NO JPY-side strikes at any coupon: a hiking BoJ (September >60% priced) plus a demonstrated two-government intervention floor makes short-yen income a tail-risk trade. Sleeve sized down a notch — the bid vol that fattens the coupon is the same vol that raises conversion odds.",
       "action": "Rotate the DCD pairs",
       "preferredExpression": "Dual-currency deposit",
       "name": "FX carry & dual-currency income",
@@ -1622,7 +1934,7 @@
       },
       "naturalExpression": "Dual-currency deposit",
       "headline": "The yen-carry era just met a coordinated policy hammer — rotate dual-currency income off JPY-funding into EUR/GBP strikes you would happily be converted into",
-      "thesis": "For two years the sleeve's easiest income was implicitly short yen — wide differentials made JPY-funded DCDs and yen-side strikes the richest coupons on the menu. That regime cracked in one week: USD/JPY's 163.73 spike was answered by the first COORDINATED US-Japan yen purchase since 1998 (31-Jul, both governments confirmed, Bessent explicitly open to more), the BoJ held at 1.00% with Ueda all but signalling September (>60% priced, one board member arguing the market underprices the PACE of hikes), and the 10-year JGB touched 2.90% — a 28-year high. Selling yen vol or funding in yen now means standing against a hiking central bank AND two finance ministries with a demonstrated $59bn-scale hammer; the desk's own tactical book is LONG yen downside-in-USD/JPY (tac-usdjpy-puts) — the income sleeve cannot be short the same move. The rotation, not the retirement, of the strategy: FX vol is bid across G4 (the intervention, the September cluster), which makes DCD coupons rich — the honest way to harvest that is on pairs where CONVERSION IS ACCEPTABLE. EUR/USD DCDs struck ~1.13: if spot stays up you keep an enhanced USD coupon; if the dollar rebounds through 1.13 you convert into EUR — which the hedge overlay (fx-usd-hedge) wants Aurora holding anyway. GBP/USD at a ~1.32 strike works identically against a BoE whose dissents all point at hikes. Size down a notch: a bid vol surface pays more coupon precisely because conversion probabilities rose. DCDs are OTC — Professional books (Fable, Amar, Jacob, Mitch) take them directly; Retail books route to fixed-coupon note equivalents; the suppression reads are the compliance conversation, as designed.",
+      "thesis": "The carry regime's yen leg is broken as an income source: the BoJ holds at 1.00% with September >60% priced (one board member flagging a FASTER pace than markets assume), the 10y JGB is at a 28-year high, and the 31-Jul joint US-Japan intervention put a demonstrated ~$59bn-scale hammer over short-yen positioning — the desk's own tactical book is long yen downside, and the income sleeve cannot be short the same move. The rotation is concrete, not conceptual. EUR/USD 1-month DCS: deposit USD, strike 1.1300 (~2% below spot ~1.154), indicative coupon ~8-10% p.a. (estimated — G4 vol is bid, which is what fattens the coupon); at expiry, spot above 1.13 pays the coupon in USD, spot below converts the deposit into EUR at 1.13 — an outcome the dollar-hedge overlay actively wants for the EUR-base and USD-heavy books. GBP/USD version: strike 1.3200 against ~1.350 spot, same logic, backed by a BoE whose dissents all point at hikes (sub-1.32 cable is a level to own while that holds). The sleeve runs a notch smaller than usual: conversion probabilities rose with the same vol that enriched the coupons, and DCS positions are OTC — Professional books (Fable, Amar, Jacob, Mitch) take them directly; Retail books route to the fixed-coupon-note equivalent. The kill switch: a September BoJ blink plus USD/JPY re-breaking 163 unpunished would reopen yen-funding — until then the sleeve earns its coupons where conversion is a feature, not a casualty.",
       "themeId": "gold",
       "offThemeWhy": null,
       "structures": [
@@ -1672,11 +1984,11 @@
             "key": "positioning",
             "score": 2,
             "dq": "estimated",
-            "note": "The yen-funded carry crowd is demonstrably offside a hiking BoJ + intervention floor — the rotation trades AGAINST that crowd's forced unwind; estimated (no CFTC read). RSI 60 (neutral).",
+            "note": "The yen-funded carry crowd is demonstrably offside a hiking BoJ + intervention floor — the rotation trades AGAINST that crowd's forced unwind; estimated (no CFTC read). RSI 59 (neutral).",
             "authoredNote": "The yen-funded carry crowd is demonstrably offside a hiking BoJ + intervention floor — the rotation trades AGAINST that crowd's forced unwind; estimated (no CFTC read).",
             "indicators": {
-              "rsi": 59.9,
-              "asOf": "2026-08-11 22:39 UTC",
+              "rsi": 58.8,
+              "asOf": "2026-08-12 04:42 UTC",
               "symbol": "FX_IDC:EURUSD",
               "direction": "neutral"
             }
@@ -1685,19 +1997,19 @@
             "key": "technical",
             "score": 2,
             "dq": "sourced",
-            "note": "Price 1.154 vs SMA50/100/200 1.147/1.157/1.163 (1/3 above), RSI 60, mid-band. Tape is sideways, calm/range-bound — supports holding the range. [sourced: TradingView]",
+            "note": "Price 1.154 vs SMA50/100/200 1.147/1.157/1.163 (1/3 above), RSI 59, mid-band. Tape is sideways, calm/range-bound — supports holding the range. [sourced: TradingView]",
             "authoredNote": "Range/carry construct — trend alignment is meaningless; scored on tape-calm: G4 FX is orderly but vol-bid, mixed for range products. Authored estimated.",
             "indicators": {
               "symbol": "FX_IDC:EURUSD",
-              "asOf": "2026-08-11 22:39 UTC",
-              "close": 1.1542,
-              "sma50": 1.1466,
+              "asOf": "2026-08-12 04:42 UTC",
+              "close": 1.1535,
+              "sma50": 1.1465,
               "sma100": 1.1566,
               "sma200": 1.1629,
-              "rsi": 59.9,
-              "bbUpper": 1.1606,
+              "rsi": 58.8,
+              "bbUpper": 1.1605,
               "bbLower": 1.1333,
-              "recommendMA": 0.357,
+              "recommendMA": 0.214,
               "direction": "neutral",
               "directionSource": "explicit"
             }
@@ -1794,7 +2106,6 @@
         "symbol": "JPY=X",
         "range": "3mo",
         "series": [
-          156.86,
           157.23,
           157.67,
           157.85,
@@ -1861,13 +2172,13 @@
           158.41,
           157.89,
           159.16,
-          159.27
+          159.4
         ],
-        "seriesAsOf": "2026-08-11",
-        "seriesSource": "Yahoo Finance daily closes · JPY=X · 3mo to 2026-08-11"
+        "seriesAsOf": "2026-08-12",
+        "seriesSource": "Yahoo Finance daily closes · JPY=X · 3mo to 2026-08-12"
       },
-      "headline": "The gate finally opens: 163.73 rejected by the first joint US-Japan intervention since 1998, a BoJ hike >60% priced for September — buy the 158/152 put spread against the 160.50 invalidation",
-      "thesis": "Discipline first: this idea sat in the payload UNTRIGGERED through four sweeps because the desk's stated condition — a confirmed lower high — never printed while the pair ground from 158 to 162. The condition has now been met in the most emphatic way FX policy allows. On 30-Jul USD/JPY spiked to 163.73; Tokyo intervened that night alongside a US 'rate check', and on 31-Jul Japan's MoF and the US TREASURY jointly bought yen — the first coordinated operation since 1998, confirmed on the record by both governments (Katayama: 'close communication with counterparts'; Bessent: 'will not hesitate to participate in further joint intervention'), with ~$59bn equivalent implied by BoJ current-account data (single-sourced, estimated). The pair broke to ~157.6 and now drifts ~159.3. The structural leg: the BoJ held 1.00% at 8-1 with Ueda strongly signalling September (>60% priced), the 10-Aug Summary of Opinions carried a member arguing markets underprice the PACE of hikes, and the 10y JGB touched 2.90% — a 28-year high. The pair is therefore capped by a demonstrated two-government sell wall at ~160-163.7 while its rate-differential foundation erodes on a dated schedule. am/FX (10-Aug) frames the post-intervention range as 152.50/160.50 — the trade shorts the top half of that range with the spread's long strike just below spot and the short strike at the floor. The honest risks price the structure: intervention effects decay (spot is already drifting back toward 160 on the Mountain Day holiday lull), a hot US CPI tomorrow lifts US yields and the pair with them, and a BoJ blink in September breaks the whole case — hence a premium-capped spread with a hard 160.50 invalidation rather than spot shorts against two months of carry bleed.",
+      "headline": "USD/JPY ~159.3 under a two-government sell wall with a >60%-priced September BoJ eroding the differential — 158/152 put spread, invalidation above 160.50",
+      "thesis": "USD/JPY ~159.3 is a pair capped by a demonstrated two-government sell wall while its rate-differential foundation erodes on a dated schedule. The cap: the 163.73 spike was answered by MoF intervention and then the first COORDINATED US-Japan yen purchase since 1998 (31-Jul, both governments on the record; ~$59bn equivalent implied), and the market now treats 160 as the re-intervention line. The erosion: the BoJ has September >60% priced, the 10-Aug Summary of Opinions carries a member arguing markets underprice the PACE of hikes, and the 10y JGB is at a 28-year high. am/FX frames the post-intervention range at 152.50/160.50 — the trade shorts the top half of it: a 6-8 week 158/152 put spread for ~0.9-1.2%, long strike just below spot, short strike at the range floor, invalidation on two daily closes above 160.50. The risks price the structure rather than kill it: intervention effects decay (spot drifts toward 160 on thin holiday liquidity), a hot US CPI today lifts the pair — toward a better entry, and toward the invalidation, which is why the premium is capped — and a September BoJ blink breaks the case outright. Defined premium against a policy vector that points one way.",
       "themeId": null,
       "offThemeWhy": "Tactical, event-driven FX trade around a specific policy sequence (intervention + BoJ September) — short-dated and defined-risk, not a standing desk theme.",
       "structures": [
@@ -1918,11 +2229,11 @@
             "key": "positioning",
             "score": 2,
             "dq": "estimated",
-            "note": "The yen-carry crowd remains short yen against a hiking BoJ and a two-government floor — the crowd is offside THIS trade's direction, which is the fuel; no CFTC print read this pass, hence estimated. RSI 43 — no sentiment extreme. [sourced: TradingView].",
+            "note": "The yen-carry crowd remains short yen against a hiking BoJ and a two-government floor — the crowd is offside THIS trade's direction, which is the fuel; no CFTC print read this pass, hence estimated. RSI 44 — no sentiment extreme. [sourced: TradingView].",
             "authoredNote": "The yen-carry crowd remains short yen against a hiking BoJ and a two-government floor — the crowd is offside THIS trade's direction, which is the fuel; no CFTC print read this pass, hence estimated.",
             "indicators": {
-              "rsi": 43.0,
-              "asOf": "2026-08-11 22:39 UTC",
+              "rsi": 43.9,
+              "asOf": "2026-08-12 04:42 UTC",
               "symbol": "FX_IDC:USDJPY",
               "direction": "short"
             }
@@ -1931,18 +2242,18 @@
             "key": "technical",
             "score": 2,
             "dq": "sourced",
-            "note": "Price 159.3 vs SMA50/100/200 161.1/160/158.1 (1/3 above), RSI 43, mid-band. Trend confirms the short. [sourced: TradingView]",
+            "note": "Price 159.4 vs SMA50/100/200 161.1/160/158.1 (1/3 above), RSI 44, mid-band. Trend confirms the short. [sourced: TradingView]",
             "authoredNote": "Lower high confirmed at 163.73 with spot below 160, but the near-term drift is UP toward 160 on holiday liquidity — trend mixed at entry; authored estimated pending the scan.",
             "indicators": {
               "symbol": "FX_IDC:USDJPY",
-              "asOf": "2026-08-11 22:39 UTC",
-              "close": 159.27,
-              "sma50": 161.1162,
-              "sma100": 159.9637,
-              "sma200": 158.1211,
-              "rsi": 43.0,
-              "bbUpper": 165.8265,
-              "bbLower": 155.7165,
+              "asOf": "2026-08-12 04:42 UTC",
+              "close": 159.401,
+              "sma50": 161.1189,
+              "sma100": 159.965,
+              "sma200": 158.1217,
+              "rsi": 43.9,
+              "bbUpper": 165.8256,
+              "bbLower": 155.7305,
               "recommendMA": -0.357,
               "direction": "short",
               "directionSource": "explicit"
@@ -1954,7 +2265,7 @@
         "metric": "USD/JPY ~159.3 · 163.73 spike rejected by joint intervention (31-Jul, first since 1998) · BoJ Sept >60% · range frame 152.50/160.50",
         "detail": "6-8 week 158/152 put spread for ~0.9-1.2% premium, spot ref ~159.3; target 152-153, mechanical invalidation on two daily closes above 160.50. The trade shorts the top half of the post-intervention range while the BoJ's dated hike path erodes the differential beneath it. Premium is the whole risk.",
         "source": "sourced",
-        "watch": "US CPI 12-Aug (a hot print lifts the pair toward the entry-improving 160 zone — and toward invalidation); any MoF/Treasury re-intervention at 160+; the September BoJ; JGB long-end behaviour; Tokyo CPI as the BoJ's own gate."
+        "watch": "Today's US CPI (a hot print lifts the pair toward the entry-improving 160 zone — and toward the 160.50 invalidation); any MoF/Treasury re-intervention; the September BoJ; JGB long-end behaviour."
       },
       "facts": [
         {
@@ -1962,7 +2273,7 @@
           "tag": "sourced"
         },
         {
-          "text": "The pair fell to ~157.6 post-intervention and trades ~159.3 on 11-Aug (Tokyo shut for Mountain Day), with 160 treated across coverage as the re-intervention line and HSBC/am-FX framing a wider post-intervention range (152.50/160.50 per am/FX)",
+          "text": "The pair trades ~159.3 (12-Aug) — the intervention effect has fully faded from SPOT but not from the reaction function: 160 is treated across coverage as the re-intervention line, and both governments remain publicly committed (Bessent: 'will not hesitate' to repeat)",
           "tag": "sourced"
         },
         {
@@ -1987,6 +2298,250 @@
           "name": "am/FX (Brent Donnelly) — 'JPY BOJ RSI SPCX CNH', 10-Aug-2026",
           "kind": "view",
           "basis": "Located via the Spectra Markets library, 11-Aug-2026: title and the 152.50/160.50 USD/JPY post-intervention range frame (body paywalled — only that frame is used, as the range within which the desk prices the put spread's strikes and invalidation)."
+        }
+      ]
+    },
+    {
+      "id": "tac-eurjpy-puts",
+      "direction": "short",
+      "intent": "add",
+      "tradeStatement": "Short EUR/JPY with defined risk — a 6-8 week 183/177 put spread for ~1-1.2% (spot ref ~183.8, scaling the entry into the 184-185 zone): the cross has retraced ~60% of its joint-intervention break (187.95 record -> 179.37 low -> ~183.8) back into the zone where BOTH Japanese and US officials pushed back, while the BoJ carries a >60%-priced September hike against an ECB that is merely optional — and it is the DOLLAR-NEUTRAL yen long on a US CPI day, isolating the yen-policy story from the print the desk's USD/JPY spread is exposed to; the ~125bp ECB-BoJ carry gap grinding the cross higher is exactly why the position is a premium-capped spread sold into strength, invalidated on two daily closes above 186.",
+      "action": "Sell the retracement",
+      "preferredExpression": "Put spread",
+      "name": "EUR/JPY downside — the dollar-neutral yen long",
+      "ticker": "EUR/JPY",
+      "sector": "FX",
+      "assetClass": "Multi-Asset",
+      "bucket": "Growth",
+      "goalType": "appreciation",
+      "riskProfile": {
+        "vol": "moderate",
+        "beta": "moderate",
+        "structured": false
+      },
+      "naturalExpression": "Put spread",
+      "tactical": true,
+      "triggered": true,
+      "trigger": "EUR/JPY ~183.8 has retraced ~60% of the joint-intervention break (record 187.95 on 17-Apr; intervention knocked it ~4% to 179.37 on 3-Aug; now pressing the 50-day EMA at 184.63) — back INTO the level zone where both Japanese and US officials publicly 'remain concerned about the level and path of the yen' — with the September BoJ hike >60% priced five weeks out. A retracement into a policed zone ahead of a dated hawkish catalyst is the entry the desk waits for; today's US CPI makes the dollar-neutral cross the cleaner yen expression than adding to USD/JPY risk.",
+      "levels": {
+        "tenor": "6-8 weeks (through the September BoJ)",
+        "entry": "Spot ref ~183.8 — buy the 183/177 EUR/JPY put spread for ~1-1.2%; scale the entry on strength into 184-185 (the 50-day EMA / official-discomfort zone)",
+        "target": "178-179 (the intervention-low zone) — monetise at least half at 180",
+        "stop": "Premium at risk by construction; two daily closes above 186 (the carry grind reclaiming the coil below the 187.95 record) invalidates the retracement-sold thesis"
+      },
+      "chart": {
+        "kind": "spark",
+        "unit": "¥",
+        "band": {
+          "lo": 177,
+          "hi": 183,
+          "label": "Put spread 183/177"
+        },
+        "refs": [
+          {
+            "y": 187.95,
+            "label": "Record 187.95 (17-Apr)"
+          },
+          {
+            "y": 179.37,
+            "label": "Intervention low 179.37 (3-Aug)"
+          }
+        ],
+        "caption": "EUR/JPY daily closes, 3 months: the grind to the April record's doorstep, the ~4% joint-intervention break, and the ~60% retracement into the policed 184+ zone the spread sells.",
+        "symbol": "EURJPY=X",
+        "range": "3mo",
+        "series": [
+          185.2,
+          185.03,
+          184.93,
+          184.7,
+          184.48,
+          185.15,
+          184.59,
+          184.69,
+          184.75,
+          185.04,
+          184.94,
+          185.3,
+          185.37,
+          185.59,
+          185.63,
+          185.74,
+          185.91,
+          185.68,
+          185.77,
+          184.73,
+          184.65,
+          185.0,
+          185.17,
+          185.37,
+          185.6,
+          185.71,
+          186.24,
+          184.81,
+          184.82,
+          185.04,
+          184.62,
+          183.88,
+          183.67,
+          183.83,
+          184.19,
+          184.9,
+          185.61,
+          184.92,
+          184.4,
+          184.65,
+          185.45,
+          185.12,
+          185.63,
+          185.63,
+          184.61,
+          184.88,
+          185.29,
+          185.88,
+          185.83,
+          185.71,
+          185.47,
+          186.07,
+          186.1,
+          186.39,
+          186.43,
+          186.19,
+          186.57,
+          187.25,
+          184.58,
+          181.9,
+          181.28,
+          181.86,
+          182.14,
+          182.54,
+          182.47,
+          183.76,
+          183.88
+        ],
+        "seriesAsOf": "2026-08-12",
+        "seriesSource": "Yahoo Finance daily closes · EURJPY=X · 3mo to 2026-08-12"
+      },
+      "headline": "EUR/JPY has retraced 60% of the intervention break back into the zone officials police — the dollar-neutral yen short, 183/177 put spread against a September BoJ five weeks out",
+      "thesis": "EUR/JPY ~183.8 is the cleanest expression of the yen-policy story available today, because it strips the dollar out on the one day the dollar is the market's main variable. The cross made its record 187.95 in April on the widest carry gap in decades; the 31-Jul joint intervention knocked it ~4% to 179.37 in three sessions; it has now retraced ~60% of that break and presses the 50-day EMA at 184.63 — re-entering the zone where, per Scotiabank's read, both Japanese AND US officials 'remain concerned about the level and path of the yen' and are determined to push back. Against that cap, the rate story compresses from the yen side on a dated schedule: the BoJ carries September >60% priced (one board member arguing markets underprice the PACE), the 10y JGB is at a 28-year high — while the ECB's September hike is merely an option the market hasn't committed to. The honest adversary is the carry: a ~125bp ECB-BoJ gap cushions every dip and is how the cross got to records — which is why the trade is a premium-capped 183/177 put spread SOLD INTO STRENGTH (scaling 184-185) rather than a spot short paying the carry to wait, with invalidation on two daily closes above 186. Risk-reversal colour has yen calls bidding across short tenors (thin sourcing, estimated) — the market quietly pays for the same tail this spread owns. A re-run of the intervention is worth ~4% in three sessions on last month's evidence; a September BoJ hike compresses the differential the cross lives on; and if neither arrives, the premium was the whole risk.",
+      "themeId": null,
+      "offThemeWhy": "Tactical, level-and-event FX trade around the intervention-retracement/BoJ-September configuration — short-dated and defined-risk, not a standing desk theme.",
+      "structures": [
+        "Put spread",
+        "FX put",
+        "Risk reversal",
+        "Digital put"
+      ],
+      "variant": {
+        "street": "Carry desks stay long the cross — the ~125bp gap grinds it higher and FXStreet-type coverage frames the gap as cushioning downside; the record is the magnet",
+        "us": "The cushion argument ignores that the topside is now policed by two governments with a demonstrated ~4%-in-three-sessions hammer, and that the gap itself compresses on a >60%-priced September BoJ — sell the retracement with capped premium and let the policy vector argue with the carry",
+        "gap": "The market prices EUR/JPY off the current differential; the desk prices it off the differential's dated direction of travel plus the intervention function — the spread pays ~4:1 if either leg lands within the tenor"
+      },
+      "changeMyMind": "A September BoJ hold with dovish guidance AND no policy response as the cross reclaims 186+ — the carry regime wins, the record goes, and the retracement-sold thesis is dead; an ECB that turns emphatically hawkish (two+ hikes re-priced) would also re-widen the euro side of the gap.",
+      "conviction": {
+        "pillars": [
+          {
+            "key": "asymmetry",
+            "score": 2,
+            "dq": "estimated",
+            "note": "~1-1.2% premium for a spread paying ~4:1 at the intervention-low zone, with last month's re-run evidence (-4% in three sessions) as the payoff template — strong defined-risk asymmetry; option pricing desk-estimated."
+          },
+          {
+            "key": "catalyst",
+            "score": 2,
+            "dq": "sourced",
+            "note": "Dated: the September BoJ (>60% priced) inside the tenor, plus the standing re-intervention function in the exact 184+ zone the entry sells."
+          },
+          {
+            "key": "consensus",
+            "score": 1,
+            "dq": "sourced",
+            "note": "The street leans the other way (carry-cushion framing) with official pushback as the desk's confirming leg — one leg, contrarian by construction."
+          },
+          {
+            "key": "thesis",
+            "score": 2,
+            "dq": "sourced",
+            "note": "Quantified drivers (187.95 record, 179.37 intervention low, ~60% retracement, 50-day EMA 184.63, ~125bp gap, BoJ >60%) and a computable variant — price the gap's direction of travel, not its level."
+          },
+          {
+            "key": "positioning",
+            "score": 1,
+            "dq": "estimated",
+            "note": "Carry longs are the crowd and would fuel the downside if forced out — offside the desk's direction — but the only flow evidence is thin RR colour (yen calls bid); a lean, honestly estimated. RSI 48 — no sentiment extreme. [sourced: TradingView].",
+            "authoredNote": "Carry longs are the crowd and would fuel the downside if forced out — offside the desk's direction — but the only flow evidence is thin RR colour (yen calls bid); a lean, honestly estimated.",
+            "indicators": {
+              "rsi": 48.2,
+              "asOf": "2026-08-12 04:42 UTC",
+              "symbol": "FX_IDC:EURJPY",
+              "direction": "short"
+            }
+          },
+          {
+            "key": "houseview",
+            "score": 1,
+            "dq": "sourced",
+            "note": "Adjacent to the desk's yen-turn and carry-rotation views — their dollar-neutral tactical expression, not a standing theme itself."
+          },
+          {
+            "key": "technical",
+            "score": 2,
+            "dq": "sourced",
+            "note": "Price 183.9 vs SMA50/100/200 184.7/185/183.9 (1/3 above), RSI 48, mid-band. Trend confirms the short. [sourced: TradingView]",
+            "authoredNote": "The uptrend argues against a short (pressing the 50-day EMA from below) — the design sells INTO that strength with capped premium; mixed by construction, authored estimated.",
+            "indicators": {
+              "symbol": "FX_IDC:EURJPY",
+              "asOf": "2026-08-12 04:42 UTC",
+              "close": 183.882,
+              "sma50": 184.7402,
+              "sma100": 185.0184,
+              "sma200": 183.8682,
+              "rsi": 48.2,
+              "bbUpper": 188.2689,
+              "bbLower": 180.5571,
+              "recommendMA": -0.357,
+              "direction": "short",
+              "directionSource": "explicit"
+            }
+          }
+        ]
+      },
+      "macro": {
+        "metric": "EUR/JPY ~183.8 · record 187.95 (17-Apr) · intervention low 179.37 (3-Aug) · ~60% retraced · ECB-BoJ gap ~125bp · BoJ Sept >60%",
+        "detail": "6-8 week 183/177 put spread (~1-1.2%), entry scaled into 184-185; target 178-179 (monetise half at 180), invalidate on two daily closes above 186. The dollar-neutral yen long: isolates the intervention function and the September BoJ from today's US CPI, which the USD/JPY leg of the book carries.",
+        "source": "sourced",
+        "watch": "Any MoF/Treasury re-intervention signal as the cross presses 184-185; the September BoJ (the differential catalyst); ECB September repricing (the euro-side risk); Japan fiscal headlines (the yen-negative tail that built the record); the 186 invalidation line."
+      },
+      "facts": [
+        {
+          "text": "EUR/JPY trades ~183.8 (12-Aug; cross-check 159.34 × 1.1534 ≈ 183.8) — ~2.2% below its 17-Apr record of 187.95, having retraced ~60% of the joint-intervention break that took it from ~187 to 179.37 (3-Aug, ~-4% in three sessions); it presses the 50-day EMA at 184.63",
+          "tag": "sourced"
+        },
+        {
+          "text": "The policy skew: BoJ September hike >60% priced (10-Aug Summary of Opinions flags a possibly faster pace; 10y JGB at a 28-year high ~2.8-2.9%) vs an ECB whose September hike is an option, not a commitment — the ~125bp carry gap that built the record compresses from the yen side on a dated schedule",
+          "tag": "sourced"
+        },
+        {
+          "text": "Both Japanese and US officials 'remain concerned about the level and path of the yen' and are determined to push back (Scotiabank read) — re-intervention above 184 is the named trade risk for carry longs and the named catalyst for this spread; short-tenor risk reversals show yen calls bid (thin sourcing)",
+          "tag": "estimated"
+        }
+      ],
+      "sources": [
+        {
+          "name": "TradingView / Trading Economics (EUR/JPY ~183.8, USD/JPY 159.3, EUR/USD 1.1534 — cross-checked)",
+          "kind": "data"
+        },
+        {
+          "name": "Tradingpedia 7-Aug / EBC / FXStreet (record 187.95 17-Apr, 179.37 intervention low, 50-day EMA 184.63, the ~125bp-gap cushion framing, Scotiabank official-pushback read)",
+          "kind": "analysis"
+        },
+        {
+          "name": "BoJ Summary of Opinions 10-Aug / Japan Times / CNBC (September >60%, faster-pace opinion, JGB highs)",
+          "kind": "data"
+        },
+        {
+          "name": "VT Markets / market summaries (short-tenor yen-call risk-reversal colour — thin, estimated)",
+          "kind": "analysis"
         }
       ]
     },
@@ -2144,7 +2699,7 @@
         "stop": "Premium at risk; invalidate on a close back below 1.15 post-entry"
       },
       "headline": "Closer, still gated: EUR/USD ~1.154 with a hawkish-option ECB and a cracked US labor tape — the 1.17 trigger arms the call spread, and 1.154 is not 1.17",
-      "thesis": "The gate discipline that kept this trade off the board through four sweeps is unchanged, and so — in substance — is the setup, just at better levels. Spot sits ~1.1542 (bulls eyeing 1.1600, resistance 1.1680), up from ~1.145 in mid-July, with the fundamental gap widening in EUR's favour: the ECB held 2.25% on 23-Jul but is in a HIKING cycle with markets pricing up to two more moves by end-2026 and Lagarde keeping September explicitly open (July HICP rose to 2.9%, energy +10% YoY; Q2 GDP printed +0.4%, double consensus), while the Fed's September hike odds collapsed to ~40-50% on the -23k payrolls print. The honest counter-view is JPMorgan's bearish-EUR pivot (2H26 target 1.13-1.15) — the street is split, which is exactly why the desk trades the LEVEL, not the argument: a confirmed daily close above 1.17 would evidence the turn broadening into momentum, arming a 1.17/1.21 call spread whose premium the trend then funds. Below the trigger, the strategic overlay (fx-usd-hedge) already expresses the house view with hedging instruments that don't need a breakout. The board keeps this idea visible as held-back precisely so the discipline is auditable: four sweeps of 'the gate is the gate' is the system working, not the idea failing.",
+      "thesis": "Spot ~1.1542, gate 1.17 — unmet, so the trade stays off the board; what the gate is waiting for is evidence the dollar turn has broadened into EUR momentum, not another argument. The fundamentals lean further toward the trade than the level does: the ECB is a hold-with-a-live-September-hike-option (July HICP 2.9%, Q2 GDP +0.4% — double consensus, up to two hikes priced by end-2026) against a Fed at ~40-50% for September, and the honest counter-view is JPMorgan's bearish-EUR pivot (1.13-1.15 target) — a genuinely split street, which is precisely why the desk trades the LEVEL: a confirmed daily close above 1.17 arms a 2-3 month 1.17/1.21 call spread (~0.5% premium, target 1.20-1.21, invalidate below 1.15). Below the trigger, the strategic overlay already expresses the house view without paying momentum premium. Zero is spent being early.",
       "themeId": null,
       "offThemeWhy": "Tactical, level-gated FX momentum trade — distinct from the strategic currency-hedge theme, which is running; this arms only on the 1.17 break.",
       "structures": [
@@ -2194,11 +2749,11 @@
             "key": "positioning",
             "score": 1,
             "dq": "estimated",
-            "note": "EUR-put skew persisting (Reuters colour, single-sourced) suggests the crowd still pays for downside — mildly contrarian-supportive; estimated. RSI 60 — no sentiment extreme. [sourced: TradingView].",
+            "note": "EUR-put skew persisting (Reuters colour, single-sourced) suggests the crowd still pays for downside — mildly contrarian-supportive; estimated. RSI 59 — no sentiment extreme. [sourced: TradingView].",
             "authoredNote": "EUR-put skew persisting (Reuters colour, single-sourced) suggests the crowd still pays for downside — mildly contrarian-supportive; estimated.",
             "indicators": {
-              "rsi": 59.9,
-              "asOf": "2026-08-11 22:39 UTC",
+              "rsi": 58.8,
+              "asOf": "2026-08-12 04:42 UTC",
               "symbol": "FX_IDC:EURUSD",
               "direction": "long"
             }
@@ -2207,19 +2762,19 @@
             "key": "technical",
             "score": 1,
             "dq": "sourced",
-            "note": "Price 1.154 vs SMA50/100/200 1.147/1.157/1.163 (1/3 above), RSI 60, mid-band. Trend is mixed for the long. [sourced: TradingView]",
+            "note": "Price 1.154 vs SMA50/100/200 1.147/1.157/1.163 (1/3 above), RSI 59, mid-band. Trend is mixed for the long. [sourced: TradingView]",
             "authoredNote": "Uptrend from the July base but below every resistance that matters (1.1600, 1.1680, the 1.17 gate) — constructive, unconfirmed; authored estimated.",
             "indicators": {
               "symbol": "FX_IDC:EURUSD",
-              "asOf": "2026-08-11 22:39 UTC",
-              "close": 1.1542,
-              "sma50": 1.1466,
+              "asOf": "2026-08-12 04:42 UTC",
+              "close": 1.1535,
+              "sma50": 1.1465,
               "sma100": 1.1566,
               "sma200": 1.1629,
-              "rsi": 59.9,
-              "bbUpper": 1.1606,
+              "rsi": 58.8,
+              "bbUpper": 1.1605,
               "bbLower": 1.1333,
-              "recommendMA": 0.357,
+              "recommendMA": 0.214,
               "direction": "long",
               "directionSource": "explicit"
             }
@@ -2290,7 +2845,7 @@
         "stop": "Below 1.32 the sold put is in the money — accept assignment only if the BoE dissent story is intact; otherwise close on a 1.33 break"
       },
       "headline": "Cable ~1.3503 against a 1.355 gate — three BoE hike-dissents and a cracked dollar say close; the desk says: not until it prints",
-      "thesis": "The narrowest gate on the board, held honestly. Cable trades ~1.3503-1.3508 — the desk's 1.355 trigger is half a big figure away — and the fundamentals lean harder toward the trade than in any prior sweep: the BoE held 3.75% on 30-Jul (a date correction from the calendar's assumed 6-Aug) at 6-3, with Greene, Pill and Mann all dissenting FOR A HIKE — the UK risk is hawkish-dissent-fading, not cuts arriving — while June CPI cooled to 2.6% (lowest since Dec-2024) and July CPI lands 19-Aug. The dollar side supplies the tailwind: payrolls -23k, Sept-hike odds ~40-50%, DXY sub-100. The chosen structure — a risk reversal rather than a call spread — reflects the pair's skew: selling the 1.32 put funds the 1.37 call at roughly zero cost, and the desk would accept assignment at 1.32 only because the BoE's dissent structure makes sub-1.32 cable a level to own, not fear. But the discipline is the idea: through four sweeps this gate has refused to round up, and 1.3503 rounds up no better than 1.34 did. Two dated deliverers of the level sit inside the next fortnight — UK July CPI (19-Aug) and the US CPI/PPI pair this week — either can print 1.355; until one does, the risk reversal stays unwritten and unpaid-for, which is the whole point of trading levels instead of arguments.",
+      "thesis": "Cable ~1.3503 against a 1.355 gate — half a big figure short, and the desk does not round up. The fundamentals are the strongest they've been for the trade: the BoE's 30-Jul hold was 6-3 with ALL THREE dissents (Greene, Pill, Mann) voting for a HIKE — the UK risk is dissent-fading, not cuts — while June CPI at 2.6% is the lowest since Dec-2024 and the dollar side supplies the tailwind (payrolls -23k, DXY sub-100). The structure on arming is a risk reversal rather than a call spread because the skew pays for it: selling the 1.32 put funds the 1.37 call at roughly zero cost, and sub-1.32 cable is a level to own while the dissent structure holds. Two dated level-deliverers sit inside a fortnight — UK July CPI (19-Aug) and the US CPI/PPI pair this week; either can print 1.355. Until one does, the reversal stays unwritten and unpaid-for.",
       "themeId": null,
       "offThemeWhy": "Tactical, level-gated FX momentum trade — the strategic dollar view lives in the hedge overlay; this arms only on the 1.355 break.",
       "structures": [
@@ -2343,8 +2898,8 @@
             "note": "No hard read; the put-skew the reversal sells suggests residual downside hedging demand — mildly supportive, estimated. RSI 61 — no sentiment extreme. [sourced: TradingView].",
             "authoredNote": "No hard read; the put-skew the reversal sells suggests residual downside hedging demand — mildly supportive, estimated.",
             "indicators": {
-              "rsi": 61.4,
-              "asOf": "2026-08-11 22:39 UTC",
+              "rsi": 61.2,
+              "asOf": "2026-08-12 04:42 UTC",
               "symbol": "FX_IDC:GBPUSD",
               "direction": "long"
             }
@@ -2353,19 +2908,19 @@
             "key": "technical",
             "score": 2,
             "dq": "sourced",
-            "note": "Price 1.351 vs SMA50/100/200 1.336/1.34/1.341 (3/3 above), RSI 61, mid-band. Trend confirms the long. [sourced: TradingView]",
+            "note": "Price 1.351 vs SMA50/100/200 1.337/1.341/1.341 (3/3 above), RSI 61, near the upper band. Trend confirms the long. [sourced: TradingView]",
             "authoredNote": "Grinding uptrend stalled just under the pivot zone — constructive, unconfirmed by definition until 1.355 prints; authored estimated.",
             "indicators": {
               "symbol": "FX_IDC:GBPUSD",
-              "asOf": "2026-08-11 22:39 UTC",
-              "close": 1.3507,
-              "sma50": 1.3364,
-              "sma100": 1.3404,
-              "sma200": 1.3407,
-              "rsi": 61.4,
-              "bbUpper": 1.3568,
-              "bbLower": 1.3275,
-              "recommendMA": 0.929,
+              "asOf": "2026-08-12 04:42 UTC",
+              "close": 1.3506,
+              "sma50": 1.3365,
+              "sma100": 1.3406,
+              "sma200": 1.3409,
+              "rsi": 61.2,
+              "bbUpper": 1.3563,
+              "bbLower": 1.3277,
+              "recommendMA": 0.786,
               "direction": "long",
               "directionSource": "explicit"
             }
@@ -2411,7 +2966,7 @@
       "id": "tac-brent-hormuz",
       "direction": "long",
       "intent": "add",
-      "tradeStatement": "BANK the July convexity and roll it — the ~$80/$92 Brent call spread bought for ~1% is deep in the money with Brent ~$87.6-88.7, so take the gains and re-strike into a 2-3 month ~$90/$105 call spread (~1-1.5% premium): the Hormuz tail is STILL live and still two-sided — no ceasefire, transits at 5-8/day vs ~20 normal, three more UAE tankers hit 5-Aug, Iran demanding compensation as a talks precondition, OPEC+'s final +188kb/d done and a halt signalled — while the $8 selloff into 7-Aug on deal headlines (Rory Johnston's W32) showed exactly how fast the premium deflates on diplomacy, which is why the trade stays a defined-premium spread on the disruption TAIL, never flat-price length; China's crude-import pullback (Johnston's 'Beijing Swing') is the standing counterweight that caps conviction at convexity-sized.",
+      "tradeStatement": "Own the Hormuz tail through the rolled spread — with Brent ~$88-89 the position is the 2-3 month ~$90/$105 call spread (~1-1.5% premium; the prior $80/$92 spread is banked, deep in the money): the strait runs 5-8 tanker transits/day against ~20 normal, three UAE tankers were hit 5-Aug, the compensation-demand impasse has talks fading, and OPEC+'s final +188kb/d leaves no spare-barrel headline to sell against a genuine closure — while the $8 selloff to ~$82 on deal hopes showed exactly how fast the premium deflates on diplomacy, which is why this stays a defined-premium spread on the disruption TAIL with China's crude-import pullback capping conviction at convexity-sized, never flat-price length.",
       "action": "Roll the call spread",
       "preferredExpression": "Call spread",
       "name": "Brent — own the Hormuz tail",
@@ -2431,7 +2986,7 @@
       "trigger": "Still live, still unresolved: no ceasefire (the June MOU collapsed in July and stayed collapsed), the naval blockade remains on with CENTCOM reporting 44 vessels redirected, Kpler counts 5-8 tanker transits/day against a ~20 pre-crisis norm, three more UAE tankers were struck 5-Aug, and the diplomacy WOBBLED into this week — Brent fell ~$8 to ~$82 into 7-Aug on deal hopes, then rallied ~5% Monday to ~$88 when Trump demanded Iran pay compensation as a condition for talks (CNN 11-Aug: 'hopes fade for Strait of Hormuz deal'). A chokepoint at a fraction of capacity with binary daily headlines is precisely the two-sided disruption tail the rolled spread owns.",
       "levels": {
         "tenor": "2-3 months",
-        "entry": "Brent ~$87.6-88.7 — BANK the deep-ITM ~$80/$92 spread from July; roll into a ~$90/$105 call spread for ~1-1.5% premium",
+        "entry": "Brent ~$88.9-89 (settled ~$88.91 Tue after >$90 intraday) — own the 2-3 month ~$90/$105 call spread for ~1-1.5% premium",
         "target": "$95-105 on a confirmed further escalation (strait formally closed to all traffic, a strike on production rather than shipping); monetise in tranches into any vertical spike",
         "stop": "Premium at risk by construction; a SIGNED navigation deal with transits recovering toward ~15+/day is the unwind signal — bank residual value early rather than decaying through a de-escalation"
       },
@@ -2445,15 +3000,14 @@
         },
         "refs": [
           {
-            "y": 87.6,
-            "label": "Spot ~$88 (11-Aug)"
+            "y": 88.9,
+            "label": "Spot ~$89 (12-Aug)"
           }
         ],
         "caption": "Brent daily closes, 3 months: the July escalation, the $90+ spike, the $8 deal-hopes selloff into 7-Aug and the snap back to ~$88 as the talks stalled — the two-sided tail the rolled $90/$105 spread owns with defined premium.",
         "symbol": "BZ=F",
         "range": "3mo",
         "series": [
-          104.21,
           107.77,
           105.63,
           105.72,
@@ -2516,13 +3070,14 @@
           82.49,
           83.55,
           87.72,
-          89.29
+          88.91,
+          89.67
         ],
-        "seriesAsOf": "2026-08-11",
-        "seriesSource": "Yahoo Finance daily closes · BZ=F · 3mo to 2026-08-11"
+        "seriesAsOf": "2026-08-12",
+        "seriesSource": "Yahoo Finance daily closes · BZ=F · 3mo to 2026-08-12"
       },
-      "headline": "The July spread paid in full — bank it, roll it: Brent ~$88 with Hormuz at 5-8 transits a day, a compensation-demand impasse, and OPEC+ out of rollback ammunition; own $90/$105 for the next leg, premium-defined",
-      "thesis": "Score the trade first: the ~$80/$92 call spread the desk held through the July escalation is deep in the money with Brent ~$87.6-88.7 — the convexity thesis (own the tail cheap, monetise the spike, cap the de-escalation cost) delivered through both directions of a violent month. The path proved the two-sidedness the structure was built for: Brent topped $90 around 19-20-Jul as tanker attacks escalated and US strikes ran ten consecutive nights, chopped through late July, then fell ~$8 to ~$82 into 7-Aug as Trump cancelled planned strikes and imminent-deal headlines ran — Rory Johnston's W32 (7-Aug) asked openly whether Washington was about to hand Tehran effective control of Hormuz, while noting spec liquidation stayed modest, prompt backwardation held historically strong ($1-2/bbl) and product inventories sat at/below 5-year lows — and then snapped +5% Monday to ~$88 when Trump demanded Iran pay compensation as a talks precondition and CNN's 11-Aug live blog led with fading deal hopes. The physical picture remains the argument: Kpler counts 5-8 daily transits against ~20 normal, CENTCOM reports 44 vessels redirected, three more UAE tankers were hit 5-Aug, an Iran-Oman 'navigation scheme' would bar US/Israeli-linked vessels entirely, and Europe's TTF (+17% m/m, storage at 2009-lows) shows the tail already leaking into gas. Supply flexibility is spent: OPEC+'s 2-Aug hike (+188kb/d for September) completed the voluntary-cut rollback with sources signalling a halt — there is no spare-barrel headline left to sell against a genuine closure. Against all that stands the sweep's best bear datapoint — Johnston's 'Beijing Swing' (5-Aug): China's unprecedented crude-import pullback is the single largest counterweight to the shock — which is exactly why the position stays a premium-defined spread rolled UP (bank $80/$92, own $90/$105) rather than conviction length: the desk owns the distribution's right tail, and diplomacy or Beijing can have the left one.",
+      "headline": "Brent ~$89 with Hormuz at 5-8 transits a day and hard Iranian conditions stalling the deal — own the $90/$105 spread, premium-defined in both directions",
+      "thesis": "Brent ~$88-89 with the chokepoint doing the work: Kpler counts 5-8 daily Hormuz transits against ~20 pre-crisis, CENTCOM reports 44 vessels redirected, three UAE tankers were struck on 5-Aug, and the diplomacy is fading rather than landing — Trump's demand that Iran pay compensation as a talks precondition drove Monday's +5% snap, and the draft Iran-Oman navigation scheme would bar US/Israeli-linked vessels entirely. Supply flexibility is spent: OPEC+'s final +188kb/d (2-Aug) completed the rollback with a halt signalled — no spare-barrel headline remains against a genuine closure. The tape is violently two-sided — an $8 selloff to ~$82 on deal hopes inside the same fortnight as a $90+ print — and the data supports both wings: Rory Johnston's W32 has spec liquidation modest, prompt backwardation historically strong ($1-2/bbl) and product inventories at/below 5-year lows, while his 'Beijing Swing' names China's unprecedented crude-import pullback as the single largest counterweight. Downstream confirms the tightness (USGC jet cracks $1.25/gal vs $0.42 in January, diesel >4x seasonal; TTF ~€60 on 2009-low storage). So the position is the rolled ~$90/$105 call spread, ~1-1.5% premium: it fills on a confirmed escalation, decays capped on a signed deal, and monetises in tranches into any vertical spike. Convexity, never conviction length.",
       "themeId": null,
       "offThemeWhy": "Tactical, event-driven commodity convexity around a specific geopolitical chokepoint — defined-risk and short-dated, not a standing desk commodity theme.",
       "structures": [
@@ -2584,14 +3139,14 @@
         ]
       },
       "macro": {
-        "metric": "Brent ~$87.6-88.7 (+5% Mon) · transits 5-8/day vs ~20 · OPEC+ final +188kb/d, halt signalled · backwardation $1-2 · TTF +17% m/m",
+        "metric": "Brent ~$89 (briefly >$90 Tue) · transits 5-8/day vs ~20 · OPEC+ rollback complete · backwardation $1-2 · deal-vs-conditions whipsaw daily",
         "detail": "Bank the deep-ITM $80/$92 spread; roll 2-3 months into ~$90/$105 for ~1-1.5% premium. Target $95-105 on confirmed escalation, monetise in tranches into spikes; unwind early on a signed deal with transits verifiably recovering. The China import pullback (Beijing Swing) caps sizing at convexity, never flat-price length.",
         "source": "sourced",
         "watch": "The compensation-demand impasse and Iran-Oman scheme; daily Kpler transit counts (the physical tell); any strike on production vs shipping; OPEC+ signals post-rollback; TTF/cracks as downstream confirmation; China's import cadence."
       },
       "facts": [
         {
-          "text": "Brent trades ~$87.6-88.7 (11-Aug, fifth session of gains; Mon 10-Aug closed $87.72, +~5%) after the month's round trip: above $90 on 19-20-Jul tanker attacks, ~$82 into 7-Aug on deal hopes, back to ~$88 as Trump's compensation demand stalled the talks; ~+16% vs pre-war (one $92.54 outlier quote discarded as unreliable)",
+          "text": "Brent settled ~$88.91 Tuesday after briefly clearing $90 (+~12% over five sessions; WTI ~$84); the whipsaw drivers are live daily: an Iran-Oman transit route being finalised and Pakistan calling a US-Iran deal 'close', against Tehran's hard conditions (war-end, US troop withdrawal, compensation) and a tanker reporting explosions near Kumzar, Oman",
           "tag": "sourced"
         },
         {
@@ -2629,7 +3184,7 @@
     }
   ],
   "meta": {
-    "technicalsAsOf": "2026-08-11 22:39 UTC",
-    "technicalsFeed": "TradingView scanner (7 sourced)"
+    "technicalsAsOf": "2026-08-12 04:42 UTC",
+    "technicalsFeed": "TradingView scanner (8 sourced)"
   }
 }
