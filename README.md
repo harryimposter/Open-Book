@@ -1,33 +1,38 @@
-# Brokerage Playground
+# Open Book
 
-A client-focused replica of the Shark Tank desk tool, restyled in a **J.P. Morgan
-Private Bank** aesthetic (espresso + bronze/gold, serif display, hairline rules).
+A private-bank investment-desk simulator in a **J.P. Morgan Private Bank**
+aesthetic. The live shell (`index.html` + `openbook.js`) is a two-sided app:
+an **Advisor / Solutions view switch** over two tabs, with light/dark themes
+and a ⌘K "search everything" palette.
 
 Static site — no build step. Open `index.html`, or serve the folder:
 
 ```bash
-python -m http.server 5544
+python -m http.server 5546
 ```
 
-## Four tabs
+## The shell — two views × two tabs
 
-- **Solutions Views** — the desk's standing investment *themes* on a left rail.
-  Selecting a theme filters its idea tiles; opening an idea shows how we'd express
-  it (clickable expressions) and which client books it fits. **Draft a view** from
-  a one-line thesis and the app suggests a theme, asset class, expressions and
-  candidate client books to keep/edit (persisted via `localStorage`).
-- **Today's Focus** — an AI-generated daily sweep in two sections, **Earnings** and
-  **Ex-earnings**. Every idea card carries a **conviction score** (4-pillar rubric),
-  the **clients it's flagged to each with a client-fit score** (a separate axis —
-  "how good is the idea" vs "how right for this client") and a one-line *why*,
-  clickable expressions, and — for earnings — report date, implied vs historical
-  move and conviction pillars. A tag shows whether it leans on a Solutions Views
-  theme or is **off-theme** (with the reason).
-- **Advisor Book** — your whole book as line items, with a client dropdown.
-  Each client opens to their portfolio: allocation vs goal target, the desk's
-  agenda, the ideas mapped to them with reasoning, and top holdings.
-- **Pre-Trade Analysis** — stage a trade (client × idea × structure × size) for a
-  first-pass read on suitability, funding, concentration, currency and desk view.
+- **Idea Feed** — the daily sweep as a social-style origination feed: a Market
+  Brief card, a **Top 3** rail (ranked by client breadth from the live engine,
+  then conviction; a sweep-pinned idea leads as DESK PICK), a **Client Toolkit**
+  (tap a client to build their email), the searchable/filterable feed, and an
+  **Ask your book** rail (Morgan AI, answers only from the live engines). Each
+  idea card carries the desk's **conviction ring** (rubric-computed), a
+  ledger-driven "posted/updated" chip, the recommendation, an inline sourced
+  chart, Via/Own-view attribution, ♥ save + engagement counters, and two
+  actions: **Idea Suitability** (per-client fit with plain-English whys and
+  MiFID suppression reasons) and **Email**.
+- **Solutions view** — the manufacturing side: sees the whole board, curates it
+  (✓ Approve / ✕ Discard per idea — only approved ideas reach the Advisor
+  view), tweaks implementations, and drafts its own ideas via the composer
+  (drafts aren't desk-scored but map through the same fit engine). Persisted in
+  `localStorage`.
+- **Advisor Book** — a client-tile coverage grid; tapping a client embeds their
+  full portfolio report (`portfolio.html?embed=1&client=…`) in-shell.
+- The original four-tab app survives as **`classic.html`** (+ `app.js`), fully
+  working standalone or embedded (embed mode hides its masthead/tabs and syncs
+  the theme); `onepager.html` renders a printable client one-pager.
 
 ## The mapping engine (`mapping.js`)
 
