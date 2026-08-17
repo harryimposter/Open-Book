@@ -91,6 +91,37 @@ stale commentary is surfaced rather than silently aging.
 where a picture adds signal (a rates accrual band, an equity pullback, FX vs a key
 level).
 
+## Claude's Weekly
+
+The Monday markets letter that goes out as an email, in the same private-bank
+letterhead as the app. Sections are fixed: **Last Week's Wrap** → **5 Points
+Looking Ahead** → **Bull / Base / Bear** (probability-weighted) → **Focus idea of
+the week** → a footer carrying the as-of date, the source list and the
+pending/developing flags.
+
+| File | Role |
+|------|------|
+| `week_prices.py` | Pulls the week's real daily closes (Yahoo Finance, stdlib only) and writes `week_prices.json`. Prints a Friday-to-Friday table. |
+| `weekly_content.py` | The letter's prose — one edition per file revision. Where the writing happens. |
+| `make_weekly.py` | Renders `weekly_content.py` into `claude_weekly_<date>.eml` (multipart: a real text/plain part alongside the HTML) plus a matching `.html` for a browser check. |
+
+```bash
+python week_prices.py          # 1. get the tape
+                               # 2. write the edition into weekly_content.py
+python make_weekly.py          # 3. build the .eml (+ .html)
+python send_email.py --to <addr> --eml claude_weekly_<date>.eml --dry-run
+```
+
+**The same evidence rules as the sweep apply.** Every index, yield, currency and
+commodity level in the letter is a close from `week_prices.py` — never a
+remembered or estimated number — and every release or consensus figure is
+verified against at least two independent outlets before it is written. Numbers
+that could not be verified are left out rather than approximated, and anything
+still ahead (an upcoming print, an unresolved geopolitical position, a
+probability that differs across venues) is named in the footer's pending flags
+rather than stated flat. `send_email.py` is the sending channel; `--dry-run`
+shows exactly what would go out.
+
 ## Files
 
 | File | Purpose |
