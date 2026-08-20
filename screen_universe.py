@@ -54,6 +54,11 @@ SCAN = "https://scanner.tradingview.com/{region}/scan"
 COLUMNS = ["name", "description", "close", "currency", "market_cap_basic",
            "price_52_week_high", "average_volume_10d_calc", "sector", "industry"]
 
+# Macro instruments are screened on a different signal (see screen_macro): a yield or a
+# currency pair has no meaningful "% off the high", so the 52-week LOW is needed too.
+MACRO_COLUMNS = ["close", "currency", "price_52_week_high", "price_52_week_low",
+                 "SMA50", "SMA200", "RSI", "change"]
+
 # US listing venues probed when resolving a bare ticker. CBOE carries a large slice
 # of the iShares sector ETFs (IGV, ITA) and is easy to miss; BATS catches the rest.
 US_EXCHANGES = ("AMEX", "NASDAQ", "NYSE", "CBOE", "BATS")
@@ -272,6 +277,67 @@ def enrich(sym, row, region_tag, fx, index_code):
     }
 
 
+
+# ---- macro screen ------------------------------------------------------------
+# The equity screen ranks on "% off the 52-week high". That is meaningless for FX and
+# only half-meaningful for a yield, so macro is ranked on RANGE PERCENTILE: where the
+# level sits between its 52-week low and high, 0-100. One signal, comparable across a
+# currency pair, a government yield and a barrel of oil, computable from columns every
+# macro symbol actually returns.
+def screen_macro(macro_tier, fx_unused, log):
+    classes = macro_tier.get("classes") or {}
+    lo_hi = (macro_tier.get("screenSignal") or {}).get("extremeAt") or [10, 90]
+    out, by_symbol = {}, {}
+
+    for key, cls in classes.items():
+        syms = [x["symbol"] for x in cls.get("symbols", [])]
+        if not syms:
+            continue
+        meta = {x["symbol"]: x for x in cls["symbols"]}
+        try:
+            rows = scan_tickers("global", syms, MACRO_COLUMNS)
+        except Exception as e:
+            log.append(f"Macro/{key}: scan failed ({type(e).__name__}) — class NOT screened")
+            continue
+        got = {sy: d for sy, d in rows}
+        for miss in [x for x in syms if x not in got]:
+            log.append(f"Macro/{key}: '{miss}' UNRESOLVED — reported, not skipped")
+
+        items = []
+        for sy, d in got.items():
+            close, hi, lo = d.get("close"), d.get("price_52_week_high"), d.get("price_52_week_low")
+            pct = None
+            if close is not None and hi is not None and lo is not None and hi > lo:
+                pct = round((close - lo) / (hi - lo) * 100, 1)
+            m = meta[sy]
+            item = {"symbol": sy, "label": m["label"], "group": m.get("group"),
+                    "appSector": m.get("appSector"), "class": key,
+                    "close": close, "high52w": hi, "low52w": lo,
+                    "rangePercentile": pct,
+                    "rsi": round(d["RSI"], 1) if d.get("RSI") is not None else None,
+                    "aboveSMA200": (None if (d.get("SMA200") is None or close is None)
+                                    else close > d["SMA200"]),
+                    "atRangeExtreme": (pct is not None and (pct <= lo_hi[0] or pct >= lo_hi[1]))}
+            if key == "commodities" and close and hi:
+                item["pctOffHigh"] = round((close / hi - 1.0) * 100, 2)
+            items.append(item)
+            by_symbol[sy] = item
+        items.sort(key=lambda x: (x["rangePercentile"] if x["rangePercentile"] is not None else 50))
+        out[key] = items
+
+    # curve spreads, computed from the yields already fetched
+    spreads = []
+    for sp in (classes.get("rates") or {}).get("curveSpreads", []):
+        a, b = by_symbol.get(sp["long"]), by_symbol.get(sp["short"])
+        if a and b and a["close"] is not None and b["close"] is not None:
+            spreads.append({"key": sp["key"], "bp": round((a["close"] - b["close"]) * 100, 1),
+                            "long": sp["long"], "short": sp["short"]})
+        else:
+            log.append(f"Macro/rates: curve spread '{sp['key']}' not computable — a leg is missing")
+    if spreads:
+        out["curveSpreads"] = spreads
+    return out
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -460,6 +526,9 @@ def main(argv=None):
             sector_rows.append(e)
         sector_rows.sort(key=lambda x: (x["pctOffHigh"] if x["pctOffHigh"] is not None else 0))
 
+    # ---- 5b. macro screen (FX / rates / commodities)
+    macro = screen_macro(uni["tiers"].get("macro") or {}, fx, log)
+
     # ---- 6. report
     print(f"\n  DISLOCATIONS  {len(capped)} candidates "
           f"(<= {dislocation_pct:.0f}% off the 52-week high"
@@ -489,6 +558,30 @@ def main(argv=None):
             print(f"    {e['pctOffHigh']:7.1f}%  {e['ticker']:<6s} {str(e['description'])[:38]:<38s} "
                   f"-> {e.get('appSector')}")
 
+    for cls_key, title in (("fx", "FX"), ("rates", "RATES"), ("commodities", "COMMODITIES")):
+        items = macro.get(cls_key) or []
+        if not items:
+            continue
+        ext = [i for i in items if i["atRangeExtreme"]]
+        print(f"\n  MACRO / {title}  {len(items)} instruments, "
+              f"{len(ext)} at a 52-week range extreme (lowest percentile first)")
+        for e in items[:6]:
+            rp = f"{e['rangePercentile']:5.1f}" if e["rangePercentile"] is not None else "  n/a"
+            rsi = f"RSI {e['rsi']:.0f}" if e.get("rsi") is not None else "no RSI"
+            star = " *" if e["atRangeExtreme"] else ""
+            print(f"    pct {rp}  {e['label']:<22s} {str(e['close']):>10s}  {rsi:<8s}{star}")
+        if len(items) > 6:
+            hi = [i for i in items[-2:]]
+            for e in hi:
+                rp = f"{e['rangePercentile']:5.1f}" if e["rangePercentile"] is not None else "  n/a"
+                star = " *" if e["atRangeExtreme"] else ""
+                print(f"    pct {rp}  {e['label']:<22s} {str(e['close']):>10s}  (top of range){star}")
+
+    if macro.get("curveSpreads"):
+        print("\n  MACRO / CURVE")
+        for sp in macro["curveSpreads"]:
+            print(f"    {sp['key']:<22s} {sp['bp']:>8.1f} bp")
+
     if log:
         print(f"\n  UNRESOLVED / WARNINGS  ({len(log)})")
         for w in log:
@@ -516,11 +609,13 @@ def main(argv=None):
          "dislocations": capped,
          "thematic": thematic_rows,
          "sectorScreen": sector_rows,
+         "macro": macro,
          "unresolved": log}, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
+    n_macro = sum(len(v) for k, v in macro.items() if k != "curveSpreads")
     print(f"\nWrote {CONSTITUENTS.name} ({len(snapshot)} index sets) "
           f"and {CANDIDATES.name} ({len(capped)} candidates, {len(thematic_rows)} thematic, "
-          f"{len(sector_rows)} sector).")
+          f"{len(sector_rows)} sector, {n_macro} macro).")
     return 0
 
 

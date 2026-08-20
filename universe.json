@@ -1,6 +1,6 @@
 {
   "_comment": "Screening universe for the daily sweep. THE definition of what gets looked at before any idea is written: a GLOBAL core of index constituents (Tier 1), every name the books hold (Tier 2), and a hand-curated thematic watchlist (Tier 3) - plus an index/sector dislocation screen that runs above the single-name layer. Read by screen_universe.py (produces the candidate list) and by build_today_focus.py (validates that every single-name idea declares a tier). Hand-edit Tier 3 and the index list only; Tier 1 constituents are fetched and Tier 2 is derived.",
-  "version": 4,
+  "version": 6,
   "definedOn": "2026-08-20",
   "note_on_market_cap": "There is deliberately NO single market-cap floor. Cap spans ~50x inside the intended universe (a low-tens-of-billions optical name vs a few-hundred-million substrate name), so any floor either admits several thousand names or excludes the thematic tier outright. Membership and intent are the gates; marketCapBn is RECORDED on every single-name idea as a sourced descriptor, never used as the filter.",
   "tiers": {
@@ -243,10 +243,401 @@
         }
       },
       "venueNote": "A Tier 3 name may list anywhere - the cohort is curated on the theme, not the exchange. Each name therefore carries `venue` and `scanRegion` so screen_universe.py can resolve it on the right endpoint. A non-US listing usually means no US-listed options, which is exactly why this tier relaxes derivatives-first; it also means FX exposure that an idea must address."
+    },
+    "macro": {
+      "label": "Tier 4 - Macro instruments (FX, rates, commodities, credit)",
+      "definition": "The non-equity screening universe. Every symbol below was resolved against the TradingView scanner on 2026-08-20 before being written here.",
+      "why_separate": "The equity screen's organising signal is '% off the 52-week high'. That is meaningless for FX - a currency pair is not 'down 20%' - and only half-meaningful for a yield. So the macro tier is screened on RANGE PERCENTILE instead: where the current level sits between the 52-week low and high, 0-100. That one signal is comparable across a currency pair, a yield and a barrel of oil, and it is computable from columns every one of these symbols actually returns.",
+      "whyItMatters": "FX and Rates are the only asset classes build_today_focus.py REQUIRES every sweep (REQUIRED_COVERAGE), yet until now they had no universe behind them - an enforcement rule with nothing to enforce against. The check could say an FX idea was missing; it could not say that USD/CAD moved 4% and nobody looked.",
+      "screenSignal": {
+        "primary": "rangePercentile = (close - low52w) / (high52w - low52w) x 100",
+        "extremeAt": [
+          10,
+          90
+        ],
+        "note": "A level at or beyond either bound is a candidate. Secondary signals per class below."
+      },
+      "ideaTier": "macro — exempt from the marketCapBn and liquidity obligations that bind single names.",
+      "classes": {
+        "fx": {
+          "label": "FX",
+          "count": 26,
+          "symbols": [
+            {
+              "symbol": "FX_IDC:EURUSD",
+              "label": "EUR/USD",
+              "group": "G10 major",
+              "appSector": "FX"
+            },
+            {
+              "symbol": "FX_IDC:USDJPY",
+              "label": "USD/JPY",
+              "group": "G10 major",
+              "appSector": "FX"
+            },
+            {
+              "symbol": "FX_IDC:GBPUSD",
+              "label": "GBP/USD",
+              "group": "G10 major",
+              "appSector": "FX"
+            },
+            {
+              "symbol": "FX_IDC:USDCHF",
+              "label": "USD/CHF",
+              "group": "G10 major",
+              "appSector": "FX"
+            },
+            {
+              "symbol": "FX_IDC:AUDUSD",
+              "label": "AUD/USD",
+              "group": "G10 major",
+              "appSector": "FX"
+            },
+            {
+              "symbol": "FX_IDC:USDCAD",
+              "label": "USD/CAD",
+              "group": "G10 major",
+              "appSector": "FX"
+            },
+            {
+              "symbol": "FX_IDC:NZDUSD",
+              "label": "NZD/USD",
+              "group": "G10 major",
+              "appSector": "FX"
+            },
+            {
+              "symbol": "FX_IDC:USDSEK",
+              "label": "USD/SEK",
+              "group": "G10 major",
+              "appSector": "FX"
+            },
+            {
+              "symbol": "FX_IDC:USDNOK",
+              "label": "USD/NOK",
+              "group": "G10 major",
+              "appSector": "FX"
+            },
+            {
+              "symbol": "FX_IDC:EURJPY",
+              "label": "EUR/JPY",
+              "group": "G10 cross",
+              "appSector": "FX"
+            },
+            {
+              "symbol": "FX_IDC:EURGBP",
+              "label": "EUR/GBP",
+              "group": "G10 cross",
+              "appSector": "FX"
+            },
+            {
+              "symbol": "FX_IDC:EURCHF",
+              "label": "EUR/CHF",
+              "group": "G10 cross",
+              "appSector": "FX"
+            },
+            {
+              "symbol": "FX_IDC:GBPJPY",
+              "label": "GBP/JPY",
+              "group": "G10 cross",
+              "appSector": "FX"
+            },
+            {
+              "symbol": "FX_IDC:AUDJPY",
+              "label": "AUD/JPY",
+              "group": "G10 cross",
+              "appSector": "FX"
+            },
+            {
+              "symbol": "FX_IDC:CHFJPY",
+              "label": "CHF/JPY",
+              "group": "G10 cross",
+              "appSector": "FX"
+            },
+            {
+              "symbol": "FX_IDC:USDCNH",
+              "label": "USD/CNH",
+              "group": "EM Asia",
+              "appSector": "FX"
+            },
+            {
+              "symbol": "FX_IDC:USDKRW",
+              "label": "USD/KRW",
+              "group": "EM Asia",
+              "appSector": "FX"
+            },
+            {
+              "symbol": "FX_IDC:USDTWD",
+              "label": "USD/TWD",
+              "group": "EM Asia",
+              "appSector": "FX"
+            },
+            {
+              "symbol": "FX_IDC:USDINR",
+              "label": "USD/INR",
+              "group": "EM Asia",
+              "appSector": "FX"
+            },
+            {
+              "symbol": "FX_IDC:USDSGD",
+              "label": "USD/SGD",
+              "group": "EM Asia",
+              "appSector": "FX"
+            },
+            {
+              "symbol": "FX_IDC:USDMXN",
+              "label": "USD/MXN",
+              "group": "EM other",
+              "appSector": "FX"
+            },
+            {
+              "symbol": "FX_IDC:USDBRL",
+              "label": "USD/BRL",
+              "group": "EM other",
+              "appSector": "FX"
+            },
+            {
+              "symbol": "FX_IDC:USDZAR",
+              "label": "USD/ZAR",
+              "group": "EM other",
+              "appSector": "FX"
+            },
+            {
+              "symbol": "FX_IDC:USDTRY",
+              "label": "USD/TRY",
+              "group": "EM other",
+              "appSector": "FX"
+            },
+            {
+              "symbol": "FX_IDC:USDPLN",
+              "label": "USD/PLN",
+              "group": "EM other",
+              "appSector": "FX"
+            },
+            {
+              "symbol": "TVC:DXY",
+              "label": "Dollar index (DXY)",
+              "group": "index",
+              "appSector": "FX"
+            }
+          ],
+          "indicators": "FULL — all 26 return SMA50/100/200 + RSI + Bollinger, so the Technical pillar is fully sourceable for every pair here.",
+          "secondarySignals": "Distance to policy / round-number levels, realised vs implied vol, carry (rate differential from the rates class above).",
+          "requiredEverySweep": true
+        },
+        "rates": {
+          "label": "Rates",
+          "count": 14,
+          "symbols": [
+            {
+              "symbol": "TVC:US02Y",
+              "label": "US 2y",
+              "group": "US curve",
+              "appSector": "Rates"
+            },
+            {
+              "symbol": "TVC:US05Y",
+              "label": "US 5y",
+              "group": "US curve",
+              "appSector": "Rates"
+            },
+            {
+              "symbol": "TVC:US10Y",
+              "label": "US 10y",
+              "group": "US curve",
+              "appSector": "Rates"
+            },
+            {
+              "symbol": "TVC:US30Y",
+              "label": "US 30y",
+              "group": "US curve",
+              "appSector": "Rates"
+            },
+            {
+              "symbol": "TVC:DE02Y",
+              "label": "Germany 2y",
+              "group": "Europe curve",
+              "appSector": "Rates"
+            },
+            {
+              "symbol": "TVC:DE10Y",
+              "label": "Germany 10y",
+              "group": "Europe curve",
+              "appSector": "Rates"
+            },
+            {
+              "symbol": "TVC:DE30Y",
+              "label": "Germany 30y",
+              "group": "Europe curve",
+              "appSector": "Rates"
+            },
+            {
+              "symbol": "TVC:FR10Y",
+              "label": "France 10y",
+              "group": "Europe curve",
+              "appSector": "Rates"
+            },
+            {
+              "symbol": "TVC:IT10Y",
+              "label": "Italy 10y",
+              "group": "Europe curve",
+              "appSector": "Rates"
+            },
+            {
+              "symbol": "TVC:GB02Y",
+              "label": "UK 2y",
+              "group": "UK curve",
+              "appSector": "Rates"
+            },
+            {
+              "symbol": "TVC:GB10Y",
+              "label": "UK 10y",
+              "group": "UK curve",
+              "appSector": "Rates"
+            },
+            {
+              "symbol": "TVC:JP10Y",
+              "label": "Japan 10y",
+              "group": "Asia curve",
+              "appSector": "Rates"
+            },
+            {
+              "symbol": "TVC:JP30Y",
+              "label": "Japan 30y",
+              "group": "Asia curve",
+              "appSector": "Rates"
+            },
+            {
+              "symbol": "TVC:CN10Y",
+              "label": "China 10y",
+              "group": "Asia curve",
+              "appSector": "Rates"
+            }
+          ],
+          "indicators": "PARTIAL — all 14 return close and a 52-week high/low, so range percentile IS sourceable; NONE return SMA or RSI, so the Technical pillar stays estimated for rates. Verified, not assumed: 0/14 carried MA+RSI.",
+          "secondarySignals": "Curve spreads (2s10s, 5s30s) computed from the points above; cross-market spreads (US-DE 10y, JGB vs the rest).",
+          "curveSpreads": [
+            {
+              "key": "US 2s10s",
+              "long": "TVC:US10Y",
+              "short": "TVC:US02Y"
+            },
+            {
+              "key": "US 5s30s",
+              "long": "TVC:US30Y",
+              "short": "TVC:US05Y"
+            },
+            {
+              "key": "DE 2s10s",
+              "long": "TVC:DE10Y",
+              "short": "TVC:DE02Y"
+            },
+            {
+              "key": "US-DE 10y",
+              "long": "TVC:US10Y",
+              "short": "TVC:DE10Y"
+            },
+            {
+              "key": "IT-DE 10y (BTP-Bund)",
+              "long": "TVC:IT10Y",
+              "short": "TVC:DE10Y"
+            }
+          ],
+          "requiredEverySweep": true
+        },
+        "commodities": {
+          "label": "Commodities",
+          "count": 12,
+          "symbols": [
+            {
+              "symbol": "ICEEUR:BRN1!",
+              "label": "Brent crude (front)",
+              "group": "Energy",
+              "appSector": "Energy"
+            },
+            {
+              "symbol": "NYMEX:CL1!",
+              "label": "WTI crude (front)",
+              "group": "Energy",
+              "appSector": "Energy"
+            },
+            {
+              "symbol": "NYMEX:NG1!",
+              "label": "US natural gas",
+              "group": "Energy",
+              "appSector": "Energy"
+            },
+            {
+              "symbol": "OANDA:XAUUSD",
+              "label": "Gold spot",
+              "group": "Precious",
+              "appSector": "Gold"
+            },
+            {
+              "symbol": "TVC:SILVER",
+              "label": "Silver spot",
+              "group": "Precious",
+              "appSector": "Materials"
+            },
+            {
+              "symbol": "TVC:PLATINUM",
+              "label": "Platinum spot",
+              "group": "Precious",
+              "appSector": "Materials"
+            },
+            {
+              "symbol": "TVC:PALLADIUM",
+              "label": "Palladium spot",
+              "group": "Precious",
+              "appSector": "Materials"
+            },
+            {
+              "symbol": "COMEX:HG1!",
+              "label": "Copper (front)",
+              "group": "Industrial",
+              "appSector": "Materials"
+            },
+            {
+              "symbol": "LME:AH1!",
+              "label": "Aluminium (LME)",
+              "group": "Industrial",
+              "appSector": "Materials"
+            },
+            {
+              "symbol": "CBOT:ZC1!",
+              "label": "Corn",
+              "group": "Agriculture",
+              "appSector": "Materials"
+            },
+            {
+              "symbol": "CBOT:ZW1!",
+              "label": "Wheat",
+              "group": "Agriculture",
+              "appSector": "Materials"
+            },
+            {
+              "symbol": "CBOT:ZS1!",
+              "label": "Soybeans",
+              "group": "Agriculture",
+              "appSector": "Materials"
+            }
+          ],
+          "indicators": "FULL — all 12 return MA + RSI, so both range percentile and the Technical pillar are sourceable.",
+          "secondarySignals": "% off the 52-week high (which does carry meaning here), and curve structure (contango / backwardation) where a front/second contract exists.",
+          "requiredEverySweep": false,
+          "coverageNote": "Gold, silver and Brent have been on the board almost every sweep by habit rather than by rule — commodities were never in REQUIRED_COVERAGE. Now added."
+        },
+        "credit": {
+          "label": "Credit",
+          "count": 0,
+          "symbols": [],
+          "status": "NOT YET SCREENED — source unresolved.",
+          "why": "Credit is named as an asset class in the sweep coverage spec and has never been screened; zero credit ideas have appeared across 19 sweeps. The natural series are the ICE BofA OAS indices (IG: BAMLC0A0CM, HY: BAMLH0A0HYM2), which FRED publishes keyless as CSV — but fred.stlouisfed.org was UNREACHABLE from this environment (read timeout), so the source could not be verified and is deliberately NOT written in as though it worked. Alternatives to evaluate: the HYG/LQD/JNK ETFs as a traded proxy (resolvable on the scanner today, but price rather than spread), or a CDS index feed. Until one is verified, credit stays out of REQUIRED_COVERAGE."
+        }
+      }
     }
   },
   "recordedFields": {
-    "tier": "REQUIRED on every single-name idea: core | held | thematic. Macro ideas (FX, rates, commodities, index) use tier 'macro' and are exempt from every tier rule below.",
+    "tier": "REQUIRED on every single-name idea: core | held | thematic. FX, rates, commodity and index/sector ideas use tier 'macro' and are exempt from the marketCapBn and liquidity obligations. The macro universe itself is defined in tiers.macro.",
     "marketCapBn": "REQUIRED on every single-name idea, sourced from the scanner (market_cap_basic), not authored. A descriptor, not a gate.",
     "advUsdM": "REQUIRED on Tier 3 ideas: 20-day average dollar volume, sourced from the scanner.",
     "speculative": "Auto-set true for Tier 3 by the generator; caps the conviction label at Medium.",
@@ -260,66 +651,78 @@
       {
         "code": "SPX",
         "name": "S&P 500",
-        "region": "US"
+        "region": "US",
+        "tvSymbol": "SP:SPX"
       },
       {
         "code": "NDX",
         "name": "Nasdaq 100",
-        "region": "US"
+        "region": "US",
+        "tvSymbol": "NASDAQ:NDX"
       },
       {
         "code": "RUT",
         "name": "Russell 2000",
         "region": "US",
-        "note": "Breadth/rotation read - already quoted in the weekly letter."
+        "note": "Breadth/rotation read - already quoted in the weekly letter.",
+        "tvSymbol": "TVC:RUT"
       },
       {
         "code": "SOX",
         "name": "PHLX Semiconductor",
         "region": "US",
-        "note": "The desk's standing semis proxy."
+        "note": "The desk's standing semis proxy.",
+        "tvSymbol": "TVC:SOX"
       },
       {
         "code": "SXXP",
         "name": "STOXX Europe 600",
-        "region": "Europe"
+        "region": "Europe",
+        "tvSymbol": "TVC:SXXP"
       },
       {
         "code": "SX5E",
         "name": "EURO STOXX 50",
-        "region": "Europe"
+        "region": "Europe",
+        "tvSymbol": "TVC:SX5E"
       },
       {
         "code": "SX7E",
         "name": "EURO STOXX Banks",
         "region": "Europe",
-        "note": "European credit/financial stress read."
+        "note": "European credit/financial stress read.",
+        "tvSymbol": "TVC:SX7E"
       },
       {
         "code": "UKX",
         "name": "FTSE 100",
-        "region": "UK"
+        "region": "UK",
+        "tvSymbol": "TVC:UKX"
       },
       {
         "code": "KOSPI",
         "name": "Korea Composite",
         "region": "Asia",
-        "note": "Memory-cycle read - the SK Hynix/Samsung tape already drives MU theses."
+        "note": "Memory-cycle read - the SK Hynix/Samsung tape already drives MU theses.",
+        "tvSymbol": "TVC:KOSPI"
       },
       {
         "code": "NKY",
         "name": "Nikkei 225",
-        "region": "Asia"
+        "region": "Asia",
+        "tvSymbol": "TVC:NI225"
       },
       {
         "code": "TWSE",
         "name": "Taiwan Weighted",
-        "region": "Asia"
+        "region": "Asia",
+        "tvSymbol": "TVC:TAIEX"
       },
       {
         "code": "HSI",
         "name": "Hang Seng",
-        "region": "Asia"
+        "region": "Asia",
+        "tvSymbol": "TVC:HSI"
       }
     ],
     "ideaTier": "An index- or sector-level idea is tier 'macro' - no marketCapBn or liquidity obligation.",
@@ -552,7 +955,8 @@
         "why": "Korea, Japan and Taiwan sector indices are fragmented across exchange-specific families with no clean cross-market equivalent to GICS or STOXX supersectors, and there is no reliable UCITS/US-listed sector proxy for most of them. Asia is screened at INDEX level (KOSPI, NKY, TWSE, HSI) and at SINGLE-NAME level via Tier 1, which already catches the memory-cycle and semi-supply-chain reads that matter to this desk. Revisit if an Asia sector thesis needs an expression the index level cannot carry."
       }
     },
-    "tradabilityGap": "KNOWN GAP, not yet modelled. mapping.js tradability() only tests OTC-vs-structured against MiFID classification. It does NOT know that a US-listed ETF (XLE and every SPDR proxy above) generally cannot be distributed to an EU retail client without a PRIIPs KID - which would bite on Aurora (MiFID Retail, EUR base). Today a US sector-ETF idea would show as tradable for her when in practice it is not. Either add a domicile check to tradability(), or require the European proxy on any sector idea flagged to an EU retail book."
+    "tradabilityGap": "KNOWN GAP, not yet modelled. mapping.js tradability() only tests OTC-vs-structured against MiFID classification. It does NOT know that a US-listed ETF (XLE and every SPDR proxy above) generally cannot be distributed to an EU retail client without a PRIIPs KID - which would bite on Aurora (MiFID Retail, EUR base). Today a US sector-ETF idea would show as tradable for her when in practice it is not. Either add a domicile check to tradability(), or require the European proxy on any sector idea flagged to an EU retail book.",
+    "symbolNote": "tvSymbol is the VERIFIED scanner symbol for each index, recorded so an index-level idea can source its Technical pillar. It is not guessable from the code: the S&P is SP:SPX (not TVC:SPX, which does not resolve), the Nasdaq 100 is NASDAQ:NDX, and the Nikkei is TVC:NI225 rather than TVC:NKY. Verified 2026-08-20 — all carry MA + RSI."
   },
   "screenOutput": {
     "_comment": "What screen_universe.py hands the sweep. Bounded on purpose - an unbounded global candidate list is the same as no screen at all.",

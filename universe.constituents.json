@@ -1,9 +1,9 @@
 {
-  "asOf": "2026-08-20 04:58 UTC",
+  "asOf": "2026-08-20 05:10 UTC",
   "note": "Fetched index membership. Committed so a sweep is reproducible after the fact. Regenerate: python screen_universe.py",
   "indices": {
     "SPX": {
-      "asOf": "2026-08-20 04:58 UTC",
+      "asOf": "2026-08-20 05:10 UTC",
       "count": 502,
       "source": "TradingView scanner symbolset SYML:SP;SPX [america:502]",
       "region": "US",
@@ -513,7 +513,7 @@
       ]
     },
     "NDX": {
-      "asOf": "2026-08-20 04:58 UTC",
+      "asOf": "2026-08-20 05:10 UTC",
       "count": 102,
       "source": "TradingView scanner symbolset SYML:NASDAQ;NDX [america:102]",
       "region": "US",
@@ -623,7 +623,7 @@
       ]
     },
     "SX5E": {
-      "asOf": "2026-08-20 04:58 UTC",
+      "asOf": "2026-08-20 05:10 UTC",
       "count": 50,
       "source": "TradingView scanner symbolset SYML:TVC;SX5E [germany:17 france:15 netherlands:6 spain:4 italy:5 belgium:2 finland:1]",
       "region": "Europe",
@@ -681,7 +681,7 @@
       ]
     },
     "SXXP": {
-      "asOf": "2026-08-20 04:58 UTC",
+      "asOf": "2026-08-20 05:10 UTC",
       "count": 600,
       "source": "TradingView scanner symbolset SYML:TVC;SXXP [germany:70 france:69 netherlands:35 spain:28 italy:40 belgium:17 finland:19 ireland:6 portugal:5 austria:9 uk:124 switzerland:60 sweden:53 denmark:23 norway:24 poland:18]",
       "region": "Europe",
@@ -1289,7 +1289,7 @@
       ]
     },
     "UKX": {
-      "asOf": "2026-08-20 04:58 UTC",
+      "asOf": "2026-08-20 05:10 UTC",
       "count": 100,
       "source": "TradingView scanner symbolset SYML:TVC;UKX [uk:100]",
       "region": "UK",
@@ -1397,7 +1397,7 @@
       ]
     },
     "KOSPI": {
-      "asOf": "2026-08-20 04:58 UTC",
+      "asOf": "2026-08-20 05:10 UTC",
       "count": 828,
       "source": "TradingView scanner symbolset SYML:KRX;KOSPI [korea:828]",
       "region": "Asia",
@@ -2233,7 +2233,7 @@
       ]
     },
     "NKY": {
-      "asOf": "2026-08-20 04:58 UTC",
+      "asOf": "2026-08-20 05:10 UTC",
       "count": 225,
       "source": "TradingView scanner symbolset SYML:TVC;NI225 [japan:225]",
       "region": "Asia",
@@ -2466,7 +2466,7 @@
       ]
     },
     "TWSE": {
-      "asOf": "2026-08-20 04:58 UTC",
+      "asOf": "2026-08-20 05:10 UTC",
       "count": 300,
       "source": "TradingView scanner, exchange=TWSE ranked by market cap, top 300",
       "region": "Asia",
@@ -2774,7 +2774,7 @@
       ]
     },
     "HSI": {
-      "asOf": "2026-08-20 04:58 UTC",
+      "asOf": "2026-08-20 05:10 UTC",
       "count": 93,
       "source": "TradingView scanner symbolset SYML:HSI;HSI [hongkong:93]",
       "region": "Asia",
@@ -2875,7 +2875,7 @@
       ]
     },
     "SX7E": {
-      "asOf": "2026-08-20 04:58 UTC",
+      "asOf": "2026-08-20 05:10 UTC",
       "count": 66,
       "source": "derived from SXXP where industry matches ['bank']",
       "region": "Europe",

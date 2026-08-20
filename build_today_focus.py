@@ -466,17 +466,27 @@ def validate(idea, as_of, warns):
 # ---- Coverage spec: every sweep must span all asset classes / global markets -----
 # Required asset-class coverage so the board is never accidentally US-equity-only.
 # FX and RATES are the most-often-missed and are REQUIRED each run.
-REQUIRED_COVERAGE = ("FX", "Rates")
+REQUIRED_COVERAGE = ("FX", "Rates", "Commodities")
+# Commodity sectors, per the macro universe in universe.json (tiers.macro.classes.commodities).
+COMMODITY_SECTORS = ("gold", "energy", "materials")
 
 
 def check_coverage(data, warns):
     """Warn if the day's ideas don't span the required asset classes. RATES is met by
-    a sector 'Rates' OR an assetClass 'Fixed Income'; FX by a sector 'FX'."""
+    a sector 'Rates' OR an assetClass 'Fixed Income'; FX by a sector 'FX'; COMMODITIES by
+    a sector in COMMODITY_SECTORS or an assetClass 'Commodity'. Commodities were added to
+    the requirement once the macro universe was defined — gold, silver and Brent had been
+    on the board almost every sweep by habit rather than by rule."""
     ideas = list(data.get("earnings", [])) + list(data.get("exEarnings", []))
     sectors = {str(i.get("sector", "")).lower() for i in ideas}
     classes = {str(i.get("assetClass", "")).lower() for i in ideas}
     has_fx = "fx" in sectors
     has_rates = ("rates" in sectors) or ("fixed income" in classes)
+    has_commod = bool(sectors & set(COMMODITY_SECTORS)) or ("commodity" in classes)
+    if not has_commod:
+        warns.append("COVERAGE: no commodity idea — every run must include commodities "
+                     "(sector Gold/Energy/Materials or assetClass 'Commodity'). See "
+                     "universe.json tiers.macro.classes.commodities for the screened set.")
     if not has_fx:
         warns.append("COVERAGE: no FX idea in this sweep — every run must include FX (sector 'FX').")
     if not has_rates:

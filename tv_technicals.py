@@ -54,17 +54,80 @@ COLUMNS = ["close", "currency", "SMA50", "SMA100", "SMA200",
 
 # ---- symbol resolution -------------------------------------------------------
 # Known macro / FX / commodity symbols (exact TradingView tickers).
-MACRO_MAP = {
-    "DXY": "TVC:DXY",
-    "XAU": "OANDA:XAUUSD", "GOLD": "OANDA:XAUUSD",
-    "XAG": "OANDA:XAGUSD", "SILVER": "OANDA:XAGUSD",
-    "WTI": "TVC:USOIL", "BRENT": "TVC:UKOIL",
-    "BTC": "BINANCE:BTCUSDT", "BTCUSD": "BINANCE:BTCUSDT",
-}
-FX_MAJORS = {"USDJPY", "EURUSD", "GBPUSD", "USDCHF", "AUDUSD", "USDCAD",
-             "NZDUSD", "EURGBP", "EURJPY", "GBPJPY", "EURCHF"}
-# Rates yields: scanner returns the level only (no daily MA/RSI) -> not sourceable.
-RATES_TOKENS = ("10Y", "2Y", "30Y", "TNX", "YIELD", "BUND", "GILT", "JGB")
+# The macro symbol tables are READ FROM universe.json (tiers.macro), not hardcoded here.
+# The old short lists silently mis-resolved live board instruments: USD/CNH and SOFR fell
+# through to the EQUITY probe (NASDAQ:USDCNH ...) and failed, and TVC:USOIL / TVC:UKOIL —
+# what WTI and BRENT were mapped to — do not resolve on the scanner at all, so Brent
+# technicals had been failing silently. Sourcing both from the universe keeps one list.
+_UNIVERSE = HERE / "universe.json"
+_macro_cache = None
+
+
+def _macro_universe():
+    global _macro_cache
+    if _macro_cache is None:
+        try:
+            u = json.loads(_UNIVERSE.read_text(encoding="utf-8"))
+            _macro_cache = ((u.get("tiers") or {}).get("macro") or {}).get("classes") or {}
+        except (OSError, json.JSONDecodeError):
+            _macro_cache = {}
+    return _macro_cache
+
+
+def _fx_map():
+    """{PAIR: FX_IDC:PAIR} for every pair in the macro universe."""
+    out = {}
+    for e in (_macro_universe().get("fx") or {}).get("symbols", []):
+        out[e["symbol"].split(":")[-1].upper()] = e["symbol"]
+    return out
+
+
+def _commodity_map():
+    """{TOKEN: symbol} — token aliases for the commodity + FX-index instruments."""
+    alias = {"Brent crude (front)": ["BRENT", "BRN"], "WTI crude (front)": ["WTI", "USOIL", "CL"],
+             "US natural gas": ["NATGAS", "NG"], "Gold spot": ["XAU", "GOLD"],
+             "Silver spot": ["XAG", "SILVER"], "Platinum spot": ["XPT", "PLATINUM"],
+             "Palladium spot": ["XPD", "PALLADIUM"], "Copper (front)": ["COPPER", "HG"],
+             "Aluminium (LME)": ["ALUMINIUM", "ALUMINUM"], "Corn": ["CORN"],
+             "Wheat": ["WHEAT"], "Soybeans": ["SOYBEANS", "SOY"],
+             "Dollar index (DXY)": ["DXY"]}
+    out = {}
+    for cls in ("commodities", "fx"):
+        for e in (_macro_universe().get(cls) or {}).get("symbols", []):
+            for a in alias.get(e["label"], []):
+                out[a] = e["symbol"]
+    out.setdefault("BTC", "BINANCE:BTCUSDT")
+    out.setdefault("BTCUSD", "BINANCE:BTCUSDT")
+    return out
+
+
+def _index_map():
+    """{CODE: verified scanner symbol} for the screened indices. Not guessable from the
+    code — the S&P is SP:SPX (TVC:SPX does not resolve) and the Nikkei is TVC:NI225."""
+    try:
+        u = json.loads(_UNIVERSE.read_text(encoding="utf-8"))
+        watch = (u.get("indexAndSectorScreen") or {}).get("watch") or []
+    except (OSError, json.JSONDecodeError):
+        return {}
+    return {w["code"].upper(): w["tvSymbol"] for w in watch if w.get("tvSymbol")}
+
+
+def _rates_map():
+    """{TOKEN: symbol}. Rates DO resolve (TVC:US10Y etc.) and carry a 52-week range, but
+    return NO SMA or RSI — verified 0/14. So the level and range are sourceable colour
+    while the Technical pillar itself stays honestly estimated."""
+    out = {}
+    for e in (_macro_universe().get("rates") or {}).get("symbols", []):
+        tok = e["symbol"].split(":")[-1].upper()          # US10Y, DE02Y ...
+        out[tok] = e["symbol"]
+        if tok.startswith("US"):
+            out.setdefault(f"US {tok[2:]}", e["symbol"])   # "US 10Y" as written on the board
+    return out
+
+
+# Rates yields: the scanner returns level + 52w range but no daily MA/RSI, so the
+# Technical pillar is not sourceable for them (verified 2026-08-20: 0/14 carried MA+RSI).
+RATES_TOKENS = ("10Y", "2Y", "30Y", "05Y", "5Y", "TNX", "YIELD", "BUND", "GILT", "JGB", "SOFR")
 # Equities whose listing venue we pin; unknown equities are probed on all three.
 EQUITY_EXCHANGE = {"NKE": "NYSE", "MU": "NASDAQ", "DAL": "NYSE"}
 EQUITY_PROBE_EXCHANGES = ("NASDAQ", "NYSE", "AMEX")
@@ -84,12 +147,20 @@ def candidate_symbols(idea: dict):
     tok = norm_ticker(raw)
     if not tok:
         return [], "none"
+    rates = _rates_map()
+    if tok in rates:
+        return [rates[tok]], "rates"
     if any(x in tok for x in RATES_TOKENS):
         return [], "rates"
-    if tok in MACRO_MAP:
-        return [MACRO_MAP[tok]], "macro"
-    if tok in FX_MAJORS:
-        return [f"FX_IDC:{tok}"], "fx"
+    index = _index_map()
+    if tok in index:
+        return [index[tok]], "macro"
+    commodity = _commodity_map()
+    if tok in commodity:
+        return [commodity[tok]], "macro"
+    fx = _fx_map()
+    if tok in fx:
+        return [fx[tok]], "fx"
     ac = (idea.get("assetClass") or "").lower()
     if ac in ("equity", "equities") or idea.get("sector") not in ("FX", "Rates", "Gold"):
         if tok in EQUITY_EXCHANGE:
