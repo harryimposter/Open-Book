@@ -1,97 +1,97 @@
 {
   "nvda-q2": {
-    "fp": "c089a38dcc93039a832e6105562a70fd4a772a68",
+    "fp": "f3dae74ae58ddfd7ad875d8775a50378ba647b96",
     "postedAt": "2026-08-11",
-    "updatedAt": "2026-08-12"
-  },
-  "csco-fq4": {
-    "fp": "d25c989e161dd09016ca2309571d0702f28410ff",
-    "postedAt": "2026-08-12",
-    "updatedAt": "2026-08-12"
+    "updatedAt": "2026-08-20"
   },
   "amat-fq3": {
-    "fp": "076cf5d0586c89e5370e6c61b1b3530b1a91449c",
+    "fp": "f2117953bd9e9a82a11d8fd16a0ffe853cd2451f",
     "postedAt": "2026-08-12",
-    "updatedAt": "2026-08-12"
-  },
-  "hd-q2": {
-    "fp": "530e2f45c3c6c02608d9bb07c220d7515d4254ce",
-    "postedAt": "2026-08-12",
-    "updatedAt": "2026-08-12"
-  },
-  "msft-fq4-react": {
-    "fp": "27398088b934d61781caa04144f4b8a74daa113b",
-    "postedAt": "2026-08-11",
-    "updatedAt": "2026-08-12"
-  },
-  "nflx-q2": {
-    "fp": "db1f76e01277ac9e49ce2288b0bcc3745205c3a7",
-    "postedAt": "2026-07-12",
-    "updatedAt": "2026-08-12"
+    "updatedAt": "2026-08-20"
   },
   "ddog-q2-react": {
-    "fp": "1ba9a260f2009ac4acda6a037d02e15bfc6a0a7b",
+    "fp": "6ce05672f8bdb0c6b3a5b26325d34e73f9113c15",
     "postedAt": "2026-08-12",
-    "updatedAt": "2026-08-12"
+    "updatedAt": "2026-08-20"
+  },
+  "wmt-q2": {
+    "fp": "bd1adaea437d8ce2ea14e54c55524f08d423f535",
+    "postedAt": "2026-08-20",
+    "updatedAt": "2026-08-20"
+  },
+  "tgt-q2-react": {
+    "fp": "bc71cc0da022c60f226607dc6faee8c3661133f4",
+    "postedAt": "2026-08-20",
+    "updatedAt": "2026-08-20"
   },
   "mu-memory-dislocation": {
-    "fp": "4c2fdb729c00bfaca9d054537512d12da348e24c",
+    "fp": "e196fb442a7e88262936f6467eb9c8ae8ecdb62f",
     "postedAt": "2026-08-11",
-    "updatedAt": "2026-08-12"
+    "updatedAt": "2026-08-20"
   },
   "gold-pullback": {
-    "fp": "1aa73c17aef3cef89c6109ccd57722b466ce9ac3",
+    "fp": "dd507b6e77f65e6600896cd5f2f61e88c27c42d5",
     "postedAt": "2026-07-07",
-    "updatedAt": "2026-08-12"
+    "updatedAt": "2026-08-20"
   },
   "silver-ratio-catchup": {
-    "fp": "31ba57c6282be46ed3aa506ea65b68ba28512f0e",
+    "fp": "48198c125f86285acbc439d3af8c213028ddc19c",
     "postedAt": "2026-08-11",
-    "updatedAt": "2026-08-12"
+    "updatedAt": "2026-08-20"
   },
   "ai-power": {
-    "fp": "fc6d095935e769be96d6bb94f70dd1f098481034",
+    "fp": "c474d0275482734ec09cab79a8f8403c838c79a7",
     "postedAt": "2026-07-07",
-    "updatedAt": "2026-08-11"
+    "updatedAt": "2026-08-20"
   },
   "rate-range-accrual": {
-    "fp": "6c3c318b246ba6e7c5e74f6e84541fb06377ff90",
+    "fp": "68a331c7ac5fa805259c2bee29983701a375e654",
     "postedAt": "2026-07-07",
-    "updatedAt": "2026-08-12"
+    "updatedAt": "2026-08-20"
   },
   "spx-cheap-convexity": {
-    "fp": "18515deb087e9266bee14384629489c4219ac2b3",
+    "fp": "b216b87d544162e62079355ab423c2417f040be9",
     "postedAt": "2026-07-07",
-    "updatedAt": "2026-08-12"
+    "updatedAt": "2026-08-20"
   },
   "fx-usd-hedge": {
-    "fp": "4304ac0dad5a606a9bed799f42a23eb10d8f0e24",
+    "fp": "685a97bd95289ee65004f02f161c1704bd3a36fb",
     "postedAt": "2026-07-07",
-    "updatedAt": "2026-08-12"
+    "updatedAt": "2026-08-20"
   },
   "fx-carry-income": {
-    "fp": "feadeb2f6aa3b704f7847a53c339fea90f1210c4",
+    "fp": "4eb89d21f5e946815e040d517786aa014e0beb7c",
     "postedAt": "2026-07-07",
-    "updatedAt": "2026-08-12"
+    "updatedAt": "2026-08-20"
   },
   "tac-usdjpy-puts": {
-    "fp": "fe92a1b5e7584b7de451538ea3e9f4e80925d3d0",
+    "fp": "5b8414b2293dad22ad3ca8819581b04a1d7beb3d",
     "postedAt": "2026-08-11",
-    "updatedAt": "2026-08-12"
+    "updatedAt": "2026-08-20"
   },
   "tac-eurjpy-puts": {
-    "fp": "7d43352b41470a378da5dbc5481214b69d9d17f5",
+    "fp": "55cb2f2b384907ea7de03db10aa54f79664e864b",
     "postedAt": "2026-08-12",
-    "updatedAt": "2026-08-12"
+    "updatedAt": "2026-08-20"
   },
-  "tac-usdcnh-puts": {
-    "fp": "8beb35fec022a5724d3ce1be630290abfdb00a7f",
-    "postedAt": "2026-08-11",
-    "updatedAt": "2026-08-11"
+  "tac-gbpusd-rr": {
+    "fp": "f4dcee3384e49e00fad8a62b9c6c9e3a98358a2e",
+    "postedAt": "2026-08-20",
+    "updatedAt": "2026-08-20"
   },
   "tac-brent-hormuz": {
-    "fp": "90e840fa1477cc73fc45e4853fb5dc859ce656f8",
+    "fp": "f1c8f986f0ed699adbeae8f18476bad664190dc4",
     "postedAt": "2026-07-07",
-    "updatedAt": "2026-08-12"
+    "updatedAt": "2026-08-20"
+  },
+  "sox-semis-derating": {
+    "fp": "7c99b6b7762cdbed33720bd8ff0c46b437e06157",
+    "postedAt": "2026-08-20",
+    "updatedAt": "2026-08-20"
+  },
+  "photonics-optical-washout": {
+    "fp": "9b61d23b1e83e062977ec33a9f56d74987fb5ec5",
+    "postedAt": "2026-08-20",
+    "updatedAt": "2026-08-20"
   }
 }
