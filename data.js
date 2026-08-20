@@ -524,7 +524,7 @@ SEED_CLIENTS.forEach(c => {
 /* idea bucket override by sector role (energy majors read as income, etc.).
    Crypto is a high-beta RISK asset (see mapping.js HIGH_BETA_SECTORS) — it plays a
    Growth role, NOT Preservation. Gold is the genuine ballast. Values are 3-bucket. */
-const SECTOR_BUCKET = { Energy: "Income", Utilities: "Income", "Real Estate": "Income", Infrastructure: "Income", Gold: "Preservation", Crypto: "Growth" };
+const SECTOR_BUCKET = { Energy: "Income", Utilities: "Income", "Real Estate": "Income", Infrastructure: "Income", Gold: "Preservation", Crypto: "Growth", "Communication Services": "Growth" };
 
 /* asset classes shown in the coverage matrix, in order */
 const ASSET_CLASSES = ["Equity", "Fixed Income", "Real Assets", "Commodity", "Alternatives", "Structured", "Cash"];
