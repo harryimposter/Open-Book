@@ -356,33 +356,50 @@ def main(argv=None):
     print(f"\n  UNION  {len(universe_rows):5d} unique names across {len(rows_by_index)} index set(s)")
 
     # ---- 3. Tier 3 thematic watchlist
-    thematic_syms = []
+    # A Tier 3 name may list anywhere — the cohort is curated on the theme, not the
+    # exchange — so each name is resolved on its own scanRegion. SIVE (Sivers
+    # Semiconductors) is the case in point: OMXSTO:SIVE, not a US ticker.
+    REGION_TAG = {"america": "US", "sweden": "Europe", "germany": "Europe",
+                  "uk": "UK", "korea": "Asia", "japan": "Asia", "hongkong": "Asia",
+                  "taiwan": "Asia"}
+    by_region = {}
+    thematic_names = []
     for cohort in (thematic.get("cohorts") or {}).values():
-        thematic_syms += [n["ticker"] for n in cohort.get("names", [])]
+        for n in cohort.get("names", []):
+            thematic_names.append(n)
+            by_region.setdefault(n.get("scanRegion", "america"), []).append(n)
+
     thematic_rows, thematic_missing = [], []
-    if thematic_syms:
-        probe = [f"{ex}:{t}" for t in thematic_syms for ex in US_EXCHANGES]
+    soft_floor = thematic.get("liquidityFloorAdvUsdM") or 0
+    for region, group in by_region.items():
+        if region == "america":
+            probe = [f"{ex}:{n['ticker']}" for n in group for ex in US_EXCHANGES]
+        else:
+            probe = [n.get("symbol") or f"{n.get('venue')}:{n['ticker']}" for n in group]
         try:
-            found = scan_tickers("america", probe, COLUMNS)
-        except Exception as e:
+            found = scan_tickers(region, probe, COLUMNS)
+        except Exception as ex:
             found = []
-            log.append(f"Tier 3: scan failed ({type(e).__name__})")
+            log.append(f"Tier 3: scan of region '{region}' failed ({type(ex).__name__})")
         by_root = {}
-        for s, d in found:
-            by_root.setdefault(str(d.get("name", "")).upper(), (s, d))
-        for t in thematic_syms:
-            hit = by_root.get(t.upper())
+        for sy, d in found:
+            by_root.setdefault(str(d.get("name", "")).upper(), (sy, d))
+        for n in group:
+            hit = by_root.get(n["ticker"].upper())
             if hit:
-                e = enrich(hit[0], hit[1], "US", fx, "THEMATIC")
+                e = enrich(hit[0], hit[1], REGION_TAG.get(region, region), fx, "THEMATIC")
                 e["tier"] = "thematic"
                 e["speculative"] = True
-                if e["advUsdM"] is not None and e["advUsdM"] < (thematic.get("liquidityFloorAdvUsdM") or 0):
+                e["venue"] = n.get("venue")
+                if e["advUsdM"] is not None and e["advUsdM"] < soft_floor:
                     e["belowSoftLiquidityFloor"] = True
                 thematic_rows.append(e)
             else:
-                thematic_missing.append(t)
-                log.append(f"Tier 3: '{t}' UNRESOLVED on US exchanges — confirm the ticker/venue "
-                           f"(it is not screened until it resolves)")
+                thematic_missing.append(n["ticker"])
+                log.append(f"Tier 3: '{n['ticker']}' UNRESOLVED on region '{region}' — confirm the "
+                           f"ticker/venue (it is not screened until it resolves)")
+    thematic_rows.sort(key=lambda x: (x["pctOffHigh"] if x["pctOffHigh"] is not None else 0))
+    thematic_syms = [n["ticker"] for n in thematic_names]
     print(f"  TIER 3 {len(thematic_rows):5d} of {len(thematic_syms)} watchlist names resolved"
           + (f"  (missing: {', '.join(thematic_missing)})" if thematic_missing else ""))
 
@@ -455,6 +472,16 @@ def main(argv=None):
               f"{e['region']:<7s} {mc:>10s} {adv:>7s}{flag}")
     if len(capped) > 20:
         print(f"    … {len(capped) - 20} more in {CANDIDATES.name}")
+
+    if thematic_rows:
+        print(f"\n  TIER 3 WATCHLIST  {len(thematic_rows)} names, deepest first "
+              f"(speculative — conviction capped at Medium)")
+        for e in thematic_rows:
+            mc = f"{e['marketCapBn']:.2f}bn" if e.get("marketCapBn") else "  n/a  "
+            adv = f"{e['advUsdM']:.0f}m" if e.get("advUsdM") else "n/a"
+            thin = " THIN" if e.get("belowSoftLiquidityFloor") else ""
+            print(f"    {e['pctOffHigh']:7.1f}%  {e['ticker']:<6s} {str(e['description'])[:32]:<32s} "
+                  f"{str(e.get('venue') or ''):<7s} {mc:>9s} {adv:>7s}{thin}")
 
     if sector_rows:
         print(f"\n  SECTOR SCREEN  {len(sector_rows)} baskets, deepest first")

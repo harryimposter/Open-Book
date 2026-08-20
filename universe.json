@@ -1,6 +1,6 @@
 {
   "_comment": "Screening universe for the daily sweep. THE definition of what gets looked at before any idea is written: a GLOBAL core of index constituents (Tier 1), every name the books hold (Tier 2), and a hand-curated thematic watchlist (Tier 3) - plus an index/sector dislocation screen that runs above the single-name layer. Read by screen_universe.py (produces the candidate list) and by build_today_focus.py (validates that every single-name idea declares a tier). Hand-edit Tier 3 and the index list only; Tier 1 constituents are fetched and Tier 2 is derived.",
-  "version": 3,
+  "version": 4,
   "definedOn": "2026-08-20",
   "note_on_market_cap": "There is deliberately NO single market-cap floor. Cap spans ~50x inside the intended universe (a low-tens-of-billions optical name vs a few-hundred-million substrate name), so any floor either admits several thousand names or excludes the thematic tier outright. Membership and intent are the gates; marketCapBn is RECORDED on every single-name idea as a sourced descriptor, never used as the filter.",
   "tiers": {
@@ -149,74 +149,89 @@
               "ticker": "AAOI",
               "name": "Applied Optoelectronics",
               "venue": "NASDAQ",
-              "source": "user-specified"
+              "source": "user-specified",
+              "scanRegion": "america"
             },
             {
               "ticker": "AXTI",
               "name": "AXT Inc",
               "venue": "NASDAQ",
-              "source": "user-specified"
+              "source": "user-specified",
+              "scanRegion": "america"
             },
             {
               "ticker": "CIEN",
               "name": "Ciena",
               "venue": "NYSE",
-              "source": "user-specified"
+              "source": "user-specified",
+              "scanRegion": "america"
             },
             {
               "ticker": "SIVE",
               "name": "Sivers Semiconductors",
-              "venue": "UNCONFIRMED",
+              "venue": "OMXSTO",
               "source": "user-specified",
-              "flag": "Ticker unconfirmed. Read as Sivers Semiconductors, which lists in Stockholm (SIVE.ST) and would have no US-listed options - affects both scanner symbol resolution and tradability. CONFIRM BEFORE FIRST SCAN."
+              "scanRegion": "sweden",
+              "symbol": "OMXSTO:SIVE",
+              "currency": "SEK",
+              "confirmedOn": "2026-08-20",
+              "note": "Confirmed as the Stockholm listing (Sivers Semiconductors AB), not a US ticker. Consequences: no US-listed options, so direct equity is the only expression - which the Tier 3 derivatives-first relaxation already permits; and a SEK-quoted line carries currency exposure for a USD- or EUR-base book, so any idea on it must state whether the FX is hedged."
             },
             {
               "ticker": "LITE",
               "name": "Lumentum",
               "venue": "NASDAQ",
-              "source": "desk-added peer"
+              "source": "desk-added peer",
+              "scanRegion": "america"
             },
             {
               "ticker": "COHR",
               "name": "Coherent",
               "venue": "NYSE",
-              "source": "desk-added peer"
+              "source": "desk-added peer",
+              "scanRegion": "america"
             },
             {
               "ticker": "FN",
               "name": "Fabrinet",
               "venue": "NYSE",
-              "source": "desk-added peer"
+              "source": "desk-added peer",
+              "scanRegion": "america"
             },
             {
               "ticker": "CRDO",
               "name": "Credo Technology",
               "venue": "NASDAQ",
-              "source": "desk-added peer"
+              "source": "desk-added peer",
+              "scanRegion": "america"
             },
             {
               "ticker": "ALAB",
               "name": "Astera Labs",
               "venue": "NASDAQ",
-              "source": "desk-added peer"
+              "source": "desk-added peer",
+              "scanRegion": "america"
             },
             {
               "ticker": "POET",
               "name": "POET Technologies",
               "venue": "NASDAQ",
-              "source": "desk-added peer"
+              "source": "desk-added peer",
+              "scanRegion": "america"
             },
             {
               "ticker": "LWLG",
               "name": "Lightwave Logic",
               "venue": "NASDAQ",
-              "source": "desk-added peer"
+              "source": "desk-added peer",
+              "scanRegion": "america"
             },
             {
               "ticker": "OCC",
               "name": "Optical Cable Corp",
               "venue": "NASDAQ",
-              "source": "desk-added peer"
+              "source": "desk-added peer",
+              "scanRegion": "america"
             }
           ],
           "alreadyTier1": [
@@ -226,7 +241,8 @@
           ],
           "livenessCheck": "REQUIRED before first scan. Several classic photonics tickers were acquired or wound down (Infinera, NeoPhotonics, EMCORE) and are deliberately absent. screen_universe.py must report any ticker the scanner cannot resolve rather than silently skipping it."
         }
-      }
+      },
+      "venueNote": "A Tier 3 name may list anywhere - the cohort is curated on the theme, not the exchange. Each name therefore carries `venue` and `scanRegion` so screen_universe.py can resolve it on the right endpoint. A non-US listing usually means no US-listed options, which is exactly why this tier relaxes derivatives-first; it also means FX exposure that an idea must address."
     }
   },
   "recordedFields": {
