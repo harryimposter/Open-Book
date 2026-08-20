@@ -117,6 +117,7 @@ window.TODAY_FOCUS = {
             "max": 2
           }
         ],
+        "speculative": false,
         "raw": 5,
         "maxRaw": 8,
         "score": 62,
@@ -261,6 +262,7 @@ window.TODAY_FOCUS = {
             "max": 2
           }
         ],
+        "speculative": false,
         "raw": 5,
         "maxRaw": 8,
         "score": 62,
@@ -389,6 +391,7 @@ window.TODAY_FOCUS = {
             "max": 2
           }
         ],
+        "speculative": false,
         "raw": 6,
         "maxRaw": 8,
         "score": 75,
@@ -517,6 +520,7 @@ window.TODAY_FOCUS = {
             "max": 2
           }
         ],
+        "speculative": false,
         "raw": 5,
         "maxRaw": 8,
         "score": 62,
@@ -646,6 +650,7 @@ window.TODAY_FOCUS = {
             "max": 2
           }
         ],
+        "speculative": false,
         "raw": 6,
         "maxRaw": 8,
         "score": 75,
@@ -783,6 +788,7 @@ window.TODAY_FOCUS = {
             "max": 2
           }
         ],
+        "speculative": false,
         "raw": 5,
         "maxRaw": 8,
         "score": 62,
@@ -906,6 +912,7 @@ window.TODAY_FOCUS = {
             "max": 2
           }
         ],
+        "speculative": false,
         "raw": 5,
         "maxRaw": 8,
         "score": 62,
@@ -1070,6 +1077,7 @@ window.TODAY_FOCUS = {
             "max": 2
           }
         ],
+        "speculative": false,
         "raw": 11,
         "maxRaw": 15,
         "score": 73,
@@ -1328,6 +1336,7 @@ window.TODAY_FOCUS = {
             "max": 2
           }
         ],
+        "speculative": false,
         "raw": 11,
         "maxRaw": 15,
         "score": 73,
@@ -1464,6 +1473,7 @@ window.TODAY_FOCUS = {
         }
       ],
       "kind": "ex-earnings",
+      "tier": "macro",
       "postedAt": "2026-07-07",
       "updatedAt": "2026-08-12"
     },
@@ -1562,6 +1572,7 @@ window.TODAY_FOCUS = {
             "max": 2
           }
         ],
+        "speculative": false,
         "raw": 8,
         "maxRaw": 15,
         "score": 53,
@@ -1605,6 +1616,7 @@ window.TODAY_FOCUS = {
         }
       ],
       "kind": "ex-earnings",
+      "tier": "macro",
       "postedAt": "2026-08-11",
       "updatedAt": "2026-08-12"
     },
@@ -1703,6 +1715,7 @@ window.TODAY_FOCUS = {
             "max": 2
           }
         ],
+        "speculative": false,
         "raw": 10,
         "maxRaw": 15,
         "score": 67,
@@ -1753,6 +1766,7 @@ window.TODAY_FOCUS = {
         }
       ],
       "kind": "ex-earnings",
+      "tier": "macro",
       "postedAt": "2026-07-07",
       "updatedAt": "2026-08-11"
     },
@@ -1849,6 +1863,7 @@ window.TODAY_FOCUS = {
             "max": 2
           }
         ],
+        "speculative": false,
         "raw": 11,
         "maxRaw": 15,
         "score": 73,
@@ -1896,6 +1911,7 @@ window.TODAY_FOCUS = {
         }
       ],
       "kind": "ex-earnings",
+      "tier": "macro",
       "postedAt": "2026-07-07",
       "updatedAt": "2026-08-12"
     },
@@ -1993,6 +2009,7 @@ window.TODAY_FOCUS = {
             "max": 2
           }
         ],
+        "speculative": false,
         "raw": 13,
         "maxRaw": 15,
         "score": 87,
@@ -2042,6 +2059,7 @@ window.TODAY_FOCUS = {
         }
       ],
       "kind": "ex-earnings",
+      "tier": "macro",
       "postedAt": "2026-07-07",
       "updatedAt": "2026-08-12"
     },
@@ -2160,6 +2178,7 @@ window.TODAY_FOCUS = {
             "max": 2
           }
         ],
+        "speculative": false,
         "raw": 11,
         "maxRaw": 15,
         "score": 73,
@@ -2207,6 +2226,7 @@ window.TODAY_FOCUS = {
         }
       ],
       "kind": "ex-earnings",
+      "tier": "macro",
       "postedAt": "2026-07-07",
       "updatedAt": "2026-08-12"
     },
@@ -2325,6 +2345,7 @@ window.TODAY_FOCUS = {
             "max": 2
           }
         ],
+        "speculative": false,
         "raw": 11,
         "maxRaw": 15,
         "score": 73,
@@ -2373,6 +2394,7 @@ window.TODAY_FOCUS = {
         }
       ],
       "kind": "ex-earnings",
+      "tier": "macro",
       "postedAt": "2026-07-07",
       "updatedAt": "2026-08-12"
     },
@@ -2594,6 +2616,7 @@ window.TODAY_FOCUS = {
             "max": 2
           }
         ],
+        "speculative": false,
         "raw": 12,
         "maxRaw": 15,
         "score": 80,
@@ -2642,6 +2665,7 @@ window.TODAY_FOCUS = {
         }
       ],
       "kind": "ex-earnings",
+      "tier": "macro",
       "postedAt": "2026-08-11",
       "updatedAt": "2026-08-12"
     },
@@ -2863,6 +2887,7 @@ window.TODAY_FOCUS = {
             "max": 2
           }
         ],
+        "speculative": false,
         "raw": 11,
         "maxRaw": 15,
         "score": 73,
@@ -2910,6 +2935,7 @@ window.TODAY_FOCUS = {
         }
       ],
       "kind": "ex-earnings",
+      "tier": "macro",
       "postedAt": "2026-08-12",
       "updatedAt": "2026-08-12"
     },
@@ -3015,6 +3041,7 @@ window.TODAY_FOCUS = {
             "max": 2
           }
         ],
+        "speculative": false,
         "raw": 11,
         "maxRaw": 15,
         "score": 73,
@@ -3059,6 +3086,7 @@ window.TODAY_FOCUS = {
         }
       ],
       "kind": "ex-earnings",
+      "tier": "macro",
       "postedAt": "2026-08-11",
       "updatedAt": "2026-08-11"
     },
@@ -3251,6 +3279,7 @@ window.TODAY_FOCUS = {
             "max": 2
           }
         ],
+        "speculative": false,
         "raw": 10,
         "maxRaw": 15,
         "score": 67,
@@ -3303,6 +3332,7 @@ window.TODAY_FOCUS = {
         }
       ],
       "kind": "ex-earnings",
+      "tier": "macro",
       "postedAt": "2026-07-07",
       "updatedAt": "2026-08-12"
     }

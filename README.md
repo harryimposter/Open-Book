@@ -57,7 +57,24 @@ A daily scheduled run would: (1) sweep the market and overwrite `today_focus.jso
 (2) run `python build_today_focus.py`, (3) commit. No app edits needed. The client
 mapping is computed in the browser, so it always reflects the current book.
 
-**Sweep inputs.** Each sweep must (a) scan large-cap **drawdowns/dislocations** (a
+**The universe** is defined in `universe.json`, not left to judgment. Three tiers,
+global, with **no single market-cap floor** — cap spans ~50x inside the intended
+universe, so membership and intent are the gates and market cap is a recorded
+descriptor rather than a filter:
+
+| Tier | What | Membership |
+|------|------|------------|
+| **1 · Core** | SPX ∪ NDX ∪ SX5E ∪ SX7E ∪ SXXP ∪ UKX ∪ KOSPI ∪ NKY ∪ TWSE ∪ HSI (~2,000–2,600 names, US/Europe/UK/Asia) | Fetched each scan, never hand-typed |
+| **2 · Held** | Every listed position across the nine books not already in Tier 1 | Derived from `data.js` — cannot drift |
+| **3 · Thematic** | A curated watchlist outside the indices; photonics/optical is the first cohort | Hand-edited, deliberately |
+
+Tier 3 is speculative by construction: conviction is **capped at Medium**, direct
+equity counts as a primary expression (listed options are thin or absent), and a
+soft $5m ADV floor forces an explicit size limit rather than blocking the idea.
+Indices and sector baskets are screened in their own right too — a sector index off
+its high is a candidate thesis even when no constituent stands out.
+
+**Sweep inputs.** Each sweep must (a) scan that universe for **drawdowns/dislocations** (a
 >~15% pullback in a widely-held name is a candidate, not noise) and (b) read the
 desk's **core voices** — every sweep, alongside the broad tape — citing them in an
 idea's `sources` (`kind: "view"`, shown as a "Via …" line). Their read informs
@@ -138,5 +155,5 @@ shows exactly what would go out.
 
 Idea→client links are derived, never hand-picked, so the views can't drift.
 
-Aurora is the real anchor book; the other clients (Fable, Scott, Amar, Jacob,
-Prahnav, Ben) are consistent, distinct private-bank books.
+Aurora is the real anchor book; the other eight clients (Fable, Scott, Amar,
+Jacob, Prahnav, Ben, Mitch, Fotis) are consistent, distinct private-bank books.

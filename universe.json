@@ -1,0 +1,553 @@
+{
+  "_comment": "Screening universe for the daily sweep. THE definition of what gets looked at before any idea is written: a GLOBAL core of index constituents (Tier 1), every name the books hold (Tier 2), and a hand-curated thematic watchlist (Tier 3) - plus an index/sector dislocation screen that runs above the single-name layer. Read by screen_universe.py (produces the candidate list) and by build_today_focus.py (validates that every single-name idea declares a tier). Hand-edit Tier 3 and the index list only; Tier 1 constituents are fetched and Tier 2 is derived.",
+  "version": 3,
+  "definedOn": "2026-08-20",
+  "note_on_market_cap": "There is deliberately NO single market-cap floor. Cap spans ~50x inside the intended universe (a low-tens-of-billions optical name vs a few-hundred-million substrate name), so any floor either admits several thousand names or excludes the thematic tier outright. Membership and intent are the gates; marketCapBn is RECORDED on every single-name idea as a sourced descriptor, never used as the filter.",
+  "tiers": {
+    "core": {
+      "label": "Tier 1 - Core index constituents (global)",
+      "definition": "The union of the constituent sets of every index listed in `indices` below. Global by design - US, Europe, UK and Asia are all first-class.",
+      "membership": "fetched",
+      "why_not_stored": "Index membership changes with every rebalance, and a hand-typed list of ~2,000 global tickers would be an unsourced assertion - the one thing this repo bans everywhere else. screen_universe.py fetches each constituent set and stamps provenance + asOf; the fetched snapshot is committed as universe.constituents.json so any sweep is reproducible.",
+      "sources": [
+        "TradingView scanner, index-membership filter (primary)",
+        "Second independent constituent source required before the snapshot is committed - the same >=2-source rule the sweep runs on"
+      ],
+      "approxCount": "~2,000-2,600 unique names depending on overlap and the Korea decision below",
+      "capFloorBn": null,
+      "liquidityFloorAdvUsdM": 10.0,
+      "screen": "Rank by % off 52-week high within each region, apply the >~15% dislocation rule, then cap the candidate list (see screenOutput). Market cap is recorded on every candidate, never used to filter.",
+      "convictionCeiling": null,
+      "derivativesFirst": true,
+      "indices": [
+        {
+          "code": "SPX",
+          "name": "S&P 500",
+          "region": "US",
+          "approx": 500,
+          "requestedBy": "desk"
+        },
+        {
+          "code": "NDX",
+          "name": "Nasdaq 100",
+          "region": "US",
+          "approx": 100,
+          "requestedBy": "desk",
+          "note": "Heavy overlap with SPX; ~35-40 names are NDX-only."
+        },
+        {
+          "code": "SX5E",
+          "name": "EURO STOXX 50",
+          "region": "Europe",
+          "approx": 50,
+          "requestedBy": "desk",
+          "note": "Explicitly requested. A strict subset of SXXP - kept named because it is also used as a benchmark/sector slice."
+        },
+        {
+          "code": "SX7E",
+          "name": "EURO STOXX Banks",
+          "region": "Europe",
+          "approx": 25,
+          "requestedBy": "desk",
+          "note": "Explicitly requested. A sector index and a subset of SXXP; doubles as an index-level dislocation signal for European financials."
+        },
+        {
+          "code": "SXXP",
+          "name": "STOXX Europe 600",
+          "region": "Europe",
+          "approx": 600,
+          "requestedBy": "desk-added",
+          "note": "Added for genuine European breadth - 50 names cannot carry 'scan Europe'. Supersets SX5E and SX7E, and reaches Swiss/Nordic listings the euro indices miss."
+        },
+        {
+          "code": "UKX",
+          "name": "FTSE 100",
+          "region": "UK",
+          "approx": 100,
+          "requestedBy": "desk-added",
+          "note": "The books hold SHEL LN and DGE LN; UK is named in the sweep coverage spec but had no universe behind it."
+        },
+        {
+          "code": "KOSPI",
+          "name": "Korea Composite",
+          "region": "Asia",
+          "approx": 800,
+          "requestedBy": "desk",
+          "note": "Explicitly requested. See koreaBreadthDecision - the full board carries a long illiquid tail the liquidity floor filters."
+        },
+        {
+          "code": "NKY",
+          "name": "Nikkei 225",
+          "region": "Asia",
+          "approx": 225,
+          "requestedBy": "desk-added",
+          "note": "The yen complex is a standing desk theme; Japan equity had no universe behind it."
+        },
+        {
+          "code": "TWSE",
+          "name": "Taiwan Weighted",
+          "region": "Asia",
+          "approx": 200,
+          "requestedBy": "desk-added",
+          "note": "TSMC and the semi supply chain - the compute side of the same AI theme the photonics cohort covers optically. Scan the liquid top of the board, not all ~1,000 listings."
+        },
+        {
+          "code": "HSI",
+          "name": "Hang Seng",
+          "region": "Asia",
+          "approx": 80,
+          "requestedBy": "desk-added",
+          "note": "China/HK exposure; the China overhang already drives AMAT-type theses."
+        }
+      ],
+      "koreaBreadthDecision": "Requested as 'all stocks in KOSPI'. The full board is ~800 listings with a long illiquid tail. Rather than narrow it to KOSPI 200 - which would silently drop names - the full board is scanned and the Tier 1 liquidity floor filters the tail. Set coreBreadth to 'kospi200' if you would rather cut it at the index level instead.",
+      "coreBreadth": "full",
+      "liquidityGate": "screen-only",
+      "liquidityRule": "PROPOSED, override freely. A ~$10m 20-day average dollar volume floor applied when building the CANDIDATE list only - it never blocks an idea you choose to write. Without it a global ~2,400-name union in a drawdown tape returns several hundred >15% hits and the sweep drowns. A noise filter, not a suitability rule.",
+      "fxNote": "Non-US constituents quote in local currency. marketCapBn and advUsdM must be normalised to USD at the scan date and the rate recorded, or the numbers are not comparable across regions."
+    },
+    "held": {
+      "label": "Tier 2 - Held names",
+      "definition": "Every listed position across the nine client books in data.js that is not already in Tier 1.",
+      "membership": "derived",
+      "derivedFrom": "window.SEED.clients[].positions[].ticker",
+      "why": "Makes 'widely-held' literal instead of a judgment call, and is the only tier that catches non-US listings clients actually own. Cannot drift from the books because it is computed from them.",
+      "knownNonUsAtV1": [
+        "ASML NA",
+        "SAP GY",
+        "SHEL LN",
+        "DGE LN",
+        "TTE FP"
+      ],
+      "capFloorBn": null,
+      "liquidityFloorAdvUsdM": null,
+      "screen": "Same dislocation rule as Tier 1, plus any position sitting on an unrealised loss or a concentration breach flagged by scanner.js.",
+      "convictionCeiling": null,
+      "derivativesFirst": true,
+      "note_on_global": "Now largely a subset of Tier 1 once SXXP and UKX are in - ASML NA, SAP GY, SHEL LN, DGE LN and TTE FP are all index members. Tier 2 stays a distinct tier because it is DERIVED from the books and so cannot drift, and because it catches any future holding outside the indices."
+    },
+    "thematic": {
+      "label": "Tier 3 - Thematic watchlist",
+      "definition": "Deliberately hand-curated names outside the indices, tracked because the desk wants coverage ahead of the street.",
+      "membership": "curated",
+      "why_curated": "This is the tier where the desk is front-running coverage. Membership is a judgment call by design and must not be derivable from anything.",
+      "capFloorBn": null,
+      "liquidityFloorAdvUsdM": 5.0,
+      "liquidityGate": "soft",
+      "liquidityRule": "Below ~$5m 20-day average dollar volume the build WARNS and the idea must state a maximum position size; it still ships. Keeps genuinely early names reachable while forcing the sizing conversation into the open rather than leaving it implicit.",
+      "convictionCeiling": "Medium",
+      "convictionRule": "Tier 3 ideas carry speculative:true and can never label High regardless of raw pillar score. Thin sell-side coverage and thin liquidity are real reasons to hold conviction back, and the existing consensus pillar cannot be honestly sourced for a two-analyst name.",
+      "derivativesFirst": false,
+      "derivativesRule": "Direct equity is a legitimate primary expression for this tier. Listed options on these names are thin or absent (a Stockholm listing has no US-listed options at all), so the derivatives-first principle is relaxed here rather than satisfied with a construction that could not actually be executed.",
+      "cohorts": {
+        "photonics": {
+          "label": "Photonics / optical networking",
+          "addedOn": "2026-08-20",
+          "rationale": "AI datacenter interconnect - the optical layer behind the capex cycle the desk already covers on the compute side.",
+          "names": [
+            {
+              "ticker": "AAOI",
+              "name": "Applied Optoelectronics",
+              "venue": "NASDAQ",
+              "source": "user-specified"
+            },
+            {
+              "ticker": "AXTI",
+              "name": "AXT Inc",
+              "venue": "NASDAQ",
+              "source": "user-specified"
+            },
+            {
+              "ticker": "CIEN",
+              "name": "Ciena",
+              "venue": "NYSE",
+              "source": "user-specified"
+            },
+            {
+              "ticker": "SIVE",
+              "name": "Sivers Semiconductors",
+              "venue": "UNCONFIRMED",
+              "source": "user-specified",
+              "flag": "Ticker unconfirmed. Read as Sivers Semiconductors, which lists in Stockholm (SIVE.ST) and would have no US-listed options - affects both scanner symbol resolution and tradability. CONFIRM BEFORE FIRST SCAN."
+            },
+            {
+              "ticker": "LITE",
+              "name": "Lumentum",
+              "venue": "NASDAQ",
+              "source": "desk-added peer"
+            },
+            {
+              "ticker": "COHR",
+              "name": "Coherent",
+              "venue": "NYSE",
+              "source": "desk-added peer"
+            },
+            {
+              "ticker": "FN",
+              "name": "Fabrinet",
+              "venue": "NYSE",
+              "source": "desk-added peer"
+            },
+            {
+              "ticker": "CRDO",
+              "name": "Credo Technology",
+              "venue": "NASDAQ",
+              "source": "desk-added peer"
+            },
+            {
+              "ticker": "ALAB",
+              "name": "Astera Labs",
+              "venue": "NASDAQ",
+              "source": "desk-added peer"
+            },
+            {
+              "ticker": "POET",
+              "name": "POET Technologies",
+              "venue": "NASDAQ",
+              "source": "desk-added peer"
+            },
+            {
+              "ticker": "LWLG",
+              "name": "Lightwave Logic",
+              "venue": "NASDAQ",
+              "source": "desk-added peer"
+            },
+            {
+              "ticker": "OCC",
+              "name": "Optical Cable Corp",
+              "venue": "NASDAQ",
+              "source": "desk-added peer"
+            }
+          ],
+          "alreadyTier1": [
+            "GLW",
+            "MRVL",
+            "ANET"
+          ],
+          "livenessCheck": "REQUIRED before first scan. Several classic photonics tickers were acquired or wound down (Infinera, NeoPhotonics, EMCORE) and are deliberately absent. screen_universe.py must report any ticker the scanner cannot resolve rather than silently skipping it."
+        }
+      }
+    }
+  },
+  "recordedFields": {
+    "tier": "REQUIRED on every single-name idea: core | held | thematic. Macro ideas (FX, rates, commodities, index) use tier 'macro' and are exempt from every tier rule below.",
+    "marketCapBn": "REQUIRED on every single-name idea, sourced from the scanner (market_cap_basic), not authored. A descriptor, not a gate.",
+    "advUsdM": "REQUIRED on Tier 3 ideas: 20-day average dollar volume, sourced from the scanner.",
+    "speculative": "Auto-set true for Tier 3 by the generator; caps the conviction label at Medium.",
+    "maxPositionBps": "REQUIRED on a Tier 3 idea that trips the soft liquidity floor."
+  },
+  "indexAndSectorScreen": {
+    "_comment": "Above the single-name layer. Indices and sector baskets are screenable objects in their own right - a sector index 20% off its high is a candidate thesis even when no single constituent stands out, and it is how a European-banks or semis dislocation gets surfaced as one idea rather than twelve.",
+    "runEverySweep": true,
+    "screen": "% off 52-week high, 1-week and 1-month move, and dispersion vs the parent index.",
+    "watch": [
+      {
+        "code": "SPX",
+        "name": "S&P 500",
+        "region": "US"
+      },
+      {
+        "code": "NDX",
+        "name": "Nasdaq 100",
+        "region": "US"
+      },
+      {
+        "code": "RUT",
+        "name": "Russell 2000",
+        "region": "US",
+        "note": "Breadth/rotation read - already quoted in the weekly letter."
+      },
+      {
+        "code": "SOX",
+        "name": "PHLX Semiconductor",
+        "region": "US",
+        "note": "The desk's standing semis proxy."
+      },
+      {
+        "code": "SXXP",
+        "name": "STOXX Europe 600",
+        "region": "Europe"
+      },
+      {
+        "code": "SX5E",
+        "name": "EURO STOXX 50",
+        "region": "Europe"
+      },
+      {
+        "code": "SX7E",
+        "name": "EURO STOXX Banks",
+        "region": "Europe",
+        "note": "European credit/financial stress read."
+      },
+      {
+        "code": "UKX",
+        "name": "FTSE 100",
+        "region": "UK"
+      },
+      {
+        "code": "KOSPI",
+        "name": "Korea Composite",
+        "region": "Asia",
+        "note": "Memory-cycle read - the SK Hynix/Samsung tape already drives MU theses."
+      },
+      {
+        "code": "NKY",
+        "name": "Nikkei 225",
+        "region": "Asia"
+      },
+      {
+        "code": "TWSE",
+        "name": "Taiwan Weighted",
+        "region": "Asia"
+      },
+      {
+        "code": "HSI",
+        "name": "Hang Seng",
+        "region": "Asia"
+      }
+    ],
+    "ideaTier": "An index- or sector-level idea is tier 'macro' - no marketCapBn or liquidity obligation.",
+    "screenVsExpress": "The object SCREENED and the instrument TRADED are different things, deliberately. Screen the INDEX (SXEP, the GICS sector level) because it is the cleaner signal - pure sector, no fee drag, no tracking error, longer history. Express via the tradable PROXY (XLE, the corresponding sector UCITS ETF, or a basket of constituents) because an index cannot be bought. The idea records the index as `ticker` and the proxy in `structures` / `preferredExpression`, exactly as a single-name idea records the underlying and its option.",
+    "howSectorIdeasMap": "A sector idea routes through mapping.js BETTER than a single name, because idea.sector is precisely what two of the four fit axes key on. Affinity fit reads the book's allocation to that sector against its 24-month history and the comfort peg; Gap fit reads the sector's goal bucket (SECTOR_BUCKET: Energy/Utilities/Real Estate/Infrastructure -> Income, Gold -> Preservation, Crypto -> Growth) against the derived goal target. Same signal as a single name, minus the idiosyncratic risk. Every sector index below therefore declares `appSector`, which MUST be one of the sectors already used in data.js or the idea cannot be scored.",
+    "sectorIdeaIntent": "An overweight book is not a reason to skip a sector - it is a reason to change the INTENT. Energy today: Ben sits at 23% (XOM 13 + SHEL 10) against the 15% Income comfort peg, so an intent 'add' idea correctly scores near-dead for him (8pp overshoot = an 80-point Affinity penalty, and no gap headroom), while intent 'protect' or 'trim' - collar the block, overwrite it - is exactly right. Amar (8%) and Aurora (4.3%) have headroom and take the 'add'. One sector dislocation can therefore legitimately produce two ideas with opposite intents.",
+    "sectorIndices": {
+      "verifyOnFirstScan": "Index codes and proxy tickers below MUST be resolved against the scanner before the first live run; anything unresolved is REPORTED, never silently skipped. European sector ETF proxies are deliberately left unnamed - the ticker varies by provider and listing venue (Xetra / LSE / Milan) and must be resolved at scan time rather than asserted here.",
+      "us": {
+        "family": "GICS sectors, screened at index level, expressed via the SPDR select-sector ETFs",
+        "members": [
+          {
+            "index": "S5ENRS",
+            "proxy": "XLE",
+            "name": "Energy",
+            "appSector": "Energy"
+          },
+          {
+            "index": "S5UTIL",
+            "proxy": "XLU",
+            "name": "Utilities",
+            "appSector": "Utilities"
+          },
+          {
+            "index": "S5INFT",
+            "proxy": "XLK",
+            "name": "Information Technology",
+            "appSector": "Technology"
+          },
+          {
+            "index": "S5FINL",
+            "proxy": "XLF",
+            "name": "Financials",
+            "appSector": "Financials"
+          },
+          {
+            "index": "S5HLTH",
+            "proxy": "XLV",
+            "name": "Health Care",
+            "appSector": "Healthcare"
+          },
+          {
+            "index": "S5INDU",
+            "proxy": "XLI",
+            "name": "Industrials",
+            "appSector": "Industrials"
+          },
+          {
+            "index": "S5COND",
+            "proxy": "XLY",
+            "name": "Consumer Discretionary",
+            "appSector": "Consumer"
+          },
+          {
+            "index": "S5CONS",
+            "proxy": "XLP",
+            "name": "Consumer Staples",
+            "appSector": "Consumer"
+          },
+          {
+            "index": "S5MATR",
+            "proxy": "XLB",
+            "name": "Materials",
+            "appSector": "Materials"
+          },
+          {
+            "index": "S5RLST",
+            "proxy": "XLRE",
+            "name": "Real Estate",
+            "appSector": "Real Estate"
+          },
+          {
+            "index": "S5TELS",
+            "proxy": "XLC",
+            "name": "Communication Services",
+            "appSector": "Communication Services"
+          }
+        ]
+      },
+      "usSubIndustry": {
+        "family": "Sub-industry and thematic baskets the desk already reasons in - finer than GICS, and where most of the real dislocations show up",
+        "members": [
+          {
+            "index": "SOX",
+            "proxy": "SMH",
+            "name": "Semiconductors",
+            "appSector": "Technology",
+            "note": "Already the desk's standing semis proxy; drives the MU / AMAT / memory-cycle theses."
+          },
+          {
+            "index": null,
+            "proxy": "XOP",
+            "name": "Oil & Gas E&P",
+            "appSector": "Energy"
+          },
+          {
+            "index": null,
+            "proxy": "OIH",
+            "name": "Oil Services",
+            "appSector": "Energy"
+          },
+          {
+            "index": null,
+            "proxy": "GDX",
+            "name": "Gold Miners",
+            "appSector": "Materials",
+            "note": "Amar holds GDX at 6% - a Tier 2 overlap, so this basket is a held name as well as a screen."
+          },
+          {
+            "index": null,
+            "proxy": "KRE",
+            "name": "Regional Banks",
+            "appSector": "Financials",
+            "note": "The US counterpart to SX7E as a credit-stress read."
+          },
+          {
+            "index": null,
+            "proxy": "IGV",
+            "name": "Software",
+            "appSector": "Technology"
+          },
+          {
+            "index": null,
+            "proxy": "ITA",
+            "name": "Aerospace & Defense",
+            "appSector": "Industrials"
+          },
+          {
+            "index": null,
+            "proxy": "XME",
+            "name": "Metals & Mining",
+            "appSector": "Materials"
+          },
+          {
+            "index": null,
+            "proxy": "URA",
+            "name": "Uranium",
+            "appSector": "Energy",
+            "note": "The fuel side of the AI-power theme already on the board (ai-power / CEG)."
+          },
+          {
+            "index": null,
+            "proxy": "ICLN",
+            "name": "Clean Energy",
+            "appSector": "Utilities"
+          }
+        ]
+      },
+      "europe": {
+        "family": "STOXX Europe 600 supersector indices. Screened at index level; expressed via the corresponding sector UCITS ETF (ticker resolved at scan time) or a constituent basket.",
+        "members": [
+          {
+            "index": "SXEP",
+            "name": "Oil & Gas",
+            "appSector": "Energy",
+            "note": "Explicitly requested. The European counterpart to XLE; the books hold SHEL LN and TTE FP."
+          },
+          {
+            "index": "SX7P",
+            "name": "Banks (Europe 600)",
+            "appSector": "Financials",
+            "note": "The Europe-600 banks index; SX7E in Tier 1 is the narrower euro-zone cut. Both screened."
+          },
+          {
+            "index": "SX6P",
+            "name": "Utilities",
+            "appSector": "Utilities"
+          },
+          {
+            "index": "SX8P",
+            "name": "Technology",
+            "appSector": "Technology",
+            "note": "Where ASML NA and SAP GY sit - both held."
+          },
+          {
+            "index": "SXDP",
+            "name": "Health Care",
+            "appSector": "Healthcare"
+          },
+          {
+            "index": "SXNP",
+            "name": "Industrial Goods & Services",
+            "appSector": "Industrials"
+          },
+          {
+            "index": "SXPP",
+            "name": "Basic Resources",
+            "appSector": "Materials"
+          },
+          {
+            "index": "SX4P",
+            "name": "Chemicals",
+            "appSector": "Materials"
+          },
+          {
+            "index": "SXAP",
+            "name": "Automobiles & Parts",
+            "appSector": "Consumer"
+          },
+          {
+            "index": "SX3P",
+            "name": "Food, Beverage & Tobacco",
+            "appSector": "Consumer",
+            "note": "Where DGE LN sits - held, and deeply underwater on the staples de-rating."
+          },
+          {
+            "index": "SXRP",
+            "name": "Retail",
+            "appSector": "Consumer"
+          },
+          {
+            "index": "SXIP",
+            "name": "Insurance",
+            "appSector": "Financials"
+          },
+          {
+            "index": "SXKP",
+            "name": "Telecommunications",
+            "appSector": "Communication Services"
+          },
+          {
+            "index": "SX86P",
+            "name": "Real Estate",
+            "appSector": "Real Estate"
+          }
+        ]
+      },
+      "asia": {
+        "family": "Not covered at sector level in v3.",
+        "why": "Korea, Japan and Taiwan sector indices are fragmented across exchange-specific families with no clean cross-market equivalent to GICS or STOXX supersectors, and there is no reliable UCITS/US-listed sector proxy for most of them. Asia is screened at INDEX level (KOSPI, NKY, TWSE, HSI) and at SINGLE-NAME level via Tier 1, which already catches the memory-cycle and semi-supply-chain reads that matter to this desk. Revisit if an Asia sector thesis needs an expression the index level cannot carry."
+      }
+    },
+    "tradabilityGap": "KNOWN GAP, not yet modelled. mapping.js tradability() only tests OTC-vs-structured against MiFID classification. It does NOT know that a US-listed ETF (XLE and every SPDR proxy above) generally cannot be distributed to an EU retail client without a PRIIPs KID - which would bite on Aurora (MiFID Retail, EUR base). Today a US sector-ETF idea would show as tradable for her when in practice it is not. Either add a domicile check to tradability(), or require the European proxy on any sector idea flagged to an EU retail book."
+  },
+  "screenOutput": {
+    "_comment": "What screen_universe.py hands the sweep. Bounded on purpose - an unbounded global candidate list is the same as no screen at all.",
+    "artifact": "universe.candidates.json (committed each sweep, so the run is reproducible)",
+    "perRegionCap": 25,
+    "globalCap": 100,
+    "rank": "Primary: % off 52-week high. Ties broken by dollar volume, so a widely-traded dislocation outranks a thin one.",
+    "alwaysInclude": [
+      "Every Tier 2 held name that trips the dislocation rule, uncapped - clients own these.",
+      "Every Tier 3 name, uncapped - the watchlist is small and curated by hand."
+    ],
+    "reportUnresolved": "Any ticker the scanner cannot resolve is REPORTED, never silently skipped (same rule as tv_technicals.py)."
+  }
+}

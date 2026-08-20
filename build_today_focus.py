@@ -35,9 +35,29 @@ COVERAGE SPEC (what every sweep MUST span — not just US equity/earnings):
 
   SWEEP INPUTS (what the sweep MUST read before writing ideas — so the board doesn't miss
   the obvious):
-    - DISLOCATIONS: scan for large-cap DRAWDOWNS in widely-held names (a >~15% pullback,
-      e.g. a hyperscaler off its highs on AI-capex fear) as candidate ideas — a sharp move
-      in a name clients own is a flag, not noise.
+    - THE UNIVERSE is defined in universe.json — read it, do not screen from memory.
+      Three tiers, GLOBAL by design, with NO single market-cap floor (cap spans ~50x
+      inside the intended universe, so membership and intent are the gates and
+      marketCapBn is a recorded descriptor):
+        Tier 1 CORE   — the union of SPX, NDX, SX5E, SX7E, SXXP, UKX, KOSPI, NKY,
+                         TWSE and HSI constituents (~2,000-2,600 unique names across
+                         US / Europe / UK / Asia). Fetched, never hand-typed.
+        Tier 2 HELD   — every listed position across the nine books not already in
+                         Tier 1. Derived from data.js, so it cannot drift.
+        Tier 3 THEMATIC — a hand-curated watchlist outside the indices (photonics /
+                         optical is the first cohort). Speculative: capped at Medium
+                         conviction, direct equity allowed, soft $5m ADV floor.
+      Every single-name idea MUST declare its `tier` and record a sourced
+      `marketCapBn`; Tier 3 also records `advUsdM` (see validate_universe below).
+    - DISLOCATIONS: scan the universe above for DRAWDOWNS (a >~15% pullback, e.g. a
+      hyperscaler off its highs on AI-capex fear) as candidate ideas — a sharp move
+      in a name clients own is a flag, not noise. Candidates come from
+      universe.candidates.json (screen_universe.py), ranked by % off the 52-week high
+      and capped per region, so two sweeps of the same day see the same names.
+    - INDICES AND SECTORS are screenable in their own right, every sweep: a sector
+      index well off its high is a candidate thesis even when no single constituent
+      stands out (SX7E for European financials, SOX for semis, KOSPI for the memory
+      cycle). An index- or sector-level idea is tier 'macro'.
     - NAMED AUTHORS (two tiers — wide funnel, same gate; NOTHING bypasses the conviction
       rubric or the client-fit mapping):
         CORE (read EVERY sweep, alongside the broad tape Reuters/WSJ/Bloomberg/CNBC):
@@ -107,6 +127,7 @@ HERE = Path(__file__).resolve().parent
 SRC = HERE / "today_focus.json"
 OUT = HERE / "today_focus.js"
 LEDGER = HERE / "today_focus.ledger.json"
+UNIVERSE = HERE / "universe.json"
 STALE_DAYS = 10  # warn when an idea's thesis hasn't been re-grounded in this many days
 
 # ---- Conviction rubrics (TWO models, selected by idea kind) -------------------
@@ -246,7 +267,15 @@ def score_conviction(idea, warns):
         if capped and tier == "High":
             tier = "Medium"
         label = EXEARN_TIER_LABEL[tier]
+    # Tier 3 ceiling: a speculative watchlist name can never label High, whatever the
+    # raw score. Thin sell-side coverage and thin liquidity are real reasons to hold
+    # conviction back - and the consensus pillar cannot be honestly sourced for a
+    # two-analyst name. Set by validate_universe() off universe.json.
+    if idea.get("speculative") and tier == "High":
+        tier = THEMATIC_CEILING
+        label = "Medium - speculative (Tier 3)"
     c = idea["conviction"]
+    c["speculative"] = bool(idea.get("speculative"))
     c["raw"] = raw
     c["maxRaw"] = rubric["maxRaw"]
     c["score"] = score
@@ -255,6 +284,94 @@ def score_conviction(idea, warns):
     c["capped"] = capped
     c["model"] = rubric["model"]
     return idea
+
+
+# ---- Screening universe ------------------------------------------------------
+# universe.json is THE definition of what the sweep looks at before any idea is
+# written: Tier 1 core (SPX u NDX, fetched), Tier 2 held (derived from the books),
+# Tier 3 thematic (hand-curated watchlist). There is deliberately NO single
+# market-cap floor - cap spans ~50x inside the intended universe, so membership and
+# intent are the gates and marketCapBn is recorded as a sourced DESCRIPTOR.
+#
+# What is enforced here (warn, never silently fix):
+#   - every single-name idea declares a `tier`;
+#   - every single-name idea records a sourced `marketCapBn`;
+#   - Tier 3 records `advUsdM` and, below the soft liquidity floor, a `maxPositionBps`;
+#   - Tier 3 is stamped speculative -> the conviction label can never exceed Medium.
+ALLOWED_TIERS = ("core", "held", "thematic", "macro")
+THEMATIC_CEILING = "Medium"
+_DEFAULT_ADV_FLOOR_M = 5.0
+
+# Macro instruments carry no single-name universe obligation (tier 'macro').
+MACRO_TICKER_TOKENS = {"DXY", "XAU", "XAG", "SPX", "BRENT", "WTI", "GOLD",
+                       "SILVER", "BTC", "SOFR", "VIX", "NDX", "RUT"}
+_RATES_TOKENS = ("10Y", "2Y", "30Y", "TNX", "YIELD", "BUND", "GILT", "JGB")
+
+_universe_cache = None
+
+
+def load_universe():
+    """universe.json, or {} if absent (the tier checks then degrade to warnings only)."""
+    global _universe_cache
+    if _universe_cache is None:
+        try:
+            _universe_cache = json.loads(UNIVERSE.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            _universe_cache = {}
+    return _universe_cache
+
+
+def adv_floor():
+    t = (load_universe().get("tiers") or {}).get("thematic") or {}
+    v = t.get("liquidityFloorAdvUsdM")
+    return v if isinstance(v, (int, float)) else _DEFAULT_ADV_FLOOR_M
+
+
+def is_macro_idea(idea):
+    """True when the idea has no single-name equity attached (FX, rates, commodity,
+    index, or an undertickered thematic basket). Mirrors tv_technicals symbol logic."""
+    t = str(idea.get("ticker") or "").upper().strip()
+    if not t:
+        return True
+    if "/" in t or t in MACRO_TICKER_TOKENS:
+        return True
+    if any(tok in t for tok in _RATES_TOKENS):
+        return True
+    return str(idea.get("sector", "")).lower() in ("fx", "rates")
+
+
+def validate_universe(idea, warns):
+    """Enforce the universe contract. Stamps `speculative` on Tier 3 so
+    score_conviction() can apply the ceiling."""
+    tier = idea.get("tier")
+    if tier is None:
+        if is_macro_idea(idea):
+            idea["tier"] = "macro"
+            return
+        warns.append(f"{idea['id']}: no `tier` declared - REQUIRED on every single-name idea "
+                     f"(core | held | thematic; macro instruments use 'macro'). See universe.json.")
+        return
+    if tier not in ALLOWED_TIERS:
+        warns.append(f"{idea['id']}: tier '{tier}' is not one of {ALLOWED_TIERS}")
+        return
+    if tier == "macro":
+        return
+
+    if idea.get("marketCapBn") is None:
+        warns.append(f"{idea['id']}: no `marketCapBn` - REQUIRED on single-name ideas, sourced from "
+                     f"the scanner (market_cap_basic). It is a recorded descriptor, not a gate.")
+
+    if tier == "thematic":
+        idea["speculative"] = True
+        floor = adv_floor()
+        adv = idea.get("advUsdM")
+        if adv is None:
+            warns.append(f"{idea['id']}: Tier 3 idea with no `advUsdM` - REQUIRED (20-day average "
+                         f"dollar volume, sourced from the scanner) to test the ${floor}m soft floor.")
+        elif adv < floor and idea.get("maxPositionBps") is None:
+            warns.append(f"{idea['id']}: Tier 3 liquidity ${adv}m/day is below the ${floor}m soft floor "
+                         f"and no `maxPositionBps` is stated - a thin name still ships, but the size "
+                         f"limit must be explicit.")
 
 
 # ---- Tactical trigger gate ---------------------------------------------------
@@ -468,6 +585,7 @@ def main():
             idea["kind"] = "earnings" if section == "earnings" else "ex-earnings"
             validate(idea, as_of, warns)
             validate_tactical(idea, warns)
+            validate_universe(idea, warns)
             ensure_intent(idea, warns)
             score_conviction(idea, warns)
 
