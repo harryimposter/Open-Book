@@ -264,7 +264,7 @@ S.section(pres, "05", "Question 5: Which product? The single-name menu", "Start 
   ];
   steps.forEach(([n, t, d], i) => {
     const y = 1.55 + i * 0.73;
-    s.addShape(pres.shapes.OVAL, { x: MX, y: y + 0.08, w: 0.5, h: 0.5, fill: { color: i === 2 ? C.red : C.ink }, line: { color: i === 2 ? C.red : C.ink } });
+    s.addShape(pres.shapes.OVAL, { x: MX, y: y + 0.08, w: 0.5, h: 0.5, fill: { color: i === 2 ? C.red : C.green }, line: { color: i === 2 ? C.red : C.green } });
     s.addText(n, { x: MX, y: y + 0.08, w: 0.5, h: 0.5, fontFace: F.title, fontSize: 15, bold: true, color: C.paper, align: "center", valign: "middle", margin: 0, isTextBox: true });
     s.addText(S.runs(`**${t}.** ${d}`, { color: C.ink }), { x: MX + 0.65, y, w: 5.6, h: 0.66, fontFace: F.body, fontSize: 12, valign: "middle", margin: 0, isTextBox: true });
   });
@@ -295,15 +295,15 @@ S.section(pres, "05", "Question 5: Which product? The single-name menu", "Start 
     ["Overdone rally", ["Put spread", "Sell call spread", "Sell call spread / overwrite"]],
   ];
   const x0 = MX, lw = 2.6, cw = (CW - lw) / 3, y0 = 1.55, rh = 0.74;
-  const colFill = [C.slateT, C.white, C.tint];
+  const colFill = [C.slateT, C.white, C.amberT];
   cols.forEach((c, j) => {
-    s.addShape(pres.shapes.RECTANGLE, { x: x0 + lw + j * cw, y: y0, w: cw, h: 0.45, fill: { color: C.ink }, line: { color: C.ink } });
-    s.addText(c.toUpperCase(), { x: x0 + lw + j * cw, y: y0, w: cw, h: 0.45, fontFace: F.sans, fontSize: 10.5, bold: true, color: C.paper, align: "center", valign: "middle", charSpacing: 2, margin: 0, isTextBox: true });
+    s.addShape(pres.shapes.RECTANGLE, { x: x0 + lw + j * cw, y: y0, w: cw, h: 0.45, fill: { color: C.white }, line: { color: C.ruleFirm } });
+    s.addText(c.toUpperCase(), { x: x0 + lw + j * cw, y: y0, w: cw, h: 0.45, fontFace: F.mono, fontSize: 10.5, bold: true, color: j === 0 ? C.slate : j === 2 ? C.amber : C.muted, align: "center", valign: "middle", charSpacing: 2, margin: 0, isTextBox: true });
   });
   rows.forEach(([r, cells], i) => {
     const y = y0 + 0.45 + i * rh;
     s.addShape(pres.shapes.RECTANGLE, { x: x0, y, w: lw, h: rh, fill: { color: C.total }, line: { color: C.rule, width: 0.75 } });
-    s.addText(r, { x: x0 + 0.12, y, w: lw - 0.24, h: rh, fontFace: F.title, fontSize: 14, bold: true, color: C.ink, valign: "middle", margin: 0, isTextBox: true });
+    s.addText(r, { x: x0 + 0.12, y, w: lw - 0.24, h: rh, fontFace: F.title, fontSize: 14, color: C.ink, valign: "middle", margin: 0, isTextBox: true });
     cells.forEach((c, j) => {
       s.addShape(pres.shapes.RECTANGLE, { x: x0 + lw + j * cw, y, w: cw, h: rh, fill: { color: colFill[j] }, line: { color: C.rule, width: 0.75 } });
       s.addText(S.runs(c, { color: C.ink }), { x: x0 + lw + j * cw + 0.12, y, w: cw - 0.24, h: rh, fontFace: F.body, fontSize: 12, valign: "middle", margin: 0, isTextBox: true });

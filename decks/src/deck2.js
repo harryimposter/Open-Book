@@ -5,21 +5,21 @@ const CW = W - 2 * MX;
 
 /* ---------- helpers specific to this deck ---------- */
 function volPill(s, x, y, v) {
-  const map = { "Long vol": C.slate, "Short vol": C.gold, "Mixed": C.muted, "Short skew": C.gold };
+  const map = { "Long vol": C.slate, "Short vol": C.amber, "Mixed": C.muted };
   return S.pill(pres, s, x, y, v, map[v] || C.muted);
 }
 function payPill(s, x, y, p) {
-  const map = { "Participation": C.green, "Income": C.brown, "Protection": C.slate };
+  const map = { "Participation": C.green, "Income": C.mauve, "Protection": C.slate, "Rates-linked": C.red };
   return S.pill(pres, s, x, y, p, map[p] || C.muted);
 }
 // Structured-note card
 function noteCard(s, x, y, w, h, n) {
   s.addShape(pres.shapes.RECTANGLE, { x, y, w, h, fill: { color: C.white }, line: { color: C.rule, width: 0.75 } });
-  s.addText(n.name, { x: x + 0.18, y: y + 0.12, w: w - 0.36, h: 0.45, fontFace: F.title, fontSize: 19, bold: true, color: C.ink, margin: 0, valign: "top", isTextBox: true });
+  s.addText(n.name, { x: x + 0.18, y: y + 0.12, w: w - 0.36, h: 0.45, fontFace: F.title, fontSize: 19, color: C.ink, margin: 0, valign: "top", isTextBox: true });
   let px = x + 0.18;
   n.tags.forEach(([kind, t]) => { px += (kind === "v" ? volPill(s, px, y + 0.62, t) : payPill(s, px, y + 0.62, t)) + 0.1; });
   s.addText(S.runs(n.payoff, { color: C.brown }), { x: x + 0.18, y: y + 1.02, w: w - 0.36, h: 1.3, fontFace: F.body, fontSize: 13, italic: false, margin: 0, valign: "top", isTextBox: true });
-  const rows = [["CONSIDER WHEN", n.consider, C.greenT, C.green], ["AVOID WHEN", n.avoid, C.redT, C.red], ["INDICATIVE TERMS", n.terms, C.tint, C.gold]];
+  const rows = [["CONSIDER WHEN", n.consider, C.greenT, C.green], ["AVOID WHEN", n.avoid, C.redT, C.red], ["INDICATIVE TERMS", n.terms, C.tint, C.muted]];
   s.addTable(rows.map(r => [
     { text: r[0], options: { fill: { color: r[2] }, color: r[3], bold: true, fontFace: F.sans, fontSize: 8.5, charSpacing: 1, valign: "top", border: { type: "solid", pt: 0.75, color: C.rule } } },
     { text: S.runs(r[1], { color: C.ink }), options: { fill: { color: r[2] }, fontFace: F.body, fontSize: 12.8, valign: "top", border: { type: "solid", pt: 0.75, color: C.rule } } },
@@ -33,7 +33,7 @@ function matrix(s, chips, o) {
   const x0 = MX + 0.5, y0 = 1.7, pw = o.w || 8.3, ph = 4.85;
   const hw = pw / 2, hh = ph / 2;
   const q = [
-    { x: x0, y: y0, fill: C.tint, label: "SELL VOL · PARTICIPATION" },
+    { x: x0, y: y0, fill: C.amberT, label: "SELL VOL · PARTICIPATION" },
     { x: x0 + hw, y: y0, fill: C.slateT, label: "BUY VOL · PARTICIPATION" },
     { x: x0, y: y0 + hh, fill: C.greenT, label: "SELL VOL · INCOME" },
     { x: x0 + hw, y: y0 + hh, fill: C.white, label: "BUY VOL · INCOME" },
@@ -44,15 +44,15 @@ function matrix(s, chips, o) {
     s.addText(qq.label, { x: qq.x + 0.12, y: qq.y + 0.07, w: hw - 0.24, h: 0.25, fontFace: F.sans, fontSize: 8.5, bold: true, color: C.muted, charSpacing: 2, align: right ? "right" : "left", margin: 0, isTextBox: true });
   });
   // axes
-  s.addShape(pres.shapes.LINE, { x: x0 + hw, y: y0 - 0.05, w: 0, h: ph + 0.1, line: { color: C.ink, width: 1.5 } });
-  s.addShape(pres.shapes.LINE, { x: x0 - 0.05, y: y0 + hh, w: pw + 0.1, h: 0, line: { color: C.ink, width: 1.5 } });
-  s.addText("◀  SHORT VEGA: you sell optionality", { x: x0, y: y0 + ph + 0.08, w: hw, h: 0.28, fontFace: F.sans, fontSize: 9.5, bold: true, color: C.gold, margin: 0, isTextBox: true });
+  s.addShape(pres.shapes.LINE, { x: x0 + hw, y: y0 - 0.05, w: 0, h: ph + 0.1, line: { color: C.muted, width: 1.5 } });
+  s.addShape(pres.shapes.LINE, { x: x0 - 0.05, y: y0 + hh, w: pw + 0.1, h: 0, line: { color: C.muted, width: 1.5 } });
+  s.addText("◀  SHORT VEGA: you sell optionality", { x: x0, y: y0 + ph + 0.08, w: hw, h: 0.28, fontFace: F.sans, fontSize: 9.5, bold: true, color: C.amber, margin: 0, isTextBox: true });
   s.addText("LONG VEGA: you buy optionality  ▶", { x: x0 + hw, y: y0 + ph + 0.08, w: hw, h: 0.28, fontFace: F.sans, fontSize: 9.5, bold: true, color: C.slate, align: "right", margin: 0, isTextBox: true });
   s.addText("PARTICIPATION  ▲", { x: x0 - 0.47, y: y0, w: 0.3, h: hh, fontFace: F.sans, fontSize: 9.5, bold: true, color: C.green, vert: "vert270", align: "center", valign: "middle", margin: 0, isTextBox: true });
-  s.addText("▼  INCOME", { x: x0 - 0.47, y: y0 + hh, w: 0.3, h: hh, fontFace: F.sans, fontSize: 9.5, bold: true, color: C.brown, vert: "vert270", align: "center", valign: "middle", margin: 0, isTextBox: true });
+  s.addText("▼  INCOME", { x: x0 - 0.47, y: y0 + hh, w: 0.3, h: hh, fontFace: F.sans, fontSize: 9.5, bold: true, color: C.mauve, vert: "vert270", align: "center", valign: "middle", margin: 0, isTextBox: true });
   // chips: fx 0..1 across plot, fy 0..1 down plot (chip centre)
   const cw = o.chipW || 1.95, ch = 0.56;
-  const border = { bull: C.green, bear: C.slate, neutral: C.ink, hedge: C.red };
+  const border = { bull: C.green, bear: C.slate, neutral: C.muted, hedge: C.red, rates: C.red };
   chips.forEach(c => {
     const cx = x0 + c.fx * pw - cw / 2, cy = y0 + c.fy * ph - ch / 2;
     s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: cx, y: cy, w: cw, h: ch, fill: { color: C.white }, line: { color: border[c.k || "neutral"], width: 1.5 }, rectRadius: 0.06 });
@@ -125,7 +125,7 @@ S.section(pres, "01", "Reading the tape", "The inputs, how to measure them, and 
 /* 5 · Thresholds */
 {
   const s = S.slide(pres, { kicker: "Reading the tape · Thresholds", title: "Starting thresholds: cheap, fair, rich", tag: "Calibrate", tagColor: C.slate });
-  const G = C.slateT, R = C.tint;
+  const G = C.slateT, R = C.amberT;
   const rows = [
     ["Signal", "Cheap → buy vol", "Fair", "Rich → sell vol"],
     ["IV percentile (1y)", "< 25th", "25th–75th", "> 75th"],
@@ -150,9 +150,9 @@ S.section(pres, "01", "Reading the tape", "The inputs, how to measure them, and 
 {
   const s = S.slide(pres, { kicker: "Reading the tape · Vol stance", title: "Turning signals into a stance: buy, sell or neutral" });
   const cols = [
-    { t: "BUY VOL", c: C.slate, fill: C.slateT, items: ["IV percentile < 25th", "IV30 ÷ RV30 < 0.9", "Earnings ratio < 0.8", "Dated catalyst inside the tenor", "Skew flat (protection cheap)"], rule: "**2+ signals → buy optionality.** Long options, spreads, straddles, protection notes." },
+    { t: "BUY VOL", c: C.slate, fill: C.slateT, items: ["IV percentile < 25th", "IV30 ÷ RV30 < 0.9", "Earnings ratio < 0.8", "Dated catalyst inside the tenor", "Skew flat (protection cheap)"], rule: "**2+ signals → buy optionality.** Long options, spreads, straddles, Market Protection and Sharkfin notes." },
     { t: "NEUTRAL", c: C.muted, fill: C.white, items: ["Signals mixed or all fair", "No clear catalyst", "Vol near its median"], rule: "**Use spreads** (buy one, sell one) so vega roughly nets out, or use **cash**. Let the view, not vol, drive." },
-    { t: "SELL VOL", c: C.gold, fill: C.tint, items: ["IV percentile > 75th", "IV30 ÷ RV30 > 1.2", "Earnings ratio > 1.2", "Post-event IV still elevated", "Skew steep (puts rich)"], rule: "**2+ signals → sell optionality.** Overwrites, put sales, income notes, collars." },
+    { t: "SELL VOL", c: C.amber, fill: C.amberT, items: ["IV percentile > 75th", "IV30 ÷ RV30 > 1.2", "Earnings ratio > 1.2", "Post-event IV still elevated", "Skew steep (puts rich)"], rule: "**2+ signals → sell optionality.** Overwrites, put sales, collars, income notes (RevCon, FCN, Phoenix, Buy-the-Dip)." },
   ];
   const cw = (CW - 0.6) / 3;
   cols.forEach((c, i) => {
@@ -207,7 +207,7 @@ scenario({
   trigger: "**15–35% off the 52-week high** · fundamentals / estimates intact · RSI(14) < 40 · often IV percentile > 60 and skew steep after the fall.",
   rows: [
     ["IV **rich**, skew steep, you'd own it here or lower", "Cash-secured put, 1–3m, 15–25Δ", "Reverse convertible or FCN", "Strike ~85–95% (at support); coupon scales with IV"],
-    ["IV **fair/low**, expect more chop before recovery", "Laddered put sales across strikes", "**Buy-the-Dip note**", "Lookback entry over first 1–3m; participation from the low"],
+    ["Rates **high**, want an entry below today's price", "Laddered put sales across strikes", "**Buy-the-Dip note**", "Dip level 85–95%; coupon mostly from rates"],
     ["IV **cheap**, high conviction on the rebound", "Call spread 3–6m, or long call", "BREN (levered to a cap)", "Long ~ATM, short at prior high / target"],
     ["Several quality names down together", "Basket put sale", "Worst-of FCN / Phoenix **only if corr > 0.6**", "Only names you'd own each of"],
     ["Index pullback 5–10%, VIX spike, term inverted", "Sell index put spreads, front month", "Phoenix on the index", "Barrier below prior cycle low"],
@@ -222,7 +222,7 @@ scenario({
   rows: [
     ["Range-bound, tight realised range, no event", "Short strangle / iron condor 1–2m, 15–20Δ", "Phoenix (memory) or FCN", "Barriers outside the 3m realised range"],
     ["Mildly bullish, stock already held", "Covered call 1–3m, 5–10% OTM", "ACM+ / Digital Review Note (new money)", "Strike at resistance / prior high"],
-    ["Would own it lower", "Cash-secured put 15–25Δ", "Reverse convertible", "Strike where you'd genuinely buy"],
+    ["Would own it lower", "Cash-secured put 15–25Δ", "Reverse convertible · Buy-the-Dip if rates high", "Strike / dip level where you'd genuinely buy"],
     ["Inverted term structure after an event", "Sell front month, buy 3m (calendar)", "—", "Same strike; roll the short leg"],
     ["Rate vol rich, rates boxed in a band", "Sell swaption strangle (specialist)", "**Callable range accrual**", "Band around the realised range"],
   ],
@@ -238,7 +238,7 @@ scenario({
     ["Big move expected, direction unclear", "Straddle / strangle through the event", "—", "Exit the day after; don't hold for decay"],
     ["Steep contango, event 1–2m out", "Buy front-month options (cheapest per day)", "—", "Expiry just after the event"],
     ["Low vol + rates high + want equity with a floor", "Long call + T-bills", "**Market Protection Note**", "90–100% protection; participation is best when IV is low"],
-    ["Low vol + bullish but want a better entry", "Staggered call purchases", "**Buy-the-Dip note**", "Lookback is cheapest when vol is low"],
+    ["Low vol + rates high + upside to a target", "Call spread + T-bills", "**Sharkfin**", "Knock-out barrier above the target; rebate if hit"],
   ],
   avoid: "Vol cheap **because nothing is happening**: no catalyst inside the tenor means theta bleed · holding long options past the event · buying the same option that realised vol has already outrun.",
 });
@@ -251,10 +251,10 @@ scenario({
     ["IV **cheap** (percentile < 30)", "Long calls 3–12m, ATM to 5% OTM", "Market Protection Note (uncapped)", "Longer tenor if rates are high"],
     ["IV **rich**, skew steep", "Risk reversal: sell 90% put, buy 110% call", "—", "Zero cost; you accept owning lower"],
     ["Want leverage and can accept a cap", "Call spread (capped: flag it)", "BREN (capped: flag it)", "Only if the cap sits above the target"],
-    ["RSI > 70, extended", "Wait, or sell puts to enter", "Buy-the-Dip (uncapped variant)", "Enter from the dip, keep the upside"],
+    ["RSI > 70, extended", "Sell puts to enter lower", "Buy-the-Dip (converts at the dip)", "Enter lower, then hold the stock uncapped"],
     ["Conviction on a basket / sector", "ETF calls", "Participation note on the index", "Index vol < single-name vol: cheaper"],
   ],
-  avoid: "**Anything that caps**: call spreads, 1x2 ratios, overwrites, autocalls and BRENs all sell the upside this view needs. Use them only if a target exists.",
+  avoid: "**Anything that caps**: call spreads, 1x2 ratios, overwrites, autocalls, BRENs and Sharkfins all sell the upside this view needs. Use them only if a target exists.",
 });
 
 /* 14 · Hedging */
@@ -274,35 +274,35 @@ scenario({
 /* 15 · Rates */
 scenario({
   k: "Rates", title: "Rates views on the note shelf", tag: "Rates", tagColor: C.brown,
-  trigger: "Read the **level vs history**, **forward curve vs your view**, **rate vol percentile**, and the **realised range** of the reference rate.",
+  trigger: "Read the **level vs history**, **forward curve vs your view**, **rate vol percentile** and the **realised range**. **Higher rates improve almost every note**; these are the most rates-sensitive.",
   rows: [
     ["Rates range-bound, rate vol elevated", "Sell swaption strangle", "**Callable range accrual**", "Band ≈ realised range; coupon rises with rate vol"],
     ["Rates high; cuts priced, you fear deeper cuts", "Buy a floor", "**Capped floored floater**", "Floor near/below forwards; cap well above"],
-    ["Rates high, equity vol low", "T-bills + calls", "**Market Protection Note**", "High rates fund better participation"],
+    ["Rates high, equity vol low", "T-bills + calls", "**Market Protection · Sharkfin**", "High rates fund better participation"],
+    ["Rates high, equity IV rich, want a name lower", "Cash-secured put", "**Buy-the-Dip**", "Deposit-like coupon; converts at the dip level"],
     ["Rates falling, want a fixed coupon locked", "Receiver swaption", "Non-callable fixed-coupon bond / note", "Avoid callables: called when you need them"],
-    ["Rates rising / sticky", "Payer swaption (hedge)", "Floater (cap far above spot)", "Avoid long fixed duration"],
   ],
   avoid: "Range accruals when a breakout is plausible (fiscal shock, policy surprise) · callables when big cuts are expected · floaters whose cap sits inside the plausible rate path.",
 });
 
 /* 16 · Section notes */
-S.section(pres, "03", "The structured-note shelf", "What drives note terms, which note fits which tape, and a card for each: RevCon, FCN, Phoenix, BREN, ACM+, Digital Review, Buy-the-Dip, Callable Range Accrual, Capped Floored Floater, Market Protection.");
+S.section(pres, "03", "The structured-note shelf", "What drives note terms, which note fits which tape, and a card for each: RevCon, FCN, Phoenix, Digital Review, BREN, ACM+, Market Protection, Sharkfin, and the rates-linked trio: Buy-the-Dip, Callable Range Accrual, Capped Floored Floater.");
 
 /* 17 · Anatomy */
 {
   const s = S.slide(pres, { kicker: "Notes · Anatomy", title: "Every note is a bond plus options" });
-  S.callout(pres, s, MX, 1.55, 4.4, 4.6, "How it's built", "The investor buys a **bank bond** (the issuer's funding) plus an **option package**.\n\n**Income notes** (RevCon, FCN, Phoenix, Digital Review, range accrual): the investor **sells** options, and the premium plus the bond yield becomes the coupon.\n\n**Participation notes** (Market Protection, Buy-the-Dip): the investor **buys** options with the bond's discount.\n\n**Hybrids** (BREN, ACM+, capped floored floater): buy some optionality, sell other optionality to fund it.", "note", 12.5);
+  S.callout(pres, s, MX, 1.55, 4.4, 4.6, "How it's built", "The investor buys a **bank bond** (the issuer's funding) plus an **option package**.\n\n**Income notes** (RevCon, FCN, Phoenix, Digital Review, Buy-the-Dip, range accrual, capped floored floater): the investor **sells** optionality, and the premium plus the bond yield becomes the coupon.\n\n**Protection notes** (Market Protection, Sharkfin): the investor **buys** options with the bond's discount.\n\n**Hybrids** (BREN, ACM+): buy some optionality, sell other optionality to fund it.", "note", 12.5);
   S.table(pres, s, [
     ["When this rises…", "Short-vol income notes", "Long-vol protection notes"],
     ["Implied volatility", "**Better**: higher coupons", "**Worse**: lower participation"],
-    ["Interest rates", "Better: bond yields more", "**Better**: cheaper zero bond, more option budget"],
+    ["Interest rates", "**Better**: bigger funding leg, higher coupon", "**Better**: cheaper zero bond, more option budget"],
     ["Issuer credit spread", "Better terms, more credit risk", "Better terms, more credit risk"],
     ["Dividend yield", "Better coupons (you forgo dividends)", "Worse (calls cheaper, but you forgo dividends)"],
     ["Skew (put richness)", "Better: sold put worth more", "Neutral to slightly worse"],
     ["Correlation (worst-of)", "Lower corr = higher coupon **and** risk", "n/a"],
     ["Tenor", "More coupon, more path risk", "Better participation, longer lock-up"],
   ], { x: MX + 4.7, y: 1.55, w: CW - 4.7, colW: [2.3, 2.6, CW - 4.7 - 4.9], fontSize: 11.5 });
-  s.addText(S.runs("_Rule:_ **Sell-vol notes when IV is rich; buy-vol notes when IV is cheap and rates are high.** A note that looks generous is usually generous because one of these drivers is stretched, so name which one.", { color: C.brown }), { x: MX + 4.7, y: 5.7, w: CW - 4.7, h: 0.8, fontFace: F.body, fontSize: 12, margin: 0, isTextBox: true });
+  s.addText(S.runs("_Rule:_ **Higher rates usually improve every note's terms.** Sell-vol notes when IV is rich; buy-vol notes when IV is cheap. Buy-the-Dip, range accruals and floaters are the most rates-sensitive.", { color: C.brown }), { x: MX + 4.7, y: 5.7, w: CW - 4.7, h: 0.8, fontFace: F.body, fontSize: 12, margin: 0, isTextBox: true });
 }
 
 /* 18 · Which note */
@@ -310,8 +310,8 @@ S.section(pres, "03", "The structured-note shelf", "What drives note terms, whic
   const s = S.slide(pres, { kicker: "Notes · Selection", title: "Which note? Start from the tape and the view" });
   const q = [
     ["Rates view, not equity?", "Range-bound → **Callable Range Accrual** · high rates, fear deep cuts → **Capped Floored Floater**"],
-    ["Need the principal back, IV low, rates high?", "**Market Protection Note**"],
-    ["Bullish, but extended; expect a dip first?", "**Buy-the-Dip note**"],
+    ["Need the principal back, IV low, rates high?", "Open-ended upside → **Market Protection** · upside to a target → **Sharkfin**"],
+    ["Want to own it lower, and rates are high?", "**Buy-the-Dip**: deposit-like coupon, converts at the dip level"],
     ["Moderately bullish to a target; skew steep?", "**BREN**: levered upside to a cap, buffered downside"],
     ["Flat-to-up but want upside kept at maturity?", "**ACM+**: call premium, or max(digital, upside) at maturity"],
     ["Flat-to-up; want a fixed lump sum, not coupons?", "**Digital Review Note**"],
@@ -361,32 +361,59 @@ const NOTES = [
     consider: "Flat-to-up with upside optionality at maturity · IV elevated · steep skew · dividends high",
     avoid: "Gap-risk names · strong downtrend · IV cheap (premium thin)",
     terms: "12–36m · annual/quarterly reviews · barrier 60–80% · confirm naming and mechanics on the issuer's term sheet" },
-  { name: "Buy-the-Dip Note", tags: [["v", "Long vol"], ["p", "Participation"]],
-    payoff: "Entry level is set at the **lowest close during an initial lookback window** (or reset lower if the underlying falls a set %). Participation runs from that lower entry, so a dip after trade date improves the entry.",
-    consider: "Bullish 12m+ but **extended** (near highs, RSI > 65) and expecting near-term chop · IV low-to-moderate (the lookback is cheapest when vol is low)",
-    avoid: "IV high (lookback expensive, participation poor) · you expect a straight-line rally (entry never improves)",
-    terms: "12–36m · lookback 1–3 (up to 6) months · participation ~100%, sometimes capped · designs vary: confirm the term sheet" },
   { name: "Market Protection Note (MPN)", tags: [["v", "Long vol"], ["p", "Protection"]],
     payoff: "**90–100% of principal** back at maturity (issuer credit aside) plus **participation** in the underlying's rise, capped or uncapped. A zero-coupon bond plus a bought call.",
     consider: "Rates high vs history (cheap zero bond) · IV percentile < 35 (cheap calls) · low dividend yield · long tenor available · re-risking after a hedge",
     avoid: "Rates low (little option budget) · IV rich (poor participation) · money needed before maturity",
     terms: "1–5y · 90–100% protection · participation 50–120%, capped or uncapped" },
-  { name: "Callable Range Accrual Note", tags: [["v", "Short vol"], ["p", "Income"]],
+  { name: "Sharkfin Note", tags: [["v", "Long vol"], ["p", "Protection"]],
+    payoff: "**Capital protected** (typically 95–100%) with participation in the rise **up to a knock-out barrier**. If the barrier is touched, participation is replaced by a fixed **rebate**. A zero-coupon bond plus a bought up-and-out call.",
+    consider: "Rates high (cheap zero bond) · IV low (cheap calls) · moderately bullish with a target **below** the barrier · want a floor",
+    avoid: "Breakout view (a knock-out leaves only the rebate) · rates low · IV high",
+    terms: "1–3y · 95–100% protection · participation 100–150% up to a 120–140% barrier · rebate 2–5%" },
+];
+const RATES_NOTES = [
+  { name: "Buy-the-Dip Note (BTD)", tags: [["v", "Short vol"], ["p", "Income"], ["p", "Rates-linked"]],
+    payoff: "A deposit-like note paying an enhanced coupon, largely funded by **interest rates** plus a sold put. If the underlying closes at or below the **dip level** during the tenor, principal converts into shares **at that level**, so you buy the dip at a pre-set discount. Otherwise principal plus coupon is repaid.",
+    consider: "Rates high (the deposit leg pays most of the coupon) · IV elevated · bullish long-term but extended (near highs, RSI > 65) · a dip level you'd genuinely buy at",
+    avoid: "Rates low (coupon thin) · falling-knife fundamentals · you wouldn't want the shares at the dip level",
+    terms: "1–6m, rolled · dip level 85–95% · coupon ≈ deposit rate + option premium · designs vary: confirm the term sheet" },
+  { name: "Callable Range Accrual Note", tags: [["v", "Short vol"], ["p", "Income"], ["p", "Rates-linked"]],
     payoff: "Coupon = fixed rate × (**days the reference rate fixes inside the band** ÷ days in period). The issuer may **call** the note on set dates. The investor is short rate vol twice: the range and the call.",
-    consider: "Rate vol percentile > 60 (pays more) · forwards sit inside the band · narrow realised range · central bank anchored · comfortable being called in the good scenario",
+    consider: "Rates high · rate vol percentile > 60 (pays more) · forwards sit inside the band · narrow realised range · central bank anchored · comfortable being called in the good scenario",
     avoid: "Breakout risk (fiscal shock, policy surprise) · extension risk: in bad scenarios it isn't called and pays little",
     terms: "3–10y · non-call 6–12m, then quarterly/annual · reference SOFR / CMS10 / CMS spread · band set around the realised range" },
-  { name: "Capped Floored Floater (CFF)", tags: [["v", "Mixed"], ["p", "Income"]],
-    payoff: "Coupon = reference rate + spread, **floored** at a minimum and **capped** at a maximum. The investor is long a floor (protection if rates fall) and short a cap (gives up very high rates).",
-    consider: "Rates high, market pricing cuts, and you fear **deeper** cuts than forwards imply · cap strike well above the plausible rate path · rate vol low (floor cheap)",
-    avoid: "Cap inside the plausible path (rates stay high) · expecting cuts shallower than priced (floor overpaid)",
+  { name: "Capped Floored Floater (CFF)", tags: [["v", "Short vol"], ["p", "Income"], ["p", "Rates-linked"]],
+    payoff: "Coupon = reference rate + spread, **floored** at a minimum and **capped** at a maximum. The investor **sells the cap** (gives up very high rates) to fund the floor and a better spread, so the note is net short rate vol.",
+    consider: "Rates high, cuts priced, and you fear **deeper** cuts than forwards imply · rate vol elevated (the sold cap is worth more) · cap strike well above the plausible rate path",
+    avoid: "Cap inside the plausible path (rates stay high or rise) · cuts shallower than priced (floor overpaid)",
     terms: "2–7y · floor near or below forwards (e.g. 3%) · cap well above spot (e.g. 6–7%)" },
 ];
 for (let i = 0; i < NOTES.length; i += 2) {
-  const s = S.slide(pres, { kicker: `Notes · Cards ${i / 2 + 1} of 5`, title: `${NOTES[i].name.split(" (")[0]} and ${NOTES[i + 1].name.split(" (")[0]}` });
+  const s = S.slide(pres, { kicker: `Notes · Cards ${i / 2 + 1} of 6`, title: `${NOTES[i].name.split(" (")[0]} and ${NOTES[i + 1].name.split(" (")[0]}` });
   const cw = (CW - 0.3) / 2;
   noteCard(s, MX, 1.52, cw, 5.28, NOTES[i]);
   noteCard(s, MX + cw + 0.3, 1.52, cw, 5.28, NOTES[i + 1]);
+}
+
+/* Rates-linked notes */
+{
+  const s = S.slide(pres, { kicker: "Notes · Cards 5 of 6 · Rates-linked", title: "Rates-linked: Buy-the-Dip and Callable Range Accrual", tag: "Rates", tagColor: C.red });
+  const cw = (CW - 0.3) / 2;
+  noteCard(s, MX, 1.52, cw, 5.28, RATES_NOTES[0]);
+  noteCard(s, MX + cw + 0.3, 1.52, cw, 5.28, RATES_NOTES[1]);
+}
+{
+  const s = S.slide(pres, { kicker: "Notes · Cards 6 of 6 · Rates-linked", title: "Capped Floored Floater, and why rates drive all three", tag: "Rates", tagColor: C.red });
+  const cw = (CW - 0.3) / 2;
+  noteCard(s, MX, 1.52, cw, 5.28, RATES_NOTES[2]);
+  S.card(pres, s, MX + cw + 0.3, 1.52, cw, 5.28, "Why these three sit apart", [
+    "**All three sell volatility**: equity vol for Buy-the-Dip, rate vol for the range accrual and the floater.",
+    "**Their coupon is mostly a rate.** BTD is a deposit plus a sold put; the range accrual and the floater reference a rate directly.",
+    "**Higher rates improve all three**, more than any other note on the shelf.",
+    "**Read rates first, equity vol second.** Level vs history, forwards vs your view, rate vol percentile, realised range.",
+    "**Higher rates help nearly every note**: a bigger funding leg means more coupon or more option budget. These three just feel it most.",
+  ], { tag: "Rates-linked", tagColor: C.red, fontSize: 13, titleSize: 19, gap: 9 });
 }
 
 /* 24 · Notes matrix */
@@ -396,24 +423,23 @@ for (let i = 0; i < NOTES.length; i += 2) {
     { n: "BREN", d: "levered to a cap; sells buffer put", fx: 0.37, fy: 0.15, k: "bull" },
     { n: "ACM+", d: "call premium; upside kept at maturity", fx: 0.14, fy: 0.33, k: "bull" },
     { n: "Market Protection", d: "zero bond + bought call", fx: 0.86, fy: 0.15, k: "bull" },
-    { n: "Buy-the-Dip", d: "lookback entry (bought)", fx: 0.64, fy: 0.33, k: "bull" },
-    { n: "Digital Review", d: "fixed premium; sold digital", fx: 0.37, fy: 0.635, k: "neutral" },
+    { n: "Sharkfin", d: "protected; bought up-and-out call", fx: 0.64, fy: 0.33, k: "bull" },
     { n: "Phoenix", d: "memory coupon; sold barrier", fx: 0.14, fy: 0.635, k: "neutral" },
-    { n: "Callable Range Accrual", d: "short rate vol ×2", fx: 0.37, fy: 0.785, k: "neutral" },
+    { n: "Digital Review", d: "fixed premium; sold digital", fx: 0.37, fy: 0.635, k: "neutral" },
     { n: "FCN", d: "fixed coupons; sold strike put", fx: 0.14, fy: 0.785, k: "neutral" },
-    { n: "Reverse Convertible", d: "bond + sold put", fx: 0.14, fy: 0.935, k: "neutral" },
-    { n: "Capped Floored Floater", d: "long floor / short cap", fx: 0.63, fy: 0.785, k: "hedge" },
-  ], { w: 8.3 });
+    { n: "Reverse Convertible", d: "bond + sold put", fx: 0.37, fy: 0.785, k: "neutral" },
+    { n: "Buy-the-Dip", d: "deposit + sold put · rates-linked", fx: 0.25, fy: 0.935, k: "rates" },
+], { w: 8.3 });
   const rx = MX + 9.25, rw = W - MX - rx;
   s.addText("HOW TO READ", { x: rx, y: 1.7, w: rw, h: 0.3, fontFace: F.sans, fontSize: 10, bold: true, color: C.gold, charSpacing: 2, margin: 0, isTextBox: true });
   S.bullets(s, [
     "**Column from the vol stance.** IV rich → left; IV cheap → right.",
     "**Row from the view shape.** Trend/breakout → top; range/sideways → bottom.",
-    "**Income notes cluster bottom-left**: the coupon *is* sold optionality.",
-    "**Buy vol · income is nearly empty.** You can't be paid a coupon for owning options; only floors live there.",
-    "Rates notes (range accrual, CFF) follow **rate vol**, not equity vol.",
-  ], { x: rx, y: 2.05, w: rw, h: 3.1, fontSize: 11, gap: 5 });
-  legend(s, rx, 5.3, [[C.green, "Bullish participation"], [C.ink, "Neutral / range income"], [C.red, "Rates protection (floor)"]]);
+    "**Income notes cluster bottom-left**: the coupon is sold optionality.",
+    "**Buy vol · income is empty.** You can't be paid a coupon for owning options.",
+  ], { x: rx, y: 2.05, w: rw, h: 1.9, fontSize: 11, gap: 5 });
+  S.callout(pres, s, rx, 4.0, rw, 1.3, "Kept separate", "**Callable Range Accrual** and **Capped Floored Floater** also sell vol, but **rate** vol: read them off the rates tape, not this grid.", "warn", 10.5);
+  legend(s, rx, 5.45, [[C.green, "Bullish participation"], [C.muted, "Neutral / range income"], [C.red, "Rates-linked"]]);
 }
 
 /* 25 · Notes grid */
@@ -427,11 +453,13 @@ for (let i = 0; i < NOTES.length; i += 2) {
     ["Digital Review", "Short", "Income", "Rich", "Higher helps", "Flat to mildly up", "12–36m"],
     ["ACM+", "Short", "Participation", "Rich, steep skew", "Higher helps", "Flat-to-up, keep upside", "12–36m"],
     ["BREN", "Mixed", "Participation", "Moderate, steep skew", "Neutral", "Up to a target", "12–24m"],
-    ["Buy-the-Dip", "Long", "Participation", "Low to moderate", "Higher helps", "Bullish, extended now", "12–36m"],
     ["Market Protection", "Long", "Protection", "Low (< 35th pct)", "**High needed**", "Upside with a floor", "1–5y"],
-    ["Callable Range Accrual", "Short (rates)", "Income", "Rate vol rich", "Range-bound", "Rates boxed in", "3–10y"],
-    ["Capped Floored Floater", "Mixed (rates)", "Income", "Rate vol low", "High, cuts priced", "Deeper cuts than priced", "2–7y"],
-  ], { y: 1.55, colW: [2.6, 1.4, 1.6, 2.0, 1.6, 2.0, CW - 11.2], fontSize: 12.8 });
+    ["Sharkfin", "Long", "Protection", "Low (< 35th pct)", "**High needed**", "Upside to a target, floored", "1–3y"],
+    ["Buy-the-Dip", "Short", "Income", "Rich", "**Rates-linked**", "Own it lower", "1–6m"],
+    ["Callable Range Accrual", "Short (rates)", "Income", "Rate vol rich", "**Rates-linked**", "Rates boxed in", "3–10y"],
+    ["Capped Floored Floater", "Short (rates)", "Income", "Rate vol rich", "**Rates-linked**", "Deeper cuts than priced", "2–7y"],
+  ], { y: 1.55, colW: [2.6, 1.4, 1.6, 2.0, 1.6, 2.0, CW - 11.2], fontSize: 12 });
+  s.addText(S.runs("**Higher rates help every row.** The three marked rates-linked depend on them most.", { color: C.muted }), { x: MX, y: 6.55, w: CW, h: 0.3, fontFace: F.body, fontSize: 11.5, italic: true, margin: 0, isTextBox: true });
 }
 
 /* 26 · Section OTC */
@@ -498,7 +526,7 @@ otcTable("OTC · Hedging", "Protection structures", "Protection", C.slate, [
     "**Hedges straddle** payoffs: a put is downside participation; a collar trades upside for protection.",
     "**Buy vol · income** holds only the calendar: long back-month vega while collecting front-month decay.",
   ], { x: rx, y: 2.05, w: rw, h: 3.1, fontSize: 11, gap: 5 });
-  legend(s, rx, 5.3, [[C.green, "Bullish participation"], [C.ink, "Neutral / range / vol"], [C.red, "Hedge"]]);
+  legend(s, rx, 5.3, [[C.green, "Bullish participation"], [C.muted, "Neutral / range / vol"], [C.red, "Hedge"]]);
 }
 
 /* 31 · Cheat sheet */
@@ -514,10 +542,11 @@ otcTable("OTC · Hedging", "Protection structures", "Protection", C.slate, [
     ["IV rich + steep skew", "Mildly bullish", "Risk reversal · seagull", "ACM+ · Digital Review"],
     ["IV rich + steep skew", "Protect", "Put spread · collar", "BREN (buffer)"],
     ["IV moderate + target", "Up to a level", "Call spread", "BREN"],
-    ["Near highs, RSI > 70", "Bullish, better entry", "Laddered put sales", "Buy-the-Dip"],
+    ["Near highs, RSI > 70, rates high", "Bullish, better entry", "Laddered put sales", "Buy-the-Dip"],
+    ["IV cheap + target + rates high", "Protected upside", "Call spread", "Sharkfin"],
     ["Rates boxed, rate vol rich", "Rates range", "Sold swaption strangle", "Callable Range Accrual"],
     ["Rates high, cuts priced", "Fear deeper cuts", "Bought floor", "Capped Floored Floater"],
-  ], { y: 1.55, colW: [3.5, 2.4, 3.2, CW - 9.1], fontSize: 13 });
+  ], { y: 1.55, colW: [3.5, 2.4, 3.2, CW - 9.1], fontSize: 12.2 });
 }
 
 /* 32 · Principles */
@@ -531,14 +560,15 @@ otcTable("OTC · Hedging", "Protection structures", "Protection", C.slate, [
     "**Buy vol only with a catalyst** inside the tenor, or the decay wins.",
     "**Anything that caps upside** is wrong for an uncapped view.",
     "**Every note is issuer credit** and illiquid until maturity; spread issuers.",
-  ], { tag: "Do", tagColor: C.green, fontSize: 14.5, gap: 10 });
+    "**Higher rates help nearly every note**; Buy-the-Dip, range accruals and floaters most of all.",
+  ], { tag: "Do", tagColor: C.green, fontSize: 13.5, gap: 8 });
   S.card(pres, s, MX + cw + 0.3, 1.55, cw, 5.2, "Caveats", [
     "**Thresholds are starting points.** Calibrate per asset: a biotech's \"rich\" is a utility's \"crisis\".",
     "**Rich vol is sometimes rich for a reason**: a binary event, a deal, a ruling. Check the calendar.",
     "**Worst-of coupons price correlation risk.** A higher coupon means more risk, not a better deal.",
-    "**Note naming varies by issuer** (ACM+, Buy-the-Dip, Digital Review): confirm mechanics on the term sheet.",
+    "**Note naming varies by issuer** (ACM+, Buy-the-Dip, Digital Review, Sharkfin): confirm mechanics on the term sheet.",
     "**This deck ignores suitability** by design; the companion deck covers who can hold what.",
-  ], { tag: "Watch", tagColor: C.red, fontSize: 14.5, gap: 10 });
+  ], { tag: "Watch", tagColor: C.red, fontSize: 13.5, gap: 8 });
 }
 
 pres.writeFile({ fileName: "Derivatives_Structuring_Methodology.pptx" }).then(f => console.log("wrote", f));
