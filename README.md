@@ -148,6 +148,7 @@ shows exactly what would go out.
 | `data.js`    | Seed themes, ideas, goal buckets and client books |
 | `scanner.js` | Portfolio scan + idea↔client fit (Advisor Book) |
 | `expressions.js` | "How to express it" knowledge base (clickable expressions) |
+| `IMPLEMENTATION_RULES.md` | Rulebook for turning an idea into a client-specific trade: cash vs derivative, which derivative / wrapper / tenor, single names and FICC |
 | `mapping.js` | Transparent idea→client scoring engine (Today's Focus) |
 | `email.js`   | Book-aware client-email engine (`window.EMAIL`) — turns any idea×client into a personalised letter (real-holding hook, tax-swap / loss-harvest / cash-redeploy / FX-sizing actions, concrete implementation terms, balanced risk line, disclosure). Shared by `app.js` and `openbook.js` so the copy can't drift. |
 | `today_focus.js` / `today_focus.json` / `build_today_focus.py` | Daily focus data + generator |
