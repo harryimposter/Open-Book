@@ -149,6 +149,7 @@ shows exactly what would go out.
 | `scanner.js` | Portfolio scan + idea↔client fit (Advisor Book) |
 | `expressions.js` | "How to express it" knowledge base (clickable expressions) |
 | `IMPLEMENTATION_RULES.md` | Standalone explainer: how a view becomes the right trade for a specific client — the reasoning and product menus for single-name equities and bonds |
+| `IMPLEMENTATION_ENGINE.html` | The implementation engine, rule by rule: how each idea's menu of structures becomes one client's implementation (resolution, MiFID filter, scoring, tie-break, gate, wording, overrides), with live traces |
 | `mapping.js` | Transparent idea→client scoring engine (Today's Focus) |
 | `email.js`   | Book-aware client-email engine (`window.EMAIL`) — turns any idea×client into a personalised letter (real-holding hook, tax-swap / loss-harvest / cash-redeploy / FX-sizing actions, concrete implementation terms, balanced risk line, disclosure). Shared by `app.js` and `openbook.js` so the copy can't drift. |
 | `today_focus.js` / `today_focus.json` / `build_today_focus.py` | Daily focus data + generator |

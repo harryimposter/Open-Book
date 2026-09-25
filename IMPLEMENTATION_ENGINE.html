@@ -1,0 +1,845 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Implementation Engine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap">
+<style>
+/* ============ tokens (the Fit Engine palette; dark green-black is the default) ============ */
+:root,[data-theme="dark"]{
+  --paper:#10130F; --card:#171A15; --band:#1C201A; --sunk:#1A1E18;
+  --ink:#EAEEE6; --ink-2:#BFC7BA; --grey:#949C8B; --grey-2:#787F70;
+  --rule:#2B3127; --rule-soft:#232820; --rule-firm:#3B4335;
+  --gap:#82B4DE;  --gap-bg:#152230;
+  --aff:#5FC1A4;  --aff-bg:#122420;
+  --man:#DBA75E;  --man-bg:#271D10;
+  --con:#C293BE;  --con-bg:#241B23;
+  --stop:#DE8974; --stop-bg:#2A1814;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+}
+[data-theme="light"]{
+  --paper:#F4F6F3; --card:#FFFFFF; --band:#EAEFE8; --sunk:#ECF0EA;
+  --ink:#171A16; --ink-2:#464E45; --grey:#6F7A6D; --grey-2:#8E968B;
+  --rule:#DBE1D8; --rule-soft:#E8ECE5; --rule-firm:#C2CBBE;
+  --gap:#2E5E8A;  --gap-bg:#E4EBF2;
+  --aff:#1D6B58;  --aff-bg:#E1EEE9;
+  --man:#8A5B18;  --man-bg:#F4EBDC;
+  --con:#6E3F6B;  --con-bg:#F0E8EF;
+  --stop:#A33B2A; --stop-bg:#F6E7E3;
+  --shadow:0 1px 2px rgba(20,26,18,.05), 0 8px 24px -12px rgba(20,26,18,.16);
+}
+:root{
+  --serif:"Newsreader",Georgia,"Times New Roman",serif;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SF Mono",Consolas,monospace;
+}
+*{box-sizing:border-box}
+html{scroll-snap-type:y proximity; scroll-behavior:smooth}
+body{margin:0; background:var(--paper); color:var(--ink); font-family:var(--sans); font-size:16px;
+     line-height:1.6; -webkit-font-smoothing:antialiased; font-variant-numeric:tabular-nums}
+@media (prefers-reduced-motion:reduce){html{scroll-snap-type:none; scroll-behavior:auto}}
+
+.slide{min-height:100svh; scroll-snap-align:start; display:flex; flex-direction:column; justify-content:center;
+  padding:clamp(3.2rem,7vh,5rem) clamp(1rem,5vw,4.5rem) clamp(3.6rem,7vh,4.6rem);
+  border-top:1px solid var(--rule); position:relative}
+.slide:first-of-type{border-top:none}
+.inner{width:100%; max-width:1060px; margin:0 auto; display:flex; flex-direction:column; gap:1.05rem}
+
+.tag{display:flex; align-items:center; gap:.7rem; font-family:var(--mono); font-size:10.5px; font-weight:500;
+  letter-spacing:.17em; text-transform:uppercase; color:var(--grey); margin:0}
+.tag .dot{width:5px; height:5px; border-radius:50%; background:currentColor; flex:none}
+.tag .ln{height:1px; flex:1; background:var(--rule); min-width:1rem}
+.tag.rule{color:var(--aff)}
+
+h1{font-family:var(--serif); font-weight:500; font-size:clamp(2.4rem,6.2vw,4.4rem); line-height:1.03; letter-spacing:-.022em; margin:0; text-wrap:balance}
+h2{font-family:var(--serif); font-weight:500; font-size:clamp(1.6rem,3.7vw,2.55rem); line-height:1.12; letter-spacing:-.016em; margin:0; text-wrap:balance}
+h3{font-family:var(--sans); font-weight:600; font-size:1rem; margin:.3rem 0 0}
+p{margin:0; max-width:74ch}
+.lede{font-size:clamp(1rem,1.7vw,1.18rem); line-height:1.55; color:var(--ink-2); max-width:70ch}
+.sub{font-size:.9rem; color:var(--grey); max-width:76ch}
+strong{font-weight:600}
+code{font-family:var(--mono); font-size:.86em; background:var(--sunk); padding:.08em .36em; border-radius:3px; color:var(--ink-2); white-space:nowrap}
+ul,ol{margin:0; padding-left:1.15rem; max-width:74ch} li{margin-bottom:.4rem}
+a{color:var(--gap)}
+
+.pagenum{position:absolute; right:clamp(1rem,5vw,4.5rem); bottom:clamp(1.4rem,3.4vh,2.2rem); font-family:var(--mono); font-size:10.5px; letter-spacing:.14em; color:var(--grey-2)}
+.rail{position:fixed; left:0; bottom:0; height:2px; background:var(--aff); width:0; z-index:60}
+.toggle{position:fixed; top:14px; right:16px; z-index:61; font-family:var(--mono); font-size:10px; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--grey); background:var(--card); border:1px solid var(--rule); border-radius:99px; padding:.35rem .8rem; cursor:pointer}
+
+/* pills */
+.ax{display:inline-block; font-family:var(--mono); font-size:10.5px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; padding:.18rem .5rem; border-radius:3px; white-space:nowrap}
+.x-gap{color:var(--gap); background:var(--gap-bg)} .x-aff{color:var(--aff); background:var(--aff-bg)}
+.x-man{color:var(--man); background:var(--man-bg)} .x-con{color:var(--con); background:var(--con-bg)}
+.x-no{color:var(--stop); background:var(--stop-bg)} .x-ok{color:var(--grey); border:1px solid var(--rule-firm)}
+
+/* formula + equations */
+.formula{background:var(--card); border:1px solid var(--rule); border-radius:5px; box-shadow:var(--shadow); padding:clamp(1rem,3vw,1.8rem); overflow-x:auto}
+.formula .line{font-family:var(--mono); font-size:clamp(12px,1.9vw,18px); line-height:2; white-space:nowrap}
+.formula .line b{font-weight:600}
+.key{display:flex; flex-wrap:wrap; gap:.5rem 1.4rem; margin-top:.8rem; font-size:12px; color:var(--grey)}
+.eq{font-family:var(--mono); font-size:clamp(11.5px,1.35vw,13.5px); line-height:1.8; background:var(--sunk); border-left:2px solid var(--rule-firm);
+  padding:.85rem 1.1rem; margin:0; overflow-x:auto; white-space:pre; color:var(--ink); border-radius:0 3px 3px 0}
+.eq b{font-weight:400; color:var(--grey)} .eq u{text-decoration:none; font-weight:600; color:var(--aff)}
+
+/* tables */
+.tw{overflow-x:auto; border:1px solid var(--rule); border-radius:5px; background:var(--card); box-shadow:var(--shadow)}
+table{border-collapse:collapse; width:100%; font-size:13.5px; min-width:520px}
+caption{caption-side:top; text-align:left; font-family:var(--mono); font-size:10px; font-weight:500; letter-spacing:.14em; text-transform:uppercase; color:var(--grey); padding:.75rem .9rem .15rem}
+th{text-align:left; font-family:var(--mono); font-weight:500; font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--grey);
+   padding:.6rem .9rem; border-bottom:1px solid var(--rule-firm); white-space:nowrap; vertical-align:bottom}
+td{padding:.5rem .9rem; border-bottom:1px solid var(--rule-soft); vertical-align:top}
+tbody tr:nth-child(even){background:var(--band)} tbody tr:last-child td{border-bottom:0}
+th.n,td.n{text-align:right; font-family:var(--mono); font-size:12.5px; white-space:nowrap}
+.m{font-family:var(--mono); font-size:12px} .w{color:var(--ink-2); font-size:13px; line-height:1.5}
+.big{font-family:var(--mono); font-weight:600} .hi{color:var(--aff); font-weight:600} .lo{color:var(--stop)}
+.tw.dense td{padding:.34rem .8rem; font-size:12.5px} .tw.dense th{padding:.45rem .8rem}
+tr.win td{background:var(--aff-bg) !important}
+
+/* notes */
+.note{border-left:2px solid var(--rule-firm); padding:.1rem 0 .1rem 1rem; color:var(--ink-2); font-size:14.5px}
+.note.good{border-left-color:var(--aff)} .note.warn{border-left-color:var(--stop)} .note.info{border-left-color:var(--gap)}
+.note .h{display:block; font-family:var(--mono); font-size:10px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:var(--grey); margin-bottom:.3rem}
+.note.good .h{color:var(--aff)} .note.warn .h{color:var(--stop)} .note.info .h{color:var(--gap)}
+
+/* the rule box: plain words / exact rule / example */
+.rulebox{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:1px; background:var(--rule); border:1px solid var(--rule); border-radius:5px; overflow:hidden}
+.rulebox > div{background:var(--card); padding:.95rem 1.05rem}
+.rulebox .k{font-family:var(--mono); font-size:9.5px; letter-spacing:.15em; text-transform:uppercase; color:var(--grey); margin-bottom:.4rem}
+.rulebox .k.p{color:var(--aff)} .rulebox .k.x{color:var(--man)} .rulebox .k.e{color:var(--gap)}
+.rulebox p,.rulebox li{font-size:14px; color:var(--ink-2)}
+.rulebox code,.note code,.lede code,.sub code{white-space:normal; word-break:break-word}
+
+.two{display:grid; grid-template-columns:repeat(auto-fit,minmax(310px,1fr)); gap:1.1rem; align-items:start}
+.three{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:1.1rem; align-items:start}
+.stack{display:flex; flex-direction:column; gap:.9rem}
+.callout{background:var(--sunk); border:1px solid var(--rule); border-radius:5px; padding:.85rem 1rem; font-family:var(--mono); font-size:13px; line-height:1.7; color:var(--ink-2)}
+.callout b{color:var(--ink); font-weight:600}
+.quote{background:var(--card); border:1px solid var(--rule); border-radius:5px; padding:1rem 1.15rem; font-family:var(--serif); font-size:1.02rem; line-height:1.6; color:var(--ink)}
+.quote .src{display:block; margin-top:.5rem; font-family:var(--mono); font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--grey)}
+.figure svg{width:100%; height:auto; display:block}
+
+/* cover */
+.cover{justify-content:flex-end}
+.cover .inner{gap:1.4rem}
+.strap{font-family:var(--mono); font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:var(--grey)}
+.cover-rule{height:1px; background:var(--rule-firm); width:100%}
+.cover-foot{display:flex; flex-wrap:wrap; gap:.6rem 2rem; font-family:var(--mono); font-size:11px; letter-spacing:.06em; color:var(--grey)}
+
+@media (max-width:860px){html{scroll-snap-type:none} .slide{min-height:auto; padding-top:2.6rem; padding-bottom:3.4rem; justify-content:flex-start} body{font-size:15.5px}}
+@page{size:13.333in 7.5in; margin:0}
+@media print{
+  .rail,.toggle{display:none !important}
+  html,body,.slide,.tw,.formula,.eq,.ax,.rulebox>div,tbody tr{-webkit-print-color-adjust:exact; print-color-adjust:exact}
+  html{scroll-snap-type:none}
+  body{font-size:12px}
+  .slide{min-height:7.5in; padding:.45in .7in; break-after:page; justify-content:flex-start}
+  table{font-size:11px; min-width:0} td{padding:.28rem .6rem} th{padding:.35rem .6rem}
+  .eq{font-size:10.5px} .lede{font-size:13px} h2{font-size:28px} h1{font-size:54px}
+}
+</style>
+</head>
+<body>
+<div class="rail" id="rail"></div>
+<button class="toggle" id="toggle" type="button">Light</button>
+
+<!-- ═════════ 1 · cover ═════════ -->
+<section class="slide cover">
+  <div class="inner">
+    <p class="strap">Open Book · the implementation engine</p>
+    <h1>Idea to implementation,<br>rule by rule</h1>
+    <p class="lede">An idea arrives with a list of possible structures. For each client, the engine picks one of
+    them and writes it into the email. This document lays out exactly how it does that, as numbered rules. Each rule
+    is given in plain words first, then as the rule the code actually runs, then with a real example
+    from the live board.</p>
+    <p class="sub">Every number here was read back from the running engine (<code>expressions.js</code>,
+    <code>mapping.js</code>, <code>data.js</code>, <code>openbook.js</code>, <code>email.js</code>,
+    <code>scanner.js</code>) against the 20-Aug-2026 board and the nine seed books. Where the code does something
+    odd, this document says so rather than smoothing it over.</p>
+    <div class="cover-rule"></div>
+    <div class="cover-foot">
+      <span>13 rules</span><span>53 catalogued products</span><span>3 mandates × 2 client classes</span><span>Prepared 25 September 2026</span>
+    </div>
+  </div>
+  <span class="pagenum"></span>
+</section>
+
+<!-- ═════════ 2 · the job ═════════ -->
+<section class="slide">
+  <div class="inner">
+    <p class="tag"><span class="dot"></span>The job<span class="ln"></span></p>
+    <h2>What goes in, what comes out</h2>
+    <p class="lede">The engine never invents a product. The desk writes a menu of structures on each idea.
+    The engine's whole job is to <strong>choose from that menu</strong> for one client, then <strong>word the
+    choice</strong> with concrete terms.</p>
+    <div class="two">
+      <div class="tw"><table style="min-width:0">
+        <caption>In · from the idea</caption>
+        <thead><tr><th>Field</th><th>What it is</th></tr></thead>
+        <tbody>
+          <tr><td class="m">structures[]</td><td class="w">The menu, e.g. <em>Phoenix autocall · Cash-secured puts · Reverse convertible · Zero-cost collar · Direct equity</em>. <strong>Order matters</strong> (Rules 1, 6, 7).</td></tr>
+          <tr><td class="m">naturalExpression</td><td class="w">The desk's headline structure. If missing, the first item on the menu.</td></tr>
+          <tr><td class="m">tradeStatement</td><td class="w">The desk's one-sentence recommendation, shown on the card.</td></tr>
+          <tr><td class="m">ticker · sector · levels</td><td class="w">Used to fill in example terms (Rule 10).</td></tr>
+        </tbody>
+      </table></div>
+      <div class="tw"><table style="min-width:0">
+        <caption>In · from the client</caption>
+        <thead><tr><th>Field</th><th>What it is</th></tr></thead>
+        <tbody>
+          <tr><td class="m">classification</td><td class="w"><span class="ax x-no">Retail</span> or <span class="ax x-ok">Professional</span>: decides what they can hold (Rule 4).</td></tr>
+          <tr><td class="m">risk</td><td class="w">Free text such as "Growth, with income needs". Parsed into a mandate (Rule 3).</td></tr>
+          <tr><td class="m">positions · cash · liabilities</td><td class="w">Only used for the email's "book hook" sentence (Rule 11). <strong>Not</strong> used to choose the product.</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+    <div class="note good"><span class="h">Out</span>
+      <p>One structure per client (the <strong>best implementation</strong>), a 0–100 suitability score for it, and
+      a finished sentence: <em>"For your book I'd implement this as a … For example: …"</em>.</p></div>
+  </div>
+  <span class="pagenum"></span>
+</section>
+
+<!-- ═════════ 3 · pipeline ═════════ -->
+<section class="slide">
+  <div class="inner">
+    <p class="tag"><span class="dot"></span>The whole pipeline<span class="ln"></span></p>
+    <h2>Eight steps, run for every idea × every client</h2>
+    <figure class="figure" style="margin:0">
+      <svg viewBox="0 0 1000 300" role="img" aria-label="Pipeline: desk menu, resolve names, read mandate, filter by what the client can hold, score each product, pick the best, gate check, write the sentence.">
+        <defs><marker id="ar" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><polygon points="0,0 8,4 0,8" fill="var(--aff)"></polygon></marker></defs>
+        <g font-family="IBM Plex Mono, monospace">
+          <g fill="var(--card)" stroke="var(--rule-firm)">
+            <rect x="10" y="20" width="220" height="110" rx="5"></rect><rect x="260" y="20" width="220" height="110" rx="5"></rect>
+            <rect x="510" y="20" width="220" height="110" rx="5"></rect><rect x="760" y="20" width="230" height="110" rx="5"></rect>
+            <rect x="760" y="170" width="230" height="110" rx="5"></rect><rect x="510" y="170" width="220" height="110" rx="5" stroke="var(--stop)"></rect>
+            <rect x="260" y="170" width="220" height="110" rx="5"></rect><rect x="10" y="170" width="220" height="110" rx="5" stroke="var(--aff)"></rect>
+          </g>
+          <g font-size="12" fill="var(--aff)" font-weight="600">
+            <text x="26" y="46">01 · RULE 1</text><text x="276" y="46">02 · RULE 2</text><text x="526" y="46">03 · RULE 3</text><text x="776" y="46">04 · RULE 4</text>
+            <text x="776" y="196">05 · RULE 5</text><text x="526" y="196" fill="var(--stop)">07 · RULE 7</text><text x="276" y="196">06 · RULE 6</text><text x="26" y="196">08 · RULES 10–12</text>
+          </g>
+          <g font-size="14" fill="var(--ink)" font-family="Newsreader, Georgia, serif">
+            <text x="26" y="74">Desk writes the menu</text><text x="276" y="74">Resolve each name</text><text x="526" y="74">Read the mandate</text><text x="776" y="74">Keep what they can hold</text>
+            <text x="776" y="224">Score each for mandate</text><text x="526" y="224">Gate: natural expr.</text><text x="276" y="224">Pick the highest</text><text x="26" y="224">Write the sentence</text>
+          </g>
+          <g font-size="11" fill="var(--grey)">
+            <text x="26" y="98">structures[], in order</text><text x="276" y="98">→ one of 53 products</text><text x="526" y="98">growth · income ·</text><text x="526" y="114">preservation</text><text x="776" y="98">Retail: no OTC</text>
+            <text x="776" y="248">40 + 30 × fit (0–100)</text><text x="526" y="248">Retail + OTC first</text><text x="526" y="264">→ idea hidden</text><text x="276" y="248">tie → first on menu</text><text x="26" y="248">terms · caveat · hook</text>
+          </g>
+          <g stroke="var(--aff)" stroke-width="1.5" fill="none">
+            <path d="M232 75 L256 75" marker-end="url(#ar)"></path><path d="M482 75 L506 75" marker-end="url(#ar)"></path><path d="M732 75 L756 75" marker-end="url(#ar)"></path>
+            <path d="M875 132 L875 166" marker-end="url(#ar)"></path><path d="M758 225 L734 225" marker-end="url(#ar)"></path><path d="M508 225 L484 225" marker-end="url(#ar)"></path><path d="M258 225 L234 225" marker-end="url(#ar)"></path>
+          </g>
+        </g>
+      </svg>
+    </figure>
+    <p class="sub">Step 7 (the gate) runs separately from steps 4–6 and reads only the <em>first</em> item on the menu.
+    Rule 7 explains why that matters. Rule 13 covers the second source of implementations: the portfolio scan, which
+    writes its own menus from the client's holdings.</p>
+  </div>
+  <span class="pagenum"></span>
+</section>
+
+<!-- ═════════ 4 · Rule 1 ═════════ -->
+<section class="slide">
+  <div class="inner">
+    <p class="tag rule"><span class="dot"></span>Rule 1 · the menu<span class="ln"></span></p>
+    <h2>The desk writes the menu, derivatives first</h2>
+    <div class="rulebox">
+      <div><p class="k p">In plain words</p><p>Every idea lists several ways to express it. By house style the <strong>first</strong>
+        one is an option, structured or OTC construction, and plain shares or bonds come further down as alternates.</p></div>
+      <div><p class="k x">The exact rule</p><p><code>naturalExpression = idea.naturalExpression || structures[0] || "Direct equity"</code>.
+        The engine can only ever choose something that is on <code>structures[]</code>. It never adds a product.</p></div>
+      <div><p class="k e">Live example</p><p>Nvidia into earnings: <em>Call spread · Zero-cost collar · Call overwrite · Buffered note · Direct equity</em>.
+        The natural expression is the call spread.</p></div>
+    </div>
+    <div class="two">
+      <div class="note warn"><span class="h">Why the order is a real decision</span>
+        <p>The order is used twice. The <strong>first</strong> item is what the regulatory gate tests (Rule 7). When two products
+        tie on score, the one <strong>listed earlier</strong> wins (Rule 6). Reordering the menu can change which clients see
+        the idea <em>and</em> what they are offered.</p></div>
+      <div class="note"><span class="h">Consequence</span>
+        <p>If a product is missing from the menu, no client can be offered it. A retail client with an OTC-only menu has
+        nothing to choose from (Rule 8).</p></div>
+    </div>
+  </div>
+  <span class="pagenum"></span>
+</section>
+
+<!-- ═════════ 5 · Rule 2 ═════════ -->
+<section class="slide">
+  <div class="inner">
+    <p class="tag rule"><span class="dot"></span>Rule 2 · names to products<span class="ln"></span></p>
+    <h2>Every name on the menu becomes one of 53 catalogued products</h2>
+    <div class="rulebox">
+      <div><p class="k p">In plain words</p><p>The desk writes names freely ("Covered call", "Call overwrite", "Covered calls").
+        Before scoring, each is translated to a single catalogue entry, such as <code>call-overwrite</code>.</p></div>
+      <div><p class="k x">The exact rule</p><ol>
+        <li>Lower-case and trim the name.</li>
+        <li>Look it up in a fixed <strong>alias table</strong> (72 exact spellings).</li>
+        <li>If not found, run a <strong>keyword ladder</strong> top to bottom. The first match wins.</li>
+        <li>If nothing matches, the product is <strong>unresolved</strong>: it scores a flat 70 for every mandate and gets generic wording.</li></ol></div>
+    </div>
+    <div class="eq">keyword ladder (first match wins, abbreviated):
+  "risk reversal" | "seagull"          → <u>fx-risk-reversal</u>     <b>← FX rules run first, even for equities</b>
+  "strangle" | "straddle"              → fx-strangle
+  "fx" + "spread" / "fx" + put|call     → fx-option-spread / fx-option
+  "collar" → zero-cost-collar     "halo" → halo-basket     "accrual" → range-accrual
+  "buffer" → buffered-note        "revcon" | "fcn" → reverse-convertible
+  "capital-protected" → capital-protected-note   "autocall" | "acm+" | "phoenix" → <u>phoenix-autocall</u>
+  "covered call" | "overwrite" → call-overwrite   "call spread" → call-spread
+  … bonds, ladders, trims, baskets …
+  "structured" | "note"                → structured-note        <b>← catch-all for any "… note"</b>
+  "etf" | "fund" | "index"             → index-core
+  "direct" | "equity" | "shares"       → <u>direct-equity</u>        <b>← catch-all for anything with "equity"</b></div>
+  </div>
+  <span class="pagenum"></span>
+</section>
+
+<!-- ═════════ 6 · Rule 2 worked ═════════ -->
+<section class="slide">
+  <div class="inner">
+    <p class="tag rule"><span class="dot"></span>Rule 2 · on the live board<span class="ln"></span></p>
+    <h2>How today's menu names resolve, including the surprises</h2>
+    <div class="tw dense"><table>
+      <thead><tr><th>Name the desk wrote</th><th>Resolves to</th><th>Via</th><th>Comment</th></tr></thead>
+      <tbody>
+        <tr><td>Call overwrite · Covered call</td><td class="m">call-overwrite</td><td class="w">alias / keyword</td><td class="w">Two spellings, one product. As intended.</td></tr>
+        <tr><td>Phoenix autocall</td><td class="m">phoenix-autocall</td><td class="w">alias</td><td class="w">As intended.</td></tr>
+        <tr><td>ACM+ · Autocall Market Plus</td><td class="m hi">phoenix-autocall</td><td class="w">alias</td><td class="w"><strong>ACM+ is treated as a Phoenix.</strong> Same scores, same wording.</td></tr>
+        <tr><td>Reverse convertible</td><td class="m">reverse-convertible</td><td class="w">alias</td><td class="w">FCN also lands here.</td></tr>
+        <tr><td>Range accrual (BREN)</td><td class="m">range-accrual</td><td class="w">keyword "accrual"</td><td class="w">The "BREN" label is ignored.</td></tr>
+        <tr><td>Fixed-coupon note · Callable note · Participation note · FX-linked note · Commodity-linked note</td><td class="m">structured-note</td><td class="w">keyword "note"</td><td class="w">Five different notes become one generic "structured note".</td></tr>
+        <tr><td>Risk reversal (on an equity)</td><td class="m hi">fx-risk-reversal</td><td class="w">keyword</td><td class="w">Scored and worded as an <strong>FX</strong> product.</td></tr>
+        <tr><td>Cash-secured FX puts</td><td class="m">fx-option</td><td class="w">keyword "fx"+"put"</td><td class="w">Caught by the FX rule before the cash-secured rule.</td></tr>
+        <tr><td>Energy-equity calls · Direct commodity</td><td class="m hi">direct-equity</td><td class="w">keyword "equity" / "direct"</td><td class="w"><strong>Options scored as plain shares.</strong></td></tr>
+        <tr><td>Basket / ETF (SLV)</td><td class="m">thematic-basket</td><td class="w">keyword "basket"</td><td class="w">An ETF treated as a thematic basket.</td></tr>
+        <tr class="win"><td>Put spread · Digital put · Brent calls</td><td class="m lo">unresolved</td><td class="w">no match</td><td class="w">Flat 70 for every mandate; generic wording.</td></tr>
+      </tbody>
+    </table></div>
+    <p class="sub">Why this matters: all scoring and wording from Rule 5 onward runs on the <em>resolved</em> product, not on the
+    name the desk wrote. A wrong resolution flows straight through to the client's email.</p>
+  </div>
+  <span class="pagenum"></span>
+</section>
+
+<!-- ═════════ 7 · Rule 3 ═════════ -->
+<section class="slide">
+  <div class="inner">
+    <p class="tag rule"><span class="dot"></span>Rule 3 · the mandate<span class="ln"></span></p>
+    <h2>Each client is boiled down to one of three mandates</h2>
+    <div class="rulebox">
+      <div><p class="k p">In plain words</p><p>The client's risk description is read for keywords and becomes <strong>growth</strong>,
+        <strong>income</strong> or <strong>preservation</strong>. That one word decides which products score well.</p></div>
+      <div><p class="k x">The exact rule</p><p>Two passes over the text: a <em>level</em> and a <em>tilt</em>. Then:
+        income tilt → <strong>income</strong>; preservation tilt or conservative level → <strong>preservation</strong>;
+        growth/aggressive → <strong>growth</strong>; anything else (moderate, balanced) → <strong>income</strong>. Unreadable text
+        falls back to the client's goal targets.</p></div>
+    </div>
+    <div class="tw dense"><table>
+      <caption>The nine books</caption>
+      <thead><tr><th>Client</th><th>Risk text on file</th><th>Mandate</th><th>Class</th><th>Why</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Fable</strong></td><td class="w">Aggressive</td><td><span class="ax x-aff">growth</span></td><td class="w">Professional</td><td class="w">"aggressive"</td></tr>
+        <tr><td><strong>Aurora</strong></td><td class="w">Growth, with income needs</td><td><span class="ax x-con">income</span></td><td class="w">Retail</td><td class="w">"income" beats "growth"</td></tr>
+        <tr><td><strong>Scott</strong></td><td class="w">Conservative income</td><td><span class="ax x-con">income</span></td><td class="w">Retail</td><td class="w">income tilt wins over conservative</td></tr>
+        <tr><td><strong>Amar</strong></td><td class="w">Growth, real-asset tilt</td><td><span class="ax x-aff">growth</span></td><td class="w">Professional</td><td class="w">"growth"</td></tr>
+        <tr><td><strong>Jacob</strong></td><td class="w">Moderate</td><td><span class="ax x-con">income</span></td><td class="w">Professional</td><td class="w">moderate → the income default</td></tr>
+        <tr><td><strong>Prahnav</strong></td><td class="w">Growth</td><td><span class="ax x-aff">growth</span></td><td class="w">Retail</td><td class="w">"growth"</td></tr>
+        <tr><td><strong>Ben</strong></td><td class="w">Moderate, value tilt</td><td><span class="ax x-con">income</span></td><td class="w">Retail</td><td class="w">moderate → the income default</td></tr>
+        <tr><td><strong>Mitch</strong></td><td class="w">Aggressive, maximum growth</td><td><span class="ax x-aff">growth</span></td><td class="w">Professional</td><td class="w">"aggressive"</td></tr>
+        <tr><td><strong>Fotis</strong></td><td class="w">Not formally risk-profiled</td><td><span class="ax x-gap">preservation</span></td><td class="w">Retail</td><td class="w">read off the book's goal targets</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+  <span class="pagenum"></span>
+</section>
+
+<!-- ═════════ 8 · Rule 4 ═════════ -->
+<section class="slide">
+  <div class="inner">
+    <p class="tag rule"><span class="dot"></span>Rule 4 · who can hold what<span class="ln"></span></p>
+    <h2>Retail clients never get an OTC product</h2>
+    <div class="rulebox">
+      <div><p class="k p">In plain words</p><p>Every product falls in one of three classes. <strong>Professional</strong> clients can hold
+        all of them. <strong>Retail</strong> clients can hold plain securities and packaged notes, but not bilateral OTC contracts.</p></div>
+      <div><p class="k x">The exact rule</p><p>Before scoring, remove every menu item whose class is <code>otc</code> if the client is
+        Retail. Professionals keep the full menu.</p></div>
+    </div>
+    <div class="tw"><table>
+      <thead><tr><th>Class</th><th>Retail?</th><th>Products in the catalogue</th></tr></thead>
+      <tbody>
+        <tr><td><span class="ax x-ok">Non-complex</span></td><td class="hi">Yes</td><td class="w">Direct equity, ETFs and baskets, govt/IG bonds, ladders, T-bills, gold ETC, hedged share classes, trims, harvests, bond swaps</td></tr>
+        <tr><td><span class="ax x-gap">Structured</span></td><td class="hi">Yes</td><td class="w">Structured note, buffered note, capital-protected note, autocall (ACM+/Phoenix), reverse convertible, HALO basket, leveraged certificate</td></tr>
+        <tr><td><span class="ax x-no">OTC</span></td><td class="lo">No</td><td class="w">Call spread, collar, covered call, protective put, cash-secured puts, prepaid variable forward, gold accumulator, FX forward/collar, DCD, FX options, spreads, risk reversals, strangles</td></tr>
+        <tr><td><span class="ax x-man">Private</span></td><td class="w">(qualified only)</td><td class="w">Private markets, private real estate</td></tr>
+      </tbody>
+    </table></div>
+    <div class="note info"><span class="h">Packaged vs bilateral</span>
+      <p>A structured note is a <em>security with an ISIN</em>, so a retail client can buy it (after an appropriateness check).
+      An OTC option is a <em>contract with the bank</em>, so it needs professional classification.</p></div>
+  </div>
+  <span class="pagenum"></span>
+</section>
+
+<!-- ═════════ 9 · Rule 4 caveat ═════════ -->
+<section class="slide">
+  <div class="inner">
+    <p class="tag rule"><span class="dot"></span>Rule 4 · a caveat worth knowing<span class="ln"></span></p>
+    <h2>There are two classifiers, and they disagree</h2>
+    <p class="lede">The <strong>scorer and the gate</strong> (<code>mapping.js</code>) classify by searching the raw name for keywords
+    (<code>data.js</code>). The <strong>email picker</strong> (<code>openbook.js</code>) classifies by the resolved product from Rule 2
+    (<code>expressions.js</code>). On today's board they disagree on eight names, and a ninth (Digital put) is wrong in both.</p>
+    <div class="tw dense"><table>
+      <thead><tr><th>Name on the menu</th><th>Scorer & gate say</th><th>Email picker says</th><th>What actually happens</th></tr></thead>
+      <tbody>
+        <tr><td>Dual-currency deposit</td><td><span class="ax x-ok">non-complex</span></td><td><span class="ax x-no">OTC</span></td><td class="w">Scorer lets Retail pick it; the keyword is "dual currency" with a space, and the desk wrote a hyphen.</td></tr>
+        <tr><td>Range accrual (BREN)</td><td><span class="ax x-gap">structured</span></td><td><span class="ax x-ok">non-complex</span></td><td class="w">Retail-eligible either way.</td></tr>
+        <tr><td>Fixed-coupon · Callable · FX-linked · Commodity-linked note</td><td><span class="ax x-ok">non-complex</span></td><td><span class="ax x-gap">structured</span></td><td class="w">Retail-eligible either way; the appropriateness caveat only shows in the email.</td></tr>
+        <tr><td>Put spread</td><td><span class="ax x-no">OTC</span></td><td><span class="ax x-ok">non-complex</span></td><td class="w">Unresolved name, so the picker defaults it to non-complex.</td></tr>
+        <tr><td>Digital put</td><td><span class="ax x-ok">non-complex</span></td><td><span class="ax x-ok">non-complex</span></td><td class="w">Both wrong: it is an OTC option.</td></tr>
+        <tr><td>Brent calls</td><td><span class="ax x-gap">structured</span></td><td><span class="ax x-ok">non-complex</span></td><td class="w">"bren" (the range-accrual keyword) is inside "Brent".</td></tr>
+      </tbody>
+    </table></div>
+    <div class="note warn"><span class="h">Rule of thumb until this is fixed</span>
+      <p>Trust the class shown in the <strong>email</strong> (the resolved product). It is right more often. Where the desk
+      writes a new product name, check that it resolves (Rule 2) before relying on either.</p></div>
+  </div>
+  <span class="pagenum"></span>
+</section>
+
+<!-- ═════════ 10 · Rule 5 ═════════ -->
+<section class="slide">
+  <div class="inner">
+    <p class="tag rule"><span class="dot"></span>Rule 5 · scoring<span class="ln"></span></p>
+    <h2>Each remaining product gets a 0–100 suitability score for the mandate</h2>
+    <div class="rulebox">
+      <div><p class="k p">In plain words</p><p>Every catalogue product carries a small rating for each mandate: how well it serves
+        <strong>growth</strong> (directional), <strong>income</strong> (coupon) and <strong>preservation</strong> (protection).
+        Products whose style matches the mandate get a small bonus. The rating is stretched to 0–100.</p></div>
+      <div><p class="k x">The exact rule</p><p>Rating 0, 1 or 2 per mandate, from a fixed table. Bonus:
+        <strong>+0.5</strong> protective product for preservation, <strong>+0.3</strong> coupon product for income,
+        <strong>+0.3</strong> directional product for growth. Unresolved product: rating 1, no bonus.</p></div>
+    </div>
+    <div class="formula">
+      <div class="line">implFit&nbsp; =&nbsp; clamp( 0, 100, round( <b style="color:var(--aff)">40</b> + <b style="color:var(--aff)">30</b> × ( rating + bonus ) ) )</div>
+      <div class="key"><span><strong>rating 0</strong> → 40</span><span><strong>rating 1</strong> → 70</span><span><strong>rating 2</strong> → 100</span><span><strong>2 + bonus</strong> → still 100 (capped)</span></div>
+    </div>
+    <div class="three">
+      <div class="note good"><span class="h">Protective (+0.5 for preservation)</span><p>Capital-protected note, zero-cost collar, buffered note, protective put, prepaid variable forward, FX forward/collar, currency-hedged sleeve</p></div>
+      <div class="note good"><span class="h">Coupon (+0.3 for income)</span><p>Autocall (ACM+/Phoenix), reverse convertible, HALO basket, call overwrite, DCD, range accrual</p></div>
+      <div class="note good"><span class="h">Directional (+0.3 for growth)</span><p>Direct equity, thematic basket, equal-weight index, leveraged certificate, call spread, index core, FX option, FX option spread, FX risk reversal</p></div>
+    </div>
+    <p class="sub">Because the score is capped at 100, the bonus only changes the result when the base rating is 0 or 1.
+    That is why so many products tie at 100, which is what makes Rule 6's tie-break matter.</p>
+  </div>
+  <span class="pagenum"></span>
+</section>
+
+<!-- ═════════ 11 · Rule 5 table ═════════ -->
+<section class="slide">
+  <div class="inner">
+    <p class="tag rule"><span class="dot"></span>Rule 5 · the score sheet<span class="ln"></span></p>
+    <h2>What every product scores, by mandate</h2>
+    <div class="two">
+      <div class="tw dense"><table style="min-width:0">
+        <thead><tr><th>Product</th><th>Class</th><th class="n">Growth</th><th class="n">Income</th><th class="n">Pres.</th></tr></thead>
+        <tbody>
+          <tr><td>Direct equity</td><td class="m">non-cx</td><td class="n hi">100</td><td class="n">40</td><td class="n">40</td></tr>
+          <tr><td>Index core / ETF</td><td class="m">non-cx</td><td class="n hi">100</td><td class="n">70</td><td class="n">70</td></tr>
+          <tr><td>Thematic · equal-weight · international basket</td><td class="m">non-cx</td><td class="n hi">100</td><td class="n">40</td><td class="n">40</td></tr>
+          <tr><td>Call spread</td><td class="m">OTC</td><td class="n hi">100</td><td class="n">40</td><td class="n">40</td></tr>
+          <tr><td>FX option · spread · risk reversal</td><td class="m">OTC</td><td class="n hi">100</td><td class="n">40</td><td class="n">40–70</td></tr>
+          <tr><td>Leveraged certificate</td><td class="m">struct.</td><td class="n hi">100</td><td class="n">40</td><td class="n">40</td></tr>
+          <tr><td>Structured note (generic)</td><td class="m">struct.</td><td class="n">70</td><td class="n">70</td><td class="n">70</td></tr>
+          <tr><td>Autocall (ACM+ / Phoenix) · HALO</td><td class="m">struct.</td><td class="n">70</td><td class="n hi">100</td><td class="n">40</td></tr>
+          <tr><td>Reverse convertible (RevCon / FCN)</td><td class="m">struct.</td><td class="n">40</td><td class="n hi">100</td><td class="n">40</td></tr>
+          <tr><td>Call overwrite / covered call</td><td class="m">OTC</td><td class="n">40</td><td class="n hi">100</td><td class="n">70</td></tr>
+          <tr><td>Cash-secured puts</td><td class="m">OTC</td><td class="n">70</td><td class="n hi">100</td><td class="n">40</td></tr>
+          <tr><td>Dual-currency deposit</td><td class="m">OTC</td><td class="n">40</td><td class="n hi">100</td><td class="n">40</td></tr>
+        </tbody>
+      </table></div>
+      <div class="tw dense"><table style="min-width:0">
+        <thead><tr><th>Product</th><th>Class</th><th class="n">Growth</th><th class="n">Income</th><th class="n">Pres.</th></tr></thead>
+        <tbody>
+          <tr><td>Range accrual</td><td class="m">struct.*</td><td class="n">40</td><td class="n hi">100</td><td class="n">70</td></tr>
+          <tr><td>Govt/IG bonds · ladders · bond swap</td><td class="m">non-cx</td><td class="n">40</td><td class="n hi">100</td><td class="n">70</td></tr>
+          <tr><td>T-bill / muni ladder</td><td class="m">non-cx</td><td class="n">40</td><td class="n hi">100</td><td class="n hi">100</td></tr>
+          <tr><td>Utilities · infrastructure</td><td class="m">non-cx</td><td class="n">70</td><td class="n hi">100</td><td class="n">70</td></tr>
+          <tr><td>Buffered note</td><td class="m">struct.</td><td class="n">70</td><td class="n">40</td><td class="n hi">100</td></tr>
+          <tr><td>Capital-protected note</td><td class="m">struct.</td><td class="n">70</td><td class="n">40</td><td class="n hi">100</td></tr>
+          <tr><td>Zero-cost collar</td><td class="m">OTC</td><td class="n">40</td><td class="n">40</td><td class="n hi">100</td></tr>
+          <tr><td>Protective put</td><td class="m">OTC</td><td class="n">70</td><td class="n">40</td><td class="n hi">100</td></tr>
+          <tr><td>Physical gold / ETC</td><td class="m">non-cx</td><td class="n">70</td><td class="n">40</td><td class="n hi">100</td></tr>
+          <tr><td>Gold accumulator</td><td class="m">OTC</td><td class="n">70</td><td class="n">70</td><td class="n">70</td></tr>
+          <tr><td>FX forward/collar · hedged sleeve</td><td class="m">mixed</td><td class="n">40</td><td class="n">40–70</td><td class="n hi">100</td></tr>
+          <tr><td>Staged trim · diversifiers · liquid alts</td><td class="m">non-cx</td><td class="n">40</td><td class="n">40</td><td class="n hi">100</td></tr>
+          <tr><td><em>Unresolved name</em></td><td class="m">—</td><td class="n">70</td><td class="n">70</td><td class="n">70</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+    <p class="sub">* classed structured by the scorer, non-complex by the email picker (Rule 4 caveat). Read a column top to
+    bottom and you have the engine's preference order for that mandate.</p>
+  </div>
+  <span class="pagenum"></span>
+</section>
+
+<!-- ═════════ 12 · Rule 6 ═════════ -->
+<section class="slide">
+  <div class="inner">
+    <p class="tag rule"><span class="dot"></span>Rule 6 · the pick<span class="ln"></span></p>
+    <h2>Highest score wins; on a tie, the one listed first</h2>
+    <div class="rulebox">
+      <div><p class="k p">In plain words</p><p>Walk down the menu in order, keep the best score seen so far, and only replace it
+        with a <strong>strictly higher</strong> score. The result is the client's best implementation.</p></div>
+      <div><p class="k x">The exact rule</p><p><code>for s in structures: if tradable(s) and implFit(s) &gt; best: best = s</code>.
+        The engine does <strong>not</strong> look at holdings, volatility, tax or tenor when picking.</p></div>
+    </div>
+    <div class="two">
+      <div class="tw dense"><table style="min-width:0">
+        <caption>Micron × Ben · Retail · income</caption>
+        <thead><tr><th>Menu, in order</th><th>Holdable?</th><th class="n">Score</th></tr></thead>
+        <tbody>
+          <tr class="win"><td>1. Phoenix autocall</td><td class="w">yes (structured)</td><td class="n big">100</td></tr>
+          <tr><td>2. Cash-secured puts</td><td class="lo w">no (OTC)</td><td class="n">—</td></tr>
+          <tr><td>3. Reverse convertible</td><td class="w">yes (structured)</td><td class="n">100 <span class="sub">tie</span></td></tr>
+          <tr><td>4. Zero-cost collar</td><td class="lo w">no (OTC)</td><td class="n">—</td></tr>
+          <tr><td>5. Direct equity</td><td class="w">yes</td><td class="n">40</td></tr>
+        </tbody>
+      </table></div>
+      <div class="tw dense"><table style="min-width:0">
+        <caption>Gold × Aurora · Retail · income</caption>
+        <thead><tr><th>Menu, in order</th><th>Holdable?</th><th class="n">Score</th></tr></thead>
+        <tbody>
+          <tr class="win"><td>1. Capital-protected note</td><td class="w">yes (structured)</td><td class="n big">40</td></tr>
+          <tr><td>2. Gold accumulator</td><td class="lo w">no (OTC)</td><td class="n">—</td></tr>
+          <tr><td>3. Call spread</td><td class="lo w">no (OTC)</td><td class="n">—</td></tr>
+          <tr><td>4. Physical / ETC</td><td class="w">yes</td><td class="n">40 <span class="sub">tie</span></td></tr>
+        </tbody>
+      </table></div>
+    </div>
+    <div class="two">
+      <div class="note good"><span class="h">Reading Micron × Ben</span><p>The Phoenix and the reverse convertible both score 100 for an
+        income book. The Phoenix wins only because the desk listed it first.</p></div>
+      <div class="note warn"><span class="h">Reading Gold × Aurora</span><p>Nothing on the gold menu suits an income mandate, so the
+        "best" scores just 40. The pick is still made (a protected note), but its low score drags down her fit (Rule 9).</p></div>
+    </div>
+  </div>
+  <span class="pagenum"></span>
+</section>
+
+<!-- ═════════ 13 · Rule 7 ═════════ -->
+<section class="slide">
+  <div class="inner">
+    <p class="tag rule"><span class="dot"></span>Rule 7 · the gate<span class="ln"></span></p>
+    <h2>If the headline product is OTC, a retail client never sees the idea</h2>
+    <div class="rulebox">
+      <div><p class="k p">In plain words</p><p>Separately from the pick, the engine checks the idea's <strong>headline</strong> product
+        (the first on the menu). If the client is Retail and that product is OTC, the idea's fit is set to <strong>zero</strong> and
+        it is hidden for them, with the reason shown.</p></div>
+      <div><p class="k x">The exact rule</p><p><code>blocked = Retail AND isOTC(naturalExpression)</code> → <code>fit = 0</code>,
+        <code>suppressed = true</code>. This runs <strong>even if Rule 6 found a holdable alternative</strong> further down the menu.</p></div>
+    </div>
+    <div class="tw dense"><table>
+      <caption>Nvidia into earnings · headline: call spread (OTC)</caption>
+      <thead><tr><th>Client</th><th>Class · mandate</th><th>Rule 6 pick</th><th class="n">Pick score</th><th>Gate</th><th class="n">Final fit</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Fable</strong></td><td class="w">Professional · growth</td><td>Call spread</td><td class="n">100</td><td class="hi">pass</td><td class="n">30</td></tr>
+        <tr><td><strong>Jacob</strong></td><td class="w">Professional · income</td><td>Call overwrite</td><td class="n">100</td><td class="hi">pass</td><td class="n">53</td></tr>
+        <tr class="win"><td><strong>Prahnav</strong></td><td class="w">Retail · growth</td><td>Direct equity</td><td class="n">100</td><td class="lo">blocked</td><td class="n lo">0</td></tr>
+        <tr class="win"><td><strong>Fotis</strong></td><td class="w">Retail · preservation</td><td>Buffered note</td><td class="n">100</td><td class="lo">blocked</td><td class="n lo">0</td></tr>
+        <tr><td><strong>Aurora · Scott · Ben</strong></td><td class="w">Retail · income</td><td>Buffered note</td><td class="n">40</td><td class="lo">blocked</td><td class="n lo">0</td></tr>
+      </tbody>
+    </table></div>
+    <div class="note warn"><span class="h">The practical consequence</span>
+      <p>Prahnav and Fotis each have a perfect-scoring, holdable implementation, and are still gated out. On today's board 14 of the 18
+      ideas lead with an OTC product, so all five retail clients are hidden from those 14. <strong>Putting a note or plain security
+      first on the menu is the only way a retail client sees an idea.</strong></p></div>
+  </div>
+  <span class="pagenum"></span>
+</section>
+
+<!-- ═════════ 14 · Rule 8 ═════════ -->
+<section class="slide">
+  <div class="inner">
+    <p class="tag rule"><span class="dot"></span>Rule 8 · when nothing is holdable<span class="ln"></span></p>
+    <h2>No holdable product: the score falls back, and the email falls back further</h2>
+    <div class="rulebox">
+      <div><p class="k p">In plain words</p><p>If every product on the menu is OTC and the client is Retail, there is nothing to pick.
+        The <strong>score</strong> then grades the idea's underlying risk instead. The <strong>email</strong> offers the whole menu anyway, with a
+        caveat that it needs professional classification.</p></div>
+      <div><p class="k x">The exact rule</p><p>Score: <code>bestImpl = null</code> → use the risk-suitability table below.
+        Email: <code>implChoices = holdable items, or if none, all items</code>. The default is the first, and the sentence adds the OTC caveat
+        (Rule 10).</p></div>
+    </div>
+    <div class="tw"><table>
+      <caption>Fallback: underlying risk vs mandate (0–100)</caption>
+      <thead><tr><th>Mandate</th><th class="n">High beta / high vol</th><th class="n">Moderate</th><th class="n">Low vol</th><th class="n">Protected note, low vol</th></tr></thead>
+      <tbody>
+        <tr><td><strong>growth</strong></td><td class="n hi">92</td><td class="n">72</td><td class="n">55</td><td class="n">—</td></tr>
+        <tr><td><strong>income</strong></td><td class="n lo">45</td><td class="n">82</td><td class="n hi">90</td><td class="n">—</td></tr>
+        <tr><td><strong>preservation</strong></td><td class="n lo">22</td><td class="n">50</td><td class="n">80</td><td class="n hi">92</td></tr>
+      </tbody>
+    </table></div>
+    <p class="sub">Live example: the GBP/USD risk reversal and EUR/USD call-spread ideas have no holdable product at all. A retail
+    client is gated out of both (Rule 7). If a retail client opens the email drafter anyway, they are offered the risk reversal with the
+    professional-classification caveat.</p>
+  </div>
+  <span class="pagenum"></span>
+</section>
+
+<!-- ═════════ 15 · Rule 9 ═════════ -->
+<section class="slide">
+  <div class="inner">
+    <p class="tag rule"><span class="dot"></span>Rule 9 · implementation feeds the fit<span class="ln"></span></p>
+    <h2>The pick's score is 60% of the Mandate &amp; risk axis</h2>
+    <div class="rulebox">
+      <div><p class="k p">In plain words</p><p>How well the best product suits the client is not just a label: it feeds straight into the
+        client-fit score that decides whether the idea is flagged to them. A great idea with no suitable product fits worse.</p></div>
+      <div><p class="k x">The exact rule</p><p>Mandate axis = <code>0.6 × pick score + 0.4 × intent fit</code>. Intent fit compares the
+        idea's goal (appreciation, yield or protection) with the mandate. The axis is then one of four fit axes, weighted 0.294.</p></div>
+    </div>
+    <div class="two">
+      <div class="tw"><table style="min-width:0">
+        <caption>Intent fit</caption>
+        <thead><tr><th>Mandate ↓ / idea goal →</th><th class="n">Appreciation</th><th class="n">Yield</th><th class="n">Protection</th></tr></thead>
+        <tbody>
+          <tr><td><strong>growth</strong></td><td class="n hi">90</td><td class="n">55</td><td class="n">45</td></tr>
+          <tr><td><strong>income</strong></td><td class="n">60</td><td class="n hi">90</td><td class="n">65</td></tr>
+          <tr><td><strong>preservation</strong></td><td class="n">30</td><td class="n">68</td><td class="n hi">92</td></tr>
+        </tbody>
+      </table></div>
+      <div class="stack">
+        <div class="callout">Micron × Ben (income, yield idea)<br>0.6 × <b>100</b> + 0.4 × <b>90</b> = <b>96</b></div>
+        <div class="callout">Gold × Aurora (income, protection idea)<br>0.6 × <b>40</b> + 0.4 × <b>65</b> = <b>50</b></div>
+        <div class="callout">Gold × Fotis (preservation, protection idea)<br>0.6 × <b>100</b> + 0.4 × <b>92</b> ≈ <b>97</b></div>
+      </div>
+    </div>
+    <p class="sub">The other three fit axes (gap, affinity, concentration) are covered in the Fit Engine document. They do not change
+    which product is picked.</p>
+  </div>
+  <span class="pagenum"></span>
+</section>
+
+<!-- ═════════ 16 · Rule 10 ═════════ -->
+<section class="slide">
+  <div class="inner">
+    <p class="tag rule"><span class="dot"></span>Rule 10 · writing it down<span class="ln"></span></p>
+    <h2>The implementation sentence is assembled from five parts</h2>
+    <div class="eq">For your book I'd implement this as <u>[a/an] [label]</u> — <u>[what it is, first clause]</u>.
+<u>For example: [example terms]</u>  <u>Indicative levels — tenor, entry, target, stop.</u>  <u>([class caveat])</u></div>
+    <div class="tw dense"><table>
+      <thead><tr><th>Part</th><th>Where it comes from</th><th>Rule</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Label</strong></td><td class="w">Catalogue entry of the resolved product</td><td class="w">Unresolved names print as written.</td></tr>
+        <tr><td><strong>What it is</strong></td><td class="w">First clause of the catalogue's description</td><td class="w">Cut at the first " — " or ", ", capped at ~84 characters.</td></tr>
+        <tr><td><strong>Example terms</strong></td><td class="w">1) a <em>term builder</em> that names the idea's own ticker (24 products have one) → 2) the product's idea-aware context line → 3) the generic catalogue example</td><td class="w">First available wins.</td></tr>
+        <tr><td><strong>Levels</strong></td><td class="w">The idea's <code>levels</code> block (tactical ideas only)</td><td class="w">Omitted if absent.</td></tr>
+        <tr><td><strong>Class caveat</strong></td><td class="w">Resolved class</td><td class="w"><span class="ax x-no">OTC</span> "needs your professional classification…" · <span class="ax x-gap">structured</span> "a packaged note… appropriateness check" · non-complex: none.</td></tr>
+      </tbody>
+    </table></div>
+    <div class="quote">For your book I'd implement this as an Autocall (ACM+ / Phoenix) — A high-coupon income note that pays conditional
+      coupons and can redeem early. For example: 1-year ACM+/Phoenix on MU: 80% capital barrier, ~12–18% p.a. memory coupon (quarterly)
+      while above 80%, autocall at ≥100%… (It's a packaged note you can hold directly — being a complex product, we'll run the usual
+      appropriateness check.)<span class="src">Live output · Micron × Ben</span></div>
+    <div class="note warn"><span class="h">Where the wording breaks</span><p>Products with no term builder fall back to the context line, which
+      can misfire. The Nvidia call spread prints "A cheaper." (the description was cut at its first comma) and quotes SOX index strikes
+      for a single-stock trade. Adding a term builder for call spreads fixes both.</p></div>
+  </div>
+  <span class="pagenum"></span>
+</section>
+
+<!-- ═════════ 17 · Rule 11 ═════════ -->
+<section class="slide">
+  <div class="inner">
+    <p class="tag rule"><span class="dot"></span>Rule 11 · the book hook<span class="ln"></span></p>
+    <h2>One extra sentence ties the implementation to the client's book</h2>
+    <p class="lede">After the implementation, the email adds at most <strong>one</strong> sentence drawn from the client's actual holdings.
+    The engine checks eight conditions <strong>in this order</strong> and uses the first that fires.</p>
+    <div class="tw dense"><table>
+      <thead><tr><th class="n">#</th><th>If…</th><th>…the email adds</th></tr></thead>
+      <tbody>
+        <tr><td class="n">a</td><td class="w">Income or rates idea <strong>and</strong> the client holds a rates or credit bond down ≥ 10%</td><td class="w">Swap out of that bond into current-coupon paper: bank the loss, lift the coupon.</td></tr>
+        <tr><td class="n">b</td><td class="w">Income idea <strong>and</strong> cash ≥ 8% of the book</td><td class="w">"You're also holding roughly N% in cash we could put to work here."</td></tr>
+        <tr><td class="n">c</td><td class="w">The client holds the idea's own stock <strong>and</strong> it is down ≥ 10%</td><td class="w">Harvest that loss for tax and rotate the proceeds into the idea.</td></tr>
+        <tr><td class="n">d</td><td class="w">FX idea <strong>and</strong> ≥ 8% of the book is in a non-base currency</td><td class="w">Size it to the ~N% mismatch; not a directional bet.</td></tr>
+        <tr><td class="n">e</td><td class="w">Protection idea <strong>and</strong> the largest single name is ≥ 12% of the book</td><td class="w">Point the protection at that concentration.</td></tr>
+        <tr><td class="n">f</td><td class="w">Income idea <strong>and</strong> a liability is on file</td><td class="w">The income can be matched against that liability.</td></tr>
+        <tr><td class="n">g</td><td class="w">Income idea <strong>and</strong> an income-per-year goal is behind</td><td class="w">Goes straight at the income target, with current vs target.</td></tr>
+        <tr><td class="n">h</td><td class="w">Growth idea <strong>and</strong> a wealth goal is behind</td><td class="w">Works toward growing the book to the target.</td></tr>
+      </tbody>
+    </table></div>
+    <div class="note info"><span class="h">Live example · Micron × Ben</span><p>Rule (b) fires: <em>"You're also holding roughly 8% in cash we could put to work here rather than leaving it idle at the front end."</em></p></div>
+    <p class="sub">The hook is wording only. It never changes which product was picked.</p>
+  </div>
+  <span class="pagenum"></span>
+</section>
+
+<!-- ═════════ 18 · Rule 12 ═════════ -->
+<section class="slide">
+  <div class="inner">
+    <p class="tag rule"><span class="dot"></span>Rule 12 · the human override<span class="ln"></span></p>
+    <h2>The Solutions desk can approve, discard or rewrite</h2>
+    <div class="rulebox">
+      <div><p class="k p">Approve / discard</p><p>Every idea from the sweep starts approved. Solutions can <strong>discard</strong> one, and it then
+        disappears from the Advisor view for every client. Ideas the desk drafts by hand are always approved.</p></div>
+      <div><p class="k x">Rewrite the implementation</p><p>Solutions can type their own implementation text for an idea. When present, it
+        <strong>replaces</strong> the engine's sentence (Rule 10) in every client's email and on the card, marked "tweaked by Solutions".</p></div>
+      <div><p class="k e">Advisor choice</p><p>In the email drafter the advisor can switch to any holdable product on the menu. The engine's pick is
+        only the <strong>default</strong> selection.</p></div>
+    </div>
+    <div class="formula">
+      <div class="line">sentence&nbsp; =&nbsp; <b style="color:var(--man)">Solutions tweak</b>&nbsp; if present,&nbsp; else&nbsp; <b style="color:var(--aff)">Rule 10</b>( advisor's choice&nbsp; or&nbsp; engine's pick )</div>
+    </div>
+    <div class="note"><span class="h">Precedence, simply</span><p>A human decision always beats the engine. The engine's job is to make the
+      right answer the default, so humans only need to step in on exceptions.</p></div>
+  </div>
+  <span class="pagenum"></span>
+</section>
+
+<!-- ═════════ 19 · Rule 13 ═════════ -->
+<section class="slide">
+  <div class="inner">
+    <p class="tag rule"><span class="dot"></span>Rule 13 · implementations from the book itself<span class="ln"></span></p>
+    <h2>The portfolio scan writes its own menus</h2>
+    <p class="lede">Separately from market ideas, the engine scans each book and raises findings. Each finding comes with its own menu, and it is
+    marked retail-blocked only if <strong>every</strong> item on that menu is OTC. Ordered by severity (3 = most urgent).</p>
+    <div class="tw dense"><table>
+      <thead><tr><th>Trigger</th><th class="n">Sev.</th><th>Menu written</th><th>Retail fallback text</th></tr></thead>
+      <tbody>
+        <tr><td class="w">Single name ≥ 15% (equity/alts, not index or crypto)</td><td class="n">2–3</td><td class="w">Zero-cost collar · PVF · protective put</td><td class="w">Scale out into a diversified core or capital-protected note</td></tr>
+        <tr><td class="w">Equity/alts/real-asset position ≤ −10%</td><td class="n">2</td><td class="w">Tax-loss harvest · buffered re-entry note · peer rotation</td><td class="w">Harvest and rotate into a comparable ETF for 30+ days</td></tr>
+        <tr><td class="w">Bond ≤ −8%</td><td class="n">2</td><td class="w">Bond swap · current-coupon ladder</td><td class="w">(all non-complex)</td></tr>
+        <tr><td class="w">Crypto ≤ −20%</td><td class="n">3</td><td class="w">Loss harvest · collar · structured re-entry</td><td class="w">Trim into the real-asset core</td></tr>
+        <tr><td class="w">Winner ≥ +50% and &lt; 15% of book</td><td class="n">1</td><td class="w">Covered calls · staged trim</td><td class="w">Staged, tax-aware trim</td></tr>
+        <tr><td class="w">≥ 40% of book outside base currency</td><td class="n">2</td><td class="w">FX forward/collar · currency-hedged sleeve</td><td class="w">Hedged share classes</td></tr>
+        <tr><td class="w">Cash ≥ 8%</td><td class="n">1</td><td class="w">T-bill ladder · short-duration bonds · cash-secured puts</td><td class="w">(first two are non-complex)</td></tr>
+        <tr><td class="w">Liabilities on file</td><td class="n">3</td><td class="w">T-bill/muni ladder · securities-backed line</td><td class="w">(all non-complex)</td></tr>
+        <tr><td class="w">Protection gap ≥ 6pt vs goal</td><td class="n">2</td><td class="w">Gold ETC · buffered notes · diversifiers</td><td class="w">(all retail-eligible)</td></tr>
+        <tr><td class="w">Income gap ≥ 8pt vs goal</td><td class="n">1</td><td class="w">Extend duration · listed infrastructure</td><td class="w">(all non-complex)</td></tr>
+        <tr><td class="w">Any sector ≥ 30%</td><td class="n">1</td><td class="w">Quality/equal-weight basket · diversifiers</td><td class="w">(all non-complex)</td></tr>
+      </tbody>
+    </table></div>
+    <p class="sub">The highest-severity finding becomes the client's "next best action". In a combined email, a portfolio finding uses the first
+    item on its menu, worded through Rule 10 against the underlying holding (e.g. Pfizer), not the finding's title.</p>
+  </div>
+  <span class="pagenum"></span>
+</section>
+
+<!-- ═════════ 20 · full trace ═════════ -->
+<section class="slide">
+  <div class="inner">
+    <p class="tag"><span class="dot"></span>Everything together · live trace<span class="ln"></span></p>
+    <h2>Five ideas × nine clients: what the engine picks</h2>
+    <div class="tw dense"><table>
+      <thead><tr><th>Client</th><th>Class · mandate</th><th>Micron dislocation</th><th>Nvidia earnings</th><th>Gold</th><th>USD hedge</th><th>Rates range</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Fable</strong></td><td class="w">Pro · growth</td><td>Direct equity</td><td>Call spread</td><td>Call spread</td><td>Risk reversal</td><td>Fixed-coupon note</td></tr>
+        <tr><td><strong>Amar</strong></td><td class="w">Pro · growth</td><td>Direct equity</td><td>Call spread</td><td>Call spread</td><td>Risk reversal</td><td>Fixed-coupon note</td></tr>
+        <tr><td><strong>Mitch</strong></td><td class="w">Pro · growth</td><td>Direct equity</td><td>Call spread</td><td>Call spread</td><td>Risk reversal</td><td>Fixed-coupon note</td></tr>
+        <tr><td><strong>Jacob</strong></td><td class="w">Pro · income</td><td>Phoenix</td><td>Call overwrite</td><td>Gold accumulator</td><td>FX forward/collar</td><td>Range accrual</td></tr>
+        <tr><td><strong>Prahnav</strong></td><td class="w">Retail · growth</td><td>Direct equity</td><td class="lo">Direct equity · gated</td><td>Capital-protected</td><td class="lo">Hedged sleeve · gated</td><td>Fixed-coupon note</td></tr>
+        <tr><td><strong>Aurora</strong></td><td class="w">Retail · income</td><td>Phoenix</td><td class="lo">Buffered · gated</td><td>Capital-protected</td><td class="lo">Hedged sleeve · gated</td><td>Range accrual</td></tr>
+        <tr><td><strong>Scott</strong></td><td class="w">Retail · income</td><td>Phoenix</td><td class="lo">Buffered · gated</td><td>Capital-protected</td><td class="lo">Hedged sleeve · gated</td><td>Range accrual</td></tr>
+        <tr><td><strong>Ben</strong></td><td class="w">Retail · income</td><td>Phoenix</td><td class="lo">Buffered · gated</td><td>Capital-protected</td><td class="lo">Hedged sleeve · gated</td><td>Range accrual</td></tr>
+        <tr><td><strong>Fotis</strong></td><td class="w">Retail · pres.</td><td>Phoenix</td><td class="lo">Buffered · gated</td><td>Capital-protected</td><td class="lo">Hedged sleeve · gated</td><td>Range accrual</td></tr>
+      </tbody>
+    </table></div>
+    <div class="three">
+      <div class="note"><span class="h">Pattern 1</span><p>Within a class and mandate, every client gets the <strong>same</strong> product. Holdings never change the pick.</p></div>
+      <div class="note"><span class="h">Pattern 2</span><p>Growth books get <strong>direction</strong> (shares, spreads), income books get <strong>coupon</strong> (Phoenix, overwrite), and preservation gets <strong>protection</strong>.</p></div>
+      <div class="note warn"><span class="h">Pattern 3</span><p>"Gated" cells show a holdable pick that the retail client never sees (Rule 7).</p></div>
+    </div>
+  </div>
+  <span class="pagenum"></span>
+</section>
+
+<!-- ═════════ 21 · limits ═════════ -->
+<section class="slide">
+  <div class="inner">
+    <p class="tag"><span class="dot"></span>Integrity<span class="ln"></span></p>
+    <h2>What the engine does not consider, and known quirks</h2>
+    <div class="two">
+      <div class="stack">
+        <h3>Not an input to the pick</h3>
+        <ul>
+          <li><strong>What the client already owns.</strong> Mitch holds 24% Nvidia at +310% and is still picked a call spread (more Nvidia). Aurora holds 25.8% Micron and is picked a Phoenix on Micron.</li>
+          <li><strong>Whether an overlay is possible.</strong> Jacob is picked a call overwrite on Nvidia, which he does not own.</li>
+          <li><strong>Volatility, rates, tax, tenor, base currency.</strong> None enters the pick. They live only in the desk's menu order and trade statement.</li>
+          <li><strong>Whether a hedge is needed.</strong> USD-based books are picked a risk reversal for a USD hedge they don't need.</li>
+        </ul>
+      </div>
+      <div class="stack">
+        <h3>Quirks in the code</h3>
+        <ul>
+          <li>The gate reads only the first menu item (Rule 7), while the pick reads them all (Rule 6).</li>
+          <li>Two classifiers disagree on eight names (Rule 4).</li>
+          <li>ACM+ is treated as a Phoenix; five different notes become "structured note"; some options resolve to shares (Rule 2).</li>
+          <li>Ties are decided by menu order, silently (Rule 6).</li>
+          <li>With no holdable item, the email drafter offers retail clients OTC products with a caveat (Rule 8).</li>
+          <li>Call-spread wording is broken (Rule 10).</li>
+        </ul>
+      </div>
+    </div>
+    <div class="note good"><span class="h">What it gets right</span><p>The pick is transparent and repeatable: one table of ratings, one formula, one tie-break.
+      Suitability shapes the product instead of killing the idea. Every suppressed client is shown with the reason, and a human can
+      always override.</p></div>
+  </div>
+  <span class="pagenum"></span>
+</section>
+
+<!-- ═════════ 22 · cheat sheet ═════════ -->
+<section class="slide">
+  <div class="inner">
+    <p class="tag"><span class="dot"></span>One page<span class="ln"></span></p>
+    <h2>The thirteen rules</h2>
+    <div class="tw dense"><table>
+      <thead><tr><th class="n">#</th><th>Rule</th><th>In one line</th></tr></thead>
+      <tbody>
+        <tr><td class="n">1</td><td><strong>Menu</strong></td><td class="w">The desk lists structures, derivative first. The engine only picks from this list.</td></tr>
+        <tr><td class="n">2</td><td><strong>Resolve</strong></td><td class="w">Each name → one of 53 products: alias table, then keyword ladder (first match), else unresolved (70 flat).</td></tr>
+        <tr><td class="n">3</td><td><strong>Mandate</strong></td><td class="w">Risk text → growth / income / preservation. "Income" anywhere wins; "moderate" → income.</td></tr>
+        <tr><td class="n">4</td><td><strong>Holdable</strong></td><td class="w">Retail drops OTC. Professional keeps everything.</td></tr>
+        <tr><td class="n">5</td><td><strong>Score</strong></td><td class="w">40 + 30 × (rating 0–2 + style bonus), capped at 100.</td></tr>
+        <tr><td class="n">6</td><td><strong>Pick</strong></td><td class="w">Highest score; tie → listed first.</td></tr>
+        <tr><td class="n">7</td><td><strong>Gate</strong></td><td class="w">Retail + OTC headline product → idea hidden (fit 0), whatever Rule 6 found.</td></tr>
+        <tr><td class="n">8</td><td><strong>Fallback</strong></td><td class="w">Nothing holdable → score the underlying's risk; the email offers the full menu with an OTC caveat.</td></tr>
+        <tr><td class="n">9</td><td><strong>Fit</strong></td><td class="w">Mandate axis = 0.6 × pick score + 0.4 × intent fit.</td></tr>
+        <tr><td class="n">10</td><td><strong>Word</strong></td><td class="w">Label + what it is + example terms + levels + class caveat.</td></tr>
+        <tr><td class="n">11</td><td><strong>Hook</strong></td><td class="w">First of eight book conditions adds one tailored sentence.</td></tr>
+        <tr><td class="n">12</td><td><strong>Override</strong></td><td class="w">Solutions tweak &gt; advisor choice &gt; engine pick. Discarded ideas vanish.</td></tr>
+        <tr><td class="n">13</td><td><strong>Book scan</strong></td><td class="w">11 portfolio triggers write their own menus; retail-blocked only if every item is OTC.</td></tr>
+      </tbody>
+    </table></div>
+    <p class="sub">Open Book · implementation engine · all figures from the live engine against the 20-Aug-2026 board and the nine seed books.</p>
+  </div>
+  <span class="pagenum"></span>
+</section>
+
+<script>
+(function(){
+  var slides = document.querySelectorAll(".slide");
+  slides.forEach(function(s, i){ var p = s.querySelector(".pagenum"); if (p) p.textContent = String(i + 1).padStart(2, "0") + " / " + slides.length; });
+  var rail = document.getElementById("rail");
+  function onScroll(){ var h = document.documentElement; var max = h.scrollHeight - h.clientHeight; rail.style.width = (max > 0 ? (h.scrollTop / max) * 100 : 0) + "%"; }
+  document.addEventListener("scroll", onScroll, { passive: true }); onScroll();
+  var t = document.getElementById("toggle"), root = document.documentElement;
+  function setTheme(th){ root.setAttribute("data-theme", th); t.textContent = th === "dark" ? "Light" : "Dark"; try { localStorage.setItem("ob-impl-theme", th); } catch (e) {} }
+  var saved = null; try { saved = localStorage.getItem("ob-impl-theme"); } catch (e) {}
+  setTheme(saved === "light" ? "light" : "dark");
+  t.addEventListener("click", function(){ setTheme(root.getAttribute("data-theme") === "dark" ? "light" : "dark"); });
+  document.addEventListener("keydown", function(e){
+    if (["ArrowRight","ArrowDown","PageDown","ArrowLeft","ArrowUp","PageUp"].indexOf(e.key) === -1) return;
+    var fwd = ["ArrowRight","ArrowDown","PageDown"].indexOf(e.key) !== -1, y = window.scrollY + 10, idx = 0;
+    slides.forEach(function(s, i){ if (s.offsetTop <= y) idx = i; });
+    var n = slides[Math.max(0, Math.min(slides.length - 1, idx + (fwd ? 1 : -1)))];
+    if (n) { e.preventDefault(); n.scrollIntoView({ behavior: "smooth" }); }
+  });
+})();
+</script>
+</body>
+</html>
