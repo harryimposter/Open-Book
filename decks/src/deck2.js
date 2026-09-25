@@ -1,6 +1,6 @@
 const S = require("./style");
 const { C, F, W, H, MX } = S;
-const pres = S.deck("Derivatives Structuring Methodology");
+const pres = S.deck("Derivs Methodology");
 const CW = W - 2 * MX;
 
 /* ---------- helpers specific to this deck ---------- */
@@ -81,7 +81,7 @@ function scenario(o) {
 
 /* 1 · Cover */
 S.cover(pres, {
-  title: "Derivatives Structuring Methodology",
+  title: "Derivs Methodology",
   subtitle: "When to reach for which structure, driven by market data: pullbacks, selling vol, buying vol, uncapped upside, hedging, and the structured-note shelf",
   meta: [["Prepared", "25 September 2026"], ["Scope", "OTC options & structured notes"], ["Out of scope", "Client suitability (see companion deck)"], ["Companion", "From Idea to Implementation"]],
   note: { tag: "The one-line truth", kind: "key", text: "**Every structure is a position in volatility and a choice between participation and income.** Read the market data first, decide whether to buy or sell optionality, then pick the payoff. The product name comes last." },
@@ -571,4 +571,4 @@ otcTable("OTC · Hedging", "Protection structures", "Protection", C.slate, [
   ], { tag: "Watch", tagColor: C.red, fontSize: 13.5, gap: 8 });
 }
 
-pres.writeFile({ fileName: "Derivatives_Structuring_Methodology.pptx" }).then(f => console.log("wrote", f));
+pres.writeFile({ fileName: "Derivs_Methodology.pptx" }).then(f => console.log("wrote", f));

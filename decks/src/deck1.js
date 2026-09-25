@@ -7,7 +7,7 @@ const CW = W - 2 * MX;
 S.cover(pres, {
   title: "From Idea to Implementation",
   subtitle: "How a market view becomes the right trade for a specific client, for single-name equities and bonds",
-  meta: [["Prepared", "25 September 2026"], ["Scope", "Single-name equities · Bonds"], ["Audience", "Anyone new to the desk's process"], ["Companion", "Derivatives Structuring Methodology"]],
+  meta: [["Prepared", "25 September 2026"], ["Scope", "Single-name equities · Bonds"], ["Audience", "Anyone new to the desk's process"], ["Companion", "Derivs Methodology"]],
   note: { tag: "The one-line truth", kind: "key", text: "**An idea is a statement about the market. An implementation is a statement about the client.** One idea can correctly become five different trades for five different clients. This deck explains how the desk reasons its way to the right one." },
 });
 
@@ -185,7 +185,7 @@ S.section(pres, "04", "Question 4: What is the market charging?", "Same view and
     ["Vol **cheap** + want protection", "**Buy puts** outright", "Protection is on sale"],
     ["Vol **rich** + want protection", "**Collar**: sell the expensive upside to pay for the downside", "The rich call funds the put"],
   ], { y: 1.6, colW: [3.6, 5.2, CW - 8.8], fontSize: 13 });
-  S.callout(pres, s, MX, 5.5, CW, 0.9, "Next", "The companion deck, **Derivatives Structuring Methodology**, turns this into explicit market-data rules: thresholds for IV percentile, IV vs realised, earnings implied/realised, skew and term structure.", "proposed", 13);
+  S.callout(pres, s, MX, 5.5, CW, 0.9, "Next", "The companion deck, **Derivs Methodology**, turns this into explicit market-data rules: thresholds for IV percentile, IV vs realised, earnings implied/realised, skew and term structure.", "proposed", 13);
 }
 
 /* 17 · Section */
