@@ -1,543 +1,1032 @@
-# Implementation Rulebook — from idea to a client's trade
+# From Idea to Implementation
+### How a market view becomes the right trade for a specific client, for equities and bonds
 
-> **What this is.** The desk originates ideas client-agnostically. This document
-> describes the rules that turn one idea into the right trade for one specific
-> client. It covers the choice between cash and derivatives, which derivative,
-> which wrapper, what tenor and what strikes, across single-name equities, indices, rates,
-> credit, FX and commodities.
+---
+
+## Who this is for
+
+This guide is for someone who has never seen the project and wants to understand the
+*thinking*. It shows how a desk goes from "we like this stock" or "we like this part of the
+yield curve" to "for this client, the trade is **this** product, on **these** terms." No code or
+system knowledge is assumed. Terms are explained as they come up, and there's a glossary at the end.
+
+The central idea is simple and runs through every page:
+
+> **An idea is a statement about the market. An implementation is a statement about the
+> client.**
 >
-> **How to read it.** Each rule has one of three tags:
->
-> | Tag | Meaning |
-> |---|---|
-> | **[ENGINE]** | Enforced in code today. The file and function are cited, and the rule can't drift from the app. |
-> | **[DESK]** | Judgement the sweep applies when it writes `tradeStatement` / `preferredExpression`. You can see it on the live board, but no code enforces it. |
-> | **[GAP]** | Should hold but currently doesn't in code. See [Appendix A](#appendix-a--where-the-code-disagrees-with-this-rulebook). |
->
-> Companion docs: `MAPPING_METHODOLOGY.md` (idea → *which clients*), `METHODOLOGY.pdf`
-> (conviction). This rulebook covers the step after both: *which instrument* each client gets.
+> "Micron is too cheap after a 25% fall" is an idea. It's true or false regardless of who
+> you're talking to. "Sell Client A a 12-month autocall on Micron, but have Client B trim
+> their existing Micron and buy a buffered note with the proceeds" is an implementation. It
+> only makes sense once you know who the client is and what they already own.
+
+One idea can produce five different trades for five different clients, and each of those trades
+can be correct. This guide explains how to reach the right one each time.
 
 ---
 
-## 0. The whole decision on one page
+## Contents
 
-Every implementation is built by running these seven questions **in order**. An earlier
-answer constrains every later one, and you never skip ahead to a favourite structure.
-
-```
- 1. ELIGIBILITY   What can this client legally hold?        MiFID Retail vs Professional
- 2. MANDATE       What payoff family does the book want?    growth → directional
-                                                            income → coupon
-                                                            preservation → protective
- 3. HOLDING       Do they already own it, and how?          new money vs overlay on a position
-                                                            (concentrated? big gain? loss?)
- 4. VIEW SHAPE    What exactly do we think happens?         breakout / to-a-level / range /
-                                                            "would own lower" / protect / fade
- 5. VOL           Is optionality cheap, fair or rich?       buy it / ignore it / sell it
- 6. CONSTRAINTS   Tax · base currency · liquidity ·         can veto a structure or force a
-                  size · conviction · trigger                wrapper
- 7. TERMS         Strikes, barrier, tenor, size             the conventions in §9
-```
-
-**Output of every implementation:** one **primary** expression, one **Retail/fallback**
-expression, and one sentence on **why not the obvious alternative**. An implementation
-without the "why not" line isn't finished. **[DESK]**
-
-**The default stance is derivatives-first.** Every idea leads with an options,
-structured or OTC construction (`preferredExpression`), and direct lines are listed as
-alternates. The client filter then decides who can trade what. **[ENGINE — METHODOLOGY.pdf sweep discipline; `structures[0]` = natural expression]**
+1. [The five questions](#1-the-five-questions)
+2. [Question 1: What exactly is the view?](#2-question-1--what-exactly-is-the-view)
+3. [Question 2: Who is the client? (suitability)](#3-question-2--who-is-the-client-suitability)
+4. [Question 3: What does the client already own?](#4-question-3--what-does-the-client-already-own)
+5. [Question 4: What is the market charging for the view?](#5-question-4--what-is-the-market-charging-for-the-view)
+6. [Question 5: Which product delivers it best?](#6-question-5--which-product-delivers-it-best)
+7. [The single-name equity product menu](#7-the-single-name-equity-product-menu)
+8. [Putting it together: the single-name decision walk](#8-putting-it-together--the-single-name-decision-walk)
+9. [Worked single-name examples](#9-worked-single-name-examples)
+10. [Bonds: how the thinking changes](#10-bonds--how-the-thinking-changes)
+11. [The bond product menu](#11-the-bond-product-menu)
+12. [The bond decision walk](#12-the-bond-decision-walk)
+13. [Worked bond examples](#13-worked-bond-examples)
+14. [Principles and common mistakes](#14-principles-and-common-mistakes)
+15. [Glossary](#15-glossary)
 
 ---
 
-## 1. Step 1 — Eligibility (MiFID). This step decides, it doesn't score.
+## 1. The five questions
 
-### 1.1 The three-way taxonomy **[ENGINE — `data.js::complexityOf`]**
+Every implementation is built by answering five questions **in this order**. The order
+matters: each answer narrows the options for the next, and jumping straight to a favourite
+product ("let's do an autocall") is the most common way to get it wrong.
 
-| Class | What's in it | Retail? | Professional? |
+| # | Question | What it decides |
+|---|---|---|
+| 1 | **What exactly is the view?** Direction, size of move, timing, path | The *shape* of payoff you need |
+| 2 | **Who is the client?** Suitability, objectives, constraints | Which products are *allowed* and which are *appropriate* |
+| 3 | **What do they already own?** | Whether this is **new money** or an **overlay** on an existing position |
+| 4 | **What is the market charging?** Option prices (volatility), yields, spreads | Whether to **buy** or **sell** optionality, and which structures are good value right now |
+| 5 | **Which product delivers the payoff best?** Plus terms and size | The final trade |
+
+At the end, every implementation should be stated as three things:
+
+1. **The primary trade.** Product, underlying, strikes or barrier, tenor, size.
+2. **The fallback.** What to do if the client can't or won't do the primary.
+3. **Why not the obvious alternative.** One sentence on why you didn't just buy the stock (or
+   the bond). If you can't write that sentence, the simple trade is probably the right one.
+
+---
+
+## 2. Question 1: What exactly is the view?
+
+"We like the stock" isn't a view precise enough to implement. Before choosing a product,
+break the view into its parts. **Each part corresponds to a feature of a product**, and
+that's what makes the choice logical rather than a matter of taste.
+
+### 2.1 The five parts of an equity view
+
+| Part of the view | The question to ask | Why it matters for implementation |
+|---|---|---|
+| **Direction** | Up, down, or sideways? | Up or down points to directional products. Sideways points to income products that get paid for *nothing happening* |
+| **Magnitude** | How far? Is there a target? | If you have a target, you can **sell the upside beyond it** to cheapen the trade (a spread). If the upside is open-ended, you shouldn't cap it |
+| **Timing** | By when? Is there a dated catalyst (earnings, a product launch, a ruling)? | A date sets the **tenor** of an option. No date means no reason to rent exposure, so own it outright |
+| **Path** | Smooth grind, or violent and two-sided on the way? | A volatile path makes options expensive and barrier products risky. A calm path suits selling options |
+| **Confidence** | High conviction, or "probably, but I could be wrong"? | High conviction can justify open-ended exposure (stock). Lower conviction calls for **defined risk**: know the maximum loss in advance |
+
+### 2.2 Translating view shapes into payoff shapes
+
+Most equity views fall into a small number of shapes. Learn these and the product choice
+mostly follows.
+
+| View shape | In plain words | Payoff you want | Product families that deliver it |
 |---|---|---|---|
-| **Non-complex** | Cash equity, ETFs/ETCs, funds, govt & IG bonds, T-bills, ladders, hedged share classes | ✅ | ✅ |
-| **Structured (packaged)** | Anything with an ISIN a bank issues: autocalls (ACM+, Phoenix), reverse convertibles, buffered / capital-protected / participation notes, range accruals (BREN), certificates, CLNs, HALO baskets | ✅ (appropriateness test still applies) | ✅ |
-| **OTC derivative** | Collars, forwards, OTC options, call/put spreads, risk reversals, straddles/strangles, covered calls, cash-secured puts, accumulators, DCDs, PVFs | ❌ (needs re-classification) | ✅ |
+| **Breakout / strong up** | "This goes a lot higher and I don't know where it stops" | Uncapped upside | Stock, long call, participation note |
+| **Up to a level** | "This goes to ~$250 and then I'm not sure" | Upside to the target, and nothing beyond it paid for | Call spread, capped participation note |
+| **Flat to modestly up** | "It won't fall much, it won't rip either" | Get paid for time passing | Covered call, autocall, Phoenix |
+| **"I'd own it lower"** | "Good company, but I want a better entry" | Paid to wait, bought at a discount if it falls | Cash-secured put, reverse convertible |
+| **Protect what I have** | "I own a lot, I've made money, I'm nervous" | A floor under an existing position | Protective put, collar, trim |
+| **Fade / overdone** | "The move was too big, it gives some back" | Profit from a modest pullback | Sell a call spread, overwrite the existing position |
+| **Re-enter after a loss** | "I got hurt, I still believe, but I can't take another 30% down" | Upside with a cushion | Buffered note |
+| **Can't lose capital** | "I want equity upside but I can't lose principal" | A floor at 100% | Capital-protected note |
 
-**Rule 1.1a.** Structured is checked **before** OTC. A "HALO basket (ACM+)" is a note even though it contains the word "basket". **[ENGINE]**
-
-**Rule 1.1b.** Within the engine's taxonomy, covered calls and cash-secured puts sit in
-**OTC**, even though listed versions exist. The desk treats every option overlay as a
-Professional tool. **[ENGINE]**
-
-### 1.2 Suppression is never silent **[ENGINE — `mapping.js::tradability`]**
-
-If a Retail client can't trade the idea's natural expression, the idea shows as
-**suppressed**, and the MiFID reason is surfaced ("Not tradable — MiFID Retail doesn't permit
-Call spread (OTC). Needs Professional re-classification or a non-complex / structured-note
-alternative."). An idea is never just dropped.
-
-### 1.3 The Retail substitution map **[DESK]**
-
-When the Professional expression is OTC, pick the Retail equivalent **that preserves
-the same payoff intent**, not just any tradable product. If you can't find one, say
-so. "Not available to Retail" is a legitimate answer.
-
-| Professional (OTC) | Payoff intent | Retail equivalent | What's lost |
-|---|---|---|---|
-| Call spread | Defined-risk upside to a level | **Participation / booster note** with a cap; or a **small direct-equity** line sized to the premium you'd have risked | Short tenor (notes are 12m+); event precision |
-| Long call / FX call | Leveraged upside | **Participation note**; leveraged certificate only if appropriateness passes | Cost, liquidity |
-| Zero-cost collar | Lock in a concentrated gain | **Staged trim** + **buffered or capital-protected note** on the proceeds | Tax deferral (the trim realises gains) |
-| Protective put / put spread (single name) | Floor under a winner | **Staged trim**; or a **capital-protected note** for the re-risked slice | Keeping full upside on the remaining shares |
-| Put spread (index) | Cheap tail convexity | **Buffered note** on the index for new money; raise cash / add **diversifiers** for existing | Convexity. A buffer isn't a hedge on stock already held |
-| Covered call / overwrite | Income from a flat winner | **Reverse convertible** or **Phoenix autocall** on the same name *for new money*; **staged trim** for the existing line | You can't overwrite a held line without OTC |
-| Cash-secured put | Paid to buy lower | **Reverse convertible** (economically ≈ bond + short put) | Flexibility on strike/tenor |
-| FX forward / collar (hedge) | Remove currency mismatch | **Currency-hedged share classes** of the foreign holdings | Precision of hedge ratio and timing |
-| Dual-currency deposit | Income on a pair you'd hold either side | **FX-linked note** (packaged) | Shorter tenors, pair choice |
-| FX put / call spread, risk reversal, digital | Tactical FX direction | **None clean.** Say "Professional-only" and don't force a note | — |
-| Gold accumulator | Accumulate at a discount | **Physical / ETC**, scaled in over time; or a **capital-protected note** on gold | The discount |
-| Brent / commodity call spread | Event upside in a commodity | **Commodity-linked participation note** or a commodity ETF/ETC | Short tenor; ETF roll/contango drag |
-| Prepaid variable forward | Liquidity + protection + tax deferral | **Staged trim** + **securities-backed line** | Tax deferral |
-
-### 1.4 Re-classification is a conversation, not a default **[DESK]**
-
-When a Retail client *needs* an OTC tool (e.g. Prahnav: 22% NVDA at +279%, where the clean
-answer is a collar), put **both** options on the table: (a) the Retail-eligible substitute,
-and (b) the Professional re-classification route and what it entails. Never assume (b).
+**Example.** "Nvidia reports in five weeks. The business is fine, but the market has punished two
+clean beats this month. I think it rises, maybe 10–15%, but the reaction could be ugly."
+Taking it apart: direction **up**, magnitude **to a level** (~15%), timing **dated** (five
+weeks), path **violent** (earnings), confidence **moderate**. That combination points
+almost exactly to a **call spread expiring a week or two after the print**: defined
+cost, upside to the target, and the tenor chosen for the event. You get there by reasoning, not by
+picking a product first.
 
 ---
 
-## 2. Step 2 — Mandate decides the payoff family
+## 3. Question 2: Who is the client? (suitability)
 
-### 2.1 How the mandate is read **[ENGINE — `mapping.js::riskProfile` / `mandateClass`]**
+Suitability is one bucket, but it has several parts. Together they answer two questions:
+*what is this client allowed to hold*, and *what is actually appropriate for them*.
 
-The free-text `risk` string is parsed into a **level** and a **tilt**, and falls back to the
-book's goal targets if it can't be parsed:
+### 3.1 The parts of suitability
 
-| Risk string contains | → mandate |
+| Part | What to find out | How it changes the implementation |
+|---|---|---|
+| **Classification and experience** | Is the client a **retail** client or a **professional** client under the regulator's rules? Do they have documented knowledge of and experience with derivatives? | Retail clients generally **can't trade OTC derivatives** (bilateral option contracts with a bank: collars, bespoke options, forwards). They **can** usually hold **packaged products** (structured notes with an ISIN, funds), subject to an appropriateness test. Professionals can use everything. If the ideal trade isn't allowed, find the **nearest allowed equivalent** (see §7.4) |
+| **Objective** | Growth, income, or preservation of capital? | Growth favours **directional** products. Income favours **coupon** products (notes that pay regular coupons, covered calls, bonds). Preservation favours **protective** products (capital protection, buffers, collars, high-quality bonds) |
+| **Risk tolerance and loss capacity** | How much can they lose without it changing their life, or their willingness to stay invested? | Low loss capacity rules out barrier products that can deliver a large loss, and leverage. It pushes toward protection even at the cost of upside |
+| **Horizon** | When might they need the money? | A structured note locks money up for 1–3 years with poor secondary liquidity. If there's a need inside that window, don't use one |
+| **Liquidity needs and liabilities** | Tax bills, property purchases, mortgage payments, living expenses? | Known future outflows should be **matched** with safe, liquid assets (bills, short bonds) *before* any view gets implemented |
+| **Tax position** | Low cost basis (large embedded gain)? Losses available to harvest? Tax-exempt income preferences? | Big embedded gain: prefer structures that **don't trigger a sale** (collar, covered call, borrow against it). Embedded loss: **harvest** it before re-entering |
+| **Base currency** | What currency does the client measure wealth in? | A USD note for a EUR client adds a currency bet. Prefer base-currency or currency-hedged versions |
+| **Existing concentration** | Is the book already heavy in this name, sector or theme? | See Question 3. It can reverse the answer completely |
+
+### 3.2 Two principles about suitability
+
+1. **Suitability shapes the implementation. It doesn't kill the idea.** A high-volatility tech
+   stock looks "unsuitable" for an income client until you see that a coupon-paying note on
+   that stock *is* an income product. Always ask: *is there a way to express this view that
+   fits this client?* Only drop the idea when the answer is no.
+2. **Never downgrade silently.** If a client can't access the best implementation, say so and
+   show the substitute and what it gives up. Sometimes the honest answer is "this idea isn't
+   available to you in a form that makes sense", and that's a fine answer.
+
+---
+
+## 4. Question 3: What does the client already own?
+
+This question changes the answer more often than any other, and it's the one most often
+forgotten. The same bullish view on a stock means completely different things depending on
+whether the client owns none of it, a normal amount, or far too much.
+
+### 4.1 New money vs overlay
+
+- **New money:** the client doesn't own the stock. You choose how to *create* exposure.
+- **Overlay:** the client already owns it. You're *reshaping* the exposure they have: adding
+  protection, generating income, reducing it.
+
+Some products **only exist as overlays.** A covered call means selling a call against shares
+you own. A collar protects shares you own. Recommending these to someone who doesn't hold the
+stock is a category error. For a non-holder, the equivalent of "income on this name" is a put
+sale or a reverse convertible, not a covered call.
+
+### 4.2 The holding situations and what each implies
+
+| What they hold | How to think about it | Typical implementation |
+|---|---|---|
+| **Nothing** | Full freedom. Choose purely on view, suitability and pricing | Anything in §7 that fits |
+| **A normal position, modest P&L** | Adding is fine if the view is strong. Otherwise overlay | Add via stock or a note, or overwrite if you expect it to go sideways |
+| **A concentrated position** (a single stock above ~15% of the portfolio, and a serious problem above ~20–25%) | **Don't add more of the same risk, however much you like the stock.** The job is to *reduce or reshape* the concentration. A structured note on the same stock is **more** of the same risk, not diversification | Collar, protective put, prepaid variable forward, staged trim, exchange into a diversified basket |
+| **A big winner** (up 50%+ but not concentrated) | The question is whether you'd buy it today at this price. If the honest answer is "not with new money", monetise it | Covered call, staged trim |
+| **A big winner that is *also* concentrated** | The hardest and most common private-wealth problem. Selling triggers a large tax bill, and holding keeps the risk | Zero-cost collar (protection without a sale), prepaid variable forward (cash now, sale deferred), borrow against it instead of selling, staged trim across tax years |
+| **A loser** (down 10–20%+) | Separate two decisions: (1) *take the tax loss*, which usually has value; (2) *do you still want the exposure?* If yes, re-enter in a way that respects wash-sale rules | Sell and harvest the loss, then re-enter via a close peer, an ETF, or a buffered note (upside with a cushion) |
+| **Deep loser the client is emotionally attached to** | Waiting to get back to break-even isn't a strategy. The only question is whether the stock is the best use of the capital today | Same as a loser. Frame it as "repair" not "admit defeat". A buffered note after harvesting often makes the conversation easier |
+
+### 4.3 Book-level situations that generate trades on their own
+
+Some implementations come from the portfolio, not from a market view:
+
+- **Idle cash** (roughly 8–10%+ of the book): put it to work. Options include bill ladders,
+  short bonds, or put sales on stocks the client would like to own lower.
+- **A currency mismatch** (a large share of assets outside the base currency): hedge it.
+- **Known liabilities:** build a matched ladder first.
+- **Sector concentration** (30%+ in one sector): diversify, not add.
+- **Gaps against objectives** (an income client with little income-producing assets, or a
+  preservation client with little protection): fill them.
+
+---
+
+## 5. Question 4: What is the market charging for the view?
+
+Two clients with the same view and the same suitability can still get different trades
+depending on **what the market is charging**. For equities, the main price is **option
+volatility**. For bonds, it's the **shape of the yield curve and the level of spreads** (§10).
+
+### 5.1 Volatility in one paragraph
+
+An option is insurance. **Implied volatility** is the price of that insurance, expressed as
+the size of move the market expects. When implied volatility is **high**, options are
+expensive: buying them costs a lot, and selling them pays a lot. When it's **low**, the
+opposite holds. **Every structured note is built from options**, so volatility also sets the
+terms of notes. High volatility means higher coupons on income notes (because the investor is
+selling expensive insurance) and worse participation on protected notes (because the note has
+to buy expensive insurance).
+
+### 5.2 How to judge whether volatility is rich or cheap
+
+Never call volatility "high" or "low" in isolation. Compare it to something:
+
+| Comparison | What it tells you |
 |---|---|
-| "income" (anywhere) | **income** (the income tilt wins even when the string says "growth, with income needs") |
-| "conservative / cautious / preservation / protect" | **preservation** |
-| "aggressive / growth" | **growth** |
-| "moderate / balanced / value" | **income** (the middle peg) |
-| Nothing parseable (unprofiled) | derived from the book → e.g. Tejpaul = **preservation** |
+| **Implied vs realised** | If options imply ±4% daily moves and the stock has been moving ±2%, insurance is overpriced. That favours selling it |
+| **Implied vs its own history** | Where today's implied sits in its 1-year range (its percentile). Top of range means sellers have the edge. Bottom of range means buyers do |
+| **Earnings: implied move vs past reactions** | Options price the move expected on results day. Compare it to the **average absolute move over the last four results**. Implied well below history means the market is under-pricing the event, so buy optionality. Implied well above history means it's over-pricing it, so sell |
+| **Skew** | Downside puts usually cost more than upside calls. Steep skew makes *selling* puts (and notes with downside barriers) more attractive, and makes *buying* protection dearer. Funding a put by selling a call (a collar) works better when call volatility is comparatively rich |
 
-Current roster: Fable, Amar, Morgan, Prahnav → **growth** · Aurora, Scott, Jacob, Ben → **income** · Tejpaul → **preservation**.
+### 5.3 The rule that follows
 
-### 2.2 Mandate → payoff family **[ENGINE — `expressions.js::PROFILE_FIT`]**
+> **If the view doesn't depend on volatility, don't pay for volatility you don't need. If
+> the market is overpaying for insurance, be the one selling it.**
 
-Every canonical expression carries a 0–2 fit per mandate. The table shows only the 2s:
+- **Volatility cheap, strong directional view:** buy options or call spreads. Leverage is cheap.
+- **Volatility rich, directional view:** use a *spread* (sell the expensive upper strike to fund
+  the lower one), or accept owning the stock outright rather than overpaying for a call.
+- **Volatility rich, neutral-to-positive view:** sell it. Covered calls, put sales, reverse
+  convertibles, autocalls.
+- **Volatility cheap, want protection:** buy puts outright. Protection is on sale.
+- **Volatility rich, want protection:** collar. Sell the expensive upside to pay for the
+  downside.
 
-| Mandate | Best-fit family (score 2) | Style bonus (tie-breaker) |
-|---|---|---|
-| **Growth** | Direct equity, index core, thematic / equal-weight / quality / value baskets, call spread, leveraged certificate, FX options / spreads / risk reversals, private markets | +0.3 for directional |
-| **Income** | Phoenix autocall, reverse convertible, HALO, range accrual, call overwrite, cash-secured puts, DCD, govt / IG / securitised bonds, ladders, utilities, infrastructure, REITs | +0.3 for coupon |
-| **Preservation** | Capital-protected note, buffered note, collar, protective put, PVF, gold, T-bills, liquid alts, macro sleeve, diversifiers, FX hedges | +0.5 for protective |
+### 5.4 The level of interest rates also matters for notes
 
-`implFit = 40 + 30 × profileScore`, capped at 100. **Among the idea's structures the client
-can trade, the engine picks the highest `implFit`.** On a tie, the one listed first in
-`structures` wins, so **the order the sweep lists structures in is a real decision**. **[ENGINE — `mapping.js::bestImplFor`]**
-
-### 2.3 What the mandate does *not* do **[ENGINE]**
-
-Suitability shapes the **implementation**. It doesn't **ban** the idea. A high-beta
-single name can still flag for an income book if an income structure on it exists (e.g. MU → Phoenix autocall
-for Ben). Only MiFID suppresses.
+A capital-protected note is, underneath, a zero-coupon bond plus an option. The **higher**
+interest rates are, the cheaper the zero-coupon bond, so there's **more budget left for the
+option** and better upside participation. Capital-protected notes are more attractive when
+rates are high than when rates are near zero.
 
 ---
 
-## 3. Step 3 — What the client already holds (overlay vs new money)
+## 6. Question 5: Which product delivers it best?
 
-This step matters most for the final answer, and the engine doesn't do it yet. **[GAP]**
+By now you know:
 
-### 3.1 The holding-state rules **[DESK, thresholds from `scanner.js::scanBook`]**
+- the **payoff shape** you need (Question 1);
+- which products are **allowed and appropriate** (Question 2);
+- whether this is **new money or an overlay** (Question 3);
+- whether you should be a **buyer or seller of optionality** (Question 4).
 
-| Client's position in the underlying | Rule | Professional | Retail |
-|---|---|---|---|
-| **Concentrated** — single name ≥ **15%** of book (≥ **22%** = severity 3) | **Never add delta.** The implementation must reduce or reshape the existing risk. | Zero-cost collar → PVF (if liquidity needed) → protective put (if you won't cap upside) | Staged trim + buffered / capital-protected note on proceeds; raise re-classification |
-| **Big winner, not concentrated** — ≥ **+50%**, < 15% | Monetise, don't add | Covered call / overwrite (30–90d, ~5% OTM) | Staged, tax-aware trim |
-| **Loser** — ≤ **−10%** (equity / alts / real assets) | Harvest first, *then* re-enter | Harvest + buffered re-entry note, or peer rotation | Harvest + comparable ETF for the wash window |
-| **Underwater bond** — ≤ **−8%** on rates, not credit | Swap, don't hold to par out of pride | Bond swap → current-coupon ladder | Same (non-complex) |
-| **Crypto** ≤ **−20%** | Rehabilitate | Harvest + structured re-entry, or collar | Trim to policy into the real-asset core |
-| **Held, normal size, fair P&L** | Overlay is allowed but optional | Overwrite if the view is range; add via structure if the view is directional | Add via note or direct |
-| **Not held** | New money: full choice of expression | Per §4–§5 | Per §4–§5 with §1.3 substitutes |
+Usually, that leaves only one or two sensible products. The next section lists the
+products and, for each, when you'd reach for it and when you wouldn't.
 
-### 3.2 Overlays require the holding **[DESK / GAP]**
-
-A covered call, collar or protective put only makes sense **on shares the client
-owns**. For a client who doesn't hold the name, an "overwrite" becomes a *new-money* decision.
-Use a reverse convertible, Phoenix or cash-secured put instead. The engine currently suggests
-"Call overwrite" to non-holders (e.g. NVDA for Jacob). Treat that as a bug.
-
-### 3.3 Book-level triggers that create their own implementations **[ENGINE — `scanBook`]**
-
-| Trigger | Threshold | Implementation |
-|---|---|---|
-| Non-base-currency exposure | ≥ **40%** of book | FX forward / collar (Pro) · hedged share classes (Retail) |
-| Idle cash | ≥ **8%** | T-bill ladder → short-duration bonds → cash-secured puts (Pro) / reverse convertible (Retail) |
-| Liabilities on file | any | T-bill / muni ladder matched to dates; SBL rather than selling low-basis stock |
-| Protection gap | goal − current ≥ **6pt** | Gold (physical/ETC), buffered notes, diversifiers |
-| Income gap | ≥ **8pt** | Extend duration, listed infrastructure |
-| Sector concentration | ≥ **30%** in one sector | Quality / equal-weight basket, cross-asset diversifiers |
+A useful habit is to **always start from the simplest product** (stock for equities, a plain
+bond for fixed income) and ask what a more complex product adds. Only move away from the
+simple product when you can name the specific improvement: *defined risk around an event*,
+*income from overpriced volatility*, *protection without a taxable sale*, *a cushion
+for a nervous client*. If the improvement is vague, stay simple.
 
 ---
 
-## 4. Single-name equities — cash or derivative?
+## 7. The single-name equity product menu
 
-### 4.1 Choose **cash equity** when… **[DESK]**
+Products are grouped by the job they do. For each: what it is, the payoff in plain words,
+when to consider it, when to think twice, and typical terms. "Suitability" says whether it's
+generally available to retail clients (**packaged / cash**) or professional-only (**OTC
+derivative**). Listed options sit in between: exchange-traded, but still complex products
+that need approval.
 
-1. **No dated event sits inside the holding window**, and the thesis is multi-quarter and
-   strategic (you want to *own* the compounding, not rent it).
-2. **Listed options are thin or absent.** Tier 3 thematic names are direct-equity-only by
-   construction (e.g. the photonics washout via AAOI). **[ENGINE — universe Tier 3]**
-3. **Vol is fair and you have no view on it.** There's then no edge in the option wrapper, so pay no
-   premium or structuring margin for it.
-4. **The client values dividends, voting, daily liquidity or tax-lot control** (gifting,
-   step-up, harvesting later).
-5. **The size is too small for a note** (below the issuer minimum) or the tenor is too
-   uncertain for a 12–24m lock-up.
-6. **Retail, and no suitable note exists** on the name.
+### 7.1 Owning the exposure directly
 
-Sizing: a 3–5% line, with a trim rule if any single name passes ~8% of the book. Tier 3
-names get a small, explicitly capped size (soft $5m ADV floor). **[ENGINE — `expressions.js` direct-equity; universe.json]**
+---
 
-### 4.2 Choose a **derivative / structure** when… **[DESK]**
+#### Cash equity (buy the shares)
 
-1. **A dated binary event (earnings, a central bank, a court ruling) sits inside the
-   window.** Hold it via defined premium, not open delta. *"The reaction function, not the number, is the
-   risk, and defined premium is the only honest way to hold it"* (NVDA into 26-Aug).
-2. **Implied vol is mispriced against your view.** When it's rich, **sell** it (overwrite, RevCon, Phoenix,
-   collar funded by the call). When it's cheap, **buy** it (calls, call spreads, puts).
-3. **The view is not "up forever"**. It's *to a level*, *range-bound*, or *would own lower*.
-   Each of those shapes has a structure that pays better than stock (§4.3).
-4. **The stock is extended** (near highs, RSI ≳ 70). Don't pay up for delta. Use a
-   call spread or sell upside instead.
-5. **The client already holds it** and wants a different payoff shape (protect, monetise,
-   repair). See §3.
-6. **The client can't take full drawdown** (preservation mandate, or a re-entry after a loss).
-   Use a buffered or capital-protected note.
+- **What it is:** Buy the stock. Full upside, full downside, you receive dividends and have voting rights.
+- **Consider it when:**
+  - the thesis is long-term and **no specific event** falls inside your horizon;
+  - volatility is **fairly priced** and you have no view on it, so an option wrapper adds cost without an edge;
+  - the stock has **thin or no options market** (smaller or less-followed names);
+  - the client values **liquidity, dividends, or control over tax lots**;
+  - the ticket is **too small** for a structured note's minimum.
+- **Think twice when:** the client is already concentrated in the name or sector; a binary
+  event is days away and the stock could gap; the stock has already run hard and you'd be
+  paying up.
+- **Suitability:** everyone.
+- **Typical terms:** size by conviction, often 2–5% of the portfolio per name, with a rule to
+  trim if it grows beyond ~8%.
 
-### 4.3 The view × vol matrix (single names) **[DESK]**
+#### Sector or index ETF instead of the single name
 
-Rows are *view shape*, columns are *implied vol vs. your fair value*. **P** = Professional,
-**R** = Retail.
+- **What it is:** Own the whole sector through one fund.
+- **Consider it when:** the thesis is really about the **sector** ("semis are 20% off their high
+  while the market is 1% off"), not about one company's edge; when dispersion inside the
+  sector is high and picking the winner is a coin toss; when the client is already
+  concentrated in one name in that sector.
+- **Think twice when:** your edge is **idiosyncratic** (a specific product cycle, a specific
+  mis-read of the company's results).
+- **Suitability:** everyone.
+- **Tip:** combine with a covered call on the ETF when sector volatility is elevated. That pays the
+  client to wait for the re-rating.
 
-| View shape ↓ / Vol → | **Cheap** | **Fair** | **Rich** |
+---
+
+### 7.2 Directional option structures (buying optionality)
+
+---
+
+#### Long call
+
+- **What it is:** The right to buy the stock at a fixed price (the strike) until expiry.
+- **Payoff:** Leveraged upside. The maximum loss is the premium paid.
+- **Consider it when:** the view is **strong and open-ended**, volatility is **cheap**, and
+  there's a catalyst within the tenor.
+- **Think twice when:** volatility is rich (you overpay); the move might happen *after*
+  expiry; you have a target (a spread is cheaper).
+- **Suitability:** professional, or retail with listed-options approval.
+- **Typical terms:** 1–6 months, at-the-money to slightly out-of-the-money.
+
+#### Call spread (buy one call, sell a higher one)
+
+- **What it is:** Buy a call at strike A, sell a call at higher strike B.
+- **Payoff:** Gains between A and B, capped at B. The maximum loss is the net premium, which is much
+  cheaper than a call alone.
+- **Consider it when:** you have a **target**; there's a **dated event** and you want a known
+  maximum loss; the stock is near its highs and you'd rather not pay up for shares;
+  volatility is rich (the call you sell recovers part of the cost).
+- **Think twice when:** the upside is genuinely open-ended; the client already owns a lot of
+  the stock (adding more upside adds to the concentration).
+- **Suitability:** professional (OTC or listed).
+- **Typical terms:** for an earnings trade, **4–6 weeks** with expiry at least 1–2 weeks after the
+  results date; long strike near the money, short strike at the target (~+10–15%); cost
+  typically ~2–3% of the stock price.
+- **Why it's the default event trade:** earnings are a binary event. The stock can gap 10%
+  either way overnight. A call spread lets you be right on the business without betting the
+  position on the market's reaction.
+
+#### Risk reversal (sell a put, buy a call)
+
+- **What it is:** Sell a downside put and use the premium to buy an upside call, often for zero cost.
+- **Payoff:** Upside above the call strike. If the stock falls below the put strike, you're
+  obliged to buy it there.
+- **Consider it when:** you're **strongly bullish** and **happy to own the stock lower**; downside
+  skew is steep (puts are expensive to sell, which funds more upside).
+- **Think twice when:** the client can't afford, or doesn't want, to be assigned the stock in a sell-off.
+- **Suitability:** professional.
+
+#### Participation / "booster" note
+
+- **What it is:** A packaged note that pays a multiple of the stock's rise (e.g. 150%) up to a
+  cap, usually with full downside below the start level (or a buffer).
+- **Consider it when:** you want a **leveraged-but-capped** upside like a call spread, but the client
+  is **retail** and can't hold OTC options; the horizon is 12 months or more.
+- **Think twice when:** the view is short-dated (notes are rarely under a year); the client
+  can't take issuer credit risk.
+- **Suitability:** packaged, so retail-eligible.
+
+#### Leveraged certificate / turbo
+
+- **What it is:** An exchange-listed product with geared exposure, often with a knock-out level.
+- **Consider it when:** a short-term, strong, actively monitored directional view, from an
+  aggressive client who understands the knock-out.
+- **Think twice when:** it's anything buy-and-hold; any income or preservation client.
+- **Suitability:** packaged, but appropriateness is strict.
+
+---
+
+### 7.3 Income structures (selling optionality)
+
+These pay the client for accepting a risk they're comfortable with: capping upside, or
+agreeing to buy lower. They work best when **volatility is rich** and the view is **flat to
+modestly positive**.
+
+---
+
+#### Covered call / overwrite (overlay only)
+
+- **What it is:** The client owns the stock and sells calls above the current price.
+- **Payoff:** Collects premium. If the stock rises above the strike, the upside above it is given up
+  and the shares may be called away.
+- **Consider it when:** the client **already owns** a stock they like but wouldn't buy more of
+  at this price; you expect sideways-to-modestly-up; volatility is elevated. It's also useful when
+  the client is happy to sell at the strike anyway ("paid to set a limit order").
+- **Think twice when:** you expect a big upside move (you'd cap it); the stock is a low-basis
+  holding where being called away triggers a large tax bill the client doesn't want.
+- **Suitability:** professional (retail sometimes via listed options, depending on permissions).
+- **Typical terms:** 1–3 month calls, ~5% out-of-the-money, rolled. Premium is often ~1–1.5% a month on
+  volatile names.
+
+#### Cash-secured put
+
+- **What it is:** Sell a put on a stock the client would like to own, holding cash to buy it.
+- **Payoff:** Collects premium. If the stock falls below the strike, the client buys it at the strike
+  (effective entry = strike − premium).
+- **Consider it when:** the client says "I'd buy this lower"; the stock has just sold off and
+  volatility is elevated (you get paid well to wait, rather than catching a falling knife);
+  the client has idle cash.
+- **Think twice when:** the client would *not* be happy owning it at the strike; volatility is cheap
+  (poor pay for the risk).
+- **Suitability:** professional or listed-options-approved.
+- **Typical terms:** ~3 months, ~15–25 delta (roughly 10–20% below the current price on a volatile name).
+
+#### Reverse convertible
+
+- **What it is:** A packaged note paying a high fixed coupon. At maturity, you get 100% back
+  if the stock is above a strike or barrier. Otherwise you receive shares (or their cash value).
+  Economically it's **a bond plus a sold put**.
+- **Consider it when:** the same "I'd own it lower" view as a put sale, but the client is **retail**
+  or wants a note format; volatility is elevated.
+- **Think twice when:** the client would hate ending up with the stock; the name is
+  already a large position.
+- **Suitability:** packaged, so retail-eligible.
+- **Typical terms:** 3–12 months, strike or barrier at a level where the client would genuinely own it.
+
+#### Autocallable note (autocall / "ACM")
+
+- **What it is:** A note paying a high coupon while the stock stays above a coupon
+  barrier. On each observation date (often quarterly), if the stock is at or above its starting
+  level, the note **redeems early** (autocalls) and pays out. At maturity, capital is
+  protected unless the stock has fallen below a **capital barrier** (e.g. 70–80% of the start).
+- **Payoff in plain words:** "You get paid a high coupon for the stock not falling more than
+  20–30%. If it rallies you get your money back early with coupons. If it collapses you own the fall."
+- **Consider it when:** the view is **flat to modestly up**; you'd rather be paid for the range
+  than pay for upside; volatility is rich (coupons are high); the stock has already sold off
+  so the barrier sits well below a level you'd defend.
+- **Think twice when:** you expect a big rally (you only get the coupon); the client is
+  already concentrated in the name; the stock is prone to sudden large falls (fraud,
+  regulatory, binary drug-trial risk).
+- **Suitability:** packaged, so retail-eligible, with an appropriateness test.
+- **Typical terms:** 12–24 months, capital barrier ~70–80%, quarterly observation, autocall at 100%.
+
+#### Phoenix autocall (memory coupon)
+
+- **What it is:** An autocall variant where coupons missed (because the stock dipped below the coupon
+  barrier) are **paid later** if the stock recovers above it (the "memory").
+- **Consider it when:** the same range view as an autocall, but the client values **coupon
+  resilience** through temporary dips over the highest headline coupon.
+- **Typical terms:** as for an autocall. The coupon barrier is often set equal to the capital barrier.
+
+#### Worst-of basket autocall
+
+- **What it is:** An autocall on several stocks, where the payoff is driven by **whichever performs
+  worst**.
+- **Consider it when:** the client would happily own **every** name in the basket; you want a
+  higher coupon than a single name gives.
+- **Think twice when:** any name in the basket is one the client would *not* want delivered. The higher coupon is
+  paid precisely because the chance that *one* name collapses is higher. Low correlation between
+  names raises the coupon *and* the risk.
+- **Rule:** only put a name in a worst-of basket if you'd accept owning that name on its own.
+
+---
+
+### 7.4 Protective structures
+
+---
+
+#### Protective put (overlay)
+
+- **What it is:** Buy a put on stock the client owns.
+- **Payoff:** A floor at the strike. Full upside is kept, and the premium is the cost.
+- **Consider it when:** protecting a winner **through a specific event**; volatility is
+  **cheap**; the client refuses to cap upside.
+- **Think twice when:** volatility is rich (a collar is better value); the protection is needed
+  for years (rolling puts gets expensive).
+- **Suitability:** professional or listed-approved.
+- **Variant:** a **put spread** (buy one put, sell a lower one) protects a range of the fall more
+  cheaply and suits "cushion a correction" rather than "insure against disaster."
+
+#### Zero-cost collar (overlay)
+
+- **What it is:** Buy a put below the market, sell a call above it, with strikes chosen so the
+  premiums offset.
+- **Payoff:** The stock's value is held inside a band. The client is protected below the put strike and gives
+  up gains above the call strike.
+- **Consider it when:** a **concentrated, low-basis winner** the client must protect but
+  doesn't want to sell (tax); volatility is rich (the call pays for the put); there's a
+  near-term need for certainty (a house purchase, a liquidity event).
+- **Think twice when:** the client is strongly bullish (the cap will hurt); the position is
+  small (just trim it).
+- **Suitability:** professional (OTC).
+- **Typical terms:** 6–12 months; put ~85–90% of spot; call strike set to make it zero-cost.
+
+#### Prepaid variable forward
+
+- **What it is:** An OTC contract where the client receives most of the stock's value in
+  cash **now**, with the number of shares delivered at maturity varying inside a collar-like band.
+- **Consider it when:** a concentrated low-basis holder needs **liquidity and protection
+  now** and wants to defer the sale for tax reasons.
+- **Suitability:** professional. Large sizes, and tax advice is essential.
+
+#### Staged trim
+
+- **What it is:** Sell the position down over time, e.g. a fixed amount each month or quarter, or
+  across two tax years.
+- **Consider it when:** the concentration must come down and **derivatives aren't available or
+  wanted** (typically retail); spreading the tax bill matters.
+- **Pair it with:** a buffered or capital-protected note, or a diversified basket, for the proceeds.
+
+#### Buffered note
+
+- **What it is:** A note giving upside participation (often uncapped) with a **cushion**. Capital
+  is returned in full unless the stock falls below a barrier (e.g. 70% of the start).
+- **Consider it when:** **re-entering after a loss harvest** (it keeps the client invested while
+  they're cushioned against the next leg down); a nervous client who wants equity upside;
+  "staying invested late in a rally."
+- **Think twice when:** the client thinks the buffer is a full guarantee. Below the barrier they
+  typically lose from par, just like the stock.
+- **Suitability:** packaged, so retail-eligible.
+- **Typical terms:** 12–18 months (long enough to clear a 30-day wash-sale window and ride out the
+  drawdown), 70% barrier, 100% participation.
+
+#### Capital-protected note
+
+- **What it is:** 100% of capital back at maturity (issuer credit aside), plus participation in
+  the stock's or index's rise, usually capped or at less than 100%.
+- **Consider it when:** the client **can't accept a loss of capital** but wants some equity
+  upside; interest rates are high (more budget for the upside, see §5.4).
+- **Think twice when:** rates are very low (the participation becomes poor); the client might need the
+  money before maturity (early exit is at a market price, not 100%).
+- **Suitability:** packaged, so retail-eligible.
+
+---
+
+### 7.5 Tax and portfolio-repair actions
+
+#### Tax-loss harvest + re-entry
+
+- **What it is:** Sell a losing position to realise the tax loss, then restore the exposure in a
+  way that doesn't breach wash-sale rules. Options: buy a close **peer**, buy a **sector ETF**,
+  use a **buffered note**, or buy back after the waiting period (31 days in the US; rules differ
+  by country).
+- **Consider it when:** there's a meaningful loss and gains elsewhere to offset; the client still
+  wants the exposure.
+
+#### Securities-backed lending (borrow instead of sell)
+
+- **What it is:** Borrow against the portfolio to meet a cash need.
+- **Consider it when:** a near-term liability, and selling appreciated stock would be tax-inefficient.
+- **Think twice when:** the collateral is concentrated and volatile (margin-call risk).
+
+---
+
+### 7.6 When the client can't use the best product: the substitution table
+
+When the ideal product is professional-only, find the nearest allowed product **that keeps the
+purpose of the trade**, and state what's lost:
+
+| Ideal (professional) | Purpose | Nearest retail-eligible alternative | What you give up |
 |---|---|---|---|
-| **Strong up / breakout** | P: long call or call spread · R: participation note | P: call spread · R: direct equity | P: call spread (short leg funds it) or risk reversal (sell put skew) · R: direct equity, small |
-| **Up to a level** | P: call spread, short strike at the target · R: capped participation note | same | same. The short strike is worth more |
-| **Flat-to-up / range** | P: direct equity; don't sell cheap vol · R: direct | P: overwrite if held · R: Phoenix | P: overwrite (held) / ACM+ or Phoenix (new money) · R: Phoenix / ACM+ |
-| **"Would own it lower"** | Wait. Selling cheap puts is poor value | P: cash-secured put · R: reverse convertible | P: sell ~15-delta 3m put · R: reverse convertible. *Paid to enter* |
-| **Protect a winner** | P: protective put / put spread · R: staged trim | P: zero-cost collar · R: trim + buffered note | P: zero-cost collar (the rich call funds the put) · R: trim + buffered |
-| **Fade / earnings-quality short** | P: put spread · R: trim / no action | P: sell call spread · R: trim | P: sell call spread or overwrite the existing line (TGT). **Never an outright short.** |
-| **Re-enter after a loss** | P: buy the stock back after the wash window; calls in the interim | P: buffered note 70% barrier · R: same | P: buffered note (rich vol = better terms) · R: same |
+| Call spread | Defined-risk upside to a target | Capped participation note, or a small stock position sized to the premium you'd have risked | Short tenor and precise event timing |
+| Covered call on a holding | Income from a flat winner | Staged trim; for *new* money, a reverse convertible or autocall on the name | The overlay itself (you can't write calls) |
+| Cash-secured put | Paid to buy lower | Reverse convertible | Flexibility on strike and tenor |
+| Collar on a concentrated winner | Protect without selling | Staged trim + buffered or capital-protected note on the proceeds | Tax deferral (the trim realises gains) |
+| Protective put | Floor through an event | Trim before the event | Keeping full exposure |
+| Index put spread | Cheap portfolio protection | Rebalance, raise cash, add genuine diversifiers | Convexity |
 
-**How to judge "rich" vs "cheap"** **[ENGINE — conviction asymmetry pillar]**
-- **Earnings:** implied straddle ÷ average absolute realised move over the **trailing 4
-  prints**. Well below 1 means buy optionality, near 1 means neutral, above 1 means sell it.
-- **Ex-earnings:** implied vs 1-year IV percentile and vs realised. Note: the IV feed is not
-  wired, so these inputs are tagged `estimated` and the data-quality cap holds conviction at
-  Medium. When the input is estimated, **prefer defined-risk constructions over naked short vol.** **[DESK]**
+---
 
-### 4.4 The earnings playbook **[DESK, from the live board]**
+## 8. Putting it together: the single-name decision walk
 
-| Stance | Situation | Implementation | Board example |
-|---|---|---|---|
-| **Pre-position** | Constructive on demand, but the tape punishes clean beats | 4–6 week call spread, ~ATM/+5% to ~+15%, ~2–2.5% premium. Expiry clears the print by ≥1–2 weeks | NVDA $220/$250 into 26-Aug · WMT |
-| **Pre-position, client holds it, implied rich** | Owner doesn't want to sell before the print | Overwrite or collar *through* the print, selling the rich event vol | CSCO "sell-the-rich-straddle" (12-Aug) |
-| **Post-print over-reaction on a quality beat** | Record quarter, stock sold anyway | Stock + 3m collar (when the same reaction risk is still ahead), or call spread | AMAT (−5% on a record) |
-| **Post-print panic on a non-demand fact** | Knife still falling, cause is idiosyncratic | Sell 3m ~15-delta puts / reverse convertible: *paid to enter, don't catch it* | DDOG one-customer disclosure |
-| **Post-print pop on low-quality EPS** | Beat flattered by one-offs | Sell a 2–3m call spread or overwrite the existing line. **No outright short**, because the underlying turn is real | TGT (≈40% of EPS from a tariff refund) |
-
-### 4.5 Which derivative *wrapper* **[DESK]**
-
-| Wrapper | Use when | Avoid when |
-|---|---|---|
-| **Listed options** | Professional · liquid US/EU large cap · tenor ≤ 3m · standard size · transparency matters | Thin chains (Tier 3), bespoke strikes, size that moves the market |
-| **OTC options** (collar, PVF, bespoke spreads) | Professional · concentrated low-basis stock (tax-sensitive) · non-standard tenor/strike · large size · non-US names with thin listed chains | Small tickets; Retail |
-| **Structured note** | Retail *or* Professional · 12–24m view · income or protection objective · client can hold to maturity | A near-term liability inside the tenor · short tactical views · issuer concentration already high |
-| **Leveraged certificate** | Aggressive growth Professional · short-term directional conviction · actively monitored | Anything buy-and-hold; any income or preservation mandate |
-
-### 4.6 Choosing *which* structured note **[DESK, from `expressions.js`]**
+Here is the full reasoning for one stock and one client, as a sequence of forks.
 
 ```
-Is capital loss unacceptable?            → Capital-protected note (100% floor, capped/partial upside)
-Re-entering after a harvested loss?      → Buffered note (70% barrier, uncapped upside, 12–18m)
-Flat-to-up, want the highest coupon?     → ACM+ / autocall (80% barrier, quarterly autocall at 100%)
-Range-bound, want coupon resilience?     → Phoenix (memory coupon, coupon barrier ≈ capital barrier)
-Would own it lower, short horizon?       → Reverse convertible (bond + short put, 3–12m)
-Several names you'd own EACH of?         → Worst-of / equal-weight basket (HALO): higher coupon,
-                                           but only if you'd be happy delivered ANY one of them
+START: We have a view on stock X.
+│
+├─ 1. VIEW. Break it down: direction · target · catalyst date · path · conviction.
+│
+├─ 2. SUITABILITY. What can this client hold? Growth, income or preservation?
+│     Horizon/liquidity: will they need this money within the likely product tenor?
+│       → If yes: stock or nothing. No notes.
+│
+├─ 3. HOLDINGS. Does the client own X?
+│     ├─ Concentrated (>~15%)? → STOP adding. Protect or reduce:
+│     │       collar / put / PVF (professional) · staged trim + note (retail)
+│     ├─ Loss? → Harvest first. Then re-enter: peer / ETF / buffered note
+│     ├─ Big gain, would not buy more here? → Overwrite (prof.) / trim (retail)
+│     └─ Not held, or a normal position → continue
+│
+├─ 4. VOL. Is optionality rich, fair or cheap vs realised, history, past earnings moves?
+│
+├─ 5. MATCH view shape × vol × objective to the menu:
+│
+│      Strong up, no event, fair vol        → Stock
+│      Strong up, cheap vol, catalyst       → Long call / call spread
+│      Up to a target / event in window     → Call spread (expiry after the event)
+│      Flat-to-up, rich vol                 → Autocall / Phoenix (new money) · covered call (held)
+│      Would own lower, rich vol            → Put sale (prof.) · reverse convertible (retail)
+│      Nervous re-entry / wants a cushion   → Buffered note
+│      Can't lose capital                   → Capital-protected note
+│      Fade an overdone rally               → Sell a call spread / overwrite; never a naked short
+│      Sector-level thesis                  → ETF (+ overwrite), not a single name
+│
+├─ 6. CHECK the fallback and the "why not the obvious alternative" sentence.
+│
+└─ 7. TERMS & SIZE. Tenor from the catalyst/horizon; strikes from the target;
+       barrier where you'd happily own the stock; size inside concentration limits.
 ```
 
-- **Worst-of rule:** only put a name in a worst-of basket if you'd accept delivery of *that*
-  name alone. Low correlation raises the coupon because it raises the risk.
-- **Concentration rule:** a note on a name the client already holds at ≥ 15% **adds** to the
-  concentration. It isn't diversification. **[GAP]**
-- **Issuer rule:** notes are unsecured bank debt. Spread issuers, and treat the issuer as a
-  credit exposure in the book.
+### 8.1 The view × volatility matrix
 
-### 4.7 Single name vs sector vs index **[DESK]**
+A compact version for new-money trades:
 
-- **Buy the sector, not the story**, when the thesis is sector-level and dispersion is high:
-  the SOX 20% off with the S&P 1.4% off is best owned via SMH plus an overwrite, not a pick.
-- **Single name** only when the edge is idiosyncratic (a print, a disclosure, a capital
-  return policy).
-- **Index** for tail protection and broad beta. Never protect a diversified book with
-  single-name puts.
-
----
-
-## 5. FICC
-
-### 5.1 Rates **[DESK, engine for eligibility]**
-
-| View | Primary | Retail? | Notes |
+| View ↓ / Volatility → | **Cheap** | **Fair** | **Rich** |
 |---|---|---|---|
-| **Range-bound rates** (belly pinned, curve moving at the ends) | **Range accrual (BREN)** on the 10Y, 6–18m, band ≈ spot ± ~40–60bp | ✅ structured | You're short rate vol: out-of-range days earn zero. Board: 10Y 4.64% in a 4.25–5.00% band |
-| **Lock yield / extend duration** (cutting cycle ahead, reinvestment risk) | **Govt / IG bonds, ladder** | ✅ | Default rates implementation for every client. Cash bonds first |
-| **Pick-up vs vanilla, rates won't fall much** | **Callable / fixed-coupon note** | ✅ | You sell the issuer a call on rates falling |
-| **Underwater legacy bond** | **Bond swap** → current-coupon ladder | ✅ | Banks the loss, lifts carry. Same credit quality |
-| **Idle cash** | **T-bill ladder → short duration** | ✅ | Liquidity leg of any liability plan |
-| **Liability-matching** | Ladder to liability dates (munis for US taxable) | ✅ | Obligations fund first (goals.js) |
-| **Tactical direction** (Professional) | Rate futures / swaptions | ❌ | **Not on the shelf today.** Flag it and don't improvise |
+| **Strong up** | Long call / call spread | Stock, or call spread if there's an event | Call spread (sell the rich upper strike) or risk reversal |
+| **Up to a target** | Call spread | Call spread | Call spread (better value) |
+| **Flat to modestly up** | Stock. Don't sell cheap insurance | Autocall / Phoenix | Autocall / Phoenix / covered call. Best value |
+| **Would own it lower** | Wait, or buy a small position | Put sale / reverse convertible | Put sale / reverse convertible. Paid well to wait |
+| **Protect a holding** | Protective put | Collar | Collar (the call funds the put) |
+| **Overdone rally** | Put spread | Sell call spread | Sell call spread / overwrite |
 
-**Rules.**
-1. **Cash bonds are the default rates implementation.** Use a derivative/note only when the view is about
-   *volatility or range* (range accrual, callable), not level.
-2. **Every sweep must carry a rates idea.** **[ENGINE — coverage check]**
-3. **Don't express a rates view through equities** (utilities, REITs) when a bond does it cleanly.
-   Those belong to income/real-asset themes, not rates calls.
+### 8.2 The earnings special case
 
-### 5.2 Credit **[DESK]**
+Earnings deserve their own playbook, because they concentrate a lot of risk into one night.
 
-| Situation | Implementation | Retail? |
+| Situation | Reasoning | Implementation |
 |---|---|---|
-| Durable income, small step out of govts | **IG corporates** | ✅ |
-| Already hold govts + corporates, want spread diversification | **Securitised sleeve** | ✅ |
-| Want income on a specific credit view | **Credit-linked note** | ✅ structured |
-| Credit stress in levered names | Reduce / avoid. The board expresses it as a *risk flag*, not a long | — |
-
-### 5.3 FX — first decide which of the three jobs the trade is doing **[ENGINE — bucket rules]**
-
-The engine forces this distinction, and it drives everything else:
-
-| Job | Bucket | Who it's for | Trigger |
-|---|---|---|---|
-| **Hedge** | Preservation | Books with a base-currency mismatch | Non-base exposure ≥ **40%** |
-| **Income** | Income | Income books holding a pair either side | A rate differential worth monetising |
-| **Direction (tactical)** | **Growth** | Professional books with appetite | A **triggered** level. A directional FX option is *growth*, not a hedge |
-
-#### Hedge **[DESK]**
-
-| Instrument | Use when |
-|---|---|
-| **FX forward** | You want the mismatch gone and accept giving up favourable moves. It's the cheapest |
-| **Zero-cost collar** | You want a band: protected below, participating up to a cap |
-| **Purchased option** | The *consequence* is asymmetric (e.g. oversold dollar into Jackson Hole). You pay for the right to be wrong |
-| **Currency-hedged share classes** | **Retail**, or anyone who wants the hedge embedded in the holding |
-
-A hedge idea should only apply to a book **that has the mismatch**. A USD-base book needs no USD hedge. **[GAP]**
-
-#### Income **[DESK]**
-
-- **Dual-currency deposit (DCD):** Professional income books, on a pair they'd genuinely hold
-  either side, with the strike at a level they'd happily convert at (ideally against real
-  receivables). 1-month tenors, rotated. Board: sell 1m EUR/USD upside at 1.1673 with RSI 73.
-- **Retail:** FX-linked note. **Not** a DCD (see Appendix A: the classifier currently lets DCD through).
-
-#### Direction (tactical) **[ENGINE gate + DESK construction]**
-
-A tactical FX idea only reaches clients if it carries a `trigger` **and** `triggered: true`.
-Untriggered ideas are dropped from the output and reported. **[ENGINE — `build_today_focus.py`]**
-
-| Construction | Use when | Board example |
-|---|---|---|
-| **Put / call spread** | Defined-risk, bounded move **to a level**, 1–3m | USD/JPY 158/152 put spread |
-| **Risk reversal** | Strong, **carry-supported** lean. You'll accept being put the pair at a worse level for zero-cost upside | GBP/USD after 1.355 cleared |
-| **Vanilla option** | Short-dated, high conviction around a dated catalyst. You want leverage with a known max loss | — |
-| **Strangle** | Binary event, large move expected, **direction genuinely two-sided** | — |
-| **Digital** | A pure "above/below level X on date Y" view | — |
-
-**Rules.**
-1. **Name the legs.** "Long yen / short dollar, a spot bet against an intervention-defended
-   level, not a carry bet." The validator requires long vs short legs and spot vs carry. **[ENGINE]**
-2. **Use the cross to isolate the view.** When the view is "yen strength" but a dollar event is in
-   the window, use EUR/JPY instead of USD/JPY. The cross is dollar-neutral by construction.
-3. **Don't initiate at range extremes.** USD/CNH at the 0.9th percentile of its range means the gate stays shut,
-   and existing positions become a profit-taking discussion.
-4. **Don't pre-empt a breakout you defined in advance.** EUR/USD 27 pips short of 1.17 stays held back.
-5. **Retail gets no tactical FX.** Say "Professional-only", and don't force a note.
-
-### 5.4 Commodities **[DESK]**
-
-| Situation | Professional | Retail |
-|---|---|---|
-| **Gold, strategic ballast** | Physical / ETC | **Physical / ETC** (default) |
-| **Gold, preservation mandate wants upside with a floor** | **Capital-protected note** struck at spot, 12m | Same |
-| **Gold, accumulate at a discount, range-to-firm view** | **Accumulator** (watch the knock-out and the geared accumulation below strike) | ETC scaled in |
-| **Gold, tactical breakout** | Call spread | ETC |
-| **Relative value (silver vs gold)** | Long silver, short a *partial* gold delta, so the trade is the ratio and not the metal | Silver ETF / participation note (outright only, with the RV caveat stated) |
-| **Oil, geopolitical tail** | **2–3m call spread** (e.g. Brent $95/$110 while 23% below the high) | Commodity-linked note; energy equities only with the caveat that they aren't a Brent proxy |
-
-**Rules.**
-1. **No direct futures for Retail.** Use an ETC/ETF, and name the roll/contango drag.
-2. **Gold's bucket is Preservation. Crypto's is Growth.** Crypto isn't a hedge. **[ENGINE — `SECTOR_BUCKET`]**
-3. For oil, the view is usually **event convexity**, so defined premium beats owning the
-   commodity.
-
-### 5.5 Index / multi-asset protection **[DESK]**
-
-- **Low VIX + a crowded event calendar + a de-rated sector underneath** → buy a 2–3m
-  **index put spread** (Professional). Board: SPX 1.4% off its high, VIX 14.88, SOX 20% off.
-- **Retail:** buffered note on the index for *new* money. For *existing* equity, the answer
-  is rebalancing, diversifiers or raising cash, because a note doesn't hedge shares already held.
-- Protect a diversified book with **index** options, never a basket of single-name puts.
+| **Before results, constructive view, client doesn't own it** | You believe the business but not necessarily the market's reaction. Pay a known premium rather than risk a gap | 4–6 week call spread, expiring after the print |
+| **Before results, client owns a lot, options price a big move** | The market is overpaying for event insurance. The owner can *sell* it | Covered call or collar through the print |
+| **Just reported, great numbers, stock fell anyway** | The reaction was about valuation or positioning, not the business. That's often an opportunity, but the same nervous tape is still there | Stock + collar, or a call spread; staged entry |
+| **Just reported, stock collapsing on a one-off fact** (e.g. a single-customer disclosure) | Don't catch the knife. Get paid for offering to buy lower while volatility is high | Sell puts / reverse convertible |
+| **Just reported, stock jumped on low-quality earnings** (e.g. a one-off gain flattering EPS) | The pop is probably partly unjustified, but the underlying business may be genuinely improving. Don't short outright | Sell a call spread, or overwrite the existing holding |
 
 ---
 
-## 6. Step 6 — Constraints that can veto or re-route
+## 9. Worked single-name examples
 
-| Constraint | Rule |
-|---|---|
-| **Tax, low-basis winner** | Prefer collar / PVF / overwrite over a sale (defers the gain). Retail: stage the trim across tax years |
-| **Tax, loser** | Harvest first, then re-enter via peer / ETF / buffered note. Respect the US 30-day wash-sale window; check the client's own jurisdiction (EU rules differ) |
-| **Base currency** | Express in the client's base currency where a quanto or hedged share class exists. For a EUR book, a USD note adds an FX decision |
-| **Liquidity / liabilities** | A liability date **inside** a note's tenor vetoes the note. Use ladders, and an SBL rather than selling low-basis stock |
-| **Size** | Below the note minimum → direct / ETF. Very large single-name overlays → OTC rather than listed |
-| **Conviction** | **High** can take open delta. **Medium** gets defined risk only. **Tier 3** stays capped at Medium and gets direct equity, small. A data-gap cap means prefer defined-risk constructions |
-| **Tactical trigger** | No trigger, no trade. Untriggered tactical ideas never reach a client **[ENGINE]** |
-| **Structured sleeve budget** | Add notes only to books **under** their structured / income target (e.g. HALO). Track issuer concentration |
+### Example A: one idea, four clients
 
----
+**The idea:** a large-cap chip designer reports in five weeks. The demand story is intact,
+but the market has sold two other companies' excellent results this month. The stock is ~8%
+below its high while its sector index is ~20% below. We expect it higher, perhaps 10–15%,
+and worry about the reaction.
 
-## 7. Step 7 — Terms conventions **[DESK, from `expressions.js` + board]**
+Taking the view apart: up · to a target · dated event · violent path · moderate
+conviction. The *natural* implementation is a **call spread expiring after the results**.
 
-| Expression | Tenor | Strikes / terms |
-|---|---|---|
-| Earnings call spread | 4–6 weeks, expiring ≥ 1–2 weeks after the print | ~ATM/+5% long, ~+15% short, ~2–2.5% premium |
-| Tactical option (FX / index / commodity) | 1–3 months | Long near spot, short at the target. Carry a `levels` block: entry, target (early unwind), stop |
-| Covered call / overwrite | Roll 30–90 days | ~5% OTM, ~1–1.5% monthly premium |
-| Cash-secured put | 3 months | ~15-delta |
-| Zero-cost collar | 6–12 months | Put ~90%, call set to zero cost |
-| ACM+ / autocall | 12–24 months | 80% capital barrier, quarterly autocall at 100%, coupon set by vol |
-| Phoenix | 12–24 months | Memory coupon, coupon barrier ≈ capital barrier (~70–80%) |
-| Buffered note | 12–18 months | 70% barrier, 100% uncapped participation. Clears the wash window |
-| Capital-protected note | 12 months+ | 100% floor at maturity, participation / cap set by rates and vol |
-| Reverse convertible | 3–12 months | Strike at the level you'd own it |
-| Range accrual | 6–18 months | Band ≈ spot ± ~40–60bp |
-| DCD | 1 month, rotated | Strike at a conversion level you'd accept |
-
----
-
-## 8. Worked examples — the same idea, different clients
-
-The engine output below is **real** (`mapping.js::scoreIdeaForClient` against today's
-`data.js` and `today_focus.json`). The "Desk answer" column applies the full rulebook,
-including the holding-state rules the engine doesn't yet have.
-
-### 8.1 NVDA into 26-Aug (natural expression: call spread)
-
-| Client | MiFID · mandate | Holds NVDA? | Engine says | Desk answer |
+| Client | Profile | Owns the stock? | Reasoning | Implementation |
 |---|---|---|---|---|
-| **Fable** | Pro · growth | **24%**, +11% | Call spread | **Don't add delta: 24% is concentrated (§3.1).** Collar or overwrite the existing line through the print, selling the rich event vol. The call spread is for books that *don't* hold it |
-| **Morgan** | Pro · growth | **24%**, +310% | Call spread | **Zero-cost collar** on the low-basis line (tax + concentration). No new delta |
-| **Amar** | Pro · growth | No | Call spread | **4–6w $220/$250 call spread.** New money, defined premium into a binary |
-| **Jacob** | Pro · income | No | Call overwrite | **Overwrite is wrong: he holds no NVDA (§3.2).** Use a short-dated reverse convertible or ~15-delta put sale: income for a "would own lower" stance |
-| **Prahnav** | Retail · growth | **22%**, +279% | Direct equity (and suppressed) | **Never "buy more".** Staged trim + buffered / capital-protected note on the proceeds, and open the re-classification conversation for a collar (§1.4) |
-| **Aurora** | Retail · income | 7.2%, −4% | Buffered note (suppressed) | Small, not concentrated. Hold the line. A buffered note is fine for *new* money if she wants more AI exposure with a cushion |
-| **Scott / Ben / Tejpaul** | Retail · income / preservation | No | Buffered note (suppressed) | Pass, or a buffered note only if the Growth bucket is under target. A single-name earnings binary is a poor fit for these mandates |
+| **1** | Professional, aggressive growth | No | Everything lines up: growth objective, derivatives allowed, new money, event in window | **4–6 week call spread**, long near the money, short ~+15%. Max loss = premium, ~2–3% of notional. *Why not stock:* a bad reaction could gap the stock 10% and the thesis would still be right |
+| **2** | Professional, aggressive growth | **24% of portfolio**, large gain | The view is bullish but the client is already dangerously concentrated. Adding upside adds risk | **No new exposure.** Protect through the print: **zero-cost collar** or a **covered call** that sells the rich event volatility. *Why not the call spread:* it adds more of the risk the client already has too much of |
+| **3** | Retail, growth | **22% of portfolio**, +279% | Same concentration problem, but OTC options aren't allowed | **Staged trim** (possibly across tax years) with proceeds into a **buffered note** or diversified equity. Raise the professional-classification conversation if a collar is really wanted. *Why not "buy more"*: concentration comes before the view |
+| **4** | Retail, income | No | A single-stock earnings bet doesn't fit an income objective | **Pass**, or, if the client wants the theme, a 12–18 month **autocall** on the name or sector after the event, when volatility is still elevated. *Why not a call spread:* not allowed, and not an income product |
 
-### 8.2 Gold at $4,485 (natural expression: capital-protected note)
+The same idea gives four different answers, and all four are correct.
 
-| Client | Engine | Desk answer |
-|---|---|---|
-| **Tejpaul** (Retail · preservation) | Capital-protected note | ✅ Capital-protected note, 12m, struck at spot. The textbook fit |
-| **Scott / Aurora** (Retail · income) | Capital-protected note | ✅ Capital-protected note, or physical / ETC if they want liquidity |
-| **Jacob** (Pro · income) | Gold accumulator | ✅ Accumulator only if he's happy to *accumulate* gold at the strike. Otherwise ETC |
-| **Fable / Amar / Morgan** (Pro · growth) | Call spread | Amar already holds gold at 12%, +118%, and his Preservation bucket is at target. **Don't add.** Fable / Morgan: call spread for tactical upside |
+### Example B: the dislocated quality stock
 
-### 8.3 USD hedge (natural expression: FX forward / collar)
+**The idea:** a memory-chip maker is 25% below its high with fundamentals unchanged. Its Korean
+competitors are making new highs. Volatility is elevated after the fall. The view is: *it
+recovers, but we don't know when, and we'd happily own it here or lower.*
 
-| Client | Engine | Desk answer |
-|---|---|---|
-| **Aurora** (Retail · EUR base, ~72% USD) | Suppressed; hedged sleeve | ✅ **Currency-hedged share classes** for the USD equity / bond sleeves. This is the book the idea is *for* |
-| **Fable / Morgan / Amar** (Pro · USD base) | Risk reversal | ❌ A USD-base book has no dollar mismatch to hedge, and a risk reversal is a directional bet, not a hedge. **Not applicable** (§5.3) |
+That's a "flat-to-up / would own it lower" view, with **rich volatility**. This is the classic
+setup for **selling** optionality.
 
----
+- **Income client, doesn't own it:** **12-month Phoenix autocall**, barrier ~70%. The high
+  coupon is funded by the elevated volatility, and the barrier sits well below a level we'd defend.
+- **Professional growth client, doesn't own it:** **stock + covered call**, or a **3-month put
+  sale** ~15% lower if they'd rather be paid to wait.
+- **Client with a 26% position and a 4x gain:** **none of the above.** Adding a note on the
+  same stock is more of the same risk. Reduce or protect first.
+- **Client who bought higher and is down 20%:** harvest the loss, then re-enter through a
+  **buffered note** to stay exposed with a cushion.
 
-## 9. Quick-reference cheat sheet
+### Example C: the fade
 
-```
-RETAIL?                 → no OTC. Use the §1.3 substitute or say "Professional-only".
-ALREADY ≥15% IN IT?     → never add delta. Collar / trim / PVF.
-BIG WINNER, <15%?       → overwrite (Pro) / staged trim (Retail).
-LOSER ≤ −10%?           → harvest first, re-enter via buffered note / peer / ETF.
-EARNINGS IN WINDOW?     → defined premium (call spread), or sell the rich vol if held.
-VOL RICH?               → sell it: overwrite, RevCon, Phoenix, collar, put sale.
-VOL CHEAP?              → buy it: calls, call spreads, put spreads.
-VIEW = RANGE?           → Phoenix / autocall / overwrite / range accrual (rates).
-VIEW = TO A LEVEL?      → spread, short strike at the target.
-VIEW = WOULD OWN LOWER? → cash-secured put (Pro) / reverse convertible (Retail).
-CAN'T TAKE A LOSS?      → capital-protected note.
-SECTOR-LEVEL THESIS?    → ETF + overwrite, not a single-name pick.
-RATES LEVEL VIEW?       → cash bonds / ladder. RATES RANGE VIEW → range accrual.
-FX: hedge / income / direction? Decide first. Hedge only mismatched books.
-TACTICAL?               → must be triggered. 1–3m. Levels block. Name the legs.
-COMMODITY?              → ETC for Retail. Spreads for event tails. Gold = ballast.
-LIABILITY INSIDE TENOR? → no notes. Ladder it.
-ALWAYS                  → primary + fallback + "why not the obvious alternative".
-```
+**The idea:** a retailer jumped 4% on results, but ~40% of the earnings came from a one-off refund.
+The underlying sales were genuinely good. It's at an overbought level near its 52-week high.
+
+View: modest pullback, not a collapse. **Don't short outright** (the business is improving).
+- **Owners:** **overwrite**, selling 2–3 month calls just above the current level.
+- **Professional non-owners:** **sell a call spread** (defined risk).
+- **Retail non-owners:** nothing. There's no clean retail implementation, and that's acceptable.
 
 ---
 
-## Appendix A — Where the code disagrees with this rulebook
+## 10. Bonds: how the thinking changes
 
-These came from running the engines against the live board (`today_focus.json`, as of
-2026-08-20) and the nine books in `data.js`. None of them are fixed in this change. The list
-is here so they can be prioritised.
+Bonds use the same five questions, but the answers look different, for three reasons.
 
-### A.1 MiFID classifier misfires (`data.js::complexityOf`)
+**1. Bonds are often implementing a *need*, not a *view*.** For an equity, the implementation usually starts from
+"we like this stock." For bonds, it often starts from "this client needs $2m a year of income,"
+"this client has a tax bill in 18 months," or "this client has 15% in cash earning nothing." A
+market view on rates then *adjusts* the answer. It rarely creates it.
 
-Keyword matching misclassifies several structures on the live board:
+**2. The view has different dimensions.** Instead of direction, target, timing and path, a
+bond view is about:
 
-| Structure | Classified as | Should be | Why it happens | Impact |
-|---|---|---|---|---|
-| **Dual-currency deposit** | non-complex | **OTC** | Keyword is `"dual currency"` (space). The board writes `"Dual-currency"` (hyphen) | **Retail clients would be shown a DCD as tradable** |
-| **Digital put** | non-complex | **OTC** | No `"digital"` keyword | Listed as a Retail-tradable alternate on 3 FX ideas |
-| **Brent calls** | structured | **OTC** | `"bren"` (BREN range accrual) is a substring of **"Brent"** | Retail shown Brent options as a note |
-| **Energy-equity calls** | non-complex | complex / OTC per desk policy | No bare `"call"` keyword | Retail shown options as non-complex |
-| **FX-linked note, Commodity-linked note, Fixed-coupon note, Callable note** | non-complex | **structured** | No `"linked note"` / `"callable"` / `"fixed-coupon"` keywords | Appropriateness test skipped |
+| Dimension | The question | Example |
+|---|---|---|
+| **Level of rates** | Will yields rise or fall? | "The central bank will cut, so yields fall" |
+| **Curve shape** | Will long yields move more or less than short ones? | "The front end is anchored, the long end will keep selling off" (a bear steepener) |
+| **Rate volatility / range** | Will rates stay in a range or break out? | "The 10-year stays between 4.25% and 5.00% for a year" |
+| **Credit spread** | Will corporate borrowers pay more or less over government bonds? | "Spreads are tight, so there's little reward for credit risk" |
+| **Specific issuer** | Is this company's debt mispriced? | "This issuer's bonds price a downgrade that won't happen" |
+| **Inflation** | Will inflation come in above or below what the market expects? | "Breakevens are too low" |
 
-**Fix:** match on the canonical expression id (`EXPRESSIONS.resolve`) with an explicit
-`complex` class per entry, not on substrings. At minimum, normalise hyphens and use
-word-boundary matching.
+**3. The market price is the curve and the spread, not volatility.** What you're paid for is
+**yield** (carry), **roll-down** (a bond's yield falling as it ages along an upward-sloping
+curve), and **spread** (extra yield for credit risk). Is the curve paying you to extend? Are
+spreads wide enough to compensate for default risk?
 
-### A.2 The tradability gate only tests the natural expression (`mapping.js::tradability`)
+### 10.1 The client questions, bond edition
 
-A Retail client is **fully suppressed** (fit 0) whenever `structures[0]` is OTC, even
-when a Retail-tradable alternate exists in the same idea. Today this suppresses **14 of 18
-live ideas** for all five Retail clients. `bestImplFor` meanwhile *does* find the tradable
-alternate, and `scanBook` only blocks a finding "when EVERY way to express it is OTC".
-**Three parts of the app disagree.**
+| Client factor | Why it matters for bonds |
+|---|---|
+| **Income need** | How much cash flow, how regularly? That drives coupon level and structure |
+| **Liabilities and dates** | Known outflows should be matched with bonds maturing just before them. That's the one place where "holding to maturity" makes interim price moves irrelevant |
+| **Role of bonds in the portfolio** | **Ballast** (to offset equity falls) calls for high-quality government duration. **Income** calls for a mix including credit. **Cash replacement** calls for short, safe paper |
+| **Reinvestment risk** | Clients in cash or short bills face lower income if rates fall. Extending locks in today's yields |
+| **Tax** | Tax-exempt bonds (e.g. US municipals) for high-bracket taxable clients; harvesting losses on bonds bought when rates were low |
+| **Suitability** | Plain bonds and funds are available to everyone. Structured rate notes are packaged products (retail-eligible with appropriateness). Swaps, futures and swaptions are professional tools |
+| **Existing bond holdings** | Duration already held, credit already held, legacy low-coupon bonds sitting at a loss |
 
-**Fix:** gate on "no tradable structure exists" (`bestImplFor(...).structure == null`),
-so the suppression reason fires only when §1.3 truly has no substitute.
+### 10.2 The holding situations, bond edition
 
-### A.3 The implementation choice ignores holdings (`mapping.js::bestImplFor`)
+| What they hold | Thinking | Implementation |
+|---|---|---|
+| **Too much cash** | Cash yields fall as soon as the central bank cuts. The client is exposed to reinvestment risk without being paid for it | Bill ladder → short-duration bonds → extend into the part of the curve that pays |
+| **Legacy low-coupon bonds at a loss** (bought when rates were low) | The loss is from **rates, not credit**. The bond will get back to par at maturity, but meanwhile it pays a tiny coupon | **Bond swap:** sell, realise the loss for tax, buy similar-quality current-coupon bonds. The client banks a tax asset and immediately earns more income |
+| **Long-duration bond, deep loss** | Same logic, but also ask whether the client wants that much rate sensitivity | Bond swap into shorter or laddered maturities |
+| **All government, no credit** | Safe, possibly under-earning | Add a step into high-quality corporates or securitised bonds if spreads compensate |
+| **Heavy credit, little government** | The portfolio's "ballast" is correlated with equities in a sell-off | Add government duration for genuine diversification |
+| **Bonds maturing into a known liability** | Well matched | Leave it. Don't trade a matched position for a view |
 
-It scores only `MiFID × mandate`. So it:
-- recommends **adding** to concentrated positions (Prahnav NVDA 22% → "Direct equity";
-  Aurora MU 25.8% → "Phoenix autocall"; Fable NVDA 24% → "Call spread");
-- recommends **overlays to non-holders** (Jacob → "Call overwrite" on NVDA he doesn't own).
+---
 
-**Fix:** feed `relevantHolding` into `bestImplFor`. At ≥ 15% concentration, restrict to
-protective/reducing expressions. Without a holding, exclude overlays (covered call, collar,
-protective put).
+## 11. The bond product menu
 
-### A.4 FX hedges are applied to books with no mismatch
+### 11.1 Cash and the front end
 
-`fx-usd-hedge` flags USD-base books and picks a **risk reversal** (a directional
-instrument) as their "hedge". **Fix:** for Preservation-bucket FX ideas, require
-`fxMismatchPct ≥ 40` and restrict to hedging instruments.
+#### Treasury bills / bill ladder
 
-### A.5 Ties resolve by list order
+- **What it is:** Very short government debt (weeks to a year), rolled or laddered.
+- **Consider it when:** parking cash safely; funding liabilities within a year; the curve is
+  inverted (short yields higher than long ones, so you're paid to stay short).
+- **Think twice when:** rate cuts are coming. Income drops as bills roll at lower yields.
 
-Many expressions score 100 for a mandate, so `structures` order silently decides. **Fix:**
-add the §4.3 vol/view inputs as a tie-breaker, or make the order an explicit, documented
-sweep responsibility (this rulebook currently does the latter).
+#### Short-duration bonds / funds
+
+- **What it is:** 1–3 year government or high-grade bonds.
+- **Consider it when:** reducing cash drag with minimal rate risk; locking yield a little
+  longer than bills.
+
+#### Floating-rate notes
+
+- **What it is:** Bonds whose coupon resets with short-term rates.
+- **Consider it when:** you expect rates to stay high or rise, and want income that moves with them.
+- **Think twice when:** cuts are coming. The income falls with rates.
+
+### 11.2 Core duration
+
+#### Government bonds (specific maturities)
+
+- **What it is:** Direct holdings of government debt at a chosen point on the curve.
+- **Consider it when:** the client needs **ballast**; you expect yields to fall; you want to lock a
+  yield for a known horizon.
+- **Choosing the maturity:** go where the curve **pays you** (the steepest part, for roll-down) and
+  where your view is (the belly if you expect cuts to pass through, the long end only if you
+  expect long yields to fall too). Avoid the long end if your view is that it keeps selling off.
+
+#### Bond ladder
+
+- **What it is:** Equal slices of bonds maturing each year (e.g. years 1–7).
+- **Consider it when:** income clients who want predictable cash flow; you have **no strong view** on
+  rates (the ladder averages across the curve); reinvesting after a bond swap.
+- **Why clients like it:** each year something matures, which gives liquidity and a chance to
+  reinvest at the then-current rate. Neither "rates up" nor "rates down" is a disaster.
+
+#### Bond funds / ETFs
+
+- **What it is:** A diversified pool of bonds.
+- **Consider it when:** smaller tickets; you want diversification across many issuers; daily liquidity.
+- **Think twice when:** the client needs a **guaranteed amount on a date**. Funds have no maturity,
+  so a fund can be down when the liability falls due. Match liabilities with individual bonds.
+
+#### Inflation-linked bonds
+
+- **What it is:** Government bonds whose principal adjusts with inflation.
+- **Consider it when:** you think inflation will exceed what's priced (the "breakeven"); the
+  client has real (inflation-linked) liabilities.
+
+### 11.3 Credit
+
+#### Investment-grade corporate bonds
+
+- **What it is:** Debt of highly rated companies, paying a spread over government bonds.
+- **Consider it when:** income clients who can step out of government bonds; spreads are **wide
+  enough** to compensate for the extra risk.
+- **Think twice when:** spreads are historically tight. You're taking equity-like risk in a bad
+  scenario for little extra yield.
+
+#### High-yield bonds
+
+- **What it is:** Debt of lower-rated companies, with higher yields and real default risk.
+- **Consider it when:** growth-tolerant income clients; spreads wide; the economic cycle supportive.
+- **Think twice when:** preservation clients; late-cycle; spreads tight. High yield behaves like
+  equity in a sell-off, so it's not ballast.
+
+#### Securitised bonds (mortgage- and asset-backed)
+
+- **What it is:** Bonds backed by pools of loans.
+- **Consider it when:** diversifying an income book beyond governments and corporates.
+- **Think twice when:** the client doesn't understand prepayment (mortgage bonds shorten when
+  rates fall, and lengthen when rates rise).
+
+#### Municipal bonds (US)
+
+- **What it is:** Tax-exempt state and local government debt.
+- **Consider it when:** high-tax-bracket US clients. Compare **after-tax** yields, not headline yields.
+
+#### Credit-linked note
+
+- **What it is:** A packaged note whose return depends on a named company **not defaulting**.
+- **Consider it when:** a specific credit view in note form, for clients who want an enhanced coupon
+  and understand they're taking that company's default risk plus the issuing bank's.
+
+### 11.4 Structured rate notes (views on the *shape* of rates)
+
+Reach for these when the view isn't "rates go up/down" but "rates **stay** in a range" or "the
+curve **stays** a certain shape." In each case the client is selling something the market
+overpays for.
+
+#### Range accrual note
+
+- **What it is:** Pays an enhanced coupon for each day a reference rate (e.g. the 10-year yield)
+  fixes **inside** a set band. On days outside the band, no coupon accrues. Capital is typically
+  returned at par.
+- **Payoff in plain words:** "Paid well above cash for rates staying boring."
+- **Consider it when:** the view is **range-bound rates**. For example, the short end is anchored by
+  a central bank on hold, and the long end is capped by buyers at a known level. Income clients who
+  want more than a plain bond pays.
+- **Think twice when:** a breakout is plausible (a fiscal shock, a policy surprise). The coupon can
+  go to zero while capital is locked up.
+- **Typical terms:** 6–18 months, band roughly spot ± 40–60bp.
+
+#### Callable bond / callable note
+
+- **What it is:** A bond the issuer can redeem early, usually after a non-call period. It pays a
+  higher coupon because the investor has **sold the issuer an option**.
+- **Consider it when:** you think rates **won't fall much**. If they don't, the bond isn't called and you keep
+  the higher coupon.
+- **Think twice when:** you expect significant rate cuts. The bond will be called just when you'd most
+  want to keep it, and you reinvest at lower yields.
+
+#### Fixed-coupon / step-up notes
+
+- **What it is:** Bank-issued notes with a set coupon schedule, often callable.
+- **Consider it when:** a simple, predictable income pick-up over government bonds, with issuer
+  credit accepted.
+
+#### Curve notes (steepener / CMS spread notes)
+
+- **What it is:** Coupons linked to the difference between long and short rates.
+- **Consider it when:** a strong curve-shape view (e.g. "the long end will stay well above the short end").
+  Specialist; mostly professional or sophisticated clients.
+
+### 11.5 Hybrids and professional tools
+
+#### Convertible bonds
+
+- **What it is:** A corporate bond convertible into the issuer's shares.
+- **Consider it when:** you want equity upside with a bond floor. It's a bridge between the equity
+  and bond worlds, and useful for cautious clients who like a company's stock.
+
+#### Rate futures, swaps, swaptions
+
+- **What it is:** Derivatives on interest rates.
+- **Consider it when:** professional clients hedging the duration of a large portfolio, or taking
+  a tactical rates view without buying bonds.
+- **Rule:** for most private clients, **cash bonds are the default**. Derivatives are for hedging or for
+  specialist tactical views.
+
+---
+
+## 12. The bond decision walk
+
+```
+START: A client need (income / ballast / cash / liability) OR a rates view.
+│
+├─ 1. NEED FIRST. Are there liabilities or known outflows?
+│     → Match them with bills / bonds maturing just before each date. Done for that slice.
+│
+├─ 2. ROLE. What is the bond sleeve for?
+│     Ballast       → high-quality government duration
+│     Income        → ladder / IG corporates / munis (tax) / securitised
+│     Cash replace  → bills / short duration / floaters
+│
+├─ 3. HOLDINGS. Fix what's broken before adding views:
+│     Idle cash → put to work · legacy low-coupon losers → bond swap ·
+│     credit-only book → add government ballast
+│
+├─ 4. VIEW. Now apply the market view to the choices above:
+│     Rates falling       → extend duration where the curve pays (often the belly)
+│     Rates rising/sticky → stay short, floaters, ladder
+│     Rates range-bound   → range accrual / callable for enhanced income
+│     No strong view      → ladder (spreads the bet across the curve)
+│     Spreads tight       → up in quality; spreads wide → add credit
+│     Inflation underpriced → inflation-linked bonds
+│
+├─ 5. WRAPPER.
+│     Needs a known amount on a known date → individual bonds (not funds)
+│     Small ticket / wants diversification → fund or ETF
+│     Specific rate-shape view, can lock up → structured rate note
+│     Professional hedging need → futures / swaps
+│
+└─ 6. TERMS. Maturity, credit quality, issuer diversification, after-tax yield,
+       and the "why not a plain government bond" sentence.
+```
+
+**The key test for any structured rate note:** compare it with the plain bond of the same
+maturity. What does the note pay extra, and what is the client giving up to get it (upside if
+rates fall, coupon on out-of-range days, liquidity, issuer credit)? If you can't answer both
+clearly, use the plain bond.
+
+---
+
+## 13. Worked bond examples
+
+### Example D: the cash-heavy income client
+
+**Client:** income objective, 12% in cash, no liabilities for five years, taxable.
+**Market:** the central bank is on hold but expected to cut within a year. The curve is
+flat at the front and steeper further out.
+
+**Thinking:** the cash earns well today but will earn less as soon as cuts start. The client is exposed to
+reinvestment risk and has no need for that much liquidity. The curve doesn't pay much to stay very short,
+and it pays more in the 3–7 year area.
+
+**Implementation:** keep ~2–3% as bills for flexibility. Put the rest in a **1–7 year ladder**,
+tilted toward the belly (3–5 years), in high-grade government and investment-grade corporate bonds
+(municipals if the client is in a high tax bracket and after-tax yields favour them).
+*Why not a bond fund:* the ladder gives certain cash flows and maturities. *Why not all 10-year:*
+it's more rate risk than an income client needs for a modest extra yield.
+
+### Example E: the legacy bond at a loss
+
+**Client:** holds a government bond with a 1.25% coupon maturing in five years, bought near par, now
+~15% below cost because yields have risen.
+
+**Thinking:** the loss comes from rates, not credit. It'll be back to par at maturity, but in the
+meantime the bond pays 1.25% when new bonds pay ~4%+. Holding it isn't "waiting to break even".
+It's accepting low income by choice. Selling realises a tax loss that can offset gains.
+
+**Implementation:** **bond swap.** Sell, harvest the loss, and buy a current-coupon government bond (or
+a ladder) of similar maturity and quality. Duration and credit risk barely change, income rises
+immediately, and the client books a tax asset. Check local wash-sale rules on "substantially
+identical" securities: a different maturity or issuer usually avoids the issue.
+
+### Example F: the range view
+
+**View:** short rates are anchored by a central bank on hold, and long yields keep bumping into a
+ceiling where buyers step in. The 10-year has traded 4.25–5.00% for months and sits at ~4.6%.
+
+**Thinking:** a plain 10-year bond pays you mainly if yields *fall*. The view is that they
+*stay put*, so the thing to monetise is low rate **volatility**.
+
+**Implementation:** for an income client comfortable with a packaged note, a **12-month range
+accrual on the 10-year yield, band 4.25–5.00%**. It pays an enhanced coupon for every day
+inside the band. *What's given up:* no coupon on days outside the band; capital locked for 12
+months; issuer credit risk. For a client who can't lock up capital, a plain intermediate
+bond or a ladder instead.
+
+### Example G: the liability
+
+**Client:** property purchase of $3m in 30 months; otherwise a growth portfolio.
+
+**Thinking:** this is a need, not a view. The money must be there on the date, whatever markets
+do. Fund risk (a bond fund could be down on the day) and equity risk are both unacceptable
+for this slice.
+
+**Implementation:** buy **individual government bonds or bills maturing just before the purchase date**
+for the full amount (plus a margin). Don't touch the rest of the growth portfolio. *Why not a
+structured note:* its payoff depends on market paths, and this money has none to spare.
+
+---
+
+## 14. Principles and common mistakes
+
+**Principles**
+
+1. **View and client are separate.** Get the view right in isolation, then fit it to the client.
+2. **Break the view into parts.** Direction, target, timing, path and conviction each map to a product feature.
+3. **Holdings before views.** Fix concentration, harvest losses and match liabilities before adding anything.
+4. **Know who is paying whom for optionality.** Buy it when it's cheap and you need it. Sell it when it's rich and the view allows.
+5. **Start simple.** Stock or a plain bond is the benchmark. Every added feature must earn its place.
+6. **Every structured note is also a credit exposure** to the issuing bank, and an illiquid one. Spread issuers, and match tenor to horizon.
+7. **State the fallback and the "why not."** Every recommendation shows what was rejected and why.
+
+**Common mistakes**
+
+| Mistake | Why it's wrong |
+|---|---|
+| Recommending more exposure to a stock the client is already concentrated in, because "we're bullish" | Concentration risk dominates any single view |
+| Suggesting a covered call or collar to someone who doesn't own the stock | Overlays only exist on holdings |
+| Selling options when volatility is cheap "for income" | You're being paid too little for the risk |
+| Buying calls into earnings when the options already price a huge move | You need the stock to beat an already-large expected move just to break even |
+| Putting a stock in a worst-of basket that the client wouldn't want to own | The worst performer is exactly what they'll end up holding |
+| Calling a buffered note "protected" | Below the barrier, the loss usually runs from par |
+| Using a bond fund to meet a dated liability | Funds have no maturity, so the value on the date is unknown |
+| Holding low-coupon bonds "until they get back to par" | That's choosing low income. Swapping usually leaves the risk unchanged and raises the income |
+| Treating high-yield bonds as portfolio ballast | They fall with equities in a crisis |
+| Putting money needed within 12 months into a 2-year note | Early exit is at the issuer's price, often well below par |
+
+---
+
+## 15. Glossary
+
+| Term | Meaning |
+|---|---|
+| **Autocall** | A structured note that redeems early if the underlying is at or above a set level on an observation date |
+| **Barrier** | A level (e.g. 70% of the start) that, if breached, changes the payoff, typically exposing capital to loss |
+| **Bear steepener** | Long-term yields rise faster than short-term yields |
+| **Breakeven (inflation)** | The inflation rate the market is pricing, from the gap between nominal and inflation-linked yields |
+| **Call / put** | The right to buy (call) or sell (put) at a set price by a set date |
+| **Carry** | The income a position earns just by being held |
+| **Collar** | Owning a stock plus a bought put and a sold call. Value is kept inside a band |
+| **Concentration** | Too much of a portfolio in one stock or sector |
+| **Coupon** | The periodic payment on a bond or note |
+| **Delta** | How much an option's value moves for a 1-unit move in the stock. Also used loosely for "direct exposure" |
+| **Duration** | A bond's sensitivity to interest-rate changes. Higher duration means more price change per rate move |
+| **Implied volatility** | The move the options market expects, i.e. the price of optionality |
+| **Issuer credit risk** | The risk that the bank issuing a note can't pay |
+| **Ladder** | Bonds with staggered maturities, e.g. one maturing each year |
+| **Loss harvest** | Selling at a loss to realise it for tax purposes |
+| **Memory coupon** | A feature that pays previously missed coupons if conditions are met later |
+| **OTC** | Over-the-counter: a bilateral contract with a bank rather than an exchange-traded product |
+| **Overlay** | A trade that reshapes an existing holding (covered call, collar, put) |
+| **Packaged product** | A security with an ISIN (e.g. a structured note) that bundles derivatives inside a note |
+| **Realised volatility** | How much the stock has actually been moving |
+| **Reverse convertible** | A note paying a high coupon that may repay in shares if the stock falls below a strike |
+| **Roll-down** | The price gain as a bond's remaining maturity shortens along an upward-sloping curve |
+| **Skew** | The difference in implied volatility between downside and upside options |
+| **Spread (credit)** | The extra yield a corporate bond pays over a government bond |
+| **Spread (options)** | Buying one option and selling another at a different strike to cheapen and cap the payoff |
+| **Tenor** | The length of time until a product matures or expires |
+| **Wash-sale rule** | A tax rule that disallows a loss if a substantially identical security is bought back within a set window (30 days in the US) |
+| **Worst-of** | A basket product whose payoff follows the worst-performing name |
